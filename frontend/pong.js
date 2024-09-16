@@ -12,6 +12,7 @@ canvas.height = 450;
 gameContainer.appendChild(canvas);
 const ctx = canvas.getContext('2d');
 ctx.fillStyle = '#d3d3d3';  // Set the fill color
+ctx.strokeStyle = '#d3d3d3';
 
 // Game variables
 const paddleWidth = 15;
@@ -26,8 +27,8 @@ let ballSpeedY = 4;  // 4
 const paddleSpeed = 7;
 let scorePlayer1 = 0;
 let scorePlayer2 = 0;
-let count = 0;             // frame count
-let lastContactCount = 0;  // last contact frame count
+let frameCount = 0;        // frame count
+let lastContactFrame = 0;  // last frame where ball made contact with paddle
 let gameStarted = false;
 let gameEnded = false;
 
@@ -59,21 +60,20 @@ function showWinner(winner) {
 
   // Display winner text
   ctx.fillStyle = '#d3d3d3';
-  ctx.font = '40px Arial';
+  ctx.font = '40px PixeloidSans';
   ctx.textAlign = 'center';
   ctx.fillText(`${winner} Wins!`, canvas.width / 2, canvas.height / 2 - 50);
 
   // Display "Play Again" button
-  ctx.font = '30px Arial';
+  ctx.font = '30px PixeloidSans';
   ctx.fillText('Play Again', canvas.width / 2, canvas.height / 2 + 50);
 
   // Draw rectangle around "Play Again" text
-  const buttonX = canvas.width / 2 - 85;   // Approximate X position
-  const buttonY = canvas.height / 2 + 50;  // Y position of text
-  const buttonWidth = 170;
+  const buttonX = canvas.width / 2 - 106;
+  const buttonY = canvas.height / 2 + 50;
+  const buttonWidth = 210;
   const buttonHeight = 70;
-  ctx.strokeStyle = '#d3d3d3';
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 4;
   ctx.strokeRect(
       buttonX, buttonY - buttonHeight / 2, buttonWidth, buttonHeight);
 
@@ -89,10 +89,10 @@ function playAgainClickHandler(event) {
   const mouseX = event.clientX - rect.left;
   const mouseY = event.clientY - rect.top;
 
-  const buttonX = canvas.width / 2 - 75;
-  const buttonY = canvas.height / 2 + 20;
-  const buttonWidth = 150;
-  const buttonHeight = 40;
+  const buttonX = canvas.width / 2 - 106;
+  const buttonY = canvas.height / 2 + 50;
+  const buttonWidth = 210;
+  const buttonHeight = 70;
 
   // Check if the click is inside the "Play Again" button
   if (mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
@@ -116,7 +116,17 @@ function playAgainClickHandler(event) {
 
 // Game loop
 function gameLoop() {
-  count++;
+  frameCount++;
+  // // show mouse cursor coordinates
+  // {
+  //   onmousemove = (event) => {
+  //     const rect = canvas.getBoundingClientRect();
+  //     const mouseX = event.clientX - rect.left;
+  //     const mouseY = event.clientY - rect.top;
+  //     console.log('mouseX, mouseY: ', mouseX, mouseY);
+  //   };
+  // }
+
   // Move paddles
   if (keys.w && leftPaddleY > paddleWidth) {
     leftPaddleY -= paddleSpeed;
@@ -143,21 +153,21 @@ function gameLoop() {
   // console.log(
   //     'ballX, ballY: ', ballX.toPrecision(4), ballY.toPrecision(4),
   //     'ballSpeedX, ballSpeedY: ', ballSpeedX.toPrecision(2),
-  //     ballSpeedY.toPrecision(2), 'lastContactCount: ', lastContactCount,
-  //     'count: ', count);
+  //     ballSpeedY.toPrecision(2), 'lastContactFrame: ', lastContactFrame,
+  //     'frameCount: ', frameCount);
   // Ball collision with left paddle
-  if (lastContactCount < count - 50           //
+  if (lastContactFrame < frameCount - 50      //
       && ballX <= 3 * paddleWidth             // ballX <= 60
       && ballX > 3 * paddleWidth - 7          // ballX > 53
       && ballY + ballSize >= leftPaddleY      // ballY + 15 >= leftPaddleY
       && ballY <= leftPaddleY + paddleHeight  // ballY <= leftPaddleY + 80
       && ballSpeedX < 0) {
-    lastContactCount = count;
+    lastContactFrame = frameCount;
     ballSpeedX = -ballSpeedX;
   }
   // Ball collision with sides of left paddle
   else if (
-      lastContactCount < count - 50           //
+      lastContactFrame < frameCount - 50      //
       && ballX <= 3 * paddleWidth             // ballX <= 60
       && ballX > 2 * paddleWidth              // ballX > 45
       && ballY + ballSize >= leftPaddleY      // ballY + 15 >= leftPaddleY
@@ -166,24 +176,24 @@ function gameLoop() {
     // check correct ball direction
     if ((ballSpeedY > 0 && ballY < leftPaddleY + paddleHeight / 2) ||
         (ballSpeedY < 0 && ballY > leftPaddleY + paddleHeight / 2)) {
-      lastContactCount = count;
+      lastContactFrame = frameCount;
       ballSpeedY = -ballSpeedY;
     }
   }
 
   // Ball collision with right paddle
-  if (lastContactCount < count - 50                             //
+  if (lastContactFrame < frameCount - 50                        //
       && ballX >= canvas.width - 3 * paddleWidth - ballSize     // ballX >= 610
       && ballX < canvas.width - 3 * paddleWidth - ballSize + 7  // ballX < 617
       && ballY + ballSize >= rightPaddleY                       //
       && ballY <= rightPaddleY + paddleHeight                   //
       && ballSpeedX > 0) {
-    lastContactCount = count;
+    lastContactFrame = frameCount;
     ballSpeedX = -ballSpeedX;
   }
   // Ball collision with sides of right paddle
   else if (
-      lastContactCount < count - 50                          //
+      lastContactFrame < frameCount - 50                     //
       && ballX >= canvas.width - 3 * paddleWidth - ballSize  // ballX >= 610
       && ballX < canvas.width - 2 * paddleWidth - ballSize   // ballX < 625
       && ballY + ballSize >= rightPaddleY                    //
@@ -192,7 +202,7 @@ function gameLoop() {
     // check correct ball direction
     if ((ballSpeedY > 0 && ballY < rightPaddleY + paddleHeight / 2) ||
         (ballSpeedY < 0 && ballY > rightPaddleY + paddleHeight / 2)) {
-      lastContactCount = count;
+      lastContactFrame = frameCount;
       ballSpeedY = -ballSpeedY;
     }
   }
@@ -259,43 +269,35 @@ function gameLoop() {
 
 // Draw the "Start" text on the canvas
 function drawStartScreen() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
-  ctx.fillStyle = '#d3d3d3';    // Set the fill color for the text
-  ctx.font = '40px Arial';      // Set the font for the text
-  ctx.textAlign = 'center';     // Center the text horizontally
-  ctx.textBaseline = 'middle';  // Center the text vertically
-  ctx.fillText('Start', canvas.width / 2, canvas.height / 2);  // Draw "Start"
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = '40px PixeloidSans';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Start', canvas.width / 2, canvas.height / 2);
 
   // Draw rectangle around "Start" text
-  const buttonX = canvas.width / 2 - 70;  // Approximate X position
-  const buttonY = canvas.height / 2;      // Y position of text
-  const buttonWidth = 145;
+  const buttonX = canvas.width / 2 - 76;
+  const buttonY = canvas.height / 2;
+  const buttonWidth = 150;
   const buttonHeight = 70;
-  ctx.strokeStyle = '#d3d3d3';
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 4;
   ctx.strokeRect(
       buttonX, buttonY - buttonHeight / 2, buttonWidth, buttonHeight);
-}
 
-// Event listener for user click on the canvas
-canvas.addEventListener('click', function(event) {
-  if (!gameStarted) {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
+  // Listen for click to start game
+  canvas.addEventListener('click', (event) => {
+    if (!gameStarted) {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
 
-    // Check if click is within the "Start" text bounds (simple box around text)
-    const startX = canvas.width / 2 - 50;
-    const startY = canvas.height / 2 - 30;
-    const textWidth = 100;
-    const textHeight = 60;
-
-    if (mouseX >= startX && mouseX <= startX + textWidth && mouseY >= startY &&
-        mouseY <= startY + textHeight) {
-      gameStarted = true;
-      gameLoop();
+      if (mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
+          mouseY >= buttonY && mouseY <= buttonY + buttonHeight) {
+        gameStarted = true;
+        gameLoop();
+      }
     }
-  }
-});
+  });
+}
 
 drawStartScreen();
