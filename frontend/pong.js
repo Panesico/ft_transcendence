@@ -15,6 +15,7 @@ ctx.fillStyle = '#d3d3d3';  // Set the fill color
 ctx.strokeStyle = '#d3d3d3';
 
 // Game variables
+const maxScore = 10;
 const ballSize = 15;
 const paddleWidth = 15;
 const paddleHeight = 80;
@@ -25,7 +26,7 @@ let ballX = canvas.width / 2;
 let ballY = canvas.height / 2;
 let ballSpeedX = 6;  // 6
 let ballSpeedY = 4;  // 4
-const paddleSpeed = 7;
+const paddleSpeed = 10;
 let scorePlayer1 = 0;
 let scorePlayer2 = 0;
 let frameCount = 0;        // frame count
@@ -41,15 +42,17 @@ const keys = {
   s: false,
   ArrowUp: false,
   ArrowDown: false,
+  8: false,
+  5: false,
   ' ': false,
   Escape: false
 };
 
 // Event listeners for controls
 window.addEventListener('keydown', (e) => {
-  console.log(`e.key: "${e.key}"`);
+  console.log('e.key: ', e.key);
   if (e.key in keys) {
-    console.log(`e.key in keys: "${e.key}"`);
+    console.log('e.key in keys: ', e.key);
     keys[e.key] = true;
   }
 });
@@ -59,8 +62,23 @@ window.addEventListener('keyup', (e) => {
   }
 });
 
+async function resetAndStartGame() {
+  scorePlayer1 = 0;
+  scorePlayer2 = 0;
+  scorePlayer1Element.textContent = scorePlayer1;
+  scorePlayer2Element.textContent = scorePlayer2;
+  gameStarted = true;
+  gameEnded = false;
+
+  ballSpeedX = (ballSpeedX > 0) ? -getRandomInt(4, 6) : getRandomInt(4, 6);
+  ballSpeedY = (ballSpeedY > 0) ? -getRandomInt(1, 3) : getRandomInt(1, 3);
+
+  await showCountdown();
+  gameLoop();
+}
+
+// Display name of winner
 function showWinner(winner) {
-  // Display winner text
   ctx.font = '40px PixeloidSans';
   ctx.textAlign = 'center';
   ctx.fillText(`${winner} Wins!`, canvas.width / 2, canvas.height / 2 - 50);
@@ -90,12 +108,12 @@ function playAgain(winner, displayWinner) {
   ctx.strokeRect(
       buttonX, buttonY - buttonHeight / 2, buttonWidth, buttonHeight);
 
-  // Listen for click to play again
+  // Event listener to play again
   canvas.addEventListener('click', playAgainClickHandler);
 }
 
 // Click handler for "Play Again"
-async function playAgainClickHandler(event) {
+function playAgainClickHandler(event) {
   if (!gameEnded) return;
 
   const rect = canvas.getBoundingClientRect();
@@ -110,21 +128,10 @@ async function playAgainClickHandler(event) {
   // Check if the click is inside the "Play Again" button
   if (mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
       mouseY >= buttonY && mouseY <= buttonY + buttonHeight) {
-    // Reset game state
-    scorePlayer1 = 0;
-    scorePlayer2 = 0;
-    scorePlayer1Element.textContent = scorePlayer1;
-    scorePlayer2Element.textContent = scorePlayer2;
-    gameStarted = false;
-    gameEnded = false;
-
     // Remove the event listener
     canvas.removeEventListener('click', playAgainClickHandler);
 
-    // Start the game again
-    gameStarted = true;
-    await showCountdown();
-    gameLoop();
+    resetAndStartGame();
   }
 }
 
@@ -144,10 +151,23 @@ function calculatePaddleAndBallCoordinates() {
       rightPaddleY < canvas.height - paddleHeight - borderWidth) {
     rightPaddleY += paddleSpeed;
   }
+  if (keys[8] && rightPaddleY > borderWidth) {
+    rightPaddleY -= paddleSpeed;
+  }
+  if (keys[5] && rightPaddleY < canvas.height - paddleHeight - borderWidth) {
+    rightPaddleY += paddleSpeed;
+  }
 
   // Move ball
   ballX += ballSpeedX;
   ballY += ballSpeedY;
+
+  console.log('ballX: ', ballX, 'ballY: ', ballY);
+}
+
+function getRandomInt(min, max) {
+  let int = Math.floor(Math.random() * (max - min + 1)) + min;
+  return int;
 }
 
 // Check ball collision with paddles
@@ -163,15 +183,24 @@ function checkBallCollision() {
     ballSpeedY = -ballSpeedY;
   }
 
-  // Ball collision with left paddle
-  if (lastContactFrame < frameCount - 50      //
-      && ballX <= 3 * paddleWidth             // ballX <= 60
-      && ballX > 3 * paddleWidth - 7          // ballX > 53
-      && ballY + ballSize >= leftPaddleY      // ballY + 15 >= leftPaddleY
-      && ballY <= leftPaddleY + paddleHeight  // ballY <= leftPaddleY + 80
-      && ballSpeedX < 0) {
+
+  if (                                     // Ball collision with left paddle
+      (lastContactFrame < frameCount - 30  //
+       && ballX <= 3 * paddleWidth         // ballX <= 60
+       && ballX > 2 * paddleWidth          // ballX > 53
+       && ballY + ballSize >= leftPaddleY  // ballY + 15 >= leftPaddleY
+       && ballY <= leftPaddleY + paddleHeight  // ballY <= leftPaddleY + 80
+       && ballSpeedX < 0)                      //
+      ||                                   // Ball collision with right paddle
+      (lastContactFrame < frameCount - 30  //
+       && ballX >= canvas.width - 3 * paddleWidth - ballSize  // ballX >= 610
+       && ballX < canvas.width - 2 * paddleWidth - ballSize   // ballX < 625
+       && ballY + ballSize >= rightPaddleY                    //
+       && ballY <= rightPaddleY + paddleHeight                //
+       && ballSpeedX > 0)) {
     lastContactFrame = frameCount;
-    ballSpeedX = -ballSpeedX;
+    ballSpeedX = (ballSpeedX > 0) ? -getRandomInt(2, 14) : getRandomInt(2, 14);
+    ballSpeedY = (ballSpeedY > 0) ? getRandomInt(4, 8) : -getRandomInt(4, 8);
   }
   // Ball collision with sides of left paddle
   else if (
@@ -185,19 +214,8 @@ function checkBallCollision() {
     if ((ballSpeedY > 0 && ballY < leftPaddleY + paddleHeight / 2) ||
         (ballSpeedY < 0 && ballY > leftPaddleY + paddleHeight / 2)) {
       lastContactFrame = frameCount;
-      ballSpeedY = -ballSpeedY;
+      ballSpeedY = (ballSpeedY > 0) ? -getRandomInt(4, 8) : getRandomInt(4, 8);
     }
-  }
-
-  // Ball collision with right paddle
-  if (lastContactFrame < frameCount - 50                        //
-      && ballX >= canvas.width - 3 * paddleWidth - ballSize     // ballX >= 610
-      && ballX < canvas.width - 3 * paddleWidth - ballSize + 7  // ballX < 617
-      && ballY + ballSize >= rightPaddleY                       //
-      && ballY <= rightPaddleY + paddleHeight                   //
-      && ballSpeedX > 0) {
-    lastContactFrame = frameCount;
-    ballSpeedX = -ballSpeedX;
   }
   // Ball collision with sides of right paddle
   else if (
@@ -211,9 +229,12 @@ function checkBallCollision() {
     if ((ballSpeedY > 0 && ballY < rightPaddleY + paddleHeight / 2) ||
         (ballSpeedY < 0 && ballY > rightPaddleY + paddleHeight / 2)) {
       lastContactFrame = frameCount;
-      ballSpeedY = -ballSpeedY;
+      ballSpeedY = (ballSpeedY > 0) ? -getRandomInt(4, 8) : getRandomInt(4, 8);
     }
   }
+  console.log(
+      'ballSpeedX: ', ballSpeedX, 'ballSpeedY: ', ballSpeedY,
+      'frameCount: ', frameCount);
 }
 
 // Check if ball out of bounds
@@ -231,22 +252,24 @@ function checkBallOutOfBounds() {
   if (ballX < 0 || ballX > canvas.width) {
     ballX = canvas.width / 2;
     ballY = canvas.height / 2;
-    ballSpeedX = -ballSpeedX;
+    ballSpeedX = (ballSpeedX > 0) ? -getRandomInt(4, 6) : getRandomInt(4, 6);
+    ballSpeedY = (ballSpeedY > 0) ? -getRandomInt(1, 3) : getRandomInt(1, 3);
   }
 }
 
+// Check for winner
 function checkWinner() {
-  // Check for winner
-  if (scorePlayer1 == 3) {
+  if (scorePlayer1 === maxScore) {
     playAgain('Player 1', true);
     return true;
-  } else if (scorePlayer2 == 3) {
+  } else if (scorePlayer2 === maxScore) {
     playAgain('Player 2', true);
     return true;
   }
   return false;
 }
 
+// Draw canvas with playing field
 function drawPlayCanvas() {
   // Clear canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -273,8 +296,8 @@ function drawPlayCanvas() {
   ctx.fillRect(ballX, ballY, ballSize, ballSize);
 }
 
+// Draw canvas with "Paused" text
 function drawPauseCanvas() {
-  // Draw "Paused" text
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = '20px PixeloidSans';
   ctx.textAlign = 'center';
@@ -301,16 +324,6 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
     return;
   }
-
-  // // show mouse cursor coordinates
-  // {
-  //   onmousemove = (event) => {
-  //     const rect = canvas.getBoundingClientRect();
-  //     const mouseX = event.clientX - rect.left;
-  //     const mouseY = event.clientY - rect.top;
-  //     console.log('mouseX, mouseY: ', mouseX, mouseY);
-  //   };
-  // }
 
   calculatePaddleAndBallCoordinates();
 
@@ -364,12 +377,6 @@ function drawStartScreen() {
   ctx.strokeRect(
       buttonX, buttonY - buttonHeight / 2 - 2, buttonWidth, buttonHeight);
 
-
-  // ctx.fillRect(0, buttonY + buttonHeight / 2, canvas.width, 1);
-  // ctx.fillRect(0, buttonY, canvas.width, 1);
-  // ctx.fillStyle = 'red';
-  // ctx.fillRect(buttonX, buttonY + buttonHeight / 2, 1, 1);
-
   // Listen for click to start game
   canvas.addEventListener('click', async (event) => {
     if (!gameStarted) {
@@ -380,15 +387,13 @@ function drawStartScreen() {
 
       if (mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
           mouseY >= buttonY && mouseY <= buttonY + buttonHeight) {
-        gameStarted = true;
-        await showCountdown();
-        gameLoop();
+        resetAndStartGame();
       }
     }
   });
 }
 
-// Wait for fonts to load before executing the rest of pong.js
+// Wait for fonts to load
 document.fonts.ready.then(() => {
   drawStartScreen();
 });
