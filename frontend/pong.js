@@ -114,19 +114,8 @@ function playAgainClickHandler(event) {
   }
 }
 
-// Game loop
-function gameLoop() {
-  frameCount++;
-  // // show mouse cursor coordinates
-  // {
-  //   onmousemove = (event) => {
-  //     const rect = canvas.getBoundingClientRect();
-  //     const mouseX = event.clientX - rect.left;
-  //     const mouseY = event.clientY - rect.top;
-  //     console.log('mouseX, mouseY: ', mouseX, mouseY);
-  //   };
-  // }
-
+// Calculate coordinates for the paddles and ball
+function calculatePaddleAndBallCoordinates() {
   // Move paddles
   if (keys.w && leftPaddleY > paddleWidth) {
     leftPaddleY -= paddleSpeed;
@@ -145,16 +134,21 @@ function gameLoop() {
   // Move ball
   ballX += ballSpeedX;
   ballY += ballSpeedY;
-  // Ball collision with top and bottom
-  if (ballY <= paddleWidth || ballY >= canvas.height - ballSize - paddleWidth) {
-    ballSpeedY = -ballSpeedY;
-  }
+}
 
+// Check ball collision with paddles
+function checkBallCollision() {
   // console.log(
   //     'ballX, ballY: ', ballX.toPrecision(4), ballY.toPrecision(4),
   //     'ballSpeedX, ballSpeedY: ', ballSpeedX.toPrecision(2),
   //     ballSpeedY.toPrecision(2), 'lastContactFrame: ', lastContactFrame,
   //     'frameCount: ', frameCount);
+
+  // Ball collision with top and bottom canvas borders
+  if (ballY <= paddleWidth || ballY >= canvas.height - ballSize - paddleWidth) {
+    ballSpeedY = -ballSpeedY;
+  }
+
   // Ball collision with left paddle
   if (lastContactFrame < frameCount - 50      //
       && ballX <= 3 * paddleWidth             // ballX <= 60
@@ -206,8 +200,10 @@ function gameLoop() {
       ballSpeedY = -ballSpeedY;
     }
   }
+}
 
-  // Ball out of bounds
+// Check if ball out of bounds
+function checkBallOutOfBounds() {
   // Update score
   if (ballX < 0) {
     scorePlayer2++;
@@ -223,16 +219,31 @@ function gameLoop() {
     ballY = canvas.height / 2;
     ballSpeedX = -ballSpeedX;
   }
+}
 
+function checkWinner() {
+  // Check for winner
   if (scorePlayer1 == 3) {
     showWinner('Player 1');
-    return;
+    return true;
   } else if (scorePlayer2 == 3) {
     showWinner('Player 2');
-    return;
+    return true;
   }
+  return false;
+}
+
+function drawCanvas() {
   // Clear canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // // debug draw goal lines
+  // ctx.fillRect(canvas.width - 3 * paddleWidth, 0, 1, canvas.height);
+  // ctx.fillRect(2 * paddleWidth, 0, 1, canvas.height);
+  // ctx.fillRect(3 * paddleWidth, 0, 1, canvas.height);
+  // // debug ball position
+  // ctx.fillRect(ballX, 0, 1, canvas.height);
+  // ctx.fillRect(0, ballY, canvas.width, 1);
 
   // Draw center line
   let centerLineY = 0;
@@ -241,14 +252,6 @@ function gameLoop() {
         canvas.width / 2, centerLineY + 0.5 * paddleWidth, 1, paddleWidth);
     centerLineY += 2 * paddleWidth;
   }
-
-  // // debug goal line
-  // ctx.fillRect(canvas.width - 3 * paddleWidth, 0, 1, canvas.height);
-  // ctx.fillRect(2 * paddleWidth, 0, 1, canvas.height);
-  // ctx.fillRect(3 * paddleWidth, 0, 1, canvas.height);
-  // // debug ball position
-  // ctx.fillRect(ballX, 0, 1, canvas.height);
-  // ctx.fillRect(0, ballY, canvas.width, 1);
 
   // Draw top and bottom borders
   ctx.fillRect(0, 0, canvas.width, paddleWidth);
@@ -262,6 +265,31 @@ function gameLoop() {
 
   // Draw ball
   ctx.fillRect(ballX, ballY, ballSize, ballSize);
+}
+
+// Game loop
+function gameLoop() {
+  frameCount++;
+  // // show mouse cursor coordinates
+  // {
+  //   onmousemove = (event) => {
+  //     const rect = canvas.getBoundingClientRect();
+  //     const mouseX = event.clientX - rect.left;
+  //     const mouseY = event.clientY - rect.top;
+  //     console.log('mouseX, mouseY: ', mouseX, mouseY);
+  //   };
+  // }
+
+  calculatePaddleAndBallCoordinates();
+
+  checkBallCollision();
+
+  checkBallOutOfBounds();
+
+  // Check for winner and exit game loop if true
+  if (checkWinner()) return;
+
+  drawCanvas();
 
   // Continue next frame
   requestAnimationFrame(gameLoop);
@@ -269,6 +297,7 @@ function gameLoop() {
 
 // Draw the "Start" text on the canvas
 function drawStartScreen() {
+  // Draw "Start" text
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = '40px PixeloidSans';
   ctx.textAlign = 'center';
@@ -287,6 +316,7 @@ function drawStartScreen() {
   // Listen for click to start game
   canvas.addEventListener('click', (event) => {
     if (!gameStarted) {
+      // Get mouse coordinates with canvas offset
       const rect = canvas.getBoundingClientRect();
       const mouseX = event.clientX - rect.left;
       const mouseY = event.clientY - rect.top;
