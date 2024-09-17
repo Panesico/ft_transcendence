@@ -1,15 +1,15 @@
 /* styles.css */
 @font-face {
   font-family: "VT323";
-  src: url(fonts/VT323-Regular.ttf);
+  src: url(../fonts/VT323-Regular.ttf);
 }
 @font-face {
   font-family: "PixeloidMono";
-  src: url(fonts/PixeloidMono-d94EV.ttf);
+  src: url(../fonts/PixeloidMono-d94EV.ttf);
 }
 @font-face {
   font-family: "PixeloidSans";
-  src: url(fonts/PixeloidSans-mLxMm.ttf);
+  src: url(../fonts/PixeloidSans-mLxMm.ttf);
 }
 
 html, body {

@@ -1,0 +1,59 @@
+name: transcendence
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: nginx
+    container_name: nginx
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - static:/var/www/html
+    networks:
+      - transcendence
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: frontend
+    container_name: frontend
+    volumes:
+      - static:/data
+    networks:
+      - transcendence
+  # django:
+  #   build:
+  #     context: ./django
+  #     dockerfile: Dockerfile
+  #   image: django
+  #   container_name: django
+  #   env_file:
+  #     - .env
+  #   expose:
+  #     - 9000
+  #   networks:
+  #     - transcendence
+  #   volumes:
+  #     - static:/var/www/html
+  #   restart: always
+
+
+volumes:
+  static:
+    name: static
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/$USER/data_transcendence/static
+
+networks:
+  transcendence:
+    name: transcendence
+    driver: bridge
