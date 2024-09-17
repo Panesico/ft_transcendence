@@ -27,6 +27,12 @@ function loadContent(path) {
     case '/game':
       document.getElementById('game').style.display = 'block';
       break;
+    case '/signup':
+      document.getElementById('signup').style.display = 'block';
+      break;
+    case '/login':
+      document.getElementById('login').style.display = 'block';
+      break;
     default:
       document.getElementById('home').style.display = 'block';
   }
