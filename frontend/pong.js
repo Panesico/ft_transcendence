@@ -70,6 +70,8 @@ async function resetAndStartGame() {
   gameStarted = true;
   gameEnded = false;
 
+  leftPaddleY = (canvas.height - paddleHeight) / 2;
+  rightPaddleY = (canvas.height - paddleHeight) / 2;
   ballSpeedX = (ballSpeedX > 0) ? -getRandomInt(4, 6) : getRandomInt(4, 6);
   ballSpeedY = (ballSpeedY > 0) ? -getRandomInt(1, 3) : getRandomInt(1, 3);
 
@@ -162,7 +164,7 @@ function calculatePaddleAndBallCoordinates() {
   ballX += ballSpeedX;
   ballY += ballSpeedY;
 
-  console.log('ballX: ', ballX, 'ballY: ', ballY);
+  // console.log('ballX: ', ballX, 'ballY: ', ballY);
 }
 
 function getRandomInt(min, max) {
@@ -183,12 +185,12 @@ function checkBallCollision() {
     ballSpeedY = -ballSpeedY;
   }
 
-
-  if (                                     // Ball collision with left paddle
-      (lastContactFrame < frameCount - 30  //
-       && ballX <= 3 * paddleWidth         // ballX <= 60
-       && ballX > 2 * paddleWidth          // ballX > 53
-       && ballY + ballSize >= leftPaddleY  // ballY + 15 >= leftPaddleY
+  if (
+      // Ball collision with left paddle
+      (lastContactFrame < frameCount - 30      //
+       && ballX <= 3 * paddleWidth             // ballX <= 60
+       && ballX > 2 * paddleWidth              // ballX > 53
+       && ballY + ballSize >= leftPaddleY      // ballY + 15 >= leftPaddleY
        && ballY <= leftPaddleY + paddleHeight  // ballY <= leftPaddleY + 80
        && ballSpeedX < 0)                      //
       ||                                   // Ball collision with right paddle
@@ -197,19 +199,27 @@ function checkBallCollision() {
        && ballX < canvas.width - 2 * paddleWidth - ballSize   // ballX < 625
        && ballY + ballSize >= rightPaddleY                    //
        && ballY <= rightPaddleY + paddleHeight                //
-       && ballSpeedX > 0)) {
+       && ballSpeedX > 0)                                     //
+  ) {
     lastContactFrame = frameCount;
     ballSpeedX = (ballSpeedX > 0) ? -getRandomInt(2, 14) : getRandomInt(2, 14);
     ballSpeedY = (ballSpeedY > 0) ? getRandomInt(4, 8) : -getRandomInt(4, 8);
-  }
-  // Ball collision with sides of left paddle
-  else if (
-      lastContactFrame < frameCount - 50      //
-      && ballX <= 3 * paddleWidth             // ballX <= 60
-      && ballX > 2 * paddleWidth              // ballX > 45
-      && ballY + ballSize >= leftPaddleY      // ballY + 15 >= leftPaddleY
-      && ballY <= leftPaddleY + paddleHeight  // ballY <= leftPaddleY + 80
-      && ballSpeedX < 0) {
+  } else if (
+      // Ball collision with sides of left paddle
+      (lastContactFrame < frameCount - 50      //
+       && ballX <= 3 * paddleWidth             // ballX <= 60
+       && ballX > 2 * paddleWidth              // ballX > 45
+       && ballY + ballSize >= leftPaddleY      // ballY + 15 >= leftPaddleY
+       && ballY <= leftPaddleY + paddleHeight  // ballY <= leftPaddleY + 80
+       && ballSpeedX < 0)                      //
+      ||  // Ball collision with sides of right paddle
+      (lastContactFrame < frameCount - 50                     //
+       && ballX >= canvas.width - 3 * paddleWidth - ballSize  // ballX >= 610
+       && ballX < canvas.width - 2 * paddleWidth - ballSize   // ballX < 625
+       && ballY + ballSize >= rightPaddleY                    //
+       && ballY <= rightPaddleY + paddleHeight                //
+       && ballSpeedX > 0)                                     //
+  ) {
     // check correct ball direction
     if ((ballSpeedY > 0 && ballY < leftPaddleY + paddleHeight / 2) ||
         (ballSpeedY < 0 && ballY > leftPaddleY + paddleHeight / 2)) {
@@ -217,24 +227,10 @@ function checkBallCollision() {
       ballSpeedY = (ballSpeedY > 0) ? -getRandomInt(4, 8) : getRandomInt(4, 8);
     }
   }
-  // Ball collision with sides of right paddle
-  else if (
-      lastContactFrame < frameCount - 50                     //
-      && ballX >= canvas.width - 3 * paddleWidth - ballSize  // ballX >= 610
-      && ballX < canvas.width - 2 * paddleWidth - ballSize   // ballX < 625
-      && ballY + ballSize >= rightPaddleY                    //
-      && ballY <= rightPaddleY + paddleHeight                //
-      && ballSpeedX > 0) {
-    // check correct ball direction
-    if ((ballSpeedY > 0 && ballY < rightPaddleY + paddleHeight / 2) ||
-        (ballSpeedY < 0 && ballY > rightPaddleY + paddleHeight / 2)) {
-      lastContactFrame = frameCount;
-      ballSpeedY = (ballSpeedY > 0) ? -getRandomInt(4, 8) : getRandomInt(4, 8);
-    }
-  }
-  console.log(
-      'ballSpeedX: ', ballSpeedX, 'ballSpeedY: ', ballSpeedY,
-      'frameCount: ', frameCount);
+
+  // console.log(
+  //     'ballSpeedX: ', ballSpeedX, 'ballSpeedY: ', ballSpeedY,
+  //     'frameCount: ', frameCount);
 }
 
 // Check if ball out of bounds
@@ -251,7 +247,7 @@ function checkBallOutOfBounds() {
   // Reset ball position
   if (ballX < 0 || ballX > canvas.width) {
     ballX = canvas.width / 2;
-    ballY = canvas.height / 2;
+    ballY = getRandomInt(-125, 125) + canvas.height / 2;
     ballSpeedX = (ballSpeedX > 0) ? -getRandomInt(4, 6) : getRandomInt(4, 6);
     ballSpeedY = (ballSpeedY > 0) ? -getRandomInt(1, 3) : getRandomInt(1, 3);
   }
@@ -355,7 +351,7 @@ async function showCountdown() {
     ctx.fillText(count, canvas.width / 2, canvas.height / 2);
 
     count--;
-    await delay(1000);
+    await delay(800);
   }
 }
 
