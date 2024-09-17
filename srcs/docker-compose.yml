@@ -27,22 +27,24 @@ services:
       - static:/data
     networks:
       - transcendence
-  # django:
-  #   build:
-  #     context: ./django
-  #     dockerfile: Dockerfile
-  #   image: django
-  #   container_name: django
-  #   env_file:
-  #     - .env
-  #   expose:
-  #     - 9000
-  #   networks:
-  #     - transcendence
-  #   volumes:
-  #     - static:/var/www/html
-  #   restart: always
 
+  django:
+    build:
+      context: ./django
+      dockerfile: Dockerfile
+    image: django
+    container_name: django
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    networks:
+      - transcendence
+    volumes:
+      - django_app:/usr/src/app
+      # - ./django:/usr/src/app
+      - static:/app/static/
+    restart: unless-stopped
 
 volumes:
   static:
@@ -51,7 +53,14 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/$USER/data_transcendence/static
+      device: ../volumes/static
+  django_app:
+    name: django_app
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../volumes/django_app/
 
 networks:
   transcendence:
