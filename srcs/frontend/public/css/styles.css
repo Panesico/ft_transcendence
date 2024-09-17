@@ -16,6 +16,8 @@ html, body {
   /* font-family: "VT323", monospace; */
   /* font-family: "PixeloidMono", monospace; */
   font-family: "PixeloidSans", "PixeloidSansBold", sans-serif;
+  height: 100%;
+  margin: 0;
 }
 
 body {
