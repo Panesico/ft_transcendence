@@ -125,8 +125,13 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
+            'level': 'INFO',  # Set to INFO to reduce verbosity
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'WARNING',  # Set to WARNING to suppress SQL query logs
+            'propagate': False,
         },
     },
 }

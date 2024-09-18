@@ -11,9 +11,9 @@ COPY  ./tools/requirements.txt .
 
 RUN chmod +x init_django.sh
 
-# Install Python dependencies - Django version specified in requirements.txt
-# RUN   pip install -r requirements.txt
-RUN   pip install Django==4.2.16
+# Install Python dependencies specified in requirements.txt
+RUN   pip install --upgrade pip
+RUN   pip install -r requirements.txt
 
 EXPOSE 9000
 
