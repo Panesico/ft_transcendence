@@ -1,1 +1,25 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Django
+*.sqlite3
+*.log
 .env
+
+# Docker
+*.pid
+*.seed
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
