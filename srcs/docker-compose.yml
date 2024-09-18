@@ -1,26 +1,27 @@
 name: transcendence
 
 services:
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    image: nginx
-    container_name: nginx
-    env_file:
-      - .env
-    ports:
-      - "8000:8000"
-    volumes:
-      - static:/var/www/html
-    networks:
-      - transcendence
-    restart: unless-stopped
+  # nginx:
+  #   build:
+  #     context: ./nginx
+  #     dockerfile: Dockerfile
+  #   image: nginx
+  #   container_name: nginx
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - static:/var/www/html
+  #   networks:
+  #     - transcendence
+  #   restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      no_cache: true
     image: frontend
     container_name: frontend
     volumes:
@@ -42,8 +43,9 @@ services:
       - transcendence
     volumes:
       - django_app:/usr/src/app
-      # - ./django:/usr/src/app
-      - static:/app/static/
+      - static:/usr/src/static/
+    depends_on:
+      - frontend
     restart: unless-stopped
 
 volumes:

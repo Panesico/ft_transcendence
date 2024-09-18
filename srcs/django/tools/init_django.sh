@@ -1,6 +1,5 @@
 #!/bin/sh
 
-echo "inside init_django.sh"
 sleep 3
 
 # Define paths
@@ -18,10 +17,10 @@ else
 fi
 
 echo "Checking for STATIC_ROOT in $SETTINGS_FILE..."
-if ! grep -q "STATIC_ROOT = '/app/static/'" "$SETTINGS_FILE"; then
+if ! grep -q "STATIC_ROOT = '/usr/src/static/'" "$SETTINGS_FILE"; then
     # Append STATIC_ROOT after STATIC_URL
     echo "Adding STATIC_ROOT to settings.py..."
-    sed -i "/STATIC_URL = 'static\/'/a STATIC_ROOT = '\/app\/static\/'" "$SETTINGS_FILE"
+    sed -i "/STATIC_URL = 'static\/'/a STATIC_ROOT = '\/usr\/src\/static\/'" "$SETTINGS_FILE"
 else
     echo "STATIC_ROOT is already present in $SETTINGS_FILE."
 fi
@@ -29,11 +28,11 @@ fi
 # Collect static files and apply migrations
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
-sleep 1
+# sleep 1
 echo "Applying migrations..."
 python manage.py migrate
 
-sleep 1
+# sleep 1
 
 echo "Django initialised successfully. Executing "$@""
-exec "$@"
+exec "$@" 

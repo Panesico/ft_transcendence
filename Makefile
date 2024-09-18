@@ -24,4 +24,8 @@ reset:
 	docker volume rm $$(docker volume ls -q); \
 	docker network rm $$(docker network ls -q) 2>/dev/null
 
+delete_volumes:
+	rm -rf volumes/static/*
+	rm -rf volumes/django_app/*
+
 .phony: all down stop logs prune routine reset
