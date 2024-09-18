@@ -48,6 +48,23 @@ services:
       - frontend
     restart: unless-stopped
 
+  postgres:
+    image: postgres:16.4-alpine3.20
+    container_name: postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: hello # ${POSTGRES_USER}
+      POSTGRES_PASSWORD: hellopwd # ${POSTGRES_PASSWORD}
+      POSTGRES_DB: hellodb # ${POSTGRES_DB}
+    expose:
+      - 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - transcendence
+    restart: unless-stopped
+
 volumes:
   static:
     name: static
@@ -63,6 +80,13 @@ volumes:
       type: none
       o: bind
       device: ../volumes/django_app/
+  postgres_data:
+    name: postgres_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../volumes/postgres_data/
 
 networks:
   transcendence:
