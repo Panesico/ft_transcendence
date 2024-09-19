@@ -11,29 +11,26 @@ function navigate(e, path) {
   loadContent(path);
 }
 
+// Load additional JS based on current path
+function loadAdditionalJs(path) {
+  if (path === '/game') {
+    const script = document.createElement('script');
+    script.src = 'js/pong.js';
+    document.head.appendChild(script);
+  }
+}
+
 // Load content based on current path
 function loadContent(path) {
   let url = '';
-  switch (path) {
-    case '/':
-      url = '/';
-      break;
-    case '/tournament':
-      url = '/tournament/';
-      break;
-    case '/game':
-      url = '/game/';
-      break;
-    case '/signup':
-      url = '/signup/';
-      break;
-    case '/login':
-      url = '/login/';
-      break;
-    default:
-      url = '/404/';
+  if (path === '/' || path === '/game' || path === '/login' ||
+      path === '/signup' || path === '/tournament' || path === '/admin') {
+    url = path;
+  } else {
+    url = '/404/';
   }
 
+  // console.log('url: ', url);
   // Fetch content from Django and inject into main
   fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
       .then(response => {
@@ -44,6 +41,7 @@ function loadContent(path) {
       })
       .then(html => {
         document.querySelector('main').innerHTML = html;
+        loadAdditionalJs(path);
       })
       .catch(error => {
         console.error('Error loading content:', error);

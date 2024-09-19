@@ -34,6 +34,6 @@ urlpatterns = [
     path('signup/', views.load_signup, name='signup'),
     path('tournament/', views.load_tournament, name='tournament'),
     path('404/', views.load_404, name='404'),
-#     path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     re_path(r'^.*$', views.load_other),  # Catch-all route to serve the SPA
 ]

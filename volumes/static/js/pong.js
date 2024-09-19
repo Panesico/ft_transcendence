@@ -50,9 +50,9 @@ const keys = {
 
 // Event listeners for controls
 window.addEventListener('keydown', (e) => {
-  console.log('e.key: ', e.key);
+  // console.log('e.key: ', e.key);
   if (e.key in keys) {
-    console.log('e.key in keys: ', e.key);
+    // console.log('e.key in keys: ', e.key);
     keys[e.key] = true;
   }
 });
