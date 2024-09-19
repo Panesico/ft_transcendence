@@ -16,6 +16,12 @@ function loadAdditionalJs(path) {
   if (path === '/game') {
     const script = document.createElement('script');
     script.src = 'js/pong.js';
+    // script.onload = () => {
+    //   console.log('Script loaded successfully.');
+    // };
+    // script.onerror = () => {
+    //   console.error('Error loading the script.');
+    // };
     document.head.appendChild(script);
   }
 }
@@ -23,11 +29,12 @@ function loadAdditionalJs(path) {
 // Load content based on current path
 function loadContent(path) {
   let url = '';
-  if (path === '/' || path === '/game' || path === '/login' ||
-      path === '/signup' || path === '/tournament' || path === '/admin') {
+  if (path === '/')
     url = path;
-  } else {
-    url = '/404/';
+  else if (
+      path === '/game' || path === '/login' || path === '/signup' ||
+      path === '/tournament' || path === '/admin') {
+    url = path + '/';
   }
 
   // console.log('url: ', url);
