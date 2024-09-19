@@ -28,7 +28,10 @@ fi
 # Collect static files and apply migrations
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
-# sleep 1
+
+echo "Making migrations..."
+python manage.py makemigrations
+
 echo "Applying migrations..."
 python manage.py migrate
 

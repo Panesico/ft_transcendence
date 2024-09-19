@@ -1,0 +1,52 @@
+<header class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/"
+      onclick="navigate(event, '/')">Pongscendence</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+      data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
+      aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item d-flex align-items-center">
+          <a class="nav-link active" aria-current="page" href="/"
+            onclick="navigate(event, '/')">Home</a>
+        </li>
+        <li class="nav-item d-flex align-items-center">
+          <a class="nav-link" href="/tournament"
+            onclick="navigate(event, '/tournament')">Tournament</a>
+        </li>
+        <li class="nav-item d-flex align-items-center">
+          <a class="nav-link" href="/game"
+            onclick="navigate(event, '/game')">Game</a>
+        </li>
+        <li class="nav-item d-flex align-items-center">
+          <a class="nav-link" href="/signup"
+            onclick="navigate(event, '/signup')">Sign Up</a>
+        </li>
+        <li class="nav-item d-flex align-items-center">
+          <a class="nav-link" href="/login"
+            onclick="navigate(event, '/login')">Log In</a>
+        </li>
+        <li class="nav-item dropdown d-flex align-items-center">
+          <p class="nav-link dropdown-toggle m-0" id="navbarDropdown"
+            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Profile
+          </p>
+          <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item bg-dark text-light"
+                href="#">Settings</a></li>
+            <li><a class="dropdown-item bg-dark text-light" href="#">Stats</a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item bg-dark text-light" href="#">Log
+                Out</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>

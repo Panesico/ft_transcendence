@@ -17,18 +17,6 @@ services:
   #     - transcendence
   #   restart: unless-stopped
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      no_cache: true
-    image: frontend
-    container_name: frontend
-    volumes:
-      - static:/data
-    networks:
-      - transcendence
-
   django:
     build:
       context: ./django
@@ -44,28 +32,28 @@ services:
     volumes:
       - django_app:/usr/src/app
       - static:/usr/src/static/
-    depends_on:
-      - frontend
+    # depends_on:
+    #   - postgres
     restart: unless-stopped
 
-  postgres:
-    image: postgres:16.4-alpine3.20
-    container_name: postgres
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: hello # ${POSTGRES_USER}
-      POSTGRES_PASSWORD: hellopwd # ${POSTGRES_PASSWORD}
-      POSTGRES_DB: hellodb # ${POSTGRES_DB}
-      LC_COLLATE: en_US.UTF-8
-      LC_CTYPE: en_US.UTF-8
-    expose:
-      - 5432
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - transcendence
-    restart: unless-stopped
+# postgres:
+#   image: postgres:16.4-alpine3.20
+#   container_name: postgres
+#   env_file:
+#     - .env
+#   environment:
+#     POSTGRES_USER: hello # ${POSTGRES_USER}
+#     POSTGRES_PASSWORD: hellopwd # ${POSTGRES_PASSWORD}
+#     POSTGRES_DB: hellodb # ${POSTGRES_DB}
+#     LC_COLLATE: en_US.UTF-8
+#     LC_CTYPE: en_US.UTF-8
+#   expose:
+#     - 5432
+#   volumes:
+#     - postgres_data:/var/lib/postgresql/data
+#   networks:
+#     - transcendence
+#   restart: unless-stopped
 
 volumes:
   static:
@@ -82,13 +70,13 @@ volumes:
       type: none
       o: bind
       device: ../volumes/django_app/
-  postgres_data:
-    name: postgres_data
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ../volumes/postgres_data/
+  # postgres_data:
+  #   name: postgres_data
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: ../volumes/postgres_data/
 
 networks:
   transcendence:

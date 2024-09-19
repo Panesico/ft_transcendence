@@ -6,17 +6,17 @@ RUN   apk update && \
 
 WORKDIR /usr/src/app
 
-COPY  ./tools/init_django.sh .
-COPY  ./tools/requirements.txt .
+COPY  ./tools/init_django.sh /tmp/init_django.sh
+COPY  ./tools/requirements.txt /tmp/requirements.txt
 
-RUN chmod +x init_django.sh
+RUN   chmod +x /tmp/init_django.sh
 
 # Install Python dependencies specified in requirements.txt
 RUN   pip install --upgrade pip
-RUN   pip install -r requirements.txt
+RUN   pip install -r /tmp/requirements.txt
 
 EXPOSE 9000
 
-ENTRYPOINT [ "/bin/sh", "init_django.sh" ]
+ENTRYPOINT [ "/bin/sh", "/tmp/init_django.sh" ]
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:9000"]

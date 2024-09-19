@@ -13,39 +13,43 @@ function navigate(e, path) {
 
 // Load content based on current path
 function loadContent(path) {
-  // Hide all sections first
-  document.querySelectorAll('.page').forEach((page) => {
-    page.style.display = 'none';
-  });
-
-  // Show appropriate section based on the path
-  let pageFound = true;
+  let url = '';
   switch (path) {
     case '/':
-      document.getElementById('home').style.display = 'block';
+      url = '/';
       break;
     case '/tournament':
-      document.getElementById('tournament').style.display = 'block';
+      url = '/tournament/';
       break;
     case '/game':
-      document.getElementById('game').style.display = 'block';
+      url = '/game/';
       break;
     case '/signup':
-      document.getElementById('signup').style.display = 'block';
+      url = '/signup/';
       break;
     case '/login':
-      document.getElementById('login').style.display = 'block';
+      url = '/login/';
       break;
     default:
-      document.getElementById('page404').style.display = 'block';
-      document.title = '404 Not Found';
-      pageFound = false;
+      url = '/404/';
   }
 
-  // Simulate sending a 404 status code by updating the state
-  if (!pageFound) {
-    history.replaceState({}, '', '/404');
-  }
+  // Fetch content from Django and inject into main
+  fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error - status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(html => {
+        document.querySelector('main').innerHTML = html;
+      })
+      .catch(error => {
+        console.error('Error loading content:', error);
+        document.querySelector('main').innerHTML =
+            '<h1>Error loading content</h1>';
+      });
 }
 
 // Listen for popstate events (Back/Forward buttons)
@@ -56,4 +60,13 @@ window.onpopstate = () => {
 // Initialise the correct content on page load
 window.onload = () => {
   loadContent(window.location.pathname);
+
+  // document.querySelectorAll('a').forEach(anchor => {
+  //   anchor.addEventListener('click', function(e) {
+  //     e.preventDefault();
+  //     const path = this.getAttribute('href');
+  //     history.pushState(null, '', path);
+  //     loadContent(path);
+  //   });
+  // });
 };

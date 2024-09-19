@@ -1,9 +1,7 @@
 Django==4.2.16
 # For PostgreSQL
 psycopg-binary==3.2.2
-# For REST API
-djangorestframework==3.15.2
 # WebSocket server
-daphne==4.1.2
-# Channels for WebSockets
-channels==4.1.0
+# daphne==4.1.2
+# # Channels for WebSockets
+# channels==4.1.0
