@@ -17,6 +17,7 @@ import logging
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+APPEND_SLASH = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -104,6 +105,16 @@ AUTH_PASSWORD_VALIDATORS = [
 class IgnoreMtimeFilter(logging.Filter):
     def filter(self, record):
         return 'first seen with mtime' not in record.getMessage()
+    
+# class IgnoreMtimeFilter(logging.Filter):
+#     def filter(self, record):
+#         try:
+#             message = record.getMessage()
+#             if isinstance(message, str):
+#                 return 'first seen with mtime' not in message
+#         except Exception as e:
+#             logging.error(f"Error in IgnoreMtimeFilter: {e}")
+#         return True
 
 LOGGING = {
     'version': 1,
@@ -157,8 +168,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/usr/src/static/'
-# STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = '/usr/src/frontend/'
+STATICFILES_DIRS = [BASE_DIR / ".." / "frontend" / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

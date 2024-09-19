@@ -3,25 +3,32 @@
     class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto"
     style="width: 256px;">
     <h1 class="mb-3 align-self-start">Sign Up</h1>
-    <form action="" method="post" class="">
+    <form method="post" action="{% url 'signup' %}">
+      {% csrf_token %}
       <div class="mb-3">
         <label for="signupUsername" class="form-label">Username</label>
-        <input type="text" class="form-control" id="signupUsername" required>
+        <input type="text" class="form-control" id="signupUsername"
+          value="{{ form.username.value }}">
+        {{ form.username.errors }}
       </div>
       <div class="mb-3">
         <label for="signupEmail" class="form-label">Email address</label>
-        <input type="email" class="form-control" id="signupEmail" required>
+        <input type="email" class="form-control" id="signupEmail"
+          value="{{ form.email.value }}">
+        {{ form.email.errors }}
       </div>
       <div class="mb-3">
         <label for="signupPassword" class="form-label">Password</label>
         <input type="password" class="form-control" id="signupPassword"
-          required>
+          value="{{ form.password.value }}">
+        {{ form.password.errors }}
       </div>
       <div class="mb-3">
         <label for="signupConfirmPassword" class="form-label">Confirm
           Password</label>
         <input type="password" class="form-control" id="signupConfirmPassword"
-          required>
+          value="{{ form.confirm_password.value }}">
+        {{ form.confirm_password.errors }}
       </div>
       <button type="submit" class="btn btn-secondary">Sign Up</button>
     </form>

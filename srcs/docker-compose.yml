@@ -35,7 +35,7 @@ services:
       - transcendence
     volumes:
       - django_app:/usr/src/app
-      - static:/usr/src/static/
+      - frontend:/usr/src/frontend/
     # depends_on:
     #   - postgres
     restart: unless-stopped
@@ -60,13 +60,13 @@ services:
 #   restart: unless-stopped
 
 volumes:
-  static:
-    name: static
+  frontend:
+    name: frontend
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ../volumes/static
+      device: ../volumes/frontend
   django_app:
     name: django_app
     driver: local
