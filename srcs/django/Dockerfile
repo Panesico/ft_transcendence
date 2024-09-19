@@ -8,11 +8,11 @@ WORKDIR /usr/src/app
 
 COPY  ./tools/ /tmp/
 
-RUN   chmod +x /tmp/init_django.sh
-
 # Install Python dependencies specified in requirements.txt
 RUN   pip install --upgrade pip
 RUN   pip install -r /tmp/requirements.txt
+
+RUN   chmod +x /tmp/init_django.sh
 
 EXPOSE 9000
 

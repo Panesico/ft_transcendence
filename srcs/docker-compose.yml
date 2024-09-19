@@ -25,6 +25,10 @@ services:
     container_name: django
     env_file:
       - .env
+    environment:
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_EMAIL: admin@admin.com
+      DJANGO_SUPERUSER_PASSWORD: admin_password
     ports:
       - "9000:9000"
     networks:

@@ -27,6 +27,10 @@ else
     echo "STATIC_ROOT is already present in $SETTINGS_FILE."
 fi
 
+# Create super user with env variables
+echo "Creating super user..."
+python manage.py createsuperuser --noinput
+
 # Collect static files and apply migrations
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
