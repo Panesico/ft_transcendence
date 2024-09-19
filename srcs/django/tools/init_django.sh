@@ -6,6 +6,8 @@ sleep 3
 PROJECT_DIR="/usr/src/app/transcendence"
 SETTINGS_FILE="$PROJECT_DIR/settings.py"
 
+mv -f /tmp/manage.py /usr/src/app/
+
 # Check if Django project directory exists
 if [ ! -d "$PROJECT_DIR" ]; then
   # Create a new Django project with name 'transcendence'

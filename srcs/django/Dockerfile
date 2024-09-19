@@ -6,8 +6,7 @@ RUN   apk update && \
 
 WORKDIR /usr/src/app
 
-COPY  ./tools/init_django.sh /tmp/init_django.sh
-COPY  ./tools/requirements.txt /tmp/requirements.txt
+COPY  ./tools/ /tmp/
 
 RUN   chmod +x /tmp/init_django.sh
 
