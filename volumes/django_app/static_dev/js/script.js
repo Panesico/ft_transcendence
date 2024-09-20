@@ -1,4 +1,5 @@
 // script.js
+// const fetchedFiles = new Set();
 
 // Intercept form submissions for AJAX processing
 function handleFormSubmission() {
@@ -41,6 +42,24 @@ function loadAdditionalJs(path) {
     script.src = 'js/pong.js';
     document.head.appendChild(script);
   }
+
+  // if (path === '/game' || path === '/game/') {
+  //   console.log('fetchedFiles:', fetchedFiles);
+  //   if (!fetchedFiles.has(path)) {
+  //     {
+  //       const fileName = 'js/pong.js';
+  //       const url = `/api/data/?fileName=${encodeURIComponent(fileName)}`;
+  //       fetch(url)
+  //           .then(response => response.json())
+  //           .then(data => {
+  //             console.log('Fetched data:', data);
+  //           })
+  //           .catch(error => {
+  //             console.error('Error fetching API data:', error);
+  //           });
+  //     }
+  //   }
+  // }
 }
 
 // Load content based on current path
@@ -92,5 +111,6 @@ window.onpopstate = () => {
 
 // Initialise the correct content on page load
 window.onload = () => {
+  console.log('onload');
   loadContent(window.location.pathname);
 };
