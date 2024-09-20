@@ -68,8 +68,8 @@ function loadContent(path) {
   if (path === '/')
     url = path;
   else if (
-      path === '/game' || path === '/login' || path === '/signup' ||
-      path === '/tournament' || path === '/admin') {
+      path === '/game' || path === '/login' || path === '/logout' ||
+      path === '/signup' || path === '/tournament' || path === '/admin') {
     url = path + '/';
   }
 

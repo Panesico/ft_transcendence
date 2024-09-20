@@ -4,9 +4,9 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
-from .forms import SignUpForm
+from .forms import SignUpForm, LogInForm
 import logging
 logger = logging.getLogger(__name__)
 
@@ -28,47 +28,43 @@ def load_game(request):
         return render(request, 'fragments/game_fragment.html')
     return render(request, 'partials/game.html')
 
+def load_logout(request):
+    logger.debug("")
+    logger.debug("load_logout")
+
+    logout(request)
+    messages.success(request, 'You have been logged out successfully.')
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        logger.debug("load_logout XMLHttpRequest")
+        return render(request, 'fragments/home_fragment.html')
+    return redirect('home')
+
 def load_login(request):
     logger.debug("")
     logger.debug("load_login")
+    if request.method == 'POST':
+        logger.debug("load_login > POST")
+        form = LogInForm(request, data=request.POST)
+        logger.debug(form)
+        if form.is_valid():
+            logger.debug("load_login > POST > form.is_valid")
+            user = form.get_user()
+            login(request, user)
+            messages.success(request, 'Login successful!')
+            return redirect('home')
+        else:
+            logger.debug("load_login > POST > form NOT valid")
+            messages.error(request, 'Invalid username or password.')
+    else:
+        form = LogInForm()
+
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("load_login XMLHttpRequest")
-        return render(request, 'fragments/login_fragment.html')
-    return render(request, 'partials/login.html')
-
-# def load_signup(request):
-#     logger.debug("")
-#     logger.debug("load_signup")
-#     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-#         logger.debug("load_signup XMLHttpRequest")
-#         return render(request, 'fragments/signup_fragment.html')
-#     return render(request, 'partials/signup.html')
-
-# def load_signup(request):
-    # logger.debug("")
-    # logger.debug("load_signup")
-#     if request.method == 'POST':
-#         form = SignUpForm(request.POST)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.set_password(form.cleaned_data['password'])
-#             user.save()
-
-#             # Log the user in automatically after signup
-#             username = form.cleaned_data.get('username')
-#             password = form.cleaned_data.get('password')
-#             user = authenticate(username=username, password=password)
-#             if user is not None:
-#                 login(request, user)
-#                 messages.success(request, 'Sign up successful!')
-#                 return redirect('home')  # Redirect to homepage after signup
-#         else:
-#             messages.error(request, 'Please correct the error below.')
-#     else:
-#         form = SignUpForm()
-
-#     return render(request, 'signup.html', {'form': form})
-
+        logger.debug("load_login returning fragment")
+        return render(request, 'fragments/login_fragment.html', {'form': form})
+    logger.debug("load_login returning")
+    logger.debug("form.errors:")
+    logger.debug(form.errors) 
+    return render(request, 'partials/login.html', {'form': form})
 
 def load_signup(request):
     logger.debug("")
@@ -84,9 +80,14 @@ def load_signup(request):
             user.set_password(form.cleaned_data['password'])
             user.save()
 
-            login(request, user)
-            messages.success(request, 'Sign up successful!')
-            return redirect('home')
+            # Log the user in automatically after signup
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, 'Sign up successful!')
+                return redirect('home')
         else:
             logger.debug("POST load_signup NOT form.is_valid")
             logger.debug("form.errors:")

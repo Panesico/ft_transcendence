@@ -22,6 +22,7 @@ urlpatterns = [
     path('home/', views.load_home, name='home'),
     path('game/', views.load_game, name='game'),
     path('login/', views.load_login, name='login'),
+    path('logout/', views.load_logout, name='logout'),
     path('signup/', views.load_signup, name='signup'),
     path('tournament/', views.load_tournament, name='tournament'),
     path('404/', views.load_404, name='404'),
