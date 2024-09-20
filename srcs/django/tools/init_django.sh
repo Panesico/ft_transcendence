@@ -19,10 +19,10 @@ else
 fi
 
 echo "Checking for STATIC_ROOT in $SETTINGS_FILE..."
-if ! grep -q "STATIC_ROOT = '/usr/src/static/'" "$SETTINGS_FILE"; then
+if ! grep -q "STATIC_ROOT = '/usr/src/frontend/'" "$SETTINGS_FILE"; then
     # Append STATIC_ROOT after STATIC_URL
     echo "Adding STATIC_ROOT to settings.py..."
-    sed -i "/STATIC_URL = 'static\/'/a STATIC_ROOT = '\/usr\/src\/static\/'" "$SETTINGS_FILE"
+    sed -i "/STATIC_URL = 'static\/'/a STATIC_ROOT = '\/usr\/src\/frontend\/'" "$SETTINGS_FILE"
 else
     echo "STATIC_ROOT is already present in $SETTINGS_FILE."
 fi

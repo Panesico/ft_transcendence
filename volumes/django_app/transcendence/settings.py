@@ -167,9 +167,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+
 STATIC_URL = '/static/'
+
+# For production, directory where Django collects static files into when running the collectstatic management command.
 STATIC_ROOT = '/usr/src/frontend/'
-STATICFILES_DIRS = [BASE_DIR / ".." / "frontend" / "static"]
+
+# For development
+STATICFILES_DIRS = [BASE_DIR / "static_dev"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
