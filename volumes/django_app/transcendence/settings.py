@@ -23,7 +23,7 @@ APPEND_SLASH = True
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)p1(3-owv&u#2gc=7uw2oivk)%d8t6(x4o&5u2h!p!7i*%)(vh'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
