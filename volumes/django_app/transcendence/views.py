@@ -100,6 +100,8 @@ def load_signup(request):
         logger.debug("load_signup returning fragment")
         return render(request, 'fragments/signup_fragment.html', {'form': form})
     logger.debug("load_signup returning")
+    logger.debug("form.errors:")
+    logger.debug(form.errors) 
     return render(request, 'partials/signup.html', {'form': form})
 
 
@@ -146,6 +148,8 @@ def load_other(request):
           return HttpResponse(f.read(), content_type='image/jpeg')
         elif file_extension == '.gif':
           return HttpResponse(f.read(), content_type='image/gif')
+        elif file_extension == '.ttf':
+          return HttpResponse(f.read(), content_type='font/ttf')
         else:
           return HttpResponse(f.read(), content_type='application/octet-stream')
     else:

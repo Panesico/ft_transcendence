@@ -1,16 +1,44 @@
 // script.js
 
+// Intercept form submissions for AJAX processing
+function handleFormSubmission() {
+  const form = document.querySelector('form');
+
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      let url = form.action;
+
+      fetch(url, {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        body: formData
+      })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error - status: ${response.status}`);
+            }
+            return response.text();
+          })
+          .then(html => {
+            document.querySelector('main').innerHTML = html;
+            handleFormSubmission();
+            loadAdditionalJs(window.location.pathname);
+          })
+          .catch(error => {
+            console.error('Form submission error:', error);
+          });
+    });
+  }
+}
+
 // Load additional JS based on current path
 function loadAdditionalJs(path) {
-  if (path === '/game') {
+  if (path === '/game' && !document.querySelector('script[src="js/pong.js"]')) {
     const script = document.createElement('script');
     script.src = 'js/pong.js';
-    // script.onload = () => {
-    //   console.log('Script loaded successfully.');
-    // };
-    // script.onerror = () => {
-    //   console.error('Error loading the script.');
-    // };
     document.head.appendChild(script);
   }
 }
@@ -37,6 +65,7 @@ function loadContent(path) {
       })
       .then(html => {
         document.querySelector('main').innerHTML = html;
+        handleFormSubmission();
         loadAdditionalJs(path);
       })
       .catch(error => {
