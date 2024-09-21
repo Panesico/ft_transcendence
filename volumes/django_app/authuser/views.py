@@ -3,10 +3,11 @@ import os
 from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from authuser.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
-from .forms import SignUpForm, LogInForm
+from authuser.forms import SignUpForm, LogInForm
 import logging
 logger = logging.getLogger(__name__)
 

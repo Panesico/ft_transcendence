@@ -2,7 +2,7 @@
 
 sleep 3
 
-# Define paths
+APP_DIR="/usr/src/app"
 PROJECT_DIR="/usr/src/app/transcendence"
 SETTINGS_FILE="$PROJECT_DIR/settings.py"
 
@@ -27,6 +27,14 @@ else
     echo "STATIC_ROOT is already present in $SETTINGS_FILE."
 fi
 
+# Create a new Django app with name 'authuser'
+if [ ! -d "$APP_DIR/authuser" ]; then
+    echo "Creating Django app 'authuser'..."
+    python manage.py startapp authuser
+else
+    echo "Django app 'authuser' already exists."
+fi
+
 # Create super user with env variables
 echo "Creating super user..."
 python manage.py createsuperuser --noinput
@@ -35,7 +43,8 @@ python manage.py createsuperuser --noinput
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
-echo "Making migrations..."
+# echo "Making migrations..."
+python manage.py makemigrations authuser
 python manage.py makemigrations
 
 echo "Applying migrations..."
