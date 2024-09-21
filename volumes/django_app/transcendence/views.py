@@ -102,6 +102,13 @@ def load_signup(request):
     logger.debug("load_signup returning")
     return render(request, 'partials/signup.html', {'form': form})
 
+def load_profile(request):
+		logger.debug("")
+		logger.debug("load_profile called")
+		if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+				logger.debug("load_profile XMLHttpRequest")
+				return render(request, 'fragments/profile_fragment.html')
+		return render(request, 'partials/profile.html')
 
 def load_tournament(request):
     logger.debug("")
