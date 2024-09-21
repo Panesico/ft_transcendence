@@ -1,3 +1,9 @@
 <div id="home" class="page p-4">
+
+  {% if user.is_authenticated %}
+  <h1>Welcome to Pong, <span class="text-danger">{{ user.username }}</span>!</h1>
+  {% else %}
   <h1>Welcome to Pong</h1>
+  {% endif %}
+
 </div>

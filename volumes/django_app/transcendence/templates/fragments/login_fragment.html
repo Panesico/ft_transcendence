@@ -3,16 +3,29 @@
     class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto"
     style="width: 256px;">
     <h1 class="mb-3 align-self-start">Log In</h1>
-    <form action="" method="post" class="">
+
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger fs-6">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
       <div class="mb-3">
-        <label for="loginUsername" class="form-label">Username</label>
-        <input type="text" class="form-control" id="loginUsername" required>
+        <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+        {{ form.username }}
+        <div class="text-danger fs-6">{{ form.username.errors }}</div>
       </div>
       <div class="mb-3">
-        <label for="loginPassword" class="form-label">Password</label>
-        <input type="password" class="form-control" id="loginPassword" required>
+        <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+        {{ form.password }}
+        <div class="text-danger fs-6">{{ form.password.errors }}</div>
       </div>
+
       <button type="submit" class="btn btn-secondary">Log In</button>
     </form>
+
   </div>
 </div>
