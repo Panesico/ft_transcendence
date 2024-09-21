@@ -4,12 +4,13 @@ RUN   apk update && \
   apk add postgresql-client && \
   rm -rf /var/cache/apk/*
 
+RUN   pip install --upgrade pip
+
 WORKDIR /usr/src/app
 
 COPY  ./tools/ /tmp/
 
 # Install Python dependencies specified in requirements.txt
-RUN   pip install --upgrade pip
 RUN   pip install -r /tmp/requirements.txt
 
 RUN   chmod +x /tmp/init_django.sh
