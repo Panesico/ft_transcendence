@@ -30,6 +30,15 @@ body {
   width: 650px;
 }
 
+/* ----------------Header*/
+.header-pic {
+  height: 3rem;
+  width: 3rem;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
 /* ----------------Profile page*/
 .profile-page-pic {
   height: 10rem;
@@ -59,10 +68,10 @@ body {
 
 .profile-page-header {
   min-height: 60vh;
-  background: #009FFF;
+  background: #dadbdc;
 background: linear-gradient(to right, #747474, #333333);
   color: white;
-  clip-path: ellipse(100vw 60vh at 50% 50%);
+  clip-path: ellipse(25vw 2000vh at 50% 50%);
   display: flex;
   align-items: center;
   justify-content: center;
