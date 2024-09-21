@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pongscendence</title>
+  <title>{% block title %}Pongscendence{% endblock %}</title>
 
   <!-- Bootstrap CSS -->
   <link
@@ -39,6 +39,9 @@
     crossorigin="anonymous"></script>
   <!-- Custom JS -->
   <script src="{% static 'js/script.js' %}"></script>
+
+  {% block additional_script %}
+  {% endblock %}
   
 </body>
 

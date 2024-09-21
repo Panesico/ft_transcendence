@@ -1,5 +1,12 @@
 {% extends 'base_index.html' %}
+{% load static %}
+
+{% block title %}Profile | Pongscendence{% endblock %}
 
 {% block content %}
 {% include '../fragments/profile_fragment.html' %}
+{% endblock %}
+
+{% block additional_script %}
+<script src="{% static 'js/profile.js' %}" defer></script>
 {% endblock %}

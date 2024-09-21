@@ -1,5 +1,5 @@
 // script.js
-// const fetchedFiles = new Set();
+const fetchedFiles = new Set();
 
 // Intercept form submissions for AJAX processing
 function handleFormSubmission() {
@@ -37,39 +37,31 @@ function handleFormSubmission() {
 
 // Load additional JS based on current path
 function loadAdditionalJs(path) {
-  if (path === '/game' && !document.querySelector('script[src="js/pong.js"]')) {
-    const script = document.createElement('script');
-    script.src = 'js/pong.js';
-    document.head.appendChild(script);
-  }
-	if (path === '/profile' && !document.querySelector('script[src="js/profile.js"]')) {
-		console.log('%cLoading profile.js', 'color: yellow; font-weight: bold;');
-    const script = document.createElement('script');
-    script.src = 'js/profile.js';
-    document.head.appendChild(script);
+  let url = '/static/js/';
+
+  if (path === '/game') {
+    url += 'pong.js';
+    loadJs(url);
+  } else if (path === '/profile') {
+    url += 'profile.js';
+    loadJs(url);
   }
 
-  // if (path === '/game' || path === '/game/') {
-  //   console.log('fetchedFiles:', fetchedFiles);
-  //   if (!fetchedFiles.has(path)) {
-  //     {
-  //       const fileName = 'js/pong.js';
-  //       const url = `/api/data/?fileName=${encodeURIComponent(fileName)}`;
-  //       fetch(url)
-  //           .then(response => response.json())
-  //           .then(data => {
-  //             console.log('Fetched data:', data);
-  //           })
-  //           .catch(error => {
-  //             console.error('Error fetching API data:', error);
-  //           });
-  //     }
-  //   }
-  // }
+  function loadJs(url) {
+    if (url.length > 11 && !document.querySelector(`script[src="${url}"]`)) {
+      console.log(`%cLoading ${url}`, 'color: yellow; font-weight: bold;');
+      const script = document.createElement('script');
+      script.src = url;
+      script.type = 'text/javascript';
+      document.body.appendChild(script);
+      fetchedFiles.add(url);
+    }
+  }
 }
 
 // Load content based on current path
 function loadContent(path) {
+  console.log('loadContent');
   let url = '';
   if (path === '/')
     url = path;
@@ -105,6 +97,13 @@ function loadContent(path) {
 function navigate(e, path) {
   e.preventDefault();
 
+  for (const jsFile of fetchedFiles) {
+    console.log(`%cRemoving ${jsFile}`, 'color: red; font-weight: bold;');
+    const script = document.querySelector(`script[src="${jsFile}"]`);
+    script.remove();
+    fetchedFiles.delete(jsFile);
+  }
+
   // Push the new state into the browser's history
   history.pushState({}, '', path);
 
@@ -117,7 +116,7 @@ window.onpopstate = () => {
 };
 
 // Initialise the correct content on page load
-window.onload = () => {
-  console.log('onload');
-  loadContent(window.location.pathname);
-};
+// window.onload = () => {
+//   console.log('onload');
+//   // loadContent(window.location.pathname);
+// };
