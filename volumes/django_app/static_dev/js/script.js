@@ -42,6 +42,12 @@ function loadAdditionalJs(path) {
     script.src = 'js/pong.js';
     document.head.appendChild(script);
   }
+	if (path === '/profile' && !document.querySelector('script[src="js/profile.js"]')) {
+		console.log('%cLoading profile.js', 'color: yellow; font-weight: bold;');
+    const script = document.createElement('script');
+    script.src = 'js/profile.js';
+    document.head.appendChild(script);
+  }
 
   // if (path === '/game' || path === '/game/') {
   //   console.log('fetchedFiles:', fetchedFiles);

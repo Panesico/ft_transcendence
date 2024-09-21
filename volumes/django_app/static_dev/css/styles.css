@@ -45,3 +45,13 @@ body {
 	background-color: #424242;
 	color: #f9f9f9;
 }
+
+.centered-location {
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.centered-location p {
+  margin: 0 0 0 8px;
+}
