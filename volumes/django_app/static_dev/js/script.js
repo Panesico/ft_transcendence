@@ -69,7 +69,8 @@ function loadContent(path) {
     url = path;
   else if (
       path === '/game' || path === '/login' || path === '/logout' ||
-			path === '/tournament' || path === '/admin' || path === '/profile') {
+      path === '/signup' || path === '/tournament' || path === '/admin' ||
+      path === '/profile') {
     url = path + '/';
   }
 
