@@ -4,7 +4,7 @@
     style="width: 256px;">
     <h1 class="mb-3 align-self-start">Sign Up</h1>
 
-    <form method="post" action="{% url 'signup' %}">
+    <form method="post" action="{% url 'post_signup' %}">
       {% csrf_token %}
 
       {% if form.non_field_errors %}

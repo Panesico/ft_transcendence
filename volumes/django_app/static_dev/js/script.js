@@ -66,7 +66,7 @@ function loadContent(path) {
   if (path === '/')
     url = path;
   else if (
-      path === '/game' || path === '/login' || path === '/logout' ||
+      path === '/game' || path === '/login' || path === '/api/auth/logout' ||
       path === '/signup' || path === '/tournament' || path === '/admin' ||
       path === '/profile') {
     url = path + '/';
@@ -85,6 +85,9 @@ function loadContent(path) {
         document.querySelector('main').innerHTML = html;
         handleFormSubmission();
         loadAdditionalJs(path);
+        // data = JSON.parse(data);
+        // document.title = data.page_title;
+        // document.querySelector('main').innerHTML = data.html;
       })
       .catch(error => {
         console.error('Error loading content:', error);
@@ -105,7 +108,10 @@ function navigate(e, path) {
   }
 
   // Push the new state into the browser's history
-  history.pushState({}, '', path);
+  if (path === '/api/auth/logout') {
+    window.history.pushState({}, '', '/');
+  } else
+    window.history.pushState({}, '', path);
 
   loadContent(path);
 }

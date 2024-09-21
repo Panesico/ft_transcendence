@@ -15,22 +15,30 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, re_path
-from authuser import views
+
+from transcendence import views as views
+from authuser import views as authViews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', views.load_home, name='home'),
-    path('home/', views.load_home, name='home'),
-    path('game/', views.load_game, name='game'),
-    path('login/', views.load_login, name='login'),
-    path('logout/', views.load_logout, name='logout'),
-    path('signup/', views.load_signup, name='signup'),
-    path('tournament/', views.load_tournament, name='tournament'),
-		path('profile/', views.load_profile, name='profile'),
+    path('', views.get_home, name='home'),
+    path('home/', views.get_home, name='home'),
 
-    path('404/', views.load_404, name='404'),
+    path('signup/', views.get_signup, name='signup'),
+    path('login/', views.get_login, name='login'),
+
+    path('game/', views.get_game, name='game'),
+    path('tournament/', views.get_tournament, name='tournament'),
+		path('profile/', views.get_profile, name='profile'),
+
+    # authuser app
+    path('api/auth/signup/', authViews.post_signup, name='post_signup'),
+    path('api/auth/login/', authViews.post_login, name='post_login'),
+    path('api/auth/logout/', authViews.get_logout, name='logout'),
+
+    path('404/', views.get_404, name='404'),
     
-    # path('api/data/', views.load_files, name='files'),
-    # re_path(r'^.*$', views.load_other),  # Catch-all route to serve the SPA
+    # path('api/data/', views.get_files, name='files'),
+    # re_path(r'^.*$', views.get_other),  # Catch-all route to serve the SPA
 ]
