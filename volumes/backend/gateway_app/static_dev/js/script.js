@@ -1,40 +1,6 @@
 // script.js
 const fetchedFiles = new Set();
 
-// Intercept form submissions for AJAX processing
-function handleFormSubmission() {
-  const form = document.querySelector('form');
-
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const formData = new FormData(form);
-      let url = form.action;
-
-      fetch(url, {
-        method: 'POST',
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-        body: formData
-      })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(`HTTP error - status: ${response.status}`);
-            }
-            return response.text();
-          })
-          .then(html => {
-            document.querySelector('main').innerHTML = html;
-            handleFormSubmission();
-            loadAdditionalJs(window.location.pathname);
-          })
-          .catch(error => {
-            console.error('Form submission error:', error);
-          });
-    });
-  }
-}
-
 // Load additional JS based on current path
 function loadAdditionalJs(path) {
   let url = '/static/js/';
@@ -59,8 +25,46 @@ function loadAdditionalJs(path) {
   }
 }
 
+// Intercept form submissions for AJAX processing
+async function handleFormSubmission() {
+  const form = document.querySelector('form');
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      let url = form.action;
+
+      console.log('formData: ', formData);
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {'X-Requested-With': 'XMLHttpRequest'},
+          body: formData
+        })
+
+        if (!response.ok) {
+          throw new Error(`HTTP error - status: ${response.status}`);
+        }
+
+        const html = await response.text();
+        document.querySelector('main').innerHTML = html;
+
+        handleFormSubmission();
+        loadAdditionalJs(window.location.pathname);
+
+      } catch (error) {
+        console.error('Form submission error:', error);
+        document.querySelector('main').innerHTML =
+            '<h1>Form submission error</h1>';
+      }
+    });
+  }
+}
+
 // Load content based on current path
-function loadContent(path) {
+async function loadContent(path) {
   console.log('loadContent');
   let url = '';
   if (path === '/')
@@ -74,26 +78,25 @@ function loadContent(path) {
 
   // console.log('url: ', url);
   // Fetch content from Django and inject into main
-  fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error - status: ${response.status}`);
-        }
-        return response.text();
-      })
-      .then(html => {
-        document.querySelector('main').innerHTML = html;
-        handleFormSubmission();
-        loadAdditionalJs(path);
-        // data = JSON.parse(data);
-        // document.title = data.page_title;
-        // document.querySelector('main').innerHTML = data.html;
-      })
-      .catch(error => {
-        console.error('Error loading content:', error);
-        document.querySelector('main').innerHTML =
-            '<h1>Error loading content</h1>';
-      });
+  try {
+    const response =
+        await fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+
+    if (!response.ok) {
+      throw new Error(`HTTP error - status: ${response.status}`);
+    }
+
+    const html = await response.text();
+    document.querySelector('main').innerHTML = html;
+    handleFormSubmission();
+    loadAdditionalJs(path);
+    // data = JSON.parse(data);
+    // document.title = data.page_title;
+    // document.querySelector('main').innerHTML = data.html;
+  } catch (error) {
+    console.error('Error loading content:', error);
+    document.querySelector('main').innerHTML = '<h1>Error loading content</h1>';
+  }
 }
 
 // Handle navigation
