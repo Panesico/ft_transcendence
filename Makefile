@@ -22,6 +22,10 @@ reset:
 	docker rmi -f $$(docker images -qa); \
 	docker volume rm $$(docker volume ls -q); \
 	docker network rm $$(docker network ls -q) 2>/dev/null
+
 django:
 	docker exec -it django /bin/sh
-.phony: all down stop logs prune routine reset
+postgres:
+	docker exec -it postgres /bin/sh
+
+.phony: all down stop logs prune routine reset django postgres

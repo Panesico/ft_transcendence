@@ -36,3 +36,7 @@ for templates:
 <!-- Custom JS -->
 <script src="{% static 'js/script.js' %}" defer></script>
 <script src="{% static 'js/pong.js' %}" defer></script>
+
+# Explore postgres
+docker container exec -it postgres sh
+psql -U postgres_main_user -d transcendence_db
