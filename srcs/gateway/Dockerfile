@@ -6,7 +6,9 @@ RUN   apk update && \
 
 RUN   pip install --upgrade pip
 
-WORKDIR /usr/src/app
+ARG   SERVICE_NAME
+ENV   SERVICE_NAME=${SERVICE_NAME}
+WORKDIR /usr/src/app/${SERVICE_NAME}_app
 
 COPY  ./tools/ /tmp/
 
@@ -19,4 +21,4 @@ EXPOSE 9000
 
 ENTRYPOINT [ "/bin/sh", "/tmp/init_django.sh" ]
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:9000"]
+CMD   ["python", "manage.py", "runserver", "0.0.0.0:9000"]

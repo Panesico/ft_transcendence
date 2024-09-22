@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, re_path
 
-from transcendence import views as views
+from gateway import views as views
 from authuser import views as authViews
 
 urlpatterns = [
