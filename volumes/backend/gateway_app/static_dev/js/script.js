@@ -8,10 +8,11 @@ function loadAdditionalJs(path) {
   if (path === '/game') {
     url += 'pong.js';
     loadJs(url);
-  } else if (path === '/profile') {
-    url += 'profile.js';
-    loadJs(url);
-  }
+	}
+  //  else if (path === '/profile') {
+  //   url += 'profile.js';
+  //   loadJs(url);
+  // }
 
   function loadJs(url) {
     if (url.length > 11 && !document.querySelector(`script[src="${url}"]`)) {

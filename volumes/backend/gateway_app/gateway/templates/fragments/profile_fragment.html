@@ -40,7 +40,7 @@
 
 <!-- Modal -->
 
- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
 		<div class="profile-modal-content">
 			<div class="modal-content" style="background-color: #333; color: #fff;">
@@ -49,16 +49,17 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></button>
       </div>
       <div class="modal-body">
-        <form>
+				<form method="post" action="{% url 'post_invite' %}">
+					{% csrf_token %}
           <div class="mb-3">
             <label for="login-name" class="col-form-label">Login:</label>
             <input type="text" class="form-control" id="login-name">
           </div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="submit" class="btn btn-light">Send invite</button>
+						</div>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-light">Send invite</button>
       </div>
     </div>
 	</div>

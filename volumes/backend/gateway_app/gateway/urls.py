@@ -32,6 +32,9 @@ urlpatterns = [
     path('tournament/', views.get_tournament, name='tournament'),
 		path('profile/', views.get_profile, name='profile'),
 
+		path('api/invite/', views.post_invite, name='post_invite'),
+
+
     # authuser app
     path('api/auth/signup/', authViews.post_signup, name='post_signup'),
     path('api/auth/login/', authViews.post_login, name='post_login'),

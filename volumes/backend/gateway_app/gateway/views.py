@@ -70,12 +70,12 @@ def get_signup(request):
 
 def get_profile(request):
     logger.debug("")
-    logger.debug("get_game")
+    logger.debug("get_profile")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_game XMLHttpRequest")
+        logger.debug("get_profile XMLHttpRequest")
         html = render_to_string('fragments/profile_fragment.html', context={}, request=request)
         return JsonResponse({'html': html})
-    return render(request, 'partials/game.html')
+    return render(request, 'partials/profile.html')
 
 def get_tournament(request):
     logger.debug("")
@@ -94,6 +94,32 @@ def get_404(request):
         html = render_to_string('fragments/404_fragment.html', context={}, request=request)
         return JsonResponse({'html': html}, status=404)
     return render(request, 'partials/404.html', status=404)
+
+def post_invite(request):
+	logger.debug("")
+	logger.debug("post_invite")
+	if request.method == 'POST':
+		logger.debug("post_invite > POST")
+		return render(request, 'partials/profile.html')
+	else:
+		logger.debug("post_login > not POST returning 405")
+		html = render_to_string('fragments/405_fragment.html', context={}, request=request)
+		return JsonResponse({'html': html}, status=405)
+		# form = InviteForm(request, data=request.POST)
+		# logger.debug(form)
+		# if form.is_valid():
+		# 	logger.debug("post_invite > POST > form.is_valid")
+		# 	invite = form.save(commit=False)
+		# 	invite.inviter = request.user
+		# 	invite.save()
+		# 	messages.success(request, 'Invite sent successfully!')
+		# 	return redirect('home')
+		# else:
+		# 	logger.debug("post_invite > POST > form NOT valid")
+		# 	logger.debug("form.errors:")
+		# 	logger.debug(form.errors) 
+		# 	messages.error(request, 'Please correct the error below.')
+
 
 # def get_other(request):
 #     logger.debug("")
