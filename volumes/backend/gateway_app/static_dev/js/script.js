@@ -36,7 +36,7 @@ async function handleFormSubmission() {
       const formData = new FormData(form);
       let url = form.action;
 
-      console.log('formData: ', formData);
+      // console.log('formData: ', formData);
       try {
         const response = await fetch(url, {
           method: 'POST',
@@ -48,8 +48,9 @@ async function handleFormSubmission() {
           throw new Error(`HTTP error - status: ${response.status}`);
         }
 
-        const html = await response.text();
-        document.querySelector('main').innerHTML = html;
+        const data = await response.json();
+        // console.log('data: ', data);
+        document.querySelector('main').innerHTML = data.html;
 
         handleFormSubmission();
         loadAdditionalJs(window.location.pathname);
@@ -66,15 +67,7 @@ async function handleFormSubmission() {
 // Load content based on current path
 async function loadContent(path) {
   console.log('loadContent');
-  let url = '';
-  if (path === '/')
-    url = path;
-  else if (
-      path === '/game' || path === '/login' || path === '/api/auth/logout' ||
-      path === '/signup' || path === '/tournament' || path === '/admin' ||
-      path === '/profile') {
-    url = path + '/';
-  }
+  let url = (path === '/') ? path : `${path}/`;
 
   // console.log('url: ', url);
   // Fetch content from Django and inject into main
@@ -82,17 +75,15 @@ async function loadContent(path) {
     const response =
         await fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
 
+    // console.log('response: ', response);
     if (!response.ok) {
       throw new Error(`HTTP error - status: ${response.status}`);
     }
-
-    const html = await response.text();
-    document.querySelector('main').innerHTML = html;
+    const data = await response.json();
+    // console.log('data: ', data);
+    document.querySelector('main').innerHTML = data.html;
     handleFormSubmission();
     loadAdditionalJs(path);
-    // data = JSON.parse(data);
-    // document.title = data.page_title;
-    // document.querySelector('main').innerHTML = data.html;
   } catch (error) {
     console.error('Error loading content:', error);
     document.querySelector('main').innerHTML = '<h1>Error loading content</h1>';

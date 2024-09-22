@@ -1,12 +1,15 @@
 # views.py
 import os
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from django.template import RequestContext
 # from django.contrib.auth.models import User
 from authuser.models import User
 from django.contrib import messages
 from authuser.forms import SignUpForm, LogInForm
+from django.middleware.csrf import get_token
 import logging
 logger = logging.getLogger(__name__)
 
@@ -17,7 +20,8 @@ def get_home(request):
     logger.debug(request)
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_home XMLHttpRequest")
-        return render(request, 'fragments/home_fragment.html')
+        html = render_to_string('fragments/home_fragment.html', context={}, request=request)
+        return JsonResponse({'html': html})
     return render(request, 'partials/home.html')
 
 def get_game(request):
@@ -25,7 +29,8 @@ def get_game(request):
     logger.debug("get_game")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_game XMLHttpRequest")
-        return render(request, 'fragments/game_fragment.html')
+        html = render_to_string('fragments/game_fragment.html', context={}, request=request)
+        return JsonResponse({'html': html})
     return render(request, 'partials/game.html')
 
 def get_login(request):
@@ -38,7 +43,8 @@ def get_login(request):
     form = LogInForm()
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_login returning fragment")
-        return render(request, 'fragments/login_fragment.html', {'form': form})
+        html = render_to_string('fragments/login_fragment.html', {'form': form}, request=request)
+        return JsonResponse({'html': html})
     logger.debug("get_login returning")
     logger.debug("form.errors:")
     logger.debug(form.errors) 
@@ -55,26 +61,29 @@ def get_signup(request):
     form = SignUpForm()
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_signup returning fragment")
-        return render(request, 'fragments/signup_fragment.html', {'form': form})
+        html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
+        return JsonResponse({'html': html})
     logger.debug("get_signup returning")
     logger.debug("form.errors:")
     logger.debug(form.errors) 
     return render(request, 'partials/signup.html', {'form': form})
 
 def get_profile(request):
-		logger.debug("")
-		logger.debug("get_profile called")
-		if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-				logger.debug("get_profile XMLHttpRequest")
-				return render(request, 'fragments/profile_fragment.html')
-		return render(request, 'partials/profile.html')
+    logger.debug("")
+    logger.debug("get_game")
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        logger.debug("get_game XMLHttpRequest")
+        html = render_to_string('fragments/profile_fragment.html', context={}, request=request)
+        return JsonResponse({'html': html})
+    return render(request, 'partials/game.html')
 
 def get_tournament(request):
     logger.debug("")
     logger.debug("get_tournament")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_tournament XMLHttpRequest")
-        return render(request, 'fragments/tournament_fragment.html')
+        html = render_to_string('fragments/tournament_fragment.html', context={}, request=request)
+        return JsonResponse({'html': html})
     return render(request, 'partials/tournament.html')
 
 def get_404(request):
@@ -82,7 +91,8 @@ def get_404(request):
     logger.debug("get_404")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_404 XMLHttpRequest")
-        return render(request, 'fragments/404_fragment.html', status=404)
+        html = render_to_string('fragments/404_fragment.html', context={}, request=request)
+        return JsonResponse({'html': html}, status=404)
     return render(request, 'partials/404.html', status=404)
 
 # def get_other(request):

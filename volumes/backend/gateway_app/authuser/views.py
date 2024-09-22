@@ -1,13 +1,16 @@
 # views.py
 import os
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from django.template import RequestContext
 # from django.contrib.auth.models import User
 from authuser.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from authuser.forms import SignUpForm, LogInForm
+from django.middleware.csrf import get_token
 import logging
 logger = logging.getLogger(__name__)
 
@@ -20,7 +23,8 @@ def get_logout(request):
     messages.success(request, 'You have been logged out successfully.')
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_logout XMLHttpRequest")
-        return render(request, 'fragments/home_fragment.html')
+        html = render_to_string('fragments/home_fragment.html', context={}, request=request)
+        return JsonResponse({'html': html})
     return redirect('home')
 
 def post_login(request):
@@ -34,6 +38,7 @@ def post_login(request):
             logger.debug("post_login > POST > form.is_valid")
             user = form.get_user()
             login(request, user)
+            # logger.debug(request.user.is_authenticated)            
             messages.success(request, 'Login successful!')
             return redirect('home')
         else:
@@ -46,7 +51,8 @@ def post_login(request):
     form = LogInForm()
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("post_login returning fragment")
-        return render(request, 'fragments/login_fragment.html', {'form': form})
+        html = render_to_string('fragments/login_fragment.html', {'form': form}, request=request)
+        return JsonResponse({'html': html})
     logger.debug("post_login returning")
     logger.debug("form.errors:")
     logger.debug(form.errors) 
@@ -86,7 +92,8 @@ def post_signup(request):
     form = SignUpForm()
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("post_signup returning fragment")
-        return render(request, 'fragments/signup_fragment.html', {'form': form})
+        html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
+        return JsonResponse({'html': html})
     logger.debug("post_signup returning")
     logger.debug("form.errors:")
     logger.debug(form.errors) 
