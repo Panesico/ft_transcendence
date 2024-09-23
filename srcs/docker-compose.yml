@@ -25,7 +25,8 @@ services:
         SERVICE_NAME: gateway
     image: gateway
     container_name: gateway
-    # environment:
+    environment:
+      - PYTHONPATH=/usr/src/app/authentif_app
     #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
     env_file:
       - .env
@@ -49,7 +50,6 @@ services:
         SERVICE_NAME: authentif
     image: authentif
     container_name: authentif
-    # environment:
     #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
     env_file:
       - .env

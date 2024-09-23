@@ -4,6 +4,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.contrib import messages
+from django.urls import reverse
 from .forms import SignUpFormFrontend, LogInFormFrontend
 import requests
 import logging
@@ -28,7 +29,7 @@ def get_signup(request):
     return render(request, 'partials/signup.html', {'form': form})
 
 def get_logout(request):
-    authentif_url = 'http://authentif:8001/api/logout/' 
+    authentif_url = 'http://authentif:9000/api/logout/' 
     if request.method != 'GET':
       return redirect('405')
     response = requests.get(authentif_url, cookies=request.COOKIES)
@@ -59,8 +60,22 @@ def post_login(request):
         'password': request.POST.get('password')
     }
     response = requests.post(authentif_url, data=data, headers=headers)
+    logger.debug(f"post_login > Response cookies: {response.cookies}")
     if response.ok:
-        return redirect('home', {'status': 'success', 'message': 'Login successful'})
+        user_response = redirect(reverse('home'))
+
+        for cookie in response.cookies:
+            user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True)
+
+        logger.debug(f"post_login > authentif_cookies: {user_response.cookies}")
+        
+        return user_response
+
+
+        for cookie in response.cookies:
+            response.set_cookie(cookie.name, cookie.value, domain='localhost:9000', httponly=True)
+        return redirect(f"{reverse('home')}?status=success&message=Login%20successful")
+
     else:
         form = LogInFormFrontend()
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
