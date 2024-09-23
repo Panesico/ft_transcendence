@@ -26,6 +26,13 @@ class CustomUserManager(UserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(blank=True, default='', unique=True, max_length=20)
     password = models.CharField(max_length=128)
+
+    city = models.CharField(max_length=100, blank=True, default='')
+    country = models.CharField(max_length=100, blank=True, default='')
+    played_games = models.IntegerField(default=0)
+    wins = models.IntegerField(default=0)
+    defeats = models.IntegerField(default=0)
+		#avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     # elo = models.IntegerField(default=1000)
     # wins = models.IntegerField(default=0)
     # loses = models.IntegerField(default=0)

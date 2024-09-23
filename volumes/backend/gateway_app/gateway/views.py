@@ -7,7 +7,8 @@ from .forms import InviteFriendFormFrontend
 from django.contrib import messages
 import logging
 logger = logging.getLogger(__name__)
-
+# May deelete this import
+from django.template.response import TemplateResponse
 
 def get_home(request):
     logger.debug("")
@@ -55,16 +56,26 @@ def get_tournament(request):
 def list_friends(request):
 	logger.debug("")
 	logger.debug("list_friends")
-	if request.method == 'GET':
-		if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-			logger.debug("list_friends > GET")
-			html = render_to_string('fragments/myfriends_fragment.html', context={}, request=request)
-			return JsonResponse({'html': html})
-		return render(request, 'partials/myfriends.html')
-	else:
-		logger.debug("post_login > not POST returning 405")
-		html = render_to_string('fragments/405_fragment.html', context={}, request=request)
-		return JsonResponse({'html': html}, status=405)
+	context = {'username': "Mbappe", 'city': "Madrid", 'country': "Spain"}
+	variable1 = "Mbappe"
+	variable2 = "Madrid"
+	variable3 = "Spain"
+	my_variable = "Hello, Django!"
+	return (render(request, 'partials/myfriends.html', {
+        'variable1': variable1,
+        'variable2': variable2,
+        'variable3': variable3,
+    }))
+	# if request.method == 'GET':
+	# 	if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+	# 		logger.debug("list_friends > GET")
+	# 		html = render_to_string('fragments/myfriends_fragment.html', {'my_variable': my_variable}, request=request)
+	# 		return JsonResponse({'html': html})
+	# 	return render(request, 'partials/myfriends.html', {'my_variable': my_variable})
+	# else:
+	# 	logger.debug("post_login > not POST returning 405")
+	# 	html = render_to_string('fragments/405_fragment.html', {'my_variable': my_variable}, request=request)
+	# 	return JsonResponse({'html': html}, status=405)
 
 def post_invite(request):
 	logger.debug("")
