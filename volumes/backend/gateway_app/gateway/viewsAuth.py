@@ -43,12 +43,13 @@ def get_logout(request):
         return JsonResponse({'status': 'error', 'message': 'Logout failed'}, status=response.status_code)
 
 def post_login(request):
-    authentif_url = 'http://authentif:9000/api/login/' 
+    logger.debug('post_login')
+    authentif_url = 'http://authentif:9000/api/login/'
     if request.method != 'POST':
       return redirect('405')
     csrf_token = request.COOKIES.get('csrftoken')
     # logger.debug(request.POST)
-    # logger.debug(f'csrf_token: {csrf_token}')
+    logger.debug(f'csrf_token: {csrf_token}')
     # logger.debug("")
     headers = {
         'X-CSRFToken': csrf_token,
@@ -60,22 +61,19 @@ def post_login(request):
         'password': request.POST.get('password')
     }
     response = requests.post(authentif_url, data=data, headers=headers)
+
     logger.debug(f"post_login > Response cookies: {response.cookies}")
     if response.ok:
-        user_response = redirect(reverse('home'))
-
+        status = response.json().get("status")
+        message = response.json().get("message")
+        user_response = redirect(
+           f"{reverse('home')}?status={status}&message={message}")
+        
         for cookie in response.cookies:
             user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True)
-
+            
         logger.debug(f"post_login > authentif_cookies: {user_response.cookies}")
-        
         return user_response
-
-
-        for cookie in response.cookies:
-            response.set_cookie(cookie.name, cookie.value, domain='localhost:9000', httponly=True)
-        return redirect(f"{reverse('home')}?status=success&message=Login%20successful")
-
     else:
         form = LogInFormFrontend()
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':

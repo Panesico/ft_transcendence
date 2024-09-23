@@ -36,7 +36,7 @@ def get_profile(request):
     logger.debug("")
     logger.debug("get_profile")
     if request.method != 'GET':
-    	return redirect('405')
+      return redirect('405')
     form = InviteFriendFormFrontend()
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_profile XMLHttpRequest")

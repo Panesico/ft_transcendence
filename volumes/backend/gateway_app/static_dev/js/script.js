@@ -41,8 +41,10 @@ async function handleFormSubmission() {
   const form = document.querySelector('form');
 
   if (form) {
+    // console.log('form: ', form);
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      // console.log('Form submitted', e);
 
       const formData = new FormData(form);
       let url = form.action;
@@ -54,19 +56,17 @@ async function handleFormSubmission() {
 
       // console.log('formData: ', formData);
       try {
-        // const response = await fetch(url, {
-        //   method: 'POST',
-        //   headers: {'X-Requested-With': 'XMLHttpRequest'},
-        //   body: formData
-        // })
+        // console.log('url: ', url);
         const response = await fetch(url, {
           method: 'POST',
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
             'Content-Type': 'application/json'
           },
+          credentials: 'include',
           body: JSON.stringify(jsonObject)
         });
+        // console.log('response: ', response);
 
         if (!response.ok) {
           throw new Error(`HTTP error - status: ${response.status}`);
@@ -97,8 +97,13 @@ async function loadContent(path) {
   // console.log('url: ', url);
   // Fetch content from Django and inject into main
   try {
-    const response =
-        await fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+    let request = new Request(url, {
+      headers: {'X-Requested-With': 'XMLHttpRequest'},
+      credentials: 'include',
+    });
+    // console.log('request: ', request);
+
+    const response = await fetch(request);
 
     // console.log('response: ', response);
     if (!response.ok) {
