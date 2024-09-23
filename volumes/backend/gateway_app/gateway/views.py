@@ -48,6 +48,20 @@ def get_tournament(request):
         return JsonResponse({'html': html})
     return render(request, 'partials/tournament.html')
 
+def list_friends(request):
+	logger.debug("")
+	logger.debug("list_friends")
+	if request.method == 'GET':
+		if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+			logger.debug("list_friends > GET")
+			html = render_to_string('fragments/myfriends_fragment.html', context={}, request=request)
+			return JsonResponse({'html': html})
+		return render(request, 'partials/myfriends.html')
+	else:
+		logger.debug("post_login > not POST returning 405")
+		html = render_to_string('fragments/405_fragment.html', context={}, request=request)
+		return JsonResponse({'html': html}, status=405)
+
 def post_invite(request):
 	logger.debug("")
 	logger.debug("post_invite")

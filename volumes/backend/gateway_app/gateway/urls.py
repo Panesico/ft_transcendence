@@ -16,7 +16,7 @@ urlpatterns = [
 		path('profile/', views.get_profile, name='profile'),
 
 		path('api/invite/', views.post_invite, name='post_invite'),
-
+		path('my_friends/', views.list_friends, name='list_friends'),
     path('404/', viewsErrors.get_404, name='404'),
     path('405/', viewsErrors.get_405, name='405'),
 
