@@ -1,23 +1,9 @@
-"""
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
 from django.contrib import admin
 from django.urls import path, re_path
 
 from gateway import views as views
-from authuser import views as authViews
+from gateway import viewsAuth as viewsAuth
+from gateway import viewsErrors as viewsErrors
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,22 +11,21 @@ urlpatterns = [
     path('', views.get_home, name='home'),
     path('home/', views.get_home, name='home'),
 
-    path('signup/', views.get_signup, name='signup'),
-    path('login/', views.get_login, name='login'),
-
     path('game/', views.get_game, name='game'),
     path('tournament/', views.get_tournament, name='tournament'),
 		path('profile/', views.get_profile, name='profile'),
 
 		path('api/invite/', views.post_invite, name='post_invite'),
 
+    path('404/', viewsErrors.get_404, name='404'),
+    path('405/', viewsErrors.get_405, name='405'),
 
-    # authuser app
-    path('api/auth/signup/', authViews.post_signup, name='post_signup'),
-    path('api/auth/login/', authViews.post_login, name='post_login'),
-    path('api/auth/logout/', authViews.get_logout, name='logout'),
-
-    path('404/', views.get_404, name='404'),
+    # authentif app
+    path('signup/', viewsAuth.get_signup, name='signup'),
+    path('login/', viewsAuth.get_login, name='login'),
+    path('api/auth/signup/', viewsAuth.post_signup, name='post_signup'),
+    path('api/auth/login/', viewsAuth.post_login, name='post_login'),
+    path('api/auth/logout/', viewsAuth.get_logout, name='logout'),
     
     # path('api/data/', views.get_files, name='files'),
     # re_path(r'^.*$', views.get_other),  # Catch-all route to serve the SPA

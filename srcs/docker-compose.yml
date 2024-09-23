@@ -25,6 +25,8 @@ services:
         SERVICE_NAME: gateway
     image: gateway
     container_name: gateway
+    # environment:
+    #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
     env_file:
       - .env
     ports:
@@ -36,26 +38,30 @@ services:
       - frontend:/usr/src/frontend/
     depends_on:
       - postgres
-  #   - authuser
+      - authentif
   # restart: unless-stopped
 
-  # authuser:
-  #   build:
-  #     context: ./authuser
-  #     dockerfile: Dockerfile
-  #   image: authuser
-  #   container_name: authuser
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "9001:9000"
-  #   networks:
-  #     - transcendence
-  #   volumes:
-  #     - backend:/usr/src/app
-  #     - frontend:/usr/src/frontend/
-  #   # depends_on:
-  #   #   - postgres
+  authentif:
+    build:
+      context: ./authentif
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: authentif
+    image: authentif
+    container_name: authentif
+    # environment:
+    #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
+    env_file:
+      - .env
+    ports:
+      - "9001:9000"
+    networks:
+      - transcendence
+    volumes:
+      - backend:/usr/src/app
+      - frontend:/usr/src/frontend/
+    depends_on:
+      - postgres
   #   restart: unless-stopped
 
   postgres:

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sleep 6
+sleep 3
 
 # ex: 
 # PROJECT_NAME: gateway
@@ -48,11 +48,16 @@ else
     echo "--STATIC_ROOT is already present in $SETTINGS_FILE."
 fi
 
+# Create super user with env variables
+echo "--Creating super user..."
+python manage.py createsuperuser --noinput
+
 # Collect static files and apply migrations
 echo "--Collecting static files..."
 python manage.py collectstatic --noinput
 
 echo "--Making migrations..."
+python manage.py makemigrations authentif
 python manage.py makemigrations
 
 echo "--Applying migrations..."

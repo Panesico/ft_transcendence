@@ -8,7 +8,7 @@ function loadAdditionalJs(path) {
   if (path === '/game') {
     url += 'pong.js';
     loadJs(url);
-	}
+  }
   //  else if (path === '/profile') {
   //   url += 'profile.js';
   //   loadJs(url);
@@ -37,13 +37,26 @@ async function handleFormSubmission() {
       const formData = new FormData(form);
       let url = form.action;
 
+      const jsonObject = {};
+      formData.forEach((value, key) => {
+        jsonObject[key] = value;
+      });
+
       // console.log('formData: ', formData);
       try {
+        // const response = await fetch(url, {
+        //   method: 'POST',
+        //   headers: {'X-Requested-With': 'XMLHttpRequest'},
+        //   body: formData
+        // })
         const response = await fetch(url, {
           method: 'POST',
-          headers: {'X-Requested-With': 'XMLHttpRequest'},
-          body: formData
-        })
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(jsonObject)
+        });
 
         if (!response.ok) {
           throw new Error(`HTTP error - status: ${response.status}`);

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
 # from django.contrib.auth.models import User
-from authuser.models import User
+from authentif.models import User
 from django.core.exceptions import ValidationError
 import logging
 logger = logging.getLogger(__name__)

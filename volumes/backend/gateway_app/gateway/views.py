@@ -1,15 +1,8 @@
-# views.py
 import os
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
-from django.template import RequestContext
-# from django.contrib.auth.models import User
-from authuser.models import User
-from django.contrib import messages
-from authuser.forms import SignUpForm, LogInForm
-from django.middleware.csrf import get_token
 import logging
 logger = logging.getLogger(__name__)
 
@@ -33,41 +26,6 @@ def get_game(request):
         return JsonResponse({'html': html})
     return render(request, 'partials/game.html')
 
-def get_login(request):
-    logger.debug("")
-    logger.debug("get_login")
-    if request.method != 'GET':
-        logger.debug("get_login > != 'GET'")
-        return render(request, 'partials/405.html', status=405)
-    
-    form = LogInForm()
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_login returning fragment")
-        html = render_to_string('fragments/login_fragment.html', {'form': form}, request=request)
-        return JsonResponse({'html': html})
-    logger.debug("get_login returning")
-    logger.debug("form.errors:")
-    logger.debug(form.errors) 
-    return render(request, 'partials/login.html', {'form': form})
-
-def get_signup(request):
-    logger.debug("")
-    logger.debug("get_signup")
-    logger.debug(request)
-    if request.method != 'GET':
-        logger.debug("get_signup > != 'GET'")
-        return render(request, 'partials/405.html', status=405)
-
-    form = SignUpForm()
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_signup returning fragment")
-        html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
-        return JsonResponse({'html': html})
-    logger.debug("get_signup returning")
-    logger.debug("form.errors:")
-    logger.debug(form.errors) 
-    return render(request, 'partials/signup.html', {'form': form})
-
 def get_profile(request):
     logger.debug("")
     logger.debug("get_profile")
@@ -85,15 +43,6 @@ def get_tournament(request):
         html = render_to_string('fragments/tournament_fragment.html', context={}, request=request)
         return JsonResponse({'html': html})
     return render(request, 'partials/tournament.html')
-
-def get_404(request):
-    logger.debug("")
-    logger.debug("get_404")
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_404 XMLHttpRequest")
-        html = render_to_string('fragments/404_fragment.html', context={}, request=request)
-        return JsonResponse({'html': html}, status=404)
-    return render(request, 'partials/404.html', status=404)
 
 def post_invite(request):
 	logger.debug("")
