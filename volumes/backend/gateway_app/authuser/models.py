@@ -39,6 +39,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(blank=True, null=True)
 
+    friends = models.ManyToManyField('self', blank=True, related_name='friends_with')
+		
     USERNAME_FIELD = 'username'
     # REQUIRED_FIELDS = ['username', 'password']
     REQUIRED_FIELDS = []
