@@ -29,7 +29,8 @@
           <p>Defeat</p>
         </div>
       </div>
-			<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleModal" >
+			<a href="{% url 'game' %}" class="btn btn-light" role="button" style="margin-right: 10px;">All my friends</a>
+			<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#inviteFrienModal" >
 				Invite a friend
 			</button>
     </div>
@@ -40,30 +41,56 @@
 
 <!-- Modal -->
 
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="inviteFrienModal" tabindex="-1" aria-labelledby="inviteFrienModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
 		<div class="profile-modal-content">
 			<div class="modal-content" style="background-color: #333; color: #fff;">
 			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="exampleModalLabel">Let's invite a friend</h1>
+				<h1 class="modal-title fs-5" id="inviteFrienModalLabel">Let's invite a friend</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></button>
       </div>
       <div class="modal-body">
 				<form method="post" action="{% url 'post_invite' %}">
+					<label for="{{ form.username.id_for_label }}" class="col-form-label">{{ form.username.label }}</label>
 					{% csrf_token %}
-          <div class="mb-3">
-            <label for="login-name" class="col-form-label">Login:</label>
-            <input type="text" class="form-control" id="login-name">
-          </div>
-						<div class="modal-footer">
+					{{ form.as_p }}
+					<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 							<button type="submit" class="btn btn-light">Send invite</button>
-						</div>
-        </form>
+					</div>
+			</form>
       </div>
     </div>
 	</div>
   </div>
 </div>
 
+
+{% comment %} <!-- Modal -->
+--> Former modal code
+<div class="modal fade" id="inviteFrienModal" tabindex="-1" aria-labelledby="inviteFrienModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+		<div class="profile-modal-content">
+			<div class="modal-content" style="background-color: #333; color: #fff;">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="inviteFrienModalLabel">Let's invite a friend</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></button>
+      </div>
+      <div class="modal-body">
+				<form method="post" action="{% url 'post_invite' %}">
+					{% csrf_token %}
+					<div class="mb-3">
+            <label for="login-name" class="col-form-label">Login:</label>
+            <input type="text" class="form-control" id="login-name">
+          </div>
+					<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="submit" class="btn btn-light">Send invite</button>
+					</div>
+			</form>
+      </div>
+    </div>
+	</div>
+  </div>
+</div> {% endcomment %}
 {% comment %} We could add a sort of statistic graph win per losses here {% endcomment %}

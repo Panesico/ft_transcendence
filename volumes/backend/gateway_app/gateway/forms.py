@@ -45,3 +45,15 @@ class SignUpFormFrontend(forms.Form):
         label='Confirm Password', 
         required=True
         )
+
+class InviteFriendFormFrontend(forms.Form):
+  friendName = forms.CharField(
+        max_length=20, 
+        widget=forms.TextInput(attrs={
+						'type': 'text',
+            'class': 'form-control',
+            'id': 'login-name'
+          }),
+        label="Friend's Name",
+        required=True,
+        )

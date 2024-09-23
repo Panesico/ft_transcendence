@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
+from .forms import InviteFriendFormFrontend
 import logging
 logger = logging.getLogger(__name__)
 
@@ -29,11 +30,14 @@ def get_game(request):
 def get_profile(request):
     logger.debug("")
     logger.debug("get_profile")
+    if request.method != 'GET':
+    	return redirect('405')
+    form = InviteFriendFormFrontend()
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_profile XMLHttpRequest")
-        html = render_to_string('fragments/profile_fragment.html', context={}, request=request)
+        html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
         return JsonResponse({'html': html})
-    return render(request, 'partials/profile.html')
+    return render(request, 'partials/profile.html', {'form': form})
 
 def get_tournament(request):
     logger.debug("")
