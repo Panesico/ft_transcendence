@@ -4,6 +4,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from .forms import InviteFriendFormFrontend
+from django.contrib import messages
 import logging
 logger = logging.getLogger(__name__)
 
@@ -12,11 +13,14 @@ def get_home(request):
     logger.debug("")
     logger.debug("get_home")
     logger.debug(request)
+    status = request.GET.get('status', '')
+    message = request.GET.get('message', '')
+    logger.debug(f"get_home > Request Cookies: {request.COOKIES}")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_home XMLHttpRequest")
         html = render_to_string('fragments/home_fragment.html', context={}, request=request)
-        return JsonResponse({'html': html})
-    return render(request, 'partials/home.html')
+        return JsonResponse({'html': html, 'status': status, 'message': "JsonResponse home"})
+    return render(request, 'partials/home.html', {'status': status, 'message': message})
 
 def get_game(request):
     logger.debug("")

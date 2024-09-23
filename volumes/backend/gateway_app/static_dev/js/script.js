@@ -1,6 +1,16 @@
 // script.js
 const fetchedFiles = new Set();
 
+function showMessage(data) {
+  if (data.message) {
+    console.log('data.message: ', data.message);
+    let messageModal =
+        new bootstrap.Modal(document.getElementById('messageModal'));
+    messageModal.show();
+    document.getElementById('messageContent').innerText = data.message;
+  }
+}
+
 // Load additional JS based on current path
 function loadAdditionalJs(path) {
   let url = '/static/js/';
@@ -66,6 +76,7 @@ async function handleFormSubmission() {
         // console.log('data: ', data);
         document.querySelector('main').innerHTML = data.html;
 
+        showMessage(data);
         handleFormSubmission();
         loadAdditionalJs(window.location.pathname);
 
@@ -96,6 +107,8 @@ async function loadContent(path) {
     const data = await response.json();
     // console.log('data: ', data);
     document.querySelector('main').innerHTML = data.html;
+
+    showMessage(data);
     handleFormSubmission();
     loadAdditionalJs(path);
   } catch (error) {
