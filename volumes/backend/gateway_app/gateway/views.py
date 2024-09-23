@@ -57,15 +57,11 @@ def list_friends(request):
 	logger.debug("")
 	logger.debug("list_friends")
 	context = {'username': "Mbappe", 'city': "Madrid", 'country': "Spain"}
-	variable1 = "Mbappe"
-	variable2 = "Madrid"
-	variable3 = "Spain"
-	my_variable = "Hello, Django!"
-	return (render(request, 'partials/myfriends.html', {
-        'variable1': variable1,
-        'variable2': variable2,
-        'variable3': variable3,
-    }))
+	name = "Mbappe"
+	city = "Madrid"
+	country = "Spain"
+	my_variable = {'name': name, 'city': city, 'country': country, 'played': 10, 'won': 5, 'lost': 5}
+	return (render(request, 'partials/myfriends.html', my_variable))
 	# if request.method == 'GET':
 	# 	if request.headers.get('x-requested-with') == 'XMLHttpRequest':
 	# 		logger.debug("list_friends > GET")
