@@ -1,4 +1,4 @@
-<header class="navbar navbar-expand-lg navbar-dark bg-dark">
+<header class="navbar navbar-expand-lg navbar-dark bg-dark" id="mainHeader">
   <div class="container-fluid">
     <a class="navbar-brand" href="{% url 'home' %}"
       onclick="navigate(event, '/')">Pongscendence</a>
@@ -9,6 +9,9 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav ms-auto">
+        <li class="nav-item d-flex align-items-center">
+          <p class="fs-6 text-light">{% if user.is_authenticated %}{{ user.username }}{% endif %}</p>
+        </li>
         <li class="nav-item d-flex align-items-center">
           <a class="nav-link active" aria-current="page" href="{% url 'home' %}"
             onclick="navigate(event, '/')">Home</a>

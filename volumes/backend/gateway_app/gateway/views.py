@@ -18,9 +18,8 @@ def get_home(request):
     message = request.GET.get('message', '')
     logger.debug(f"get_home > Request Cookies: {request.COOKIES}")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_home XMLHttpRequest")
         html = render_to_string('fragments/home_fragment.html', context={}, request=request)
-        return JsonResponse({'html': html, 'status': status, 'message': "JsonResponse home"})
+        return JsonResponse({'html': html, 'status': status, 'message': message})
     return render(request, 'partials/home.html', {'status': status, 'message': message})
 
 def get_game(request):
