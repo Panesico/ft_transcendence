@@ -34,7 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     defeats = models.IntegerField(default=0)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     # friends = models.ManyToManyField('self', blank=True, related_name='friends_with')
-    friends = models.ManyToManyField('self', blank=True, related_name='friend_set')
+    friends = models.ManyToManyField('self', blank=True)
     # elo = models.IntegerField(default=1000)
     # wins = models.IntegerField(default=0)
     # loses = models.IntegerField(default=0)
