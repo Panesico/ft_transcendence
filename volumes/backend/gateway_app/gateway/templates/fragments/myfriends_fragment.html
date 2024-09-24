@@ -158,14 +158,14 @@
 </div>
 </div> {% endcomment %}
 
-<div class="container">
+<div class="container" style="overflow-y: scroll;">
 	<div class="row">
 			<div class="col-md-10">
-					<div class="people-nearby">
+					<div class="people-nearby" >
 							{% comment %} {% for friend in friends %} {% endcomment %}
 							<div class="nearby-user">
-									<div class="row">
-											<div class="col-md-2 col-sm-2">
+									<div class="row" >
+											<div class="col-md-2 col-sm-2" >
 													<img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="user" class="profile-photo-lg">
 											</div>
 											<div class="col-md-7 col-sm-7">
@@ -180,8 +180,8 @@
 													{% endblock %}
 											</div>
 											<div class="col-md-3 col-sm-3 d-flex">
-													<button class="btn btn-light flex-fill me-2">Let's chat</button>
-													<button class="btn btn-outline-light flex-fill">Let's play</button>
+													<button class="btn btn-light flex-fill me-2" data-bs-toggle="modal" data-bs-target="#chatModal" >Let's chat</button>
+													<button class="btn btn-outline-light flex-fill" >Let's play</button>
 											</div>
 									</div>
 							</div>
@@ -190,3 +190,40 @@
 			</div>
 	</div>
 </div>
+
+
+<section>
+  <div class="container py-5">
+    <!-- Modal -->
+    <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" style="background: linear-gradient(to left, #747474, #333333);">
+          <div class="modal-header d-flex justify-content-center align-items-center">
+						<h5 style="color: white; flex-grow: 1; text-align: center;" class="modal-title" id="chatModalLabel">Chat messages</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+          <div class="modal-body" style="height: 400px; overflow-y: scroll;">
+            <!-- Chat messages will go here -->
+            <div class="d-flex justify-content-between">
+              <p style="color: white" >Fanny Neguesha</p>
+              <p class="small mb-1 text-muted" >23 Jan 2:00 pm</p>
+            </div>
+            <div class="d-flex flex-row justify-content-start">
+              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp" alt="avatar 1" style="width: 45px; height: 100%;">
+              <div>
+                <p class="small p-2 ms-3 mb-3 rounded-3 bg-body-tertiary" style="color: black">What's up crackos ?</p>
+              </div>
+            </div>
+            <!-- More chat messages... -->
+          </div>
+          <div class="modal-footer">
+            <div class="input-group mb-0">
+              <input type="text" class="form-control" placeholder="Type message" aria-label="Recipient's username" aria-describedby="button-addon2" />
+              <button class="btn btn-dark" type="button" id="button-addon2" style="padding-top: .55rem;">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
