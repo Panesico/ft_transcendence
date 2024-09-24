@@ -14,7 +14,6 @@ COPY  ./tools/ /tmp/
 
 # Install Python dependencies specified in requirements.txt
 RUN   pip install -r /tmp/requirements.txt
-RUN		python -m pip install Pillow  #Access to the avatar
 
 RUN   chmod +x /tmp/init_django.sh
 

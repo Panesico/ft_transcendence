@@ -7,3 +7,5 @@ requests==2.32.3
 # daphne==4.1.2
 # # Channels for WebSockets
 # channels==4.1.0
+# Image processing
+pillow==10.4.0
