@@ -1,6 +1,7 @@
 // script.js
 const fetchedFiles = new Set();
 
+// Show message modal
 function showMessage(data) {
   if (data.message) {
     console.log('data.message: ', data.message);
@@ -26,7 +27,7 @@ function loadAdditionalJs(path) {
 
   function loadJs(url) {
     if (url.length > 11 && !document.querySelector(`script[src="${url}"]`)) {
-      console.log(`%cLoading ${url}`, 'color: yellow; font-weight: bold;');
+      // console.log(`%cLoading ${url}`, 'color: yellow; font-weight: bold;');
       const script = document.createElement('script');
       script.src = url;
       script.type = 'text/javascript';
@@ -34,6 +35,22 @@ function loadAdditionalJs(path) {
       fetchedFiles.add(url);
     }
   }
+}
+
+// Get value of a cookie
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    let cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      let cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
 }
 
 // Intercept form submissions for AJAX processing
@@ -57,16 +74,19 @@ async function handleFormSubmission() {
       // console.log('formData: ', formData);
       try {
         // console.log('url: ', url);
-        const response = await fetch(url, {
+        let request = new Request(url, {
           method: 'POST',
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
           },
           credentials: 'include',
           body: JSON.stringify(jsonObject)
         });
-        // console.log('response: ', response);
+        // console.log('handleFormSubmission > request: ', request);
+        const response = await fetch(request);
+        // console.log('handleFormSubmission > response: ', response);
 
         if (!response.ok) {
           throw new Error(`HTTP error - status: ${response.status}`);
@@ -91,7 +111,7 @@ async function handleFormSubmission() {
 
 // Load content based on current path
 async function loadContent(path) {
-  console.log('loadContent');
+  // console.log('loadContent');
   let url = (path === '/') ? path : `${path}/`;
 
   // console.log('url: ', url);
@@ -101,11 +121,11 @@ async function loadContent(path) {
       headers: {'X-Requested-With': 'XMLHttpRequest'},
       credentials: 'include',
     });
-    // console.log('request: ', request);
+    // console.log('loadContent > request: ', request);
 
     const response = await fetch(request);
 
-    // console.log('response: ', response);
+    // console.log('loadContent > response: ', response);
     if (!response.ok) {
       throw new Error(`HTTP error - status: ${response.status}`);
     }
@@ -127,7 +147,7 @@ function navigate(e, path) {
   e.preventDefault();
 
   for (const jsFile of fetchedFiles) {
-    console.log(`%cRemoving ${jsFile}`, 'color: red; font-weight: bold;');
+    // console.log(`%cRemoving ${jsFile}`, 'color: red; font-weight: bold;');
     const script = document.querySelector(`script[src="${jsFile}"]`);
     script.remove();
     fetchedFiles.delete(jsFile);
@@ -148,7 +168,8 @@ window.onpopstate = () => {
 };
 
 // Initialise the correct content on page load
-// window.onload = () => {
-//   console.log('onload');
-//   // loadContent(window.location.pathname);
-// };
+window.onload = () => {
+  // console.log('onload');
+  // loadContent(window.location.pathname);
+  handleFormSubmission();
+};

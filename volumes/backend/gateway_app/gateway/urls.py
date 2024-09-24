@@ -21,10 +21,8 @@ urlpatterns = [
     path('405/', viewsErrors.get_405, name='405'),
 
     # authentif app
-    path('signup/', viewsAuth.get_signup, name='signup'),
-    path('login/', viewsAuth.get_login, name='login'),
-    path('api/auth/signup/', viewsAuth.post_signup, name='post_signup'),
-    path('api/auth/login/', viewsAuth.post_login, name='post_login'),
+    path('signup/', viewsAuth.view_signup, name='signup'),
+    path('login/', viewsAuth.view_login, name='login'),
     path('api/auth/logout/', viewsAuth.get_logout, name='logout'),
     
     # path('api/data/', views.get_files, name='files'),
