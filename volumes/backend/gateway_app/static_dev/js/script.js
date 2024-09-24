@@ -9,6 +9,11 @@ function showMessage(data) {
         new bootstrap.Modal(document.getElementById('messageModal'));
     messageModal.show();
     document.getElementById('messageContent').innerText = data.message;
+
+
+    // if (data.message && (data.message === 'Logged out successfully')) {
+    //   location.reload();
+    // }
   }
 }
 
@@ -73,7 +78,7 @@ async function handleFormSubmission() {
 
       // console.log('formData: ', formData);
       try {
-        // console.log('url: ', url);
+        console.log('url: ', url);
         let request = new Request(url, {
           method: 'POST',
           headers: {
@@ -94,7 +99,11 @@ async function handleFormSubmission() {
 
         const data = await response.json();
         // console.log('data: ', data);
-        document.querySelector('main').innerHTML = data.html;
+        if (data.message && (data.message === 'Login successful')) {
+          sessionStorage.setItem('afterLogin', 'true');
+          window.location.replace('/');
+        } else
+          document.querySelector('main').innerHTML = data.html;
 
         showMessage(data);
         handleFormSubmission();
@@ -114,7 +123,7 @@ async function loadContent(path) {
   // console.log('loadContent');
   let url = (path === '/') ? path : `${path}/`;
 
-  // console.log('url: ', url);
+  console.log('url: ', url);
   // Fetch content from Django and inject into main
   try {
     let request = new Request(url, {
@@ -131,7 +140,11 @@ async function loadContent(path) {
     }
     const data = await response.json();
     // console.log('data: ', data);
-    document.querySelector('main').innerHTML = data.html;
+    if (data.message && (data.message === 'Logged out successfully')) {
+      sessionStorage.setItem('afterLogout', 'true');
+      window.location.replace('/');
+    } else
+      document.querySelector('main').innerHTML = data.html;
 
     showMessage(data);
     handleFormSubmission();
@@ -173,3 +186,20 @@ window.onload = () => {
   // loadContent(window.location.pathname);
   handleFormSubmission();
 };
+
+// Display modal after redirect
+document.addEventListener('DOMContentLoaded', () => {
+  // console.log(
+  //     'sessionStorage.getItem(\'afterLogin\'): ',
+  //     sessionStorage.getItem('afterLogin'));
+  const data = {};
+  if (sessionStorage.getItem('afterLogin') === 'true') {
+    data.message = 'Login successful';
+    showMessage(data);
+    sessionStorage.removeItem('afterLogin');
+  } else if (sessionStorage.getItem('afterLogout') === 'true') {
+    data.message = 'Logged out successfully';
+    showMessage(data);
+    sessionStorage.removeItem('afterLogout');
+  }
+});
