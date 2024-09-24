@@ -99,7 +99,11 @@ def post_login(request):
 
         return user_response
     else:
-        form = LogInFormFrontend()
+        logger.debug(f"post_login > Response NOT OK: {response.json()}")
+        logger.debug(message)
+        data = json.loads(request.body)
+        form = LogInFormFrontend(data)
+        form.add_error(None, message)
         html = render_to_string('fragments/login_fragment.html', {'form': form}, request=request)
         return JsonResponse({'html': html, 'status': status, 'message': message})
 
@@ -124,18 +128,47 @@ def get_signup(request):
         return JsonResponse({'html': html})
     return render(request, 'partials/signup.html', {'form': form})
 
-
 def post_signup(request):
     logger.debug('post_signup')
     authentif_url = 'http://authentif:9001/api/signup/' 
     if request.method != 'POST':
-      return redirect('405')    
-    response = requests.post(authentif_url, data=request.POST)        
+      return redirect('405')
+
+    csrf_token = request.COOKIES.get('csrftoken')
+    headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json'
+    }
+    data = json.loads(request.body)
+
+    # logger.debug(f'csrf_token: {csrf_token}')
+    # logger.debug(f'Extracted headers: {headers}')
+    # logger.debug(f'Extracted data from JSON: {data}')
+    
+    response = requests.post(authentif_url, json=data, headers=headers)
+
+    status = response.json().get("status")
+    message = response.json().get("message")
+    logger.debug(f"status: {status}, message: {message}")
+    logger.debug(f"post_signup > Response: {response.json()}")
     if response.ok:
-        return redirect('home', {'status': 'success', 'message': 'Login successful'})
+        logger.debug('post_signup > Response OK')
+        user_response =  JsonResponse({'status': status, 'message': message})
+
+        for cookie in response.cookies:
+            user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True)
+
+        return user_response
     else:
-        form = SignUpFormFrontend()
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
-            return JsonResponse({'html': html, 'status': 'error', 'message': response.json().get('message')}, status=response.status_code)
-        return render(request, 'partials/signup.html', {'form': form, 'status': 'error', 'message': response.json().get('message')})
+        # logger.debug('post_signup > Response NOT OK')
+        data = json.loads(request.body)
+        form = SignUpFormFrontend(data)
+        # existing_errors = form.non_field_errors.as_text()
+        # logger.debug(f"existing_errors: {existing_errors}")
+        form.add_error(None, message)
+        # form._non_field_errors = form._create_errors(message)
+        # existing_errors = form.non_field_errors.as_text()
+        # logger.debug(f"existing_errors: {existing_errors}")
+        html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
+        return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)

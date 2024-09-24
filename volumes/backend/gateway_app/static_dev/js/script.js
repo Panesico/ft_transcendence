@@ -9,11 +9,6 @@ function showMessage(data) {
         new bootstrap.Modal(document.getElementById('messageModal'));
     messageModal.show();
     document.getElementById('messageContent').innerText = data.message;
-
-
-    // if (data.message && (data.message === 'Logged out successfully')) {
-    //   location.reload();
-    // }
   }
 }
 
@@ -78,7 +73,7 @@ async function handleFormSubmission() {
 
       // console.log('formData: ', formData);
       try {
-        console.log('url: ', url);
+        // console.log('url: ', url);
         let request = new Request(url, {
           method: 'POST',
           headers: {
@@ -91,24 +86,30 @@ async function handleFormSubmission() {
         });
         // console.log('handleFormSubmission > request: ', request);
         const response = await fetch(request);
+        const data = await response.json();
         // console.log('handleFormSubmission > response: ', response);
 
-        if (!response.ok) {
+        if (!response.ok && !data.html.includes('class="errorlist nonfield')) {
           throw new Error(`HTTP error - status: ${response.status}`);
         }
 
-        const data = await response.json();
         // console.log('data: ', data);
-        if (data.message && (data.message === 'Login successful')) {
-          sessionStorage.setItem('afterLogin', 'true');
+        if (data.status != 'error' && data.message) {
+          console.log('data.message: ', data.message);
+          if (data.message === 'Login successful') {
+            sessionStorage.setItem('afterLogin', 'true');
+          } else if (data.message === 'Sign up successful') {
+            sessionStorage.setItem('afterSignup', 'true');
+          }
           window.location.replace('/');
         } else
           document.querySelector('main').innerHTML = data.html;
 
-        showMessage(data);
+        if (!data?.html?.includes('class="errorlist nonfield')) {
+          showMessage(data);
+        }
         handleFormSubmission();
         loadAdditionalJs(window.location.pathname);
-
       } catch (error) {
         console.error('Form submission error:', error);
         document.querySelector('main').innerHTML =
@@ -123,7 +124,7 @@ async function loadContent(path) {
   // console.log('loadContent');
   let url = (path === '/') ? path : `${path}/`;
 
-  console.log('url: ', url);
+  // console.log('url: ', url);
   // Fetch content from Django and inject into main
   try {
     let request = new Request(url, {
@@ -201,5 +202,9 @@ document.addEventListener('DOMContentLoaded', () => {
     data.message = 'Logged out successfully';
     showMessage(data);
     sessionStorage.removeItem('afterLogout');
+  } else if (sessionStorage.getItem('afterSignup') === 'true') {
+    data.message = 'Signup successful';
+    showMessage(data);
+    sessionStorage.removeItem('afterSignup');
   }
 });

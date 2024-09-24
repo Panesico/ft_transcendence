@@ -8,8 +8,10 @@
       {% csrf_token %}
 
       {% if form.non_field_errors %}
-        <div class="alert alert-danger fs-6">
-          {{ form.non_field_errors }}
+        <div class="alert alert-danger fs-6 p-3">
+          <div class="errorlist nonfield m-0 p-0">
+            {{ form.non_field_errors.0 }}
+          </div>
         </div>
       {% endif %}
 
