@@ -53,8 +53,8 @@ services:
     #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
     env_file:
       - .env
-    ports:
-      - "9001:9000"
+    expose:
+      - 9001
     networks:
       - transcendence
     volumes:
