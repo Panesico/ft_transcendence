@@ -4,6 +4,9 @@ from django.urls import path, re_path
 from gateway import views as views
 from gateway import viewsAuth as viewsAuth
 from gateway import viewsErrors as viewsErrors
+# media setting 
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,3 +31,5 @@ urlpatterns = [
     # path('api/data/', views.get_files, name='files'),
     # re_path(r'^.*$', views.get_other),  # Catch-all route to serve the SPA
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

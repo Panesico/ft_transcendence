@@ -1,6 +1,7 @@
 # admin.py
 from django.contrib import admin
 from .models import User
+from django.utils.html import format_html
 
 # Inline for friends
 class FriendsInline(admin.TabularInline):
