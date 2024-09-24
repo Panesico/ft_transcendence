@@ -23,8 +23,8 @@ reset:
 	docker volume rm $$(docker volume ls -q); \
 	docker network rm $$(docker network ls -q) 2>/dev/null
 
-django:
-	docker exec -it django /bin/sh
+gateway:
+	docker exec -it gateway /bin/sh
 postgres:
 	docker exec -it postgres /bin/sh
 

@@ -32,7 +32,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     played_games = models.IntegerField(default=0)
     wins = models.IntegerField(default=0)
     defeats = models.IntegerField(default=0)
-		#avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     # elo = models.IntegerField(default=1000)
     # wins = models.IntegerField(default=0)
     # loses = models.IntegerField(default=0)
