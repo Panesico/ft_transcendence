@@ -32,8 +32,13 @@
         <li class="nav-item dropdown d-flex align-items-center">
           <p class="nav-link dropdown-toggle m-0" id="navbarDropdown"
             role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src= {{user.avatar.url}} alt="user.username"
-							style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
+            {% if user.is_authenticated %}
+						<img src="{{ user.avatar.url }}" alt="{{ user.username }}"
+								style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
+						{% else %}
+								<img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="default icon"
+										style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
+						{% endif %}
           </p>
           <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
 						<li>

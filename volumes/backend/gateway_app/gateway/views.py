@@ -35,6 +35,8 @@ def get_game(request):
 def get_profile(request):
     logger.debug("")
     logger.debug("get_profile")
+    if request.user.is_authenticated == False:
+      return redirect('login')
     if request.method != 'GET':
       return redirect('405')
     form = InviteFriendFormFrontend()
@@ -54,6 +56,8 @@ def get_tournament(request):
     return render(request, 'partials/tournament.html')
 
 def list_friends(request):
+	if not request.user.is_authenticated:
+		return redirect('login')
 	logger.debug("")
 	logger.debug("list_friends")
 	context = {'username': "Mbappe", 'city': "Madrid", 'country': "Spain"}

@@ -33,6 +33,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     wins = models.IntegerField(default=0)
     defeats = models.IntegerField(default=0)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    # friends = models.ManyToManyField('self', blank=True, related_name='friends_with')
+    friends = models.ManyToManyField('self', blank=True, related_name='friend_set')
     # elo = models.IntegerField(default=1000)
     # wins = models.IntegerField(default=0)
     # loses = models.IntegerField(default=0)
@@ -46,8 +48,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(blank=True, null=True)
 
-    # friends = models.ManyToManyField('self', blank=True, related_name='friends_with')
-    friends = models.ManyToManyField('self', blank=True)
 
     USERNAME_FIELD = 'username'
     # REQUIRED_FIELDS = ['username', 'password']
@@ -63,3 +63,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.name
 
 
+# If you have a through model, you can define it like this:
+# class Friendship(models.Model):
+#     from_user = models.ForeignKey(User, related_name='from_user', on_delete=models.CASCADE)
+#     to_user = models.ForeignKey(User, related_name='to_user', on_delete=models.CASCADE)
+#     created = models.DateTimeField(auto_now_add=True)

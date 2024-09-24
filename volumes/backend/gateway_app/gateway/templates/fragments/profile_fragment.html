@@ -6,35 +6,39 @@
 		margin-top: 80px;">
     <div class="profile-page-details">
 			<h1 style="margin-bottom: 1rem; align-self: flex-start;">Profile page</h1>
+			{% if user.is_authenticated %}
 			<img src= {{user.avatar.url}} alt="user.username" style="height: 10rem; width: 10rem; object-fit: center;
 				border-radius: 50%; border: 2px solid #fff;">
-      <h1 style="font-weight: 400; font-size: 1.3rem; margin: 1rem 0;"> {{ user.username }}</h1>
-      <div style="display: flex; justify-content: center;">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-					<path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12 ,2Z"></path>
-				</svg>
-				<p style="margin: 5  0 8px;">{{ user.city }}, {{ user.country }}</p>
+				<img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="default avatar"
+				style="height: 10rem; width: 10rem; object-fit: center;
+				border-radius: 50%; border: 2px solid #fff;">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12 ,2Z"></path>
+					</svg>
+					<p style="margin: 5  0 8px;">{{ user.city }}, {{ user.country }}</p>
+				</div>
+				<div style="display: flex;">
+					<div class="col-4" >
+						<h4>{{user.played_games}}</h4>
+						<p>Games</p>
+					</div>
+					<div class="col-4">
+						<h4>{{user.wins}}</h4>
+						<p>Wins</p>
+					</div>
+					<div class="col-4">
+						<h4>{{user.defeats}}</h4>
+						<p>Defeat</p>
+					</div>
+				</div>
+				<a href="{% url 'list_friends' %}" class="btn btn-light" role="button" style="margin-right: 10px;">All my friends</a>
+				<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#inviteFrienModal" >
+					Invite a friend
+				{% else %}
+				{% endif %}
+				</button>
 			</div>
-      <div style="display: flex;">
-        <div class="col-4" >
-          <h4>{{user.played_games}}</h4>
-          <p>Games</p>
-        </div>
-        <div class="col-4">
-          <h4>{{user.wins}}</h4>
-          <p>Wins</p>
-        </div>
-        <div class="col-4">
-          <h4>{{user.defeats}}</h4>
-          <p>Defeat</p>
-        </div>
-      </div>
-			<a href="{% url 'list_friends' %}" class="btn btn-light" role="button" style="margin-right: 10px;">All my friends</a>
-			<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#inviteFrienModal" >
-				Invite a friend
-			</button>
-    </div>
-  </header>
+		</header>
 </section>
 <!-- Button trigger modal -->
 
