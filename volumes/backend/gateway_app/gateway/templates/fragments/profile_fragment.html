@@ -6,8 +6,14 @@
 		margin-top: 80px;">
     <div class="profile-page-details">
 			<h1 style="margin-bottom: 1rem; align-self: flex-start;">Profile page</h1>
+			{% if user.avatar %}
 			<img src= {{user.avatar.url}} alt="user.username" style="height: 10rem; width: 10rem; object-fit: center;
 			border-radius: 50%; border: 2px solid #fff;">
+			{% else %}
+			<img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="default icon"
+				style="height: 10rem; width: 10rem; object-fit: center;
+				border-radius: 50%; border: 2px solid #fff;">
+			{% endif %}
 				<h1 style="font-weight: 400; font-size: 1.3rem; margin: 1rem 0;"> {{ user.username }}</h1>
 				<div style="display: flex; justify-content: center;">
 					<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">

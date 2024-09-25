@@ -28,9 +28,9 @@ class UserAdmin(admin.ModelAdmin):
     ordering = ('username',)
 
     def avatar_tag(self, obj):
-        if obj.avatar:
-            return format_html('<img src="{}" style="height: 50px; width: 50px; border-radius: 50%;" />', obj.avatar.url)
-        return '-'
+        default_avatar_url = 'https://api.dicebear.com/9.x/notionists/svg?seed=Jack'  # Replace with the actual path to your default avatar image
+        avatar_url = obj.avatar.url if obj.avatar else default_avatar_url
+        return format_html('<img src="{}" style="height: 50px; width: 50px; border-radius: 50%;" />', avatar_url)
     avatar_tag.short_description = 'Avatar'
 # Register the updated UserAdmin
 admin.site.register(User, UserAdmin)

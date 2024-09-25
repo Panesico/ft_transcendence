@@ -10,9 +10,6 @@
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item d-flex align-items-center">
-          <p class="fs-6 text-light">{% if user.is_authenticated %}{{ user.username }}{% endif %}</p>
-        </li>
-        <li class="nav-item d-flex align-items-center">
           <a class="nav-link active" aria-current="page" href="{% url 'home' %}"
             onclick="navigate(event, '/')">Home</a>
         </li>
@@ -35,7 +32,7 @@
         <li class="nav-item dropdown d-flex align-items-center">
           <p class="nav-link dropdown-toggle m-0" id="navbarDropdown"
             role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and user.avatar %}
 						<img src="{{ user.avatar.url }}" alt="{{ user.username }}"
 								style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
 						{% else %}
