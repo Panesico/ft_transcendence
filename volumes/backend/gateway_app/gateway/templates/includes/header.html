@@ -35,7 +35,7 @@
         <li class="nav-item dropdown d-flex align-items-center">
           <p class="nav-link dropdown-toggle m-0" id="navbarDropdown"
             role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and user.avatar and user.avatar.url %}
 						<img src="{{ user.avatar.url }}" alt="{{ user.username }}"
 								style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
 						{% else %}
