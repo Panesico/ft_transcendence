@@ -64,6 +64,28 @@ services:
       - postgres
   #   restart: unless-stopped
 
+  user_profile:
+    build:
+      context: ./user_profile
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: user_profile
+    image: user_profile
+    container_name: user_profile
+    #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
+    env_file:
+      - .env
+    expose:
+      - 9002
+    networks:
+      - transcendence
+    volumes:
+      - backend:/usr/src/app
+      - frontend:/usr/src/frontend/
+    depends_on:
+      - postgres
+      - authentif
+
   postgres:
     image: postgres:16.4-alpine3.20
     container_name: postgres

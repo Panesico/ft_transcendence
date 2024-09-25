@@ -62,7 +62,7 @@
 					{{ form.as_p }}
 					<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-							<button type="submit" class="btn btn-light">Send invite</button>
+							<button type="submit" class="btn btn-light" data-bs-dismiss="modal">Send invite</button>
 					</div>
 			</form>
       </div>
@@ -70,33 +70,3 @@
 	</div>
   </div>
 </div>
-
-
-{% comment %} <!-- Modal -->
---> Former modal code
-<div class="modal fade" id="inviteFrienModal" tabindex="-1" aria-labelledby="inviteFrienModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-		<div class="profile-modal-content">
-			<div class="modal-content" style="background-color: #333; color: #fff;">
-			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="inviteFrienModalLabel">Let's invite a friend</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></button>
-      </div>
-      <div class="modal-body">
-				<form method="post" action="{% url 'post_invite' %}">
-					{% csrf_token %}
-					<div class="mb-3">
-            <label for="login-name" class="col-form-label">Login:</label>
-            <input type="text" class="form-control" id="login-name">
-          </div>
-					<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-							<button type="submit" class="btn btn-light">Send invite</button>
-					</div>
-			</form>
-      </div>
-    </div>
-	</div>
-  </div>
-</div> {% endcomment %}
-{% comment %} We could add a sort of statistic graph win per losses here {% endcomment %}

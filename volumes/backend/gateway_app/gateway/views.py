@@ -79,13 +79,22 @@ def list_friends(request):
 def post_invite(request):
 	logger.debug("")
 	logger.debug("post_invite")
+	authentif_url = 'http://authentif:9001/api/logout/'
+	csrf_token = request.COOKIES.get('csrftoken')
+	headers = {
+			'X-CSRFToken': csrf_token,
+			'Cookie': f'csrftoken={csrf_token}',
+			'Content-Type': 'application/json'
+  }
+	data = json.loads(request.body)
 	if request.method == 'POST':
 		logger.debug("post_invite > POST")
-		return render(request, 'partials/profile.html')
+		html = render_to_string('fragments/profile_fragment.html', context={}, request=request)
+		return JsonResponse({'html': html, 'close_modal': True})
 	else:
 		logger.debug("post_login > not POST returning 405")
 		html = render_to_string('fragments/405_fragment.html', context={}, request=request)
-		return JsonResponse({'html': html}, status=405)
+		return JsonResponse({'html': html, 'close_modal': False}, status=405)
 		# form = InviteForm(request, data=request.POST)
 		# logger.debug(form)
 		# if form.is_valid():

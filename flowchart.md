@@ -5,7 +5,7 @@ A["User/Client (browser)"] -->|9000| B("API Gateway (<i>gateway</i>)")
   subgraph db
     direction RL
     style C text-align:left
-    B -->|5432| C("PostgreSQL database (<i>postgres</i>)<br> - table for authentication<br> - table for user stats<br> - table for tournament stats")
+    B -->|5432| C("PostgreSQL database (<i>postgres</i>)<br> - table for authentication (User)<br> - table for user profile (Profile)<br> - table for user stats<br> - table for tournament stats")
   end
 
   subgraph microservices
@@ -20,6 +20,22 @@ A["User/Client (browser)"] -->|9000| B("API Gateway (<i>gateway</i>)")
 
       B -->|9003| F("Match History (<i>history</i>)<br>
       For each user:<br> - History of 1v1 games<br> - Dates<br> - Relevant details")
-
+D--> C
+E--> C
+F--> C
   end
 ``` 
+
+User
+	- user_id			1
+	- username		Doruk
+	- password		fdsafg
+
+Profile
+	- user_id		1
+	- avatar
+	- city
+	- Country
+	- Played games
+	- Win
+	- Defeats
