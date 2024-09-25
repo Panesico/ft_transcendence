@@ -9,6 +9,4 @@ RUN   openssl req -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/nginx.key \
 
 COPY  ./tools/server-block.conf /etc/nginx/conf.d/
 
-EXPOSE  8000
-
 CMD   ["nginx", "-g", "daemon off;"]

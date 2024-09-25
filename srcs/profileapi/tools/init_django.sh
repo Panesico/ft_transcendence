@@ -53,7 +53,7 @@ echo "--Collecting static files..."
 python manage.py collectstatic --noinput
 
 echo "--Making migrations..."
-python manage.py makemigrations user_profile
+python manage.py makemigrations profileapi
 python manage.py makemigrations
 
 echo "--Applying migrations..."

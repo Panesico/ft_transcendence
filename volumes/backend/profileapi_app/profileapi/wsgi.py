@@ -1,5 +1,5 @@
 """
-WSGI config for user_profile project.
+WSGI config for profileapi project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'user_profile.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'profileapi.settings')
 
 application = get_wsgi_application()

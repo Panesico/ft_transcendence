@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 from authentif.forms import SignUpForm, LogInForm
 from authentif.models import User
 import json
+import requests
 import logging
 logger = logging.getLogger(__name__)
 
@@ -36,17 +37,46 @@ def api_login(request):
     logger.debug('api_login > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
+# Create a profile linked to user through call to profileapi service
+def createProfile(user_id, csrf_token):
+    profileapi_url = 'http://profileapi:9002/api/signup/'
+    profile_data = { 'user_id': user_id }
+    headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'HTTP_HOST': 'profileapi',
+    }
+
+    try:
+        response = requests.post(
+            profileapi_url, json=profile_data, headers=headers)
+        logger.debug(f'api_signup > createProfile > Response: {response}')
+        logger.debug(f'api_signup > createProfile > Response status code: {response.status_code}')
+        
+        response.raise_for_status()
+        if response.status_code == 201:
+            logger.debug('api_signup > createProfile > Profile created in profile service')
+            return True
+        else:
+            logger.error(f'api_signup > createProfile > Unexpected status code: {response.status_code}')
+            return False
+    except requests.RequestException as e:
+        logger.error(f'api_signup > createProfile > Failed to create profile: {e}')
+        return False
+
 def api_signup(request):
     logger.debug("api_signup")
     if request.method == 'POST':
         try:
           data = json.loads(request.body)
-          logger.debug(f'Received data: {data}')
+          # logger.debug(f'Received data: {data}')
           form = SignUpForm(data=data)
           if form.is_valid():
               user = form.save(commit=False)
               user.password = make_password(data['password'])
               user = form.save()
+
               username = data.get('username')
               password = data.get('password')
               logger.info(f'api_signup > User.username: {user.username}, hased pwd {user.password}')
@@ -55,6 +85,7 @@ def api_signup(request):
                   user_obj = User.objects.get(username=username)
               except User.DoesNotExist:
                   logger.debug(f'api_signup > User not found: {username}')
+                  user.delete()
                   return JsonResponse({
                       'status': 'error', 
                       'message': 'User not found'
@@ -63,10 +94,20 @@ def api_signup(request):
               # Check if the user is active
               if not user_obj.is_active:
                   logger.debug('api_signup > User is inactive')
+                  user.delete()
                   return JsonResponse({
                       'status': 'error', 
                       'message': 'User is inactive'
                   }, status=400)
+              
+              csrf_token = request.COOKIES.get('csrftoken')
+              # Create a profile through call to profileapi service
+              if not createProfile(user.id, csrf_token):
+                    user.delete()
+                    return JsonResponse({
+                        'status': 'error', 
+                        'message': 'Failed to create profile'
+                    }, status=500)
 
               user = authenticate(username=username, password=password)
               if user is not None:
@@ -77,6 +118,7 @@ def api_signup(request):
                       'message': 'Sign up successful',
                   })
               else:
+                  user.delete()
                   logger.debug('api_signup > Authentication failed')
                   return JsonResponse({'status': 'error', 'message': 'Authentication failed'}, status=401)
           else:

@@ -64,14 +64,14 @@ services:
       - postgres
   #   restart: unless-stopped
 
-  user_profile:
+  profileapi:
     build:
-      context: ./user_profile
+      context: ./profileapi
       dockerfile: Dockerfile
       args:
-        SERVICE_NAME: user_profile
-    image: user_profile
-    container_name: user_profile
+        SERVICE_NAME: profileapi
+    image: profileapi
+    container_name: profileapi
     #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
     env_file:
       - .env
