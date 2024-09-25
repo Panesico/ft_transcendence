@@ -1,0 +1,1 @@
+- Prevent log-in and sign-up if already logged in
