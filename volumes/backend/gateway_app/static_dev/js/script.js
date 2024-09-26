@@ -88,9 +88,8 @@ async function handleFormSubmission() {
         const data = await response.json();
         // console.log('handleFormSubmission > response: ', response);
 
-        if (!response.ok && !data.html.includes('class="errorlist nonfield'))
-				{
-					console.log("response non ok 1")
+        if (!response.ok && !data.html.includes('class="errorlist nonfield')) {
+          console.log('response non ok 1')
           throw new Error(`HTTP error - status: ${response.status}`);
         }
 

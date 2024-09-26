@@ -28,17 +28,6 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'authentif']
-
-
-# CORS_ALLOW_ALL_ORIGINS = True  # For development, not recommended for production
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:8000",
-# ]
-
-CSRF_TRUSTED_ORIGINS = [ 'http://gateway:9000',]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -187,3 +176,38 @@ STATIC_ROOT = '/usr/src/frontend/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# SSL - HTTPS - Security
+
+# Defines a set of host/domain names that Django will accept requests from
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'authentif']
+
+
+# Redirect all HTTP traffic to HTTPS
+SECURE_SSL_REDIRECT = True
+
+# Set the header that tells the browser to use HTTPS
+# Use the X-Forwarded-Proto header to determine whether the request is secure
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  
+
+# Tells browser to strictly follow the Content-Type headers provided by the server.
+SECURE_CONTENT_TYPE_NOSNIFF = True
+# Instructs browsers to activate their built-in XSS filtering mechanisms by adding X-XSS-Protection HTTP header
+SECURE_BROWSER_XSS_FILTER = True
+
+# Session cookie only transmitted over HTTPS secure connections
+SESSION_COOKIE_SECURE = True
+# Mitigates the risk of cross-site scripting (XSS) - document.cookie not accessible in the browser.
+SESSION_COOKIE_HTTPONLY = True
+
+CORS_ALLOWED_ORIGINS = [ "https://localhost:8443" ]
+
+
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'Strict'
+CSRF_TRUSTED_ORIGINS = [
+    'https://gateway:8443',
+    'https://authentif:9001',
+    'https://profileapi:9002',
+    ]

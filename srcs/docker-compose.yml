@@ -31,7 +31,7 @@ services:
     env_file:
       - .env
     ports:
-      - "9000:9000"
+      - "8443:8443"
     networks:
       - transcendence
     volumes:
@@ -40,7 +40,14 @@ services:
     depends_on:
       - postgres
       - authentif
-  # restart: unless-stopped
+    # command:
+    #   - daphne
+    #   - -e
+    #   - ssl:8443:/etc/ssl/certs/key.pem:/etc/ssl/certs/cert.pem
+    #   - gateway.asgi:application
+    command: uvicorn gateway.asgi:application --host 0.0.0.0 --port 8443 --reload --ssl-keyfile=/usr/src/app/key.pem --ssl-certfile=/usr/src/app/cert.pem
+    # command: gunicorn gateway.asgi:application -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8443 --ssl-keyfile=/usr/src/app/key.pem --ssl-certfile=/usr/src/app/cert.pem # to handle multiple connections
+    # restart: unless-stopped
 
   authentif:
     build:
@@ -62,6 +69,7 @@ services:
       - frontend:/usr/src/frontend/
     depends_on:
       - postgres
+    command: uvicorn authentif.asgi:application --host 0.0.0.0 --port 9001 --reload --ssl-keyfile=/usr/src/app/key.pem --ssl-certfile=/usr/src/app/cert.pem
   #   restart: unless-stopped
 
   profileapi:
@@ -85,6 +93,7 @@ services:
     depends_on:
       - postgres
       - authentif
+    command: uvicorn profileapi.asgi:application --host 0.0.0.0 --port 9002 --reload --ssl-keyfile=/usr/src/app/key.pem --ssl-certfile=/usr/src/app/cert.pem
 
   postgres:
     image: postgres:16.4-alpine3.20

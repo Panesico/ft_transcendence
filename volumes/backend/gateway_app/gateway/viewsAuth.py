@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 # Logout
 
 def get_logout(request):
-    authentif_url = 'http://authentif:9001/api/logout/' 
+    authentif_url = 'https://authentif:9001/api/logout/' 
     if request.method != 'GET':
         return redirect('405')
-    response = requests.get(authentif_url, cookies=request.COOKIES)
+    response = requests.get(authentif_url, cookies=request.COOKIES, verify=os.getenv("CERTFILE"))
     if response.ok:
         return JsonResponse({'status': 'success', 'message': 'Logged out successfully'})
     else:
@@ -45,7 +45,7 @@ def get_login(request):
    
 def post_login(request):
     logger.debug('post_login')
-    authentif_url = 'http://authentif:9001/api/login/'
+    authentif_url = 'https://authentif:9001/api/login/'
     if request.method != 'POST':
       return redirect('405')
     
@@ -53,7 +53,8 @@ def post_login(request):
     headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
     }
     data = json.loads(request.body)
 
@@ -61,7 +62,7 @@ def post_login(request):
     # logger.debug(f'Extracted headers: {headers}')
     # logger.debug(f'Extracted data from JSON: {data}')
     
-    response = requests.post(authentif_url, json=data, headers=headers)
+    response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
     # logger.debug(f"post_login > Response cookies: {response.cookies}")
 
     status = response.json().get("status")
@@ -95,7 +96,7 @@ def post_login(request):
         user_response =  JsonResponse({'status': status, 'message': message})
         # Set cookies from the external response if available
         for cookie in response.cookies:
-            user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True)
+            user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True, secure=True)
 
         return user_response
     else:
@@ -130,7 +131,7 @@ def get_signup(request):
 
 def post_signup(request):
     logger.debug('post_signup')
-    authentif_url = 'http://authentif:9001/api/signup/' 
+    authentif_url = 'https://authentif:9001/api/signup/' 
     if request.method != 'POST':
       return redirect('405')
 
@@ -138,7 +139,8 @@ def post_signup(request):
     headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
     }
     data = json.loads(request.body)
 
@@ -146,7 +148,7 @@ def post_signup(request):
     # logger.debug(f'Extracted headers: {headers}')
     # logger.debug(f'Extracted data from JSON: {data}')
     
-    response = requests.post(authentif_url, json=data, headers=headers)
+    response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
 
     status = response.json().get("status")
     message = response.json().get("message")
@@ -157,7 +159,7 @@ def post_signup(request):
         user_response =  JsonResponse({'status': status, 'message': message})
 
         for cookie in response.cookies:
-            user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True)
+            user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True, secure=True)
 
         return user_response
     else:

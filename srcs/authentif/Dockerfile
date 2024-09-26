@@ -18,5 +18,3 @@ RUN   pip install -r /tmp/requirements.txt
 RUN   chmod +x /tmp/init_django.sh
 
 ENTRYPOINT [ "/bin/sh", "/tmp/init_django.sh" ]
-
-CMD   ["python", "manage.py", "runserver", "0.0.0.0:9001"]

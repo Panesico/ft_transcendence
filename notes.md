@@ -42,3 +42,10 @@ docker container exec -it postgres sh
 psql -U postgres_main_user -d transcendence_db
 \dt
 SELECT * FROM authentif_user;
+
+# Include every service when generating the certificate
+openssl req -x509 -nodes -newkey rsa:4096 -days 365 \
+  -keyout key.pem \
+  -out cert.pem \
+  -subj "/C=ES/L=Malaga/O=42 Malaga/CN=localhost" \
+  -addext "subjectAltName=DNS:gateway,DNS:authentif,DNS:profileapi,DNS:tournament,DNS:localhost"

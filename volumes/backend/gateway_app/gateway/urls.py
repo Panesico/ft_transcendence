@@ -1,10 +1,6 @@
 from django.contrib import admin
-from django.urls import path, re_path
-
-from gateway import views as views
-from gateway import viewsAuth as viewsAuth
-from gateway import viewsErrors as viewsErrors
-# media setting 
+from django.urls import path #, re_path
+from gateway import views, viewsAuth, viewsErrors
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -32,4 +28,5 @@ urlpatterns = [
     # re_path(r'^.*$', views.get_other),  # Catch-all route to serve the SPA
 ]
 
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

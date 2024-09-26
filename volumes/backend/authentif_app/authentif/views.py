@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 from authentif.forms import SignUpForm, LogInForm
 from authentif.models import User
 import json
+import os
 import requests
 import logging
 logger = logging.getLogger(__name__)
@@ -39,18 +40,19 @@ def api_login(request):
 
 # Create a profile linked to user through call to profileapi service
 def createProfile(user_id, csrf_token):
-    profileapi_url = 'http://profileapi:9002/api/signup/'
+    profileapi_url = 'https://profileapi:9002/api/signup/'
     profile_data = { 'user_id': user_id }
     headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',
         'Content-Type': 'application/json',
         'HTTP_HOST': 'profileapi',
+        'Referer': 'https://authentif:9001',
     }
 
     try:
         response = requests.post(
-            profileapi_url, json=profile_data, headers=headers)
+            profileapi_url, json=profile_data, headers=headers, verify=os.getenv("CERTFILE"))
         logger.debug(f'api_signup > createProfile > Response: {response}')
         logger.debug(f'api_signup > createProfile > Response status code: {response.status_code}')
         

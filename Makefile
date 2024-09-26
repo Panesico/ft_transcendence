@@ -23,9 +23,23 @@ reset:
 	docker volume rm $$(docker volume ls -q); \
 	docker network rm $$(docker network ls -q) 2>/dev/null
 
-gateway:
-	docker exec -it gateway /bin/sh
 postgres:
 	docker exec -it postgres /bin/sh
+gateway:
+	docker exec -it gateway /bin/sh
+gateway_restart:
+	docker restart gateway
+authentif:
+	docker exec -it authentif /bin/sh
+authentif_restart:
+	docker restart authentif
+profileapi:
+	docker exec -it profileapi /bin/sh
+profileapi_restart:
+	docker restart profileapi
 
-.phony: all down stop logs prune routine reset django postgres
+
+
+.phony: all down stop logs prune routine reset postgres \
+	gateway gateway_restart authentif authentif_restart \
+	profileapi profileapi_restart

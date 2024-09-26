@@ -12,8 +12,7 @@ from django.template.response import TemplateResponse
 
 def get_home(request):
     logger.debug("")
-    logger.debug("get_home")
-    logger.debug(request)
+    logger.debug(f"get_home > request: {request}")
     status = request.GET.get('status', '')
     message = request.GET.get('message', '')
     logger.debug(f"get_home > Request Cookies: {request.COOKIES}")
@@ -79,7 +78,7 @@ def list_friends(request):
 def post_invite(request):
 	logger.debug("")
 	logger.debug("post_invite")
-	authentif_url = 'http://authentif:9001/api/logout/'
+	authentif_url = 'https://authentif:9001/api/logout/'
 	csrf_token = request.COOKIES.get('csrftoken')
 	headers = {
 			'X-CSRFToken': csrf_token,
