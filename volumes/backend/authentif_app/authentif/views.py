@@ -154,7 +154,7 @@ def api_check_exists(request):
               return JsonResponse({'status': 'success', 'message': 'User exists'})
           else:
               logger.debug('api_check_exists > User does not exist')
-              return JsonResponse({'status': 'error', 'message': 'User does not exist'}, status=404)
+              return JsonResponse({'status': 'failure', 'message': 'User does not exist'}, status=404)
         except json.JSONDecodeError:
             logger.debug('api_check_exists > Invalid JSON')
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
