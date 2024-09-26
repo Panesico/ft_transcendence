@@ -142,3 +142,21 @@ def api_signup(request):
             }, status=500)
     logger.debug('api_signup > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+def api_check_exists(request):
+    logger.debug("api_check_exists")
+    if request.method == 'POST':
+        try:
+          data = json.loads(request.body)
+          username = data.get('username')
+          if User.objects.filter(username=username).exists():
+              logger.debug('api_check_exists > User exists')
+              return JsonResponse({'status': 'success', 'message': 'User exists'})
+          else:
+              logger.debug('api_check_exists > User does not exist')
+              return JsonResponse({'status': 'error', 'message': 'User does not exist'}, status=404)
+        except json.JSONDecodeError:
+            logger.debug('api_check_exists > Invalid JSON')
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    logger.debug('api_check_exists > Method not allowed')
+    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
