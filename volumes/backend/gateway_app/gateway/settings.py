@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'authentif',
+    'channels',
+    'uvicorn',
 ]
 
 AUTH_USER_MODEL = 'authentif.User'
@@ -185,6 +187,15 @@ from django.conf.urls.static import static
 urlpatterns = [
     # ... your url patterns
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+# Channels
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 
 # SSL - HTTPS - Security

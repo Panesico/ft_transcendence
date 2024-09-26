@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 		'gamecalc',
-    # 'authentif',
+    'channels',
 ]
 
 # AUTH_USER_MODEL = 'authentif.User'
@@ -166,6 +166,15 @@ STATIC_ROOT = '/usr/src/frontend/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Channels
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 
 # SSL - HTTPS - Security

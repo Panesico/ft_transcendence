@@ -1,5 +1,26 @@
 // pong.js
 
+const gameCalcSocket = new WebSocket('/wss/gamecalc/');
+
+gameCalcSocket.onopen = function(e) {
+  console.log('GameCalc socket connected');
+};
+
+gameCalcSocket.onmessage = function(e) {
+  const data = JSON.parse(e.data);
+  const message = data['message'];
+  console.log('Received message from socket: ', message);
+};
+
+gameCalcSocket.onclose = function(e) {
+  console.error('GameCalc socket closed unexpectedly');
+};
+
+function sendMessage(message) {
+  console.log('Sending message to socket: ', message);
+  gameCalcSocket.send(JSON.stringify({'message': message}));
+}
+
 // Get the game container
 const gameContainer = document.querySelector('.game-container');
 const scorePlayer1Element = document.querySelector('.scorePlayer1');
@@ -183,6 +204,7 @@ function checkBallCollision() {
   // Ball collision with top and bottom canvas borders
   if (ballY <= borderWidth || ballY >= canvas.height - ballSize - borderWidth) {
     ballSpeedY = -ballSpeedY;
+    sendMessage('Ball hit top or bottom border');
   }
 
   if (
