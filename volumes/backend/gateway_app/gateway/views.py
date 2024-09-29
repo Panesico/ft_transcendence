@@ -55,6 +55,17 @@ def get_tournament(request):
         return JsonResponse({'html': html})
     return render(request, 'partials/tournament.html')
 
+def get_edit_profile(request):
+    if request.user.is_authenticated == False:
+      return redirect('login')
+    logger.debug("")
+    logger.debug("get_edit_profile")
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        logger.debug("edit_profile XMLHttpRequest")
+        html = render_to_string('fragments/edit_profile_fragment.html', context={}, request=request)
+        return JsonResponse({'html': html})
+    return render(request, 'partials/edit_profile.html')
+
 def list_friends(request):
 	if not request.user.is_authenticated:
 		return redirect('login')
@@ -108,37 +119,6 @@ def post_invite(request):
     html = render_to_string('fragments/profile_fragment.html', {'form': data}, request=request)
     return JsonResponse({'html': html, 'status': status, 'message': message})
     #Handle form error
-
-  # logger.debug("")
-  # logger.debug("post_invite")
-  # authentif_url = 'https://authentif:9001/api/logout/'
-  # csrf_token = request.COOKIES.get('csrftoken')
-  # headers = {
-  #     'X-CSRFToken': csrf_token,
-  #     'Cookie': f'csrftoken={csrf_token}',
-  #     'Content-Type': 'application/json'
-  # }
-  # data = json.loads(request.body)
-  # if request.method == 'POST':
-  #     try:
-  #       data = json.loads(request.body)
-  #       logger.debug("post_invite > POST")
-  #       form = InviteForm(request, data=request.POST)
-  #       if form.is_valid():
-  #         user = form.get_user()
-  #         logger.debug('user: %s', user, ' sent a friend request to:')
-  #         html = render_to_string('fragments/profile_fragment.html', context={}, request=request)
-  #         return JsonResponse({'html': html, 'close_modal': True})
-  #       else:
-  #         logger.debug('post_invite > Invalid friend invite')
-  #         return JsonResponse({'status': 'error', 'message': 'Invalid username or password'}, status=401)
-  #     except json.JSONDecodeError:
-  #       logger.debug('post_invite > Invalid JSON')
-  #       return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-  # else:
-  #   logger.debug("post_login > not POST returning 405")
-  #   html = render_to_string('fragments/405_fragment.html', context={}, request=request)
-  #   return JsonResponse({'html': html, 'close_modal': False}, status=405)
 
 
 

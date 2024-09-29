@@ -1,0 +1,74 @@
+<h1>Edit <span class="text-danger">{% if user.is_authenticated %}{{ user.username }}{% endif %}</span>'s profile</h1>
+<div class="row" >
+    <div class="col-xs-12 col-sm-9 mx-auto">
+      <form method="post" enctype="multipart/form-data" style="margin-left: 30px">
+        <div class="panel panel-default" style="border-bottom : 0">
+          <div class="panel-body text-center" >
+            {% if user.avatar %}
+            <img src= {{user.avatar.url}} alt="user.username" style="height: 15rem; width: 15rem; object-fit: center; margin: 0px auto; margin-top: 30px; border-radius: 50%; border: 2px solid #fff;">
+            {% else %}
+            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="default icon"
+            style="height: 10rem; width: 10rem; object-fit: center;
+            border-radius: 50%; border: 2px solid #fff;">
+            {% endif %}
+            <div class="d-flex align-items-center justify-content-center" style="margin-top : 15px">
+              <div class="form-group">
+                <label for="avatar">Choose a new avatar</label>
+                <input type="file" class="form-control-file" id="avatar" name="avatar">
+              </div>
+            </div>
+          </div>
+        </div>
+      <form method="post" enctype="multipart/form-data">
+      <div class="panel panel-default">
+        <div style="border-bottom : 0">
+        <h4 class="panel-title" style="margin-top: 30px">User info</h4>
+        </div>
+        <div style="margin-top: 0">
+          <div class="form-group" style="margin-top : -5px">
+            <label class="col-sm-3 control-label" style="margin-top: 15px;">Country</label>
+              <div class="col-sm-14">
+                <input type="country" class="form-control" name="country">
+              </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label" style="margin-top: 15px;">City</label>
+              <div class="col-sm-14">
+              <input type="City" class="form-control" name="city">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h4 class="panel-title" style="margin-top: 30px">Security</h4>
+        <div class="panel-body" style="margin-top : -5px">
+          <div class="form-group">
+            <label class="col-sm-3 control-label" style="margin-top: 15px;">Current password</label>
+            <div class="col-sm-14">
+              <input type="password" class="form-control" name="current_password">
+            </div>
+          </div>
+            <div class="form-group">
+              <label class="col-sm-3 control-label" style="margin-top: 15px;">New password</label>
+              <div class="col-sm-14">
+              <input type="password" class="form-control" name="new_password">
+            </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label " style="margin-top: 15px;">Confirm new password</label>
+            <div class="col-sm-14">
+              <input type="password" class="form-control" name="confirm_new_password">
+            </div>
+          </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-10 col-sm-offset-2" style="margin-top : 20px; margin-down : 15px; margin-bottom : 30px">
+              <a href="{% url 'home' %}" class="btn btn-danger" role="button" style="margin-right: 10px;">Cancel</a>
+              <button type="submit" class="btn btn-light">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+</div>

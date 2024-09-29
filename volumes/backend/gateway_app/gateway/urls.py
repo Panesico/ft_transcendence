@@ -13,6 +13,7 @@ urlpatterns = [
     path('game/', views.get_game, name='game'),
     path('tournament/', views.get_tournament, name='tournament'),
 		path('profile/', views.get_profile, name='profile'),
+    path('edit_profile/', views.get_edit_profile, name='edit_profile'),
 
 		path('api/invite/', views.post_invite, name='post_invite'),
 		path('my_friends/', views.list_friends, name='list_friends'),
