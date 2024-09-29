@@ -5,7 +5,9 @@ from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from .forms import InviteFriendFormFrontend
 from django.contrib import messages
+import json
 import logging
+import requests
 logger = logging.getLogger(__name__)
 # May deelete this import
 from django.template.response import TemplateResponse
@@ -76,38 +78,68 @@ def list_friends(request):
 	# 	return JsonResponse({'html': html}, status=405)
 
 def post_invite(request):
-	logger.debug("")
-	logger.debug("post_invite")
-	authentif_url = 'https://authentif:9001/api/logout/'
-	csrf_token = request.COOKIES.get('csrftoken')
-	headers = {
-			'X-CSRFToken': csrf_token,
-			'Cookie': f'csrftoken={csrf_token}',
-			'Content-Type': 'application/json'
-  }
-	data = json.loads(request.body)
-	if request.method == 'POST':
-		logger.debug("post_invite > POST")
-		html = render_to_string('fragments/profile_fragment.html', context={}, request=request)
-		return JsonResponse({'html': html, 'close_modal': True})
-	else:
-		logger.debug("post_login > not POST returning 405")
-		html = render_to_string('fragments/405_fragment.html', context={}, request=request)
-		return JsonResponse({'html': html, 'close_modal': False}, status=405)
-		# form = InviteForm(request, data=request.POST)
-		# logger.debug(form)
-		# if form.is_valid():
-		# 	logger.debug("post_invite > POST > form.is_valid")
-		# 	invite = form.save(commit=False)
-		# 	invite.inviter = request.user
-		# 	invite.save()
-		# 	messages.success(request, 'Invite sent successfully!')
-		# 	return redirect('home')
-		# else:
-		# 	logger.debug("post_invite > POST > form NOT valid")
-		# 	logger.debug("form.errors:")
-		# 	logger.debug(form.errors) 
-		# 	messages.error(request, 'Please correct the error below.')
+  logger.debug('post_invite')
+  authentif_url = 'https://profileapi:9002/api/inviterequest/'
+  if request.method != 'POST':
+    return redirect('405')
+  logger.debug('post_invite > POST')
+  csrf_token = request.COOKIES.get('csrftoken')
+  headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+    }
+  data = json.loads(request.body)
+  logger.debug('post_invite > data: %s', data)
+  response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
+  logger.debug('post_invite > Response: %s', response)
+  status = response.json().get("status")
+  message = response.json().get("message")
+  if response.ok:
+    user_response =  JsonResponse({'status': status, 'message': message})
+    for cookie in response.cookies:
+      user_response.set_cookie(cookie.key, cookie.value)
+    return user_response
+  else:
+    logger.debug('post_invite > Response NOT OK')
+    logger.debug(message)
+    data = json.loads(request.body)
+    html = render_to_string('fragments/profile_fragment.html', {'form': data}, request=request)
+    return JsonResponse({'html': html, 'status': status, 'message': message})
+    #Handle form error
+
+  # logger.debug("")
+  # logger.debug("post_invite")
+  # authentif_url = 'https://authentif:9001/api/logout/'
+  # csrf_token = request.COOKIES.get('csrftoken')
+  # headers = {
+  #     'X-CSRFToken': csrf_token,
+  #     'Cookie': f'csrftoken={csrf_token}',
+  #     'Content-Type': 'application/json'
+  # }
+  # data = json.loads(request.body)
+  # if request.method == 'POST':
+  #     try:
+  #       data = json.loads(request.body)
+  #       logger.debug("post_invite > POST")
+  #       form = InviteForm(request, data=request.POST)
+  #       if form.is_valid():
+  #         user = form.get_user()
+  #         logger.debug('user: %s', user, ' sent a friend request to:')
+  #         html = render_to_string('fragments/profile_fragment.html', context={}, request=request)
+  #         return JsonResponse({'html': html, 'close_modal': True})
+  #       else:
+  #         logger.debug('post_invite > Invalid friend invite')
+  #         return JsonResponse({'status': 'error', 'message': 'Invalid username or password'}, status=401)
+  #     except json.JSONDecodeError:
+  #       logger.debug('post_invite > Invalid JSON')
+  #       return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+  # else:
+  #   logger.debug("post_login > not POST returning 405")
+  #   html = render_to_string('fragments/405_fragment.html', context={}, request=request)
+  #   return JsonResponse({'html': html, 'close_modal': False}, status=405)
+
 
 
 # def get_other(request):

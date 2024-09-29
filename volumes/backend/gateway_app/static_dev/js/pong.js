@@ -1,6 +1,7 @@
 // pong.js
 
-const gameCalcSocket = new WebSocket('/wss/gamecalc/');
+const gameCalcSocket = new WebSocket('wss://localhost:8443/wss/gamecalc/');
+//const gameCalcSocket = new WebSocket('/wss/gamecalc/');
 
 gameCalcSocket.onopen = function(e) {
   console.log('GameCalc socket connected');
@@ -329,6 +330,7 @@ function gameLoop() {
   frameCount++;
 
   if (keys[' '] && frameCount > pauseFrameCount + 10) {
+    sendMessage('Game paused');
     gamePaused = !gamePaused;
     pauseFrameCount = frameCount;
   }

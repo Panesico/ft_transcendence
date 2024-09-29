@@ -53,6 +53,29 @@ function getCookie(name) {
   return cookieValue;
 }
 
+/* WebSocket */
+const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
+//const formSocket = new WebSocket('/wss/gamecalc/');
+
+formSocket.onopen = function(e) {
+  console.log('formSocket socket connected');
+};
+
+formSocket.onmessage = function(e) {
+  const data = JSON.parse(e.data);
+  const message = data['message'];
+  console.log('Received message from socket: ', message);
+};
+
+formSocket.onclose = function(e) {
+  console.error('formSocket socket closed unexpectedly');
+};
+
+function sendMessage(message) {
+  console.log('Sending message to socket: ', message);
+  formSocket.send(JSON.stringify({'message': message}));
+}
+
 // Intercept form submissions for AJAX processing
 async function handleFormSubmission() {
   const form = document.querySelector('form');
@@ -86,7 +109,8 @@ async function handleFormSubmission() {
         // console.log('handleFormSubmission > request: ', request);
         const response = await fetch(request);
         const data = await response.json();
-        // console.log('handleFormSubmission > response: ', response);
+
+        console.log('handleFormSubmission > response: ', response);
 
         if (!response.ok && !data.html.includes('class="errorlist nonfield')) {
           console.log('response non ok 1')
@@ -97,6 +121,7 @@ async function handleFormSubmission() {
         if (data.status != 'error' && data.message) {
           console.log('data.message: ', data.message);
           if (data.message === 'Login successful') {
+            sendMessage('websocket: data received');
             sessionStorage.setItem('afterLogin', 'true');
           } else if (data.message === 'Sign up successful') {
             sessionStorage.setItem('afterSignup', 'true');

@@ -1,3 +1,4 @@
+# This file is used to configure the ASGI application for the gateway app.
 """
 ASGI config for gateway project.
 
@@ -16,7 +17,7 @@ from gateway import websocket_routing
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gateway.settings')
 
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    "http": get_asgi_application(), #https?
     "websocket": AuthMiddlewareStack(
         URLRouter(
             websocket_routing.websocket_urlpatterns

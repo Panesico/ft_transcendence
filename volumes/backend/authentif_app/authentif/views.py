@@ -39,9 +39,9 @@ def api_login(request):
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
 # Create a profile linked to user through call to profileapi service
-def createProfile(user_id, csrf_token):
+def createProfile(username, user_id, csrf_token):
     profileapi_url = 'https://profileapi:9002/api/signup/'
-    profile_data = { 'user_id': user_id }
+    profile_data = { 'user_id': user_id, 'username': username }
     headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',
@@ -104,7 +104,7 @@ def api_signup(request):
               
               csrf_token = request.COOKIES.get('csrftoken')
               # Create a profile through call to profileapi service
-              if not createProfile(user.id, csrf_token):
+              if not createProfile(username, user.id, csrf_token):
                     user.delete()
                     return JsonResponse({
                         'status': 'error', 
