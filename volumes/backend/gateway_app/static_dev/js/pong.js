@@ -1,7 +1,7 @@
 // pong.js
 
 const gameCalcSocket = new WebSocket('wss://localhost:8443/wss/gamecalc/');
-//const gameCalcSocket = new WebSocket('/wss/gamecalc/');
+// const gameCalcSocket = new WebSocket('/wss/gamecalc/');
 
 gameCalcSocket.onopen = function(e) {
   console.log('GameCalc socket connected');
@@ -37,7 +37,7 @@ ctx.fillStyle = '#d3d3d3';  // Set the fill color
 ctx.strokeStyle = '#d3d3d3';
 
 // Game variables
-const maxScore = 10;
+const maxScore = 2;
 const ballSize = 15;
 const paddleWidth = 15;
 const paddleHeight = 80;
@@ -108,6 +108,35 @@ function showWinner(winner) {
   ctx.fillText(`${winner} Wins!`, canvas.width / 2, canvas.height / 2 - 50);
 }
 
+async function saveGameResultInDatabase(winner) {
+  const url = '';  // URL route already game/
+  player1_name = document.getElementById('namePlayer1').textContent
+  player2_name = document.getElementById('namePlayer2').textContent
+  // player1_id, player2_id
+
+  const jsonObject = {
+    'game_type': 'Pong',
+    'game_round': 'Single',
+    'player1_name': player1_name,
+    'player2_name': player2_name,
+    'score_player1': scorePlayer1,
+    'score_player2': scorePlayer2,
+    'winner': winner,
+  };
+
+  let request = new Request(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    credentials: 'include',
+    body: JSON.stringify(jsonObject)
+  });
+  const response = await fetch(request);
+  const data = await response.json();
+}
+
 // Display winner splash screen with "Play Again" button
 function playAgain(winner, displayWinner) {
   gameEnded = true;
@@ -117,6 +146,7 @@ function playAgain(winner, displayWinner) {
   // Display winner's name if displayWinner is true
   if (displayWinner) {
     showWinner(winner);
+    saveGameResultInDatabase(winner);
   }
 
   // Display "Play Again" button

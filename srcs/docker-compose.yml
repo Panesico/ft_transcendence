@@ -95,14 +95,14 @@ services:
       - authentif
     command: uvicorn profileapi.asgi:application --host 0.0.0.0 --port 9002 --reload --ssl-keyfile=/usr/src/app/key.pem --ssl-certfile=/usr/src/app/cert.pem
 
-  gamecalc:
+  play:
     build:
-      context: ./gamecalc
+      context: ./play
       dockerfile: Dockerfile
       args:
-        SERVICE_NAME: gamecalc
-    image: gamecalc
-    container_name: gamecalc
+        SERVICE_NAME: play
+    image: play
+    container_name: play
     #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
     env_file:
       - .env
@@ -115,8 +115,30 @@ services:
       - frontend:/usr/src/frontend/
     depends_on:
       - postgres
-      - authentif
-    command: uvicorn gamecalc.asgi:application --host 0.0.0.0 --port 9003 --reload --ssl-keyfile=/usr/src/app/key.pem --ssl-certfile=/usr/src/app/cert.pem
+    command: uvicorn play.asgi:application --host 0.0.0.0 --port 9003 --reload --ssl-keyfile=/usr/src/app/key.pem --ssl-certfile=/usr/src/app/cert.pem
+
+  # gamecalc:
+  #   build:
+  #     context: ./gamecalc
+  #     dockerfile: Dockerfile
+  #     args:
+  #       SERVICE_NAME: gamecalc
+  #   image: gamecalc
+  #   container_name: gamecalc
+  #   #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
+  #   env_file:
+  #     - .env
+  #   expose:
+  #     - 9003
+  #   networks:
+  #     - transcendence
+  #   volumes:
+  #     - backend:/usr/src/app
+  #     - frontend:/usr/src/frontend/
+  #   depends_on:
+  #     - postgres
+  #     - authentif
+  #   command: uvicorn gamecalc.asgi:application --host 0.0.0.0 --port 9003 --reload --ssl-keyfile=/usr/src/app/key.pem --ssl-certfile=/usr/src/app/cert.pem
 
   postgres:
     image: postgres:16.4-alpine3.20

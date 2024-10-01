@@ -2,6 +2,7 @@
   <div
     class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto"
     style="width: 256px;">
+
     <h1 class="mb-3 align-self-start">Log In</h1>
 
     <form method="post" action="{% url 'login' %}">
@@ -28,6 +29,7 @@
 
       <button type="submit" class="btn btn-secondary">Log In</button>
     </form>
+    
     <p class="mt-4"><a href="{% url 'signup' %}" onclick="navigate(event, '/signup')" class="link-secondary">Don't have an account?</a></p>
 
   </div>

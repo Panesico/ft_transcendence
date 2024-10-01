@@ -199,4 +199,5 @@ CSRF_TRUSTED_ORIGINS = [
     'https://gateway:8443',
     'https://authentif:9001',
     'https://profileapi:9002',
+    'https://play:9003',
     ]

@@ -23,25 +23,6 @@ def get_home(request):
         return JsonResponse({'html': html, 'status': status, 'message': message})
     return render(request, 'partials/home.html', {'status': status, 'message': message})
 
-def get_game(request):
-    logger.debug("")
-    logger.debug("get_game")
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_game XMLHttpRequest")
-        html = render_to_string('fragments/game_fragment.html', context={}, request=request)
-        return JsonResponse({'html': html})
-    return render(request, 'partials/game.html')
-
-
-def get_tournament(request):
-    logger.debug("")
-    logger.debug("get_tournament")
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_tournament XMLHttpRequest")
-        html = render_to_string('fragments/tournament_fragment.html', context={}, request=request)
-        return JsonResponse({'html': html})
-    return render(request, 'partials/tournament.html')
-
 def list_friends(request):
 	if not request.user.is_authenticated:
 		return redirect('login')

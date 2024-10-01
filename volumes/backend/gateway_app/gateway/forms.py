@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 
 class LogInFormFrontend(forms.Form):
   username = forms.CharField(
@@ -118,3 +119,61 @@ class EditProfileFormFrontend(forms.Form):
         label='Confirm new Password', 
         required=True
         )
+  
+class TournamentFormFrontend(forms.Form):
+  player1 = forms.CharField(
+        max_length=20, 
+        widget=forms.TextInput(attrs={
+            'value': 'Name1',
+            'class': 'form-control',
+            'id': 'namePlayer1'
+          }),
+        label="Player 1",
+        required=True,
+        )
+  player2 = forms.CharField(
+        max_length=20, 
+        widget=forms.TextInput(attrs={
+            'value': 'Name2',
+            'class': 'form-control',
+            'id': 'namePlayer2'
+          }),
+        label="Player 2",
+        required=True,
+        )
+  player3 = forms.CharField(
+        max_length=20, 
+        widget=forms.TextInput(attrs={
+            'value': 'Name3',
+            'class': 'form-control',
+            'id': 'namePlayer3'
+          }),
+        label="Player 3",
+        required=True,
+        )
+  player4 = forms.CharField(
+        max_length=20, 
+        widget=forms.TextInput(attrs={
+            'value': 'Name4',
+            'class': 'form-control',
+            'id': 'namePlayer4'
+          }),
+        label="Player 4",
+        required=True,
+        )
+  
+  player1_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+  
+  def clean(self):
+      cleaned_data = super().clean()
+      player1 = cleaned_data.get("player1")
+      player2 = cleaned_data.get("player2")
+      player3 = cleaned_data.get("player3")
+      player4 = cleaned_data.get("player4")
+
+      players = [player1, player2, player3, player4]
+      if len(players) != len(set(players)):
+          raise ValidationError("Player names must be unique.")
+
+      return cleaned_data
+  
