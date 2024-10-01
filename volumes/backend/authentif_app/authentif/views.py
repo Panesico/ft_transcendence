@@ -1,13 +1,13 @@
-from django.contrib.auth import login, logout, authenticate
-from django.http import JsonResponse
-from django.contrib.auth.hashers import make_password
-from authentif.forms import SignUpForm, LogInForm, EditProfileForm
-from authentif.models import User
-from django.contrib.auth.decorators import login_required
 import json
 import os
 import requests
 import logging
+from django.contrib.auth import login, logout, authenticate
+from django.http import JsonResponse
+from django.contrib.auth.hashers import make_password
+from authentif.forms import SignUpForm, LogInForm, EditProfileForm
+from django.contrib.auth.decorators import login_required
+from authentif.models import User
 logger = logging.getLogger(__name__)
 
 def api_logout(request):
@@ -171,11 +171,13 @@ def api_edit_profile(request):
     try:
       data = json.loads(request.body)
       user_id = data.get('user_id')
-      user_id = data.get('user_id')
       logger.debug(f'user_id: {user_id}')
       try :
         logger.debug(f'extract user_obj')
-        user_obj = User.objects.get(id=user_id)
+        try:
+          user_obj = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+          return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
         #user_obj = User.objects.filter(id=user_id).first()
         logger.debug(f'user_obj username: {user_obj.username}')
         form = EditProfileForm(data, instance=user_obj)

@@ -1,8 +1,11 @@
 from django.http import JsonResponse
 from django import forms
 from profileapi.models import Profile
+from django.core.exceptions import ValidationError
 import json
 import os
+import logging
+logger = logging.getLogger(__name__)
 
 class InviteFriendForm(forms.ModelForm):
     friendName = forms.CharField(
@@ -39,7 +42,83 @@ class InviteFriendForm(forms.ModelForm):
           #     raise ValidationError("This username does not exist.")
           return friend_name
 
+class EditProfileForm(forms.ModelForm):
 
+  avatar = forms.ImageField(
+    widget=forms.FileInput(attrs={
+        'class': 'form-control',
+        'id': 'editProfileAvatar'
+      }),
+    label='Upload avatar',
+    required=False,
+    )
+  username = forms.CharField(
+        max_length=20, 
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'editProfileUsername'
+          }),
+        label='Username', 
+        required=True,
+        )
+  country = forms.CharField(
+        max_length=20, 
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'editProfileCountry'
+          }),
+        label='Country', 
+        required=True,
+        )
+  city = forms.CharField(
+        max_length=20, 
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'editProfileCity'
+          }),
+        label='City', 
+        required=True,
+        )
+  user_id = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        required=True,
+        )
+
+  class Meta:
+        model = Profile  # Specify the model if needed
+        logger.debug(f"model: {model}")
+        fields = ['username', 'avatar', 'country', 'city', 'user_id']
+        logger.debug(f"fields: {fields}")
+
+  def clean(self):
+        cleaned_data = super().clean() # call the clean method of the parent class
+        username = cleaned_data.get('username')
+        logger.debug(f'username: {username}')
+        avatar = cleaned_data.get('avatar')
+        logger.debug(f'avatar: {avatar}')
+        country = cleaned_data.get('country')
+        logger.debug(f'country: {country}')
+        city = cleaned_data.get('city')
+        logger.debug(f'city: {city}')
+        user_id = cleaned_data.get('user_id')
+        logger.debug(f'user_id: {user_id}')
+        try:
+          profile = Profile.objects.get(user_id=user_id)
+          print('User ID:', profile.user_id)
+          if username:
+            profile.username = username
+          if avatar:
+            profile.avatar = avatar
+          if country:
+            profile.country = country
+          if city:
+            profile.city = city
+          profile.save()
+          logger.debug('forms.py > Profile updated')
+        except Profile.DoesNotExist:
+          print('Profile not found')
+          raise ValidationError("This username does not exist.")
+        return cleaned_data
 # body{
 #     margin-top:20px;
 #     background:#f5f5f5;

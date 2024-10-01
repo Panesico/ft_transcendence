@@ -12,8 +12,12 @@ urlpatterns = [
 
     path('game/', views.get_game, name='game'),
     path('tournament/', views.get_tournament, name='tournament'),
+
 		path('profile/', viewsProfile.get_profile, name='profile'),
-    path('edit_profile/', viewsProfile.edit_profile, name='edit_profile'),
+    path('edit_profile/', viewsProfile.get_edit_profile, name='edit_profile'),
+    path('edit_profile_general/', viewsProfile.post_edit_profile_general, name='edit_profile_general'),
+    path('edit_profile_security/', viewsProfile.post_edit_profile_security, name='edit_profile_security'),
+
 
 		path('api/invite/', views.post_invite, name='post_invite'),
 		path('my_friends/', views.list_friends, name='list_friends'),

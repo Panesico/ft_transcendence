@@ -2,7 +2,7 @@ from django.db import models
 
 class Profile(models.Model):
     user_id = models.IntegerField() # This is the user_id from the authentif app
-    username = models.CharField(max_length=20)
+    username = models.CharField(max_length=20, default='user')
     city = models.CharField(max_length=100, blank=True, default='Málaga')
     country = models.CharField(max_length=100, blank=True, default='Spain')
     played_games = models.IntegerField(default=0)
