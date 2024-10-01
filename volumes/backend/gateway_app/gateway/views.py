@@ -32,19 +32,6 @@ def get_game(request):
         return JsonResponse({'html': html})
     return render(request, 'partials/game.html')
 
-def get_profile(request):
-    logger.debug("")
-    logger.debug("get_profile")
-    if request.user.is_authenticated == False:
-      return redirect('login')
-    if request.method != 'GET':
-      return redirect('405')
-    form = InviteFriendFormFrontend()
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_profile XMLHttpRequest")
-        html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
-        return JsonResponse({'html': html})
-    return render(request, 'partials/profile.html', {'form': form})
 
 def get_tournament(request):
     logger.debug("")
@@ -54,17 +41,6 @@ def get_tournament(request):
         html = render_to_string('fragments/tournament_fragment.html', context={}, request=request)
         return JsonResponse({'html': html})
     return render(request, 'partials/tournament.html')
-
-def get_edit_profile(request):
-    if request.user.is_authenticated == False:
-      return redirect('login')
-    logger.debug("")
-    logger.debug("get_edit_profile")
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("edit_profile XMLHttpRequest")
-        html = render_to_string('fragments/edit_profile_fragment.html', context={}, request=request)
-        return JsonResponse({'html': html})
-    return render(request, 'partials/edit_profile.html')
 
 def list_friends(request):
 	if not request.user.is_authenticated:

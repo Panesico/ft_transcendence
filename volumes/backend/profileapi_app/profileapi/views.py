@@ -54,3 +54,4 @@ def api_invite_request(request):
   else:
     logger.debug('api_invite_request > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+

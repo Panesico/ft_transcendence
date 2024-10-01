@@ -1,8 +1,9 @@
 from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
-from authentif.forms import SignUpForm, LogInForm
+from authentif.forms import SignUpForm, LogInForm, EditProfileForm
 from authentif.models import User
+from django.contrib.auth.decorators import login_required
 import json
 import os
 import requests
@@ -161,4 +162,36 @@ def api_check_exists(request):
             logger.debug('api_check_exists > Invalid JSON')
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
     logger.debug('api_check_exists > Method not allowed')
+    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+
+def api_edit_profile(request):
+  logger.debug("api_edit_profile")
+  if request.method == 'POST':
+    try:
+      data = json.loads(request.body)
+      user_id = data.get('user_id')
+      user_id = data.get('user_id')
+      logger.debug(f'user_id: {user_id}')
+      try :
+        logger.debug(f'extract user_obj')
+        user_obj = User.objects.get(id=user_id)
+        #user_obj = User.objects.filter(id=user_id).first()
+        logger.debug(f'user_obj username: {user_obj.username}')
+        form = EditProfileForm(data, instance=user_obj)
+        logger.debug(f'form: {form}')
+      except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+      if form.is_valid():
+        logger.debug('api_edit_profile > Form is valid')
+        form.save()
+        return JsonResponse({'status': 'success', 'message': 'Profile updated', 'status': 200})
+      else:
+        logger.debug('api_edit_profile > Form is invalid')
+        return JsonResponse({'status': 'error', 'message': 'Invalid profile update'}, status=400)
+    except json.JSONDecodeError:
+      logger.debug('api_edit_profile > Invalid JSON')
+      return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+  else:
+    logger.debug('api_edit_profile > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
