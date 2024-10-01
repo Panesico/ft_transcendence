@@ -32,6 +32,8 @@ def edit_profile(request):
     if request.method == 'GET': 
         return get_edit_profile(request=request)
     elif request.method == 'POST':
+        #data = json.loads(request.body)
+        #return post_edit_profile(data)
         return post_edit_profile(request=request)
     return render('partials/edit_profile.html')
   
@@ -87,6 +89,7 @@ def post_edit_profile(request):
         for cookie in response.cookies:
             user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
         return user_response
+    #handle wrong confirmation password
     else:
       logger.debug('post_edit_profile > Response KO')
       data = json.loads(request.body)
