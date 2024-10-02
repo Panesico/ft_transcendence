@@ -24,13 +24,13 @@
             onclick="navigate(event, '/tournament')">Tournament</a>
         </li>
 
-				<li class="nav-item dropdown d-flex align-items-center">
-          <p class="nav-link dropdown-toggle m-0" id="navbarDropdown"
+        <li class="nav-item dropdown d-flex align-items-center">
+          <p class="nav-link dropdown-toggle m-0" id="navbarDropdownGame"
             role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Game
           </p>
 
-          <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
+          <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownGame">
             <li>
               <a class="dropdown-item bg-dark text-light" href="{% url 'game' %}" onclick="navigate(event, '/game')">Local</a>
             </li>
@@ -51,25 +51,23 @@
         </li>
 
         <li class="nav-item dropdown d-flex align-items-center">
-
-          <p class="nav-link dropdown-toggle m-0" id="navbarDropdown"
+          <p class="nav-link dropdown-toggle m-0" id="navbarDropdownUser"
             role="button" data-bs-toggle="dropdown" aria-expanded="false">
             {% if user.is_authenticated and user.avatar and user.avatar.url %}
-						<img src="{{ user.avatar.url }}" alt="{{ user.username }}"
-								style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
-						{% else %}
-								<img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="default icon"
-										style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
-						{% endif %}
+            <img src="{{ user.avatar.url }}" alt="{{ user.username }}"
+              style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
+            {% else %}
+            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="default icon"
+              style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
+            {% endif %}
           </p>
-          <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
-						<li>
-							<a class="dropdown-item bg-dark text-light" href="{% url 'profile' %}" onclick="navigate(event, '/profile')">Profile</a>
-						</li>
+          <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownUser">
             <li>
-							<a class="dropdown-item bg-dark text-light"
-                href="#">Settings</a>
-						</li>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'profile' %}" onclick="navigate(event, '/profile')">Profile</a>
+            </li>
+            <li>
+              <a class="dropdown-item bg-dark text-light" href="#">Settings</a>
+            </li>
             <li><a class="dropdown-item bg-dark text-light" href="#">Stats</a>
             </li>
             <li>
@@ -77,7 +75,25 @@
             </li>
             <li><a class="dropdown-item bg-dark text-light" href="{% url 'logout' %}" onclick="navigate(event, '/api/auth/logout')">Logout</a></li> 
           </ul>
+        </li>
 
+        <!-- Dropdown to change the language -->
+        <li class="nav-item dropdown d-flex align-items-center">
+          <p class="nav-link dropdown-toggle m-0" id="navbarDropdownLanguage"
+            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Language
+          </p>
+          <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownLanguage">
+            <li>
+              <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('en')">English</a>
+            </li>
+            <li>
+              <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('es')">Español</a>
+            </li>
+            <li>
+              <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('fr')">Français</a>
+            </li>
+          </ul>
         </li>
 
       </ul>

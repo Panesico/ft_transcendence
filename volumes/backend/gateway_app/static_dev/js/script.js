@@ -201,6 +201,12 @@ function navigate(e, path) {
   loadContent(path);
 }
 
+
+function changeLanguage(lang) {
+  console.log("Cambiar idioma a: " + lang);
+}
+
+
 // Listen for popstate events (Back/Forward buttons)
 window.onpopstate = () => {
   loadContent(window.location.pathname);
