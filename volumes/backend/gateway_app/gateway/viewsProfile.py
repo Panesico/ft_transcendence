@@ -30,6 +30,14 @@ def get_edit_profile(request):
     logger.debug("")
     if request.method != 'GET':
         return redirect('405')
+    user_id = request.user.id
+    profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
+    logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
+    response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+    if response.status_code == 200:
+      logger.debug(f"-------> get_edit_profile > Response: {response.json()}")
+    else:
+      logger.debug(f"-------> get_edit_profile > Response: {response.status_code}")
     initial_data = {'username': request.user.username,
                     'avatar': request.user.avatar,
                     'country': request.user.country,
@@ -105,7 +113,8 @@ def post_edit_profile_general(request):
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
     }
-    data = json.loads(request.body)
+    #data = json.loads(request.body)
+    data = request.POST.copy()
     logger.debug(f"post data : {data}")
     data['user_id'] = request.user.id
     logger.debug(f"user_id : {data['user_id']}")
@@ -120,13 +129,32 @@ def post_edit_profile_general(request):
     logger.debug(f"post_edit_profile_general > Response: {response.json()}")
     if response.ok:
         logger.debug('post_edit_profile_general > Response OK')      
-        user_response =  JsonResponse({'status': status, 'message': message})
-        for cookie in response.cookies:
-            user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
-        return user_response
+        # user_response =  JsonResponse({'status': status, 'message': message})
+        # for cookie in response.cookies:
+        #     user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
+        # return user_response
+        return render(request, 'partials/home.html', {'status': status, 'message': message})#change this line to return only the fragment
     #handle wrong confirmation password
     else:
       logger.debug('post_edit_profile_general > Response KO')
-      data = json.loads(request.body)
+      #data = json.loads(request.body)
 #      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form}, request=request)
       return render(request, 'partials/edit_profile.html', {'status': status, 'message': message})
+
+def get_test_profileapi(request):
+    if request.user.is_authenticated == False:
+        return redirect('login')
+    logger.debug("")
+    logger.debug("get_test_profileapi")
+    if request.method != 'GET':
+        return redirect('405')
+    user_id = request.user.id
+    profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
+    logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
+    response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+    data = response.json()
+    if response.status_code == 200:
+      logger.debug(f"-------> get_edit_profile > Response: {response.json()}")
+    else:
+      logger.debug(f"-------> get_edit_profile > Response: {response.status_code}")
+    return render(request, 'partials/test_profileapi.html', data)

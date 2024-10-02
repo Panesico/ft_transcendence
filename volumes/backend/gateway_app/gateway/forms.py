@@ -22,7 +22,7 @@ class LogInFormFrontend(forms.Form):
 
 class SignUpFormFrontend(forms.Form):
   username = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'signupUsername'
@@ -49,7 +49,7 @@ class SignUpFormFrontend(forms.Form):
 
 class InviteFriendFormFrontend(forms.Form):
   friendName = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
 						'type': 'text',
             'class': 'form-control',
@@ -69,7 +69,7 @@ class EditProfileFormFrontend(forms.Form):
         required=False,
         )
   username = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'editProfileUsername'
@@ -77,8 +77,17 @@ class EditProfileFormFrontend(forms.Form):
         label='Username', 
         required=True,
         )
+  display_name = forms.CharField(
+        max_length=16, 
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'editProfileDisplayName'
+          }),
+        label='DisplayName', 
+        required=False,
+        )
   country = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'editProfileCountry'
@@ -87,7 +96,7 @@ class EditProfileFormFrontend(forms.Form):
         required=True,
         )
   city = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'editProfileCity'

@@ -27,8 +27,8 @@ def api_signup(request):
     try:
       profile = Profile(
       user_id=data['user_id'],
-      username=data['username'],
       )
+      logger.debug("--> profile user_id created")
       profile.save()
       logger.debug("--> profile created")
       return JsonResponse({'message': 'Signup successful'}, status=201)
@@ -71,7 +71,6 @@ def api_edit_profile(request):
             logger.debug('user_obj recovered')
 
             # Log the current profile data
-            logger.debug(f'username: {user_obj.username}')
             logger.debug(f'avatar: {user_obj.avatar}')
             logger.debug(f'country: {user_obj.country}')
             logger.debug(f'city: {user_obj.city}')
@@ -81,7 +80,6 @@ def api_edit_profile(request):
             logger.debug(f'form: {form}')
             # Log the current profile data
             logger.debug('------------------------------')
-            logger.debug(f'username: {user_obj.username}')
             logger.debug(f'avatar: {user_obj.avatar}')
             logger.debug(f'country: {user_obj.country}')
             logger.debug(f'city: {user_obj.city}')
@@ -99,3 +97,25 @@ def api_edit_profile(request):
     else:
         logger.debug('api_edit_profile > Method not allowed')
         return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+def get_profile_api(request, user_id):
+    logger.debug("")
+    logger.debug("get_profile_api")
+    id = int(user_id)
+    logger.debug(f"id: {id}")
+    try:
+        user_obj = Profile.objects.get(user_id=id)
+        logger.debug('user_obj recovered')
+        data = {
+            'user_id': user_obj.user_id,
+            'avatar': user_obj.avatar.url if user_obj.avatar else None,
+            'country': user_obj.country,
+            'city': user_obj.city,
+        }
+        return JsonResponse(data, status=200)
+    except Profile.DoesNotExist:
+        logger.debug('get_profile > User not found')
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    except Exception as e:
+        logger.debug(f'get_profile > {str(e)}')
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

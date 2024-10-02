@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/signup/', views.api_signup, name='api_signup'),
     path('api/inviterequest/', views.api_invite_request, name='api_invite_request'),
     path('api/editprofile/', views.api_edit_profile, name='api_edit_profile'),
+    path('api/profile/<str:user_id>/', views.get_profile_api, name='profile_api'),
 ]

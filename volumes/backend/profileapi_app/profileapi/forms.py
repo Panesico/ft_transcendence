@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class InviteFriendForm(forms.ModelForm):
     friendName = forms.CharField(
-          max_length=20, 
+          max_length=16, 
           widget=forms.TextInput(attrs={
               'type': 'text',
               'class': 'form-control',
@@ -51,56 +51,53 @@ class EditProfileForm(forms.ModelForm):
       }),
     label='Upload avatar',
     required=False,
-    errors='Upload a valid image'
     )
-  username = forms.CharField(
-        max_length=20, 
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'id': 'editProfileUsername'
-          }),
-        label='Username', 
-        required=True,
-        errors='Invalid username'
-        )
+
   country = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'editProfileCountry'
           }),
         label='Country', 
         required=True,
-        errors='Invalid country'
         )
   city = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'editProfileCity'
           }),
         label='City', 
         required=True,
-        errors='Invalid city'
         )
+
+  display_name = forms.CharField(
+        max_length=16, 
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'editProfileCity'
+          }),
+        label='City', 
+        required=True,
+        )
+
   user_id = forms.IntegerField(
         widget=forms.HiddenInput(),
         required=True,
-        errors='Invalid user_id'
         )
 
   class Meta:
         model = Profile  # Specify the model if needed
         logger.debug(f"model: {model}")
-        fields = ['username', 'avatar', 'country', 'city', 'user_id']
+        fields = ['avatar', 'country', 'city', 'user_id', 'display_name']
         logger.debug(f"fields: {fields}")
 
   def clean(self):
         cleaned_data = super().clean() # call the clean method of the parent class
-        username = cleaned_data.get('username')
-        logger.debug(f'username: {username}')
         avatar = cleaned_data.get('avatar')
         logger.debug(f'avatar: {avatar}')
+        display_name = cleaned_data.get('display_name')
         country = cleaned_data.get('country')
         logger.debug(f'country: {country}')
         city = cleaned_data.get('city')
@@ -110,19 +107,19 @@ class EditProfileForm(forms.ModelForm):
         try:
           profile = Profile.objects.get(user_id=user_id)
           print('User ID:', profile.user_id)
-          if username:
-            profile.username = username
           if avatar:
             profile.avatar = avatar
           if country:
             profile.country = country
           if city:
             profile.city = city
+          if display_name:
+            profile.display_name = display_name
           profile.save()
           logger.debug('forms.py > Profile updated')
         except Profile.DoesNotExist:
           print('Profile not found')
-          raise ValidationError("This username does not exist.")
+          raise ValidationError("This user_id does not exist.")
         return cleaned_data
 # body{
 #     margin-top:20px;
