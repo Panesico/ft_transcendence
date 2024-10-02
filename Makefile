@@ -3,9 +3,9 @@ SHELL	= /bin/sh
 NAME	= transcendence
 
 all:
-	cd volumes/certs && openssl req -x509 -nodes -newkey rsa:4096 -days 365 \
-		-keyout key.pem \
-		-out cert.pem \
+	mkdir -p volumes/certs && cd volumes/certs && openssl req -x509 -nodes \
+		-newkey rsa:4096 -days 365 \
+		-keyout key.pem -out cert.pem \
 		-subj "/C=ES/L=Malaga/O=42 Malaga/CN=localhost" \
 		-addext "subjectAltName=DNS:localhost,DNS:gateway,DNS:authentif,\
 		DNS:profileapi,DNS:play,DNS:gamecalc"
