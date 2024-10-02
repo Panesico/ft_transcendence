@@ -52,6 +52,9 @@ class EditProfileForm(UserChangeForm):
     # current_password = forms.CharField(widget=forms.PasswordInput(attrs={
     #     'class': 'form-control', 'id': 'currentPassword'
     # }), label='Current Password')
+    new_username = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control', 'id': 'newUsername'
+    }), label='New Username', required=False)
 
     new_password = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control', 'id': 'newPassword'
@@ -81,9 +84,11 @@ class EditProfileForm(UserChangeForm):
         logger.debug("EditProfileForm > clean")
         logger.debug(f"new_password: {self.cleaned_data.get('new_password')}")
         logger.debug(f"confirm_password: {self.cleaned_data.get('confirm_password')}")
+        logger.debug(f"new_username: {self.cleaned_data.get('username')}")
         cleaned_data = super().clean()
         new_password = cleaned_data.get('new_password')
         confirm_password = cleaned_data.get('confirm_password')
+        new_username = cleaned_data.get('username')
         # current_password = cleaned_data.get('current_password')
 
         # Validate current password
@@ -94,5 +99,7 @@ class EditProfileForm(UserChangeForm):
                 raise ValidationError("Passwords do not match")
             else:
               self.instance.set_password(new_password)
+              if new_username:
+                self.instance.username = new_username
         logger.debug("EditProfileForm > clean > return cleaned_data")
         return cleaned_data

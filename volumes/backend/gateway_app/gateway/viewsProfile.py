@@ -73,13 +73,13 @@ def post_edit_profile_security(request):
     logger.debug(f"status: {status}, message: {message}")
     logger.debug(f"post_edit_profile > Response: {response.json()}")
     if response.ok:
-      logger.debug('post_edit_profile > Response OK')
-      #   html = render_to_string('partials/profile.html', context={}, request=request)
-      #   user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
-      #   for cookie in response.cookies:
-      #       user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
-      #  return user_response
-      return render(request, 'partials/profile.html', {'status': status, 'message': message})
+      # logger.debug('post_edit_profile > Response OK')
+      # html = render_to_string('partials/login.html', context={}, request=request)
+      # user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
+      # for cookie in response.cookies:
+      #   user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
+      # return user_response
+      return render(request, 'partials/home.html', {'status': status, 'message': message})#create a page to redirect to login page
     #handle wrong confirmation password
     else:
       logger.debug('post_edit_profile > Response KO')
@@ -105,7 +105,6 @@ def post_edit_profile_general(request):
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
     }
-
     data = json.loads(request.body)
     logger.debug(f"post data : {data}")
     data['user_id'] = request.user.id

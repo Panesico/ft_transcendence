@@ -51,6 +51,7 @@ class EditProfileForm(forms.ModelForm):
       }),
     label='Upload avatar',
     required=False,
+    errors='Upload a valid image'
     )
   username = forms.CharField(
         max_length=20, 
@@ -60,6 +61,7 @@ class EditProfileForm(forms.ModelForm):
           }),
         label='Username', 
         required=True,
+        errors='Invalid username'
         )
   country = forms.CharField(
         max_length=20, 
@@ -69,6 +71,7 @@ class EditProfileForm(forms.ModelForm):
           }),
         label='Country', 
         required=True,
+        errors='Invalid country'
         )
   city = forms.CharField(
         max_length=20, 
@@ -78,10 +81,12 @@ class EditProfileForm(forms.ModelForm):
           }),
         label='City', 
         required=True,
+        errors='Invalid city'
         )
   user_id = forms.IntegerField(
         widget=forms.HiddenInput(),
         required=True,
+        errors='Invalid user_id'
         )
 
   class Meta:
