@@ -3,5 +3,5 @@ from . import views
 
 urlpatterns = [
     path('api/newTournament/', views.api_newTournament, name='newTournament'),
-    path('api/playGame/', views.api_playGame, name='playGame'),
+    path('api/saveGame/', views.api_saveGame, name='saveGame'),
 ]

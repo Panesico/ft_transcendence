@@ -109,12 +109,20 @@ function showWinner(winner) {
 }
 
 async function saveGameResultInDatabase(winner) {
-  const url = '';  // URL route already game/
+  let path = window.location.pathname;
+  let url = '';
+  // console.log('path: ', path);
+  if (path === '/game/') {
+    url = 'saveGame/';
+  } else if (path === '/game') {
+    url = path + '/saveGame/';
+  }
+  // console.log('url: ', url);
   player1_name = document.getElementById('namePlayer1').textContent
   player2_name = document.getElementById('namePlayer2').textContent
   // player1_id, player2_id
 
-  const jsonObject = {
+  const jsonData = {
     'game_type': 'Pong',
     'game_round': 'Single',
     'player1_name': player1_name,
@@ -131,10 +139,12 @@ async function saveGameResultInDatabase(winner) {
       'X-CSRFToken': getCookie('csrftoken')
     },
     credentials: 'include',
-    body: JSON.stringify(jsonObject)
+    body: JSON.stringify(jsonData)
   });
   const response = await fetch(request);
+  // console.log('response: ', response);
   const data = await response.json();
+  // console.log('data: ', data);
 }
 
 // Display winner splash screen with "Play Again" button
