@@ -10,7 +10,7 @@ class LogInFormFrontend(forms.Form):
           }),
         label='Username', 
         required=True,
-        )
+  )
   password = forms.CharField(
         widget=forms.PasswordInput(attrs={
           'class': 'form-control',
@@ -18,7 +18,7 @@ class LogInFormFrontend(forms.Form):
           }), 
         label='Password', 
         required=True
-        )
+  )
 
 class SignUpFormFrontend(forms.Form):
   username = forms.CharField(
