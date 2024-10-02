@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.db import DatabaseError
 # from .forms import TournamentForm
-from .models import Game, Player
+from .models import Game
 import json
 import os
 import requests
@@ -27,24 +27,30 @@ def api_saveGame(request):
 
             if not all([game_type, game_round, player1_name, player2_name, score_player1 is not None, score_player2 is not None]):
                 return JsonResponse({'status': 'error', 'message': 'Missing or invalid parameters'}, status=400)
+            if player1_id == 0:
+                player1_id = None
+            if player2_id == 0:
+                player2_id = None
             
-            player1 = Player.objects.create(
-                user_id=player1_id if player1_id else None,
-                displayName=player1_name
-            )
-            player2 = Player.objects.create(
-                user_id=player2_id if player2_id else None,
-                displayName=player2_name
-            )
+            # player1 = Player.objects.create(
+            #     user_id=player1_id if player1_id else None,
+            #     displayName=player1_name
+            # )
+            # player2 = Player.objects.create(
+            #     user_id=player2_id if player2_id else None,
+            #     displayName=player2_name
+            # )
 
             logger.debug('api_saveGame > Saving game...')
             game = Game.objects.create(
-                game_type=game_type,
-                game_round=game_round,
-                player1=player1,
-                player2=player2,
-                score_player1=score_player1,
-                score_player2=score_player2,
+                game_type = game_type,
+                game_round = game_round,
+                p1_id = player1_id,
+                p1_name = player1_name,
+                p2_id = player2_id,
+                p2_name = player2_name,
+                p1_score = score_player1,
+                p2_score = score_player2,
             )
             logger.debug('api_saveGame > Game saved')
             return JsonResponse({'status': 'success', 'message': 'Game saved'})

@@ -106,7 +106,7 @@ def save_game(request):
     if request.method != 'POST': 
       return redirect('405')
     logger.debug('save_game')
-    authentif_url = 'https://play:9003/api/saveGame/'
+    play_url = 'https://play:9003/api/saveGame/'
     
     csrf_token = request.COOKIES.get('csrftoken')
     headers = {
@@ -121,7 +121,7 @@ def save_game(request):
     # logger.debug(f'Extracted headers: {headers}')
     # logger.debug(f'Extracted data from JSON: {data}')
     
-    response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
+    response = requests.post(play_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
     # logger.debug(f"save_game > Response cookies: {response.cookies}")
 
     status = response.json().get("status")
