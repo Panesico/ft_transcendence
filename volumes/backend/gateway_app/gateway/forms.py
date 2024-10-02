@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 
 class LogInFormFrontend(forms.Form):
   username = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'id': 'loginUsername'
@@ -131,7 +131,7 @@ class EditProfileFormFrontend(forms.Form):
   
 class TournamentFormFrontend(forms.Form):
   player1 = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
             'value': 'Name1',
             'class': 'form-control',
@@ -141,7 +141,7 @@ class TournamentFormFrontend(forms.Form):
         required=True,
         )
   player2 = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
             'value': 'Name2',
             'class': 'form-control',
@@ -151,7 +151,7 @@ class TournamentFormFrontend(forms.Form):
         required=True,
         )
   player3 = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
             'value': 'Name3',
             'class': 'form-control',
@@ -161,7 +161,7 @@ class TournamentFormFrontend(forms.Form):
         required=True,
         )
   player4 = forms.CharField(
-        max_length=20, 
+        max_length=16, 
         widget=forms.TextInput(attrs={
             'value': 'Name4',
             'class': 'form-control',
