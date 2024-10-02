@@ -82,27 +82,31 @@ def post_tournament(request):
         return JsonResponse({'html': html, 'status': status, 'message': message})
 
 
-def view_game(request):
-    logger.debug('view_game')
-    if request.method == 'GET': 
-       return get_game(request)      
-    elif request.method == 'POST':
-       return post_game(request)
-    else:
-      return redirect('405')
+# def view_game(request):
+#     logger.debug('view_game')
+#     if request.method == 'GET': 
+#        return get_game(request)      
+#     elif request.method == 'POST':
+#        return post_game(request)
+#     else:
+#       return redirect('405')
     
 def get_game(request):
     logger.debug("")
     logger.debug("get_game")
+    if request.method != 'GET': 
+      return redirect('405')
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_game XMLHttpRequest")
         html = render_to_string('fragments/game_fragment.html', context={}, request=request)
         return JsonResponse({'html': html})
     return render(request, 'partials/game.html')
 
-def post_game(request):
-    logger.debug('post_game')
-    authentif_url = 'https://play:9003/api/playGame/'
+def save_game(request):
+    if request.method != 'POST': 
+      return redirect('405')
+    logger.debug('save_game')
+    authentif_url = 'https://play:9003/api/saveGame/'
     
     csrf_token = request.COOKIES.get('csrftoken')
     headers = {
@@ -118,18 +122,18 @@ def post_game(request):
     # logger.debug(f'Extracted data from JSON: {data}')
     
     response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
-    # logger.debug(f"post_game > Response cookies: {response.cookies}")
+    # logger.debug(f"save_game > Response cookies: {response.cookies}")
 
     status = response.json().get("status")
     message = response.json().get("message")
-    logger.debug(f"post_game > Response message: {message}")
+    logger.debug(f"save_game > Response message: {message}")
     if response.ok:        
         user_response =  JsonResponse({'status': status, 'message': message})
         for cookie in response.cookies:
             user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True, secure=True)
         return user_response
     else:
-        logger.debug(f"post_game > Response NOT OK: {response.json()}")
+        logger.debug(f"save_game > Response NOT OK: {response.json()}")
         logger.debug(message)
         data = json.loads(request.body)
         form = TournamentFormFrontend(data)

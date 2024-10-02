@@ -28,7 +28,8 @@ urlpatterns = [
     path('edit_profile_security/', viewsProfile.post_edit_profile_security, name='edit_profile_security'),
 
     # play api
-    path('game/', viewsPlay.view_game, name='game'),
+    path('game/', viewsPlay.get_game, name='game'),
+    path('game/saveGame/', viewsPlay.save_game, name='saveGame'),
     path('tournament/', viewsPlay.view_tournament, name='tournament'),
 
 

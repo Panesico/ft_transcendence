@@ -7,12 +7,12 @@ import requests
 import logging
 logger = logging.getLogger(__name__)
 
-def api_playGame(request):
-    logger.debug("api_playGame")
+def api_saveGame(request):
+    logger.debug("api_saveGame")
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            logger.debug(f'api_playGame > Received data: {data}')
+            logger.debug(f'api_saveGame > Received data: {data}')
 
             game_type = data.get('game_type')
             game_round = data.get('game_round')
@@ -44,11 +44,12 @@ def api_playGame(request):
                 score_player1=score_player1,
                 score_player2=score_player2,
             )
-            return JsonResponse({'status': 'success', 'message': 'Game played'})
+            logger.debug('api_saveGame > Game saved')
+            return JsonResponse({'status': 'success', 'message': 'Game saved'})
         except json.JSONDecodeError:
-            logger.debug('api_playGame > Invalid JSON')
+            logger.debug('api_saveGame > Invalid JSON')
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    logger.debug('api_playGame > Method not allowed')
+    logger.debug('api_saveGame > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
     
 def api_newTournament(request):
