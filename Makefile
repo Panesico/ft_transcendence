@@ -34,9 +34,10 @@ certs:
 		-subj "/C=ES/L=Malaga/O=42 Malaga/CN=localhost" \
 		-addext "subjectAltName=DNS:localhost,DNS:gateway,DNS:authentif,\
 		DNS:profileapi,DNS:play,DNS:gamecalc"
+
 postgres:
-	# docker exec -it postgres /bin/sh
-	docker exec -it postgres sh -c "psql -U postgres_main_user -d transcendence_db"
+	docker exec -it postgres sh \
+		-c "psql -U postgres_main_user -d transcendence_db"
 
 gateway:
 	docker exec -it gateway /bin/sh
@@ -53,6 +54,6 @@ profileapi_restart:
 
 
 
-.phony: all down stop logs prune routine reset postgres \
+.phony: all down stop logs prune routine reset certs postgres \
 	gateway gateway_restart authentif authentif_restart \
 	profileapi profileapi_restart
