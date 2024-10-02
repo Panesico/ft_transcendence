@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.db import DatabaseError
 # from .forms import TournamentForm
 from .models import Game, Player
 import json
@@ -36,6 +37,7 @@ def api_saveGame(request):
                 displayName=player2_name
             )
 
+            logger.debug('api_saveGame > Saving game...')
             game = Game.objects.create(
                 game_type=game_type,
                 game_round=game_round,
@@ -46,9 +48,10 @@ def api_saveGame(request):
             )
             logger.debug('api_saveGame > Game saved')
             return JsonResponse({'status': 'success', 'message': 'Game saved'})
-        except json.JSONDecodeError:
-            logger.debug('api_saveGame > Invalid JSON')
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+        except (json.JSONDecodeError, DatabaseError) as e:
+            logger.debug(f'api_saveGame > Database error: {str(e)}')
+            return JsonResponse({'status': 'error', 'message': 'Database error: ' + str(e)}, status=400)
+
     logger.debug('api_saveGame > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
     

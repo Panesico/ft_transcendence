@@ -142,7 +142,9 @@ async function saveGameResultInDatabase(winner) {
     body: JSON.stringify(jsonData)
   });
   const response = await fetch(request);
+  // console.log('response: ', response);
   const data = await response.json();
+  // console.log('data: ', data);
 }
 
 // Display winner splash screen with "Play Again" button
