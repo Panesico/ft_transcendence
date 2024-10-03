@@ -3,8 +3,8 @@
   <div class="col-xs-12 col-sm-9 mx-auto">
     <div class="panel panel-default" style="border-bottom : 0">
       <div class="panel-body text-center" >
-        {% if user.avatar %}
-        <img src= {{user.avatar.url}} alt="user.username" style="height: 15rem; width: 15rem; object-fit: center; margin: 0px auto; margin-top: 30px; border-radius: 50%; border: 2px solid #fff;">
+        {% if profile_data.avatar %}
+        <img src= {{profile_data.avatar}} alt="user.username" style="height: 15rem; width: 15rem; object-fit: center; margin: 0px auto; margin-top: 30px; border-radius: 50%; border: 2px solid #fff;">
         {% else %}
         <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="default icon"
         style="height: 10rem; width: 10rem; object-fit: center;

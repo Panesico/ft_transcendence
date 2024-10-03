@@ -6,8 +6,8 @@
 		margin-top: 80px;">
     <div class="profile-page-details">
 			<h1 style="margin-bottom: 1rem; align-self: flex-start;">Profile page</h1>
-			{% if user.avatar %}
-			<img src= {{user.avatar.url}} alt="user.username" style="height: 10rem; width: 10rem; object-fit: center;
+			{% if profile_data.avatar %}
+			<img src= {{profile_data.avatar}} alt="user.username" style="height: 10rem; width: 10rem; object-fit: center;
 			border-radius: 50%; border: 2px solid #fff;">
 			{% else %}
 			<img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="default icon"

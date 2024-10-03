@@ -12,6 +12,20 @@ import logging
 import requests
 logger = logging.getLogger(__name__)
 
+def get_profileapi_variables(request):
+  user_id = request.user.id
+  profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
+  logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
+  response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+  if response.status_code == 200:
+    logger.debug(f"-------> get_edit_profile > Response: {response.json()}")
+    return response.json()
+  else:
+    logger.debug(f"-------> get_edit_profile > Response: {response.status_code}")
+    return {'avatar': '/media/avatars/default.png',
+            'country': 'Spain',
+            'city': 'Málaga'}
+
 def get_profile(request):
     logger.debug("")
     logger.debug("get_profile")
@@ -20,11 +34,16 @@ def get_profile(request):
     if request.method != 'GET':
       return redirect('405')
     form = InviteFriendFormFrontend()
+
+    # GET profile user's variables
+    profile_data = get_profileapi_variables(request=request)
+
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_profile XMLHttpRequest")
-        html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
+        html = render_to_string('fragments/profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
         return JsonResponse({'html': html})
-    return render(request, 'partials/profile.html', {'form': form})
+    return render(request, 'partials/profile.html', {'form': form, 'profile_data': profile_data})
+    #return render(request, 'partials/my_template.html', {'my_avatar': my_avatar})
 
 def get_edit_profile(request):
     if request.user.is_authenticated == False:
@@ -32,27 +51,18 @@ def get_edit_profile(request):
     logger.debug("")
     if request.method != 'GET':
         return redirect('405')
-    # user_id = request.user.id
-    # profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
-    # logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
-    # response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
-    # if response.status_code == 200:
-    #   logger.debug(f"-------> get_edit_profile > Response: {response.json()}")
-    # else:
-    #   logger.debug(f"-------> get_edit_profile > Response: {response.status_code}")
-    # initial_data = {'username': request.user.username,
-    #                 'avatar': request.user.avatar,
-    #                 'country': request.user.country,
-    #                 'city': request.user.city,
-    #                 }
+
+    # GET profile user's variables
+    profile_data = get_profileapi_variables(request=request)
+
     form = EditProfileFormFrontend()
     logger.debug(f"get_edit_profile > form: {form}")
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_edit_profile > XMLHttpRequest")
-        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form}, request=request)
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
         return JsonResponse({'html': html})
-    return render(request, 'partials/edit_profile.html', {'form': form})
+    return render(request, 'partials/edit_profile.html', {'form': form, 'profile_data': profile_data})
 
 def post_edit_profile_security(request):
     if request.user.is_authenticated == False:
