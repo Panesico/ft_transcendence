@@ -3,6 +3,8 @@
 
 @iisaacc
 -	Minor module: Show in more languages (3 minimum).
+  - Username and password are not being translated X
+  - It only adds the country prefix when you click in change language, but it doesnt stay while navigating
 -	Replacing Pong implementation in the backend
 -	Research web sockets?? Live chat and playing at the same time??
 -	Other game implementation
