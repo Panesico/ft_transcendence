@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSIÓN DEL PAQUETE\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-03 11:28+0000\n"
+"POT-Creation-Date: 2024-10-03 15:43+0000\n"
 "PO-Revision-Date: AÑO-MO-DA HO:MI+ZONA\n"
 "Last-Translator: NOMBRE COMPLETO <EMAIL@DIRECCIÓN>\n"
 "Language-Team: ESPAÑOL <ES@li.org>\n"
@@ -50,31 +50,31 @@ msgstr "País"
 msgid "City"
 msgstr "Ciudad"
 
-#: gateway/forms.py:121
+#: gateway/forms.py:114
 msgid "New password"
 msgstr "Nueva contraseña"
 
-#: gateway/forms.py:129
+#: gateway/forms.py:122
 msgid "Confirm new Password"
 msgstr "Confirmar nueva contraseña"
 
-#: gateway/forms.py:141
+#: gateway/forms.py:134
 msgid "Player 1"
 msgstr "Jugador 1"
 
-#: gateway/forms.py:151
+#: gateway/forms.py:144
 msgid "Player 2"
 msgstr "Jugador 2"
 
-#: gateway/forms.py:161
+#: gateway/forms.py:154
 msgid "Player 3"
 msgstr "Jugador 3"
 
-#: gateway/forms.py:171
+#: gateway/forms.py:164
 msgid "Player 4"
 msgstr "Jugador 4"
 
-#: gateway/forms.py:186
+#: gateway/forms.py:179
 msgid "Player names must be unique."
 msgstr "Los nombres de los jugadores deben ser únicos."
 
@@ -105,22 +105,21 @@ msgstr "Perfil de"
 msgid "default icon"
 msgstr "ícono predeterminado"
 
-#: gateway/templates/fragments/edit_profile_fragment.html:23
-#: gateway/templates/fragments/edit_profile_fragment.html:49
-#: gateway/templates/fragments/edit_profile_fragment.html:76
-msgid "Submit"
-msgstr "Enviar"
-
-#: gateway/templates/fragments/edit_profile_fragment.html:33
+#: gateway/templates/fragments/edit_profile_fragment.html:29
 msgid "User info"
 msgstr "Información del usuario"
 
-#: gateway/templates/fragments/edit_profile_fragment.html:54
+#: gateway/templates/fragments/edit_profile_fragment.html:45
+#: gateway/templates/fragments/edit_profile_fragment.html:72
+msgid "Submit"
+msgstr "Enviar"
+
+#: gateway/templates/fragments/edit_profile_fragment.html:50
 msgid "Security"
 msgstr "Seguridad"
 
-#: gateway/templates/fragments/edit_profile_fragment.html:91
-#: gateway/templates/fragments/edit_profile_fragment.html:92
+#: gateway/templates/fragments/edit_profile_fragment.html:87
+#: gateway/templates/fragments/edit_profile_fragment.html:88
 msgid "Passwords do not match!"
 msgstr "¡Las contraseñas no coinciden!"
 
@@ -336,5 +335,8 @@ msgid "Spanish"
 msgstr "Español"
 
 #: gateway/templates/includes/header.html:95
-msgid "Français"
-msgstr "Francés"
+msgid "French"
+msgstr ""
+
+#~ msgid "Français"
+#~ msgstr "Francés"
