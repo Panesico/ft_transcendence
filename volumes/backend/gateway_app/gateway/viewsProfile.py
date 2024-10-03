@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from .forms import InviteFriendFormFrontend, EditProfileFormFrontend
 from django.contrib import messages
+from datetime import datetime
+from django.core.files.storage import FileSystemStorage
 import json
 import logging
 import requests
@@ -30,20 +32,20 @@ def get_edit_profile(request):
     logger.debug("")
     if request.method != 'GET':
         return redirect('405')
-    user_id = request.user.id
-    profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
-    logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
-    response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
-    if response.status_code == 200:
-      logger.debug(f"-------> get_edit_profile > Response: {response.json()}")
-    else:
-      logger.debug(f"-------> get_edit_profile > Response: {response.status_code}")
-    initial_data = {'username': request.user.username,
-                    'avatar': request.user.avatar,
-                    'country': request.user.country,
-                    'city': request.user.city,
-                    }
-    form = EditProfileFormFrontend(initial=initial_data)
+    # user_id = request.user.id
+    # profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
+    # logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
+    # response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+    # if response.status_code == 200:
+    #   logger.debug(f"-------> get_edit_profile > Response: {response.json()}")
+    # else:
+    #   logger.debug(f"-------> get_edit_profile > Response: {response.status_code}")
+    # initial_data = {'username': request.user.username,
+    #                 'avatar': request.user.avatar,
+    #                 'country': request.user.country,
+    #                 'city': request.user.city,
+    #                 }
+    form = EditProfileFormFrontend()
     logger.debug(f"get_edit_profile > form: {form}")
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -141,6 +143,68 @@ def post_edit_profile_general(request):
 #      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form}, request=request)
       return render(request, 'partials/edit_profile.html', {'status': status, 'message': message})
 
+
+def handle_uploaded_file(f, user_id):
+    # Define the directory where you want to save the uploaded files
+    logger.debug("handle_uploaded_file")
+    upload_dir = os.path.join(settings.MEDIA_ROOT, 'uploads', str(user_id))
+    logger.debug(f"upload_dir: {upload_dir}")
+    # Ensure the directory exists
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+    
+    # Generate a custom filename
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    filename = f"{timestamp}_{f.name}"
+    file_path = os.path.join(upload_dir, filename)
+    
+    # Save the uploaded file
+    with open(file_path, "wb+") as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+    
+    logger.debug(f"File saved to {file_path}")
+    return file_path
+
+def post_edit_profile_avatar(request):
+  if request.user.is_authenticated == False:
+    return redirect('login')
+  if request.method != 'POST':
+      return redirect('405')
+  logger.debug("")
+  logger.debug("post_edit_profile_avatar")
+  authentif_url = 'https://profileapi:9002/api/editprofile/'
+  csrf_token = request.COOKIES.get('csrftoken')
+  headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+    }
+  data = request.POST.copy()
+  uploaded_file = request.FILES['avatar']
+  # Save the uploaded file
+  avatar_dir = os.path.join(settings.MEDIA_ROOT, 'avatars')
+  fs = FileSystemStorage(location=avatar_dir)
+  filename = fs.save(uploaded_file.name, uploaded_file)
+
+  data['user_id'] = request.user.id
+  data['avatar'] = '/media/avatars/' + filename
+  logger.debug(f"post_edit_profile_avatar > data: {data}")
+
+  # send the file path to the profile api
+  response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
+  if response.ok:
+    logger.debug('post_edit_profile_avatar > Response OK')
+    user_response =  JsonResponse({'status': 'success', 'message': 'Avatar updated successfully'})
+    for cookie in response.cookies:
+      user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
+    return user_response
+    #return render(request, 'partials/home.html')
+  else:
+    logger.debug('post_edit_profile_avatar > Response KO')
+    return JsonResponse({'status': 'error', 'message': 'An error occurred while updating the avatar'}, status=response.status_code)
+ 
 def get_test_profileapi(request):
     if request.user.is_authenticated == False:
         return redirect('login')
@@ -158,3 +222,16 @@ def get_test_profileapi(request):
     else:
       logger.debug(f"-------> get_edit_profile > Response: {response.status_code}")
     return render(request, 'partials/test_profileapi.html', data)
+
+
+def upload_file(request):
+  if request.method == 'POST' and request.FILES['myfile']:
+      print('request.FILES: ', request.FILES)
+      myfile = request.FILES['myfile']
+      fs = FileSystemStorage()
+      filename = fs.save(myfile.name, myfile)
+      uploaded_file_url = fs.url(filename)
+      return render(request, 'partials/upload.html', {
+          'uploaded_file_url': uploaded_file_url
+      })
+  return render(request, 'partials/upload.html')

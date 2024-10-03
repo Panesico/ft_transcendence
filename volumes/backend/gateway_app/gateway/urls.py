@@ -26,6 +26,7 @@ urlpatterns = [
     path('edit_profile/', viewsProfile.get_edit_profile, name='edit_profile'),
     path('edit_profile_general/', viewsProfile.post_edit_profile_general, name='edit_profile_general'),
     path('edit_profile_security/', viewsProfile.post_edit_profile_security, name='edit_profile_security'),
+    path('edit_profile_avatar/', viewsProfile.post_edit_profile_avatar, name='edit_profile_avatar'),
 
     # play api
     path('game/', viewsPlay.get_game, name='game'),

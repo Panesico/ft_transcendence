@@ -28,3 +28,6 @@ Thumbs.db
 volumes/frontend/
 
 *.pem
+
+# PNG files
+*.png

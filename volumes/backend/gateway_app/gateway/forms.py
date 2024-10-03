@@ -76,7 +76,7 @@ class EditProfileFormFrontend(forms.Form):
             'id': 'editProfileUsername'
           }),
         label=_('Username'), 
-        required=True,
+        required=False,
         )
   display_name = forms.CharField(
         max_length=16, 
@@ -94,7 +94,7 @@ class EditProfileFormFrontend(forms.Form):
             'id': 'editProfileCountry'
           }),
         label=_('Country'), 
-        required=True,
+        required=False,
         )
   city = forms.CharField(
         max_length=16, 
@@ -103,23 +103,16 @@ class EditProfileFormFrontend(forms.Form):
             'id': 'editProfileCity'
           }),
         label=_('City'), 
-        required=True,
+        required=False,
         )
-  # current_password = forms.CharField(
-  #       widget=forms.PasswordInput(attrs={
-  #         'class': 'form-control',
-  #         'id': 'editProfileCurrentPassword'
-  #         }), 
-  #       label='Current Password', 
-  #       required=True
-  #       )
+
   new_password = forms.CharField(
         widget=forms.PasswordInput(attrs={
           'class': 'form-control',
           'id': 'editProfilePassword'
           }), 
         label=_('New password'), 
-        required=True
+        required=False
         )
   confirm_password = forms.CharField(
         widget=forms.PasswordInput(attrs={
@@ -127,7 +120,7 @@ class EditProfileFormFrontend(forms.Form):
           'id': 'editProfileConfirmPassword'
           }), 
         label=_('Confirm new Password'), 
-        required=True
+        required=False
         )
   
 class TournamentFormFrontend(forms.Form):

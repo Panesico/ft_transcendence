@@ -23,7 +23,7 @@ def api_signup(request):
     }
     logger.debug("--> POST method")
     data = json.loads(request.body)
-    logger.debug(f"data : {data['user_id']}")
+    logger.debug(f"data : {data}")
     try:
       profile = Profile(
       user_id=data['user_id'],

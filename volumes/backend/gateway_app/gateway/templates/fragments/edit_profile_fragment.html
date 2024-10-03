@@ -10,20 +10,16 @@
         style="height: 10rem; width: 10rem; object-fit: center;
         border-radius: 50%; border: 2px solid #fff;">
         {% endif %}
-        <div class="d-flex align-items-center justify-content-center" style="margin-top : 15px">
-        <form action="{% url 'edit_profile_general' %}" method="post" enctype="multipart/form-data">
+        <form action="{% url 'edit_profile_avatar' %}" id="file-upload" method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="mb-3">
-            <label for="{{ form.avatar.id_for_label }}" class="form-group">{{ form.avatar.label }}</label>
-            {{ form.avatar }}
-            <div class="text-danger fs-6">
-              {{ form.avatar.errors }}
+              {{ form.avatar }}
             </div>
           </div>
           <div style="text-align: left;">
-            <button type="submit" class="btn btn-success" value="general">Submit</button>
-          </div>
-        </form>
+          <button type="submit" class="btn btn-success" value="general" >Submit</button>
+        </form> 
+        </div>
         </div>
       </div>
     </div>

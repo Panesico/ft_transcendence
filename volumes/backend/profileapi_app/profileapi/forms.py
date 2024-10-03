@@ -44,14 +44,15 @@ class InviteFriendForm(forms.ModelForm):
 
 class EditProfileForm(forms.ModelForm):
 
-  avatar = forms.ImageField(
-    widget=forms.FileInput(attrs={
-        'class': 'form-control',
-        'id': 'editProfileAvatar'
-      }),
-    label='Upload avatar',
-    required=False,
-    )
+  avatar = forms.CharField(
+        max_length=100, 
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'editProfileCountry'
+          }),
+        label='Avatar', 
+        required=False,
+        )
 
   country = forms.CharField(
         max_length=16, 
@@ -60,7 +61,7 @@ class EditProfileForm(forms.ModelForm):
             'id': 'editProfileCountry'
           }),
         label='Country', 
-        required=True,
+        required=False,
         )
   city = forms.CharField(
         max_length=16, 
@@ -69,7 +70,7 @@ class EditProfileForm(forms.ModelForm):
             'id': 'editProfileCity'
           }),
         label='City', 
-        required=True,
+        required=False,
         )
 
   display_name = forms.CharField(
@@ -79,12 +80,12 @@ class EditProfileForm(forms.ModelForm):
             'id': 'editProfileCity'
           }),
         label='City', 
-        required=True,
+        required=False,
         )
 
   user_id = forms.IntegerField(
         widget=forms.HiddenInput(),
-        required=True,
+        required=False,
         )
 
   class Meta:
