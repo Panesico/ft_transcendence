@@ -1,12 +1,12 @@
 /* styles.css */
-@font-face {
+/* @font-face {
   font-family: "VT323";
   src: url(../fonts/VT323-Regular.ttf);
 }
 @font-face {
   font-family: "PixeloidMono";
   src: url(../fonts/PixeloidMono-d94EV.ttf);
-}
+} */
 @font-face {
   font-family: "PixeloidSans";
   src: url(../fonts/PixeloidSans-mLxMm.ttf);
@@ -24,10 +24,17 @@ body {
   background-color: #181a1b;
 }
 
-.game-container {
+#game-container {
   background-color: #000;
   height: 450px;
   width: 650px;
+}
+
+#startGame-button {
+  background-color: #000;
+  color: #d3d3d3;
+  border: solid 4px #d3d3d3;
+  height: 80px;
 }
 
 /* Custom styles for the Bootstrap modal */

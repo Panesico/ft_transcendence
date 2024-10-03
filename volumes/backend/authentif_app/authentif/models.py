@@ -24,7 +24,7 @@ class CustomUserManager(UserManager):
     
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(blank=True, default='', unique=True, max_length=20)
+    username = models.CharField(blank=True, default='', unique=True, max_length=16)
     password = models.CharField(max_length=128)
 
     city = models.CharField(max_length=100, blank=True, default='Málaga')
