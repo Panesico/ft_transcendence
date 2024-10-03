@@ -6,6 +6,8 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.urls import path, include
 
+handler405 = 'gateway.viewsErrors.get_405'
+
 urlpatterns = [
     # django admin
     path('admin/', admin.site.urls),
@@ -34,6 +36,7 @@ urlpatterns = [
     path('game/', viewsPlay.get_game, name='game'),
     path('game/saveGame/', viewsPlay.save_game, name='saveGame'),
     path('tournament/', viewsPlay.view_tournament, name='tournament'),
+    path('tournament/update/', viewsPlay.view_tournament_update, name='tournamentUpdate'),
 
     # Languages API
     path('i18n/', include('django.conf.urls.i18n')),

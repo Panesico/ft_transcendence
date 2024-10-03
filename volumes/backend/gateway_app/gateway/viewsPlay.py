@@ -49,8 +49,11 @@ def post_tournament(request):
         'Referer': 'https://gateway:8443',
     }
     data = json.loads(request.body)
-    if request.user.is_authenticated:
-        data['player1_id'] = request.user.id
+    data['p1_id'] = request.user.id if request.user.is_authenticated else 0
+    data['p2_id'] = 0
+    data['p3_id'] = 0
+    data['p4_id'] = 0
+    data['tournament_type'] = 'Pong'
     logger.debug(f'post_tournament > extracted data from JSON: {data}')
 
     form = TournamentFormFrontend(data)
@@ -67,19 +70,57 @@ def post_tournament(request):
 
     status = response.json().get("status")
     message = response.json().get("message")
-    if response.ok:        
-        user_response =  JsonResponse({'status': status, 'message': message})
-        for cookie in response.cookies:
-            user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True, secure=True)
-        return user_response
+    logger.debug(f"post_tournament > Response {response.ok}, message: {message}")
+    if response.ok:
+        info = response.json().get("info")
+        logger.debug(f"post_tournament > Response info: {info}")
+        html = render_to_string('fragments/tournament_game_fragment.html', {'info': info}, request=request)
     else:
         logger.debug(f"post_tournament > Response NOT OK: {response.json()}")
-        logger.debug(message)
         data = json.loads(request.body)
         form = TournamentFormFrontend(data)
         form.add_error(None, message)
         html = render_to_string('fragments/tournament_fragment.html', {'form': form}, request=request)
-        return JsonResponse({'html': html, 'status': status, 'message': message})
+    return JsonResponse({'html': html, 'status': status, 'message': message})
+
+def view_tournament_update(request):
+    logger.debug('view_tournament_update')
+    if request.method != 'POST':
+      return redirect('405')
+    
+    play_url = 'https://play:9003/api/updateTournament/'
+
+    csrf_token = request.COOKIES.get('csrftoken')
+    headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+    }
+
+    data = json.loads(request.body)
+    logger.debug(f'view_tournament_update > Received data: {data}')
+
+    response = requests.post(play_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
+
+    status = response.json().get("status")
+    message = response.json().get("message")
+    logger.debug(f"post_tournament > Response {response.ok}, message: {message}")
+    if response.ok:
+        info = response.json().get("info")
+        logger.debug(f"post_tournament > Response info: {info}")
+        logger.debug(f"post_tournament > Response info.tournament_round: {info['tournament_round']}")
+        if info['tournament_round'] == 'Semi-Final 2' or info['tournament_round'] == 'Final':
+            html = render_to_string('fragments/tournament_game_fragment.html', {'info': info}, request=request)
+        elif info['tournament_round'] == 'has_ended':
+            html = render_to_string('fragments/tournament_end_fragment.html', {'info': info}, request=request)
+    else:
+        logger.debug(f"post_tournament > Response NOT OK: {response.json()}")
+        form = TournamentFormFrontend()
+        html = render_to_string('fragments/tournament_fragment.html', {'form': form}, request=request)
+    return JsonResponse({'html': html, 'status': status, 'message': message})
+
+
 
 
 # def view_game(request):
@@ -90,7 +131,7 @@ def post_tournament(request):
 #        return post_game(request)
 #     else:
 #       return redirect('405')
-    
+
 def get_game(request):
     logger.debug("")
     logger.debug("get_game")

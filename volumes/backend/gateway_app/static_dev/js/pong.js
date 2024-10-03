@@ -22,7 +22,8 @@
 //   gameCalcSocket.send(JSON.stringify({'message': message}));
 // }
 
-function executePongGame(player1_name, player1_id, player2_name, player2_id) {
+function executePongGame(
+    tournament_id, game_round, p1_name, p1_id, p2_name, p2_id) {
   // Get the game container
   const gameContainer = document.querySelector('#game-container');
   const scorePlayer1Element = document.querySelector('.scorePlayer1');
@@ -119,20 +120,25 @@ function executePongGame(player1_name, player1_id, player2_name, player2_id) {
       url = 'saveGame/';
     } else if (path === '/game') {
       url = path + '/saveGame/';
+    } else if (path === '/tournament/') {
+      url = 'update/';
+    } else if (path === '/tournament') {
+      url = path + '/update/';
     }
     // console.log('url: ', url);
-    // player1_id, player2_id
 
     const jsonData = {
-      'game_type': 'Pong',
-      'game_round': 'Single',
-      'player1_name': player1_name,
-      'player2_name': player2_name,
-      'player1_id': player1_id,
-      'player2_id': player2_id,
-      'score_player1': scorePlayer1,
-      'score_player2': scorePlayer2,
-      'winner': winner,
+      'tournament_id': tournament_id,
+      'game_type': 'pong',
+      'game_round': game_round,
+      'p1_name': p1_name,
+      'p2_name': p2_name,
+      'p1_id': p1_id,
+      'p2_id': p2_id,
+      'p1_score': scorePlayer1,
+      'p2_score': scorePlayer2,
+      'game_winner_name': winner,
+      'game_winner_id': (winner == p1_name) ? p1_id : p2_id,
     };
 
     let request = new Request(url, {
@@ -145,9 +151,17 @@ function executePongGame(player1_name, player1_id, player2_name, player2_id) {
       body: JSON.stringify(jsonData)
     });
     const response = await fetch(request);
-    // console.log('response: ', response);
+    console.log('response: ', response);
     const data = await response.json();
-    // console.log('data: ', data);
+    console.log('data.status: ', data.status);
+    console.log('data.message: ', data.message);
+
+    document.querySelector('main').innerHTML = data.html;
+    showMessage(data);
+
+    if (game_round != 'Single') {
+      return;
+    }
   }
 
   // Display winner splash screen with "Play Again" button
@@ -326,10 +340,10 @@ function executePongGame(player1_name, player1_id, player2_name, player2_id) {
   // Check for winner
   function checkWinner() {
     if (scorePlayer1 === maxScore) {
-      playAgain(player1_name, true);
+      playAgain(p1_name, true);
       return true;
     } else if (scorePlayer2 === maxScore) {
-      playAgain(player2_name, true);
+      playAgain(p2_name, true);
       return true;
     }
     return false;
@@ -460,14 +474,15 @@ function executePongGame(player1_name, player1_id, player2_name, player2_id) {
     });
   }
   resetAndStartGame();
+  console.log('Tournament game ended');
 }
 // Wait for fonts to load
 // document.fonts.ready.then(() => {
 //   drawStartScreen();
 // });
 
-function startGame(player1_name, player1_id, player2_name, player2_id) {
-  // console.log(player1_name, player1_id, player2_name, player2_id);
-  document.querySelector('#startGame-button').remove();
-  executePongGame(player1_name, player1_id, player2_name, player2_id);
+function startGame(tournament_id, game_round, p1_name, p1_id, p2_name, p2_id) {
+  console.log(tournament_id, game_round, p1_name, p1_id, p2_name, p2_id);
+  document.getElementById('startGame-button').remove();
+  executePongGame(tournament_id, game_round, p1_name, p1_id, p2_name, p2_id);
 }
