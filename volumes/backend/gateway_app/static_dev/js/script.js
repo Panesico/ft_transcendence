@@ -55,7 +55,7 @@ function getCookie(name) {
 
 /* WebSocket */
 const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
-//const formSocket = new WebSocket('/wss/gamecalc/');
+// const formSocket = new WebSocket('/wss/gamecalc/');
 
 formSocket.onopen = function(e) {
   console.log('formSocket socket connected');
@@ -118,7 +118,7 @@ async function handleFormSubmission() {
         }
 
         // console.log('data: ', data);
-        if (data.status != 'error' && data.message) {
+        if (data.status != 'error' && data.message && !data.html) {
           console.log('data.message: ', data.message);
           if (data.message === 'Login successful') {
             sendMessage('websocket: data received');
