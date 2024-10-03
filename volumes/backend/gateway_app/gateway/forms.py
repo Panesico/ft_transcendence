@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 
 class LogInFormFrontend(forms.Form):
   username = forms.CharField(
@@ -8,7 +9,7 @@ class LogInFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'loginUsername'
           }),
-        label='Username', 
+        label=_('Username'), 
         required=True,
   )
   password = forms.CharField(
@@ -16,7 +17,7 @@ class LogInFormFrontend(forms.Form):
           'class': 'form-control',
           'id': 'loginPassword'
           }), 
-        label='Password', 
+        label=_('Password'), 
         required=True
   )
 
@@ -27,7 +28,7 @@ class SignUpFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'signupUsername'
           }),
-        label='Username', 
+        label=_('Username'), 
         required=True,
         )
   password = forms.CharField(
@@ -35,7 +36,7 @@ class SignUpFormFrontend(forms.Form):
           'class': 'form-control',
           'id': 'signupPassword'
           }), 
-        label='Password', 
+        label=_('Password'), 
         required=True
         )
   confirm_password = forms.CharField(
@@ -43,7 +44,7 @@ class SignUpFormFrontend(forms.Form):
           'class': 'form-control',
           'id': 'signupConfirmPassword'
           }), 
-        label='Confirm Password', 
+        label=_('Confirm Password'), 
         required=True
         )
 
@@ -55,7 +56,7 @@ class InviteFriendFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'login-name'
           }),
-        label="Friend's Name",
+        label=_("Friend's Name"),
         required=True,
         )
 
@@ -65,7 +66,7 @@ class EditProfileFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'editProfileAvatar'
           }),
-        label='Upload avatar',
+        label=_('Upload avatar'),
         required=False,
         )
   username = forms.CharField(
@@ -74,7 +75,7 @@ class EditProfileFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'editProfileUsername'
           }),
-        label='Username', 
+        label=_('Username'), 
         required=True,
         )
   display_name = forms.CharField(
@@ -83,7 +84,7 @@ class EditProfileFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'editProfileDisplayName'
           }),
-        label='DisplayName', 
+        label=_('DisplayName'), 
         required=False,
         )
   country = forms.CharField(
@@ -92,7 +93,7 @@ class EditProfileFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'editProfileCountry'
           }),
-        label='Country', 
+        label=_('Country'), 
         required=True,
         )
   city = forms.CharField(
@@ -101,7 +102,7 @@ class EditProfileFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'editProfileCity'
           }),
-        label='City', 
+        label=_('City'), 
         required=True,
         )
   # current_password = forms.CharField(
@@ -117,7 +118,7 @@ class EditProfileFormFrontend(forms.Form):
           'class': 'form-control',
           'id': 'editProfilePassword'
           }), 
-        label='New password', 
+        label=_('New password'), 
         required=True
         )
   confirm_password = forms.CharField(
@@ -125,7 +126,7 @@ class EditProfileFormFrontend(forms.Form):
           'class': 'form-control',
           'id': 'editProfileConfirmPassword'
           }), 
-        label='Confirm new Password', 
+        label=_('Confirm new Password'), 
         required=True
         )
   
@@ -137,7 +138,7 @@ class TournamentFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'namePlayer1'
           }),
-        label="Player 1",
+        label=_("Player 1"),
         required=True,
         )
   player2 = forms.CharField(
@@ -147,7 +148,7 @@ class TournamentFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'namePlayer2'
           }),
-        label="Player 2",
+        label=_("Player 2"),
         required=True,
         )
   player3 = forms.CharField(
@@ -157,7 +158,7 @@ class TournamentFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'namePlayer3'
           }),
-        label="Player 3",
+        label=_("Player 3"),
         required=True,
         )
   player4 = forms.CharField(
@@ -167,7 +168,7 @@ class TournamentFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'namePlayer4'
           }),
-        label="Player 4",
+        label=_("Player 4"),
         required=True,
         )
   
