@@ -1,9 +1,10 @@
+{% load i18n %}
 <div id="signup" class="page p-4">
   <div
     class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto"
     style="width: 256px;">
     
-    <h1 class="mb-3 align-self-start">Sign Up</h1>
+    <h1 class="mb-3 align-self-start">{% trans "Sign Up" %}</h1>
 
     <form method="post" action="{% url 'signup' %}">
       {% csrf_token %}
@@ -17,7 +18,6 @@
       {% endif %}
 
       <div class="mb-3">
-        
         {{ form.username }}
         <div class="text-danger fs-6">{{ form.username.errors }}</div>
       </div>
@@ -34,10 +34,10 @@
         <div class="text-danger fs-6">{{ form.confirm_password.errors }}</div>
       </div>
 
-      <button type="submit" class="btn btn-secondary">Sign Up</button>
+      <button type="submit" class="btn btn-secondary">{% trans "Sign Up" %}</button>
     </form>
 
-    <p class="mt-4"><a href="{% url 'login' %}" onclick="navigate(event, '/login')" class="link-secondary">Already have an account?</a></p>
+    <p class="mt-4"><a href="{% url 'login' %}" onclick="navigate(event, '/login')" class="link-secondary">{% trans "Already have an account?" %}</a></p>
 
   </div>
 </div>

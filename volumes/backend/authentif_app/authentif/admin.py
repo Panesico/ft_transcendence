@@ -2,6 +2,7 @@
 from django.contrib import admin
 from .models import User
 from django.utils.html import format_html
+from django.utils.translation import gettext as _
 
 # Inline for friends
 class FriendsInline(admin.TabularInline):
@@ -18,10 +19,10 @@ class UserAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('avatar', 'city', 'country')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
-        ('Game', {'fields': ('played_games', 'wins', 'defeats')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        (_('Personal info'), {'fields': ('avatar', 'city', 'country')}),
+        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+        (_('Game'), {'fields': ('played_games', 'wins', 'defeats')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
 
     search_fields = ('username', 'city', 'country')
@@ -31,6 +32,6 @@ class UserAdmin(admin.ModelAdmin):
         default_avatar_url = 'https://api.dicebear.com/9.x/notionists/svg?seed=Jack'  # Replace with the actual path to your default avatar image
         avatar_url = obj.avatar.url if obj.avatar else default_avatar_url
         return format_html('<img src="{}" style="height: 50px; width: 50px; border-radius: 50%;" />', avatar_url)
-    avatar_tag.short_description = 'Avatar'
+    avatar_tag.short_description = _('Avatar')
 # Register the updated UserAdmin
 admin.site.register(User, UserAdmin)

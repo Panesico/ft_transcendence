@@ -1,9 +1,10 @@
+{% load i18n %}
 <div id="login" class="page p-4">
   <div
     class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto"
     style="width: 256px;">
 
-    <h1 class="mb-3 align-self-start">Log In</h1>
+    <h1 class="mb-3 align-self-start">{% trans "Log In" %}</h1>
 
     <form method="post" action="{% url 'login' %}">
       {% csrf_token %}
@@ -27,10 +28,10 @@
         <div class="text-danger fs-6">{{ form.password.errors }}</div>
       </div>
 
-      <button type="submit" class="btn btn-secondary">Log In</button>
+      <button type="submit" class="btn btn-secondary">{% trans "Log In" %}</button>
     </form>
     
-    <p class="mt-4"><a href="{% url 'signup' %}" onclick="navigate(event, '/signup')" class="link-secondary">Don't have an account?</a></p>
+    <p class="mt-4"><a href="{% url 'signup' %}" onclick="navigate(event, '/signup')" class="link-secondary">{% trans "Don't have an account?" %}</a></p>
 
   </div>
 </div>

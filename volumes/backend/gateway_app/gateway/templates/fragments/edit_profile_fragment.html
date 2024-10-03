@@ -1,14 +1,13 @@
-<h1>Edit <span class="text-danger">{% if user.is_authenticated %}{{ user.username }}{% endif %}</span>'s profile</h1>
-<div class="row" >
+{% load i18n %}
+<h1>{% trans "Edit" %} <span class="text-danger">{% if user.is_authenticated %}{{ user.username }}{% endif %}</span>{% trans "'s profile" %}</h1>
+<div class="row">
   <div class="col-xs-12 col-sm-9 mx-auto">
     <div class="panel panel-default" style="border-bottom : 0">
       <div class="panel-body text-center" >
         {% if profile_data.avatar %}
         <img src= {{profile_data.avatar}} alt="user.username" style="height: 15rem; width: 15rem; object-fit: center; margin: 0px auto; margin-top: 30px; border-radius: 50%; border: 2px solid #fff;">
         {% else %}
-        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="default icon"
-        style="height: 10rem; width: 10rem; object-fit: center;
-        border-radius: 50%; border: 2px solid #fff;">
+        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="{% trans "default icon" %}" style="height: 10rem; width: 10rem; object-fit: center; border-radius: 50%; border: 2px solid #fff;">
         {% endif %}
         <form action="{% url 'edit_profile_avatar' %}" id="file-upload" method="post" enctype="multipart/form-data">
           {% csrf_token %}
@@ -25,75 +24,70 @@
     </div>
     <form method="post" enctype="multipart/form-data" style="margin-left: 30px" action="{% url 'edit_profile_general' %}" >
       {% csrf_token %}
-    <div class="panel panel-default">
-      <div style="border-bottom : 0">
-        <h4 class="panel-title" style="margin-top: 30px">User info</h4>
-        <div class="mb-3">
-          <label for="{{ form.disaplayName.id_for_label }}" class="form-group">{{ form.display_name.label }}</label>
-          {{ form.display_name }}
-          <div class="text-danger fs-6">{{ form.display_name.errors }}
+      <div class="panel panel-default">
+        <div style="border-bottom: 0">
+          <h4 class="panel-title" style="margin-top: 30px">{% trans "User info" %}</h4>
+          <div class="mb-3">
+            <label for="{{ form.display_name.id_for_label }}" class="form-group">{{ form.display_name.label }}</label>
+            {{ form.display_name }}
+            <div class="text-danger fs-6">{{ form.display_name.errors }}</div>
           </div>
-        </div>
-      <div class="mb-3">
-        <label for="{{ form.country.id_for_label }}" class="form-group">{{ form.country.label }}</label>
-        {{ form.country }}
-        <div class="text-danger fs-6">{{ form.country.errors }}
+          <div class="mb-3">
+            <label for="{{ form.country.id_for_label }}" class="form-group">{{ form.country.label }}</label>
+            {{ form.country }}
+            <div class="text-danger fs-6">{{ form.country.errors }}</div>
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.city.id_for_label }}" class="form-group">{{ form.city.label }}</label>
+            {{ form.city }}
+            <div class="text-danger fs-6">{{ form.city.errors }}</div>
+          </div>
+          <button type="submit" class="btn btn-success" value="general">{% trans "Submit" %}</button>
         </div>
       </div>
-      <div class="mb-3">
-        <label for="{{ form.city.id_for_label }}" class="form-group">{{ form.city.label }}</label>
-        {{ form.city }}
-        <div class="text-danger fs-6">{{ form.city.errors }}
-        </div>
-      </div>
-    <button type="submit" class="btn btn-success" value="general">Submit</button>
-    </div>
     </form>
     <div>
-      <h4 class="panel-title" style="margin-top: 30px">Security</h4>
+      <h4 class="panel-title" style="margin-top: 30px">{% trans "Security" %}</h4>
       <form method="post" enctype="multipart/form-data" action="{% url 'edit_profile_security' %}" onsubmit="return validatePasswords()">
         {% csrf_token %}
-      <div>
-        <div class="mb-3">
-          <label for="{{ form.username.id_for_label }}" class="form-group">{{ form.username.label }}</label>
-          {{ form.username }}
-        <div class="text-danger fs-6">{{ form.username.errors }}
+        <div>
+          <div class="mb-3">
+            <label for="{{ form.username.id_for_label }}" class="form-group">{{ form.username.label }}</label>
+            {{ form.username }}
+            <div class="text-danger fs-6">{{ form.username.errors }}</div>
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.new_password.id_for_label }}" class="form-group">{{ form.new_password.label }}</label>
+            {{ form.new_password }}
+            <div class="text-danger fs-6">{{ form.new_password.errors }}</div>
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.confirm_password.id_for_label }}" class="form-group">{{ form.confirm_password.label }}</label>
+            {{ form.confirm_password }}
+            <div class="text-danger fs-6">{{ form.confirm_password.errors }}</div>
+          </div>
         </div>
-      </div>
-      <div class="mb-3">
-        <label for="{{ form.new_password.id_for_label }}" class="form-group">{{ form.new_password.label }}</label>
-        {{ form.new_password }}
-        <div class="text-danger fs-6">{{ form.new_password.errors }}
+        <div class="form-group">
+          <div class="col-sm-10 col-sm-offset-2" style="margin-top: 20px; margin-down: 15px; margin-bottom: 30px">
+            <button type="submit" class="btn btn-success" value="security">{% trans "Submit" %}</button>
+          </div>
         </div>
-      </div>
-      <div class="mb-3">
-        <label for="{{ form.confirm_password.id_for_label }}" class="form-group">{{ form.confirm_password.label }}</label>
-        {{ form.confirm_password }}
-        <div class="text-danger fs-6">{{ form.confirm_password.errors }}
-        </div>
-      </div>
-    </div>
-    <div class="form-group">
-      <div class="col-sm-10 col-sm-offset-2" style="margin-top : 20px; margin-down : 15px; margin-bottom : 30px">
-        <button type="submit" class="btn btn-success" value="security">Submit</button>
-      </div>
+      </form>
     </div>
   </div>
-</form>
 </div>
-
 
 <script>
   function validatePasswords() {
-      var newPassword = document.getElementById('{{ form.new_password.id_for_label }}').value;
-      var confirmPassword = document.getElementById('{{ form.confirm_password.id_for_label }}').value;
-      console.log('newPassword: ', newPassword);
-      console.log('confirmPassword', confirmPassword);
-      if (newPassword !== confirmPassword) {
-          console.log("Passwords do not match!");
-          alert("Passwords do not match!");
-          return false; // Prevent form submission
-      }
-      return true; // Allow form submission
+    var newPassword = document.getElementById('{{ form.new_password.id_for_label }}').value;
+    var confirmPassword = document.getElementById('{{ form.confirm_password.id_for_label }}').value;
+    console.log('newPassword: ', newPassword);
+    console.log('confirmPassword', confirmPassword);
+    if (newPassword !== confirmPassword) {
+      console.log("{% trans 'Passwords do not match!' %}");
+      alert("{% trans 'Passwords do not match!' %}");
+      return false; // Prevent form submission
+    }
+    return true; // Allow form submission
   }
-  </script>
+</script>
