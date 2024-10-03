@@ -33,21 +33,21 @@ DEBUG = True
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 TIME_ZONE = 'UTC'
 USE_TZ = True
 USE_I18N = True
 USE_L10N = True
 # Path to the translation files
 LOCALE_PATHS = [
-    BASE_DIR / 'translations/',
+    BASE_DIR / '..' / 'translations/',
 ]
 
 # Define the languages that the application will support
 LANGUAGES = [
-    ('en', _('English')),
-    ('es', _('Spanish')),
-    ('fr', _('French')),
+    ('en', 'English'),
+    ('es', 'Spanish'),
+    ('fr', 'French'),
 ]
 
 
@@ -70,12 +70,12 @@ AUTH_USER_MODEL = 'authentif.User'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'gateway.urls'

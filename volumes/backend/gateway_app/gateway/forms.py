@@ -176,7 +176,7 @@ class TournamentFormFrontend(forms.Form):
 
       players = [player1, player2, player3, player4]
       if len(players) != len(set(players)):
-          raise ValidationError("Player names must be unique.")
+          raise ValidationError(_("Player names must be unique."))
 
       return cleaned_data
   

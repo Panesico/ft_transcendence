@@ -1,7 +1,8 @@
+{% load i18n %}
 {% load static %}
 <div id="game" class="page p-4">
 
-  <h1>Game</h1>
+  <h1>{% trans "Game" %}</h1>
 
   <div class="container-fluid d-flex flex-column align-items-center">
 
@@ -10,9 +11,9 @@
 
         <div class="col-4">
           <div class="d-flex align-items-center justify-content-center">
-            <img src="{% static 'images/face_48.svg' %}" alt="user profile picture" height="32" class="photoPlayer1 pe-2">
+            <img src="{% static 'images/face_48.svg' %}" alt="{% trans "user profile picture" %}" height="32" class="photoPlayer1 pe-2">
             <p id="namePlayer1" class="m-0 fs-4">
-              {% if user.is_authenticated %}{{ user.username }}{% else %}Player1{% endif %}
+              {% if user.is_authenticated %}{{ user.username }}{% else %}{% trans "Player1" %}{% endif %}
             </p>
           </div>
           <p class="scorePlayer1 fs-1">0</p>
@@ -20,8 +21,8 @@
 
         <div class="col-4">
           <div class="d-flex align-items-center justify-content-center">
-            <p id="namePlayer2" class="pe-2 m-0 fs-4">Player2</p>
-            <img src="{% static 'images/face_48.svg' %}" alt="user profile picture" height="32" class="photoPlayer2">
+            <p id="namePlayer2" class="pe-2 m-0 fs-4">{% trans "Player2" %}</p>
+            <img src="{% static 'images/face_48.svg' %}" alt="{% trans "user profile picture" %}" height="32" class="photoPlayer2">
           </div>
           <p class="scorePlayer2 fs-1">0</p>
         </div>
@@ -36,10 +37,10 @@
           {% if user.is_authenticated %}
             '{{ user.username }}',{{ user.id }}
           {% else %}
-            'Player1', 0
+            '{% trans "Player1" %}', 0
           {% endif %},
-          'Player2', 0
-        )">Start</button>
+          '{% trans "Player2" %}', 0
+        )">{% trans "Start" %}</button>
     </div>
 
   </div>

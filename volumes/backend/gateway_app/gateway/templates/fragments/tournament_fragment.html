@@ -1,14 +1,15 @@
+{% load i18n %}
 <div id="tournament" class="page p-4">
   <div
     class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto"
     style="width: 256px;">
     
-    <h1 class="mb-3 align-self-start">Tournament</h1>
+    <h1 class="mb-3 align-self-start">{% trans "Tournament" %}</h1>
     
     <form method="post" action="{% url 'tournament' %}">
       {% csrf_token %}
 
-      <p>Enter player names:</p>
+      <p>{% trans "Enter player names:" %}</p>
 
       {% if form.non_field_errors %}
         <div class="alert alert-danger fs-6 p-3">
@@ -42,7 +43,7 @@
         <div class="text-danger fs-6">{{ form.player4.errors }}</div>
       </div>
 
-      <button type="submit" class="btn btn-secondary">Start Tournament</button>
+      <button type="submit" class="btn btn-secondary">{% trans "Start Tournament" %}</button>
     </form>
 
   </div>

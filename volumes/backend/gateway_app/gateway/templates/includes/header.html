@@ -1,10 +1,11 @@
+{% load i18n %}
 <header class="navbar navbar-expand-lg navbar-dark bg-dark" id="mainHeader">
   <div class="container-fluid">
     <a class="navbar-brand" href="{% url 'home' %}"
       onclick="navigate(event, '/')">Pongscendence</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
       data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
-      aria-expanded="false" aria-label="Toggle navigation">
+      aria-expanded="false" aria-label="{% trans "Toggle navigation" %}">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
@@ -16,38 +17,38 @@
 
         <li class="nav-item d-flex align-items-center">
           <a class="nav-link active" aria-current="page" href="{% url 'home' %}"
-            onclick="navigate(event, '/')">Home</a>
+            onclick="navigate(event, '/')">{% trans "Home" %}</a>
         </li>
 
         <li class="nav-item d-flex align-items-center">
           <a class="nav-link" href="{% url 'tournament' %}"
-            onclick="navigate(event, '/tournament')">Tournament</a>
+            onclick="navigate(event, '/tournament')">{% trans "Tournament" %}</a>
         </li>
 
         <li class="nav-item dropdown d-flex align-items-center">
           <p class="nav-link dropdown-toggle m-0" id="navbarDropdownGame"
             role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Game
+            {% trans "Game" %}
           </p>
 
           <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownGame">
             <li>
-              <a class="dropdown-item bg-dark text-light" href="{% url 'game' %}" onclick="navigate(event, '/game')">Local</a>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'game' %}" onclick="navigate(event, '/game')">{% trans "Local" %}</a>
             </li>
             <li>
-              <a class="dropdown-item bg-dark text-light" href="{% url 'game' %}" onclick="navigate(event, '/game')">Remote</a>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'game' %}" onclick="navigate(event, '/game')">{% trans "Remote" %}</a>
             </li>
           </ul>          
         </li>
 
         <li class="nav-item d-flex align-items-center">
           <a class="nav-link" href="{% url 'signup' %}"
-            onclick="navigate(event, '/signup')">Sign Up</a>
+            onclick="navigate(event, '/signup')">{% trans "Sign Up" %}</a>
         </li>
 
         <li class="nav-item d-flex align-items-center">
           <a class="nav-link" href="{% url 'login' %}"
-            onclick="navigate(event, '/login')">Log In</a>
+            onclick="navigate(event, '/login')">{% trans "Log In" %}</a>
         </li>
 
         <li class="nav-item dropdown d-flex align-items-center">
@@ -57,23 +58,23 @@
             <img src="{{ user.avatar.url }}" alt="{{ user.username }}"
               style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
             {% else %}
-            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="default icon"
+            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="{% trans "default icon" %}"
               style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
             {% endif %}
           </p>
           <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownUser">
             <li>
-              <a class="dropdown-item bg-dark text-light" href="{% url 'profile' %}" onclick="navigate(event, '/profile')">Profile</a>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'profile' %}" onclick="navigate(event, '/profile')">{% trans "Profile" %}</a>
             </li>
             <li>
-              <a class="dropdown-item bg-dark text-light" href="#">Settings</a>
+              <a class="dropdown-item bg-dark text-light" href="#">{% trans "Settings" %}</a>
             </li>
-            <li><a class="dropdown-item bg-dark text-light" href="#">Stats</a>
+            <li><a class="dropdown-item bg-dark text-light" href="#">{% trans "Stats" %}</a>
             </li>
             <li>
               <hr class="dropdown-divider">
             </li>
-            <li><a class="dropdown-item bg-dark text-light" href="{% url 'logout' %}" onclick="navigate(event, '/api/auth/logout')">Logout</a></li> 
+            <li><a class="dropdown-item bg-dark text-light" href="{% url 'logout' %}" onclick="navigate(event, '/api/auth/logout')">{% trans "Logout" %}</a></li> 
           </ul>
         </li>
 
@@ -81,17 +82,17 @@
         <li class="nav-item dropdown d-flex align-items-center">
           <p class="nav-link dropdown-toggle m-0" id="navbarDropdownLanguage"
             role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Language
+            {% trans "Language" %}
           </p>
           <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownLanguage">
             <li>
-              <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('en')">English</a>
+              <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('en')">{% trans "English" %}</a>
             </li>
             <li>
-              <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('es')">Español</a>
+              <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('es')">{% trans "Spanish" %}</a>
             </li>
             <li>
-              <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('fr')">Français</a>
+              <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('fr')">{% trans "French" %}</a>
             </li>
           </ul>
         </li>
@@ -100,4 +101,5 @@
     </div>
   </div>
 </header>
+
 

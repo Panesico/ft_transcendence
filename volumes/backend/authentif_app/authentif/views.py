@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
 from authentif.forms import SignUpForm, LogInForm, EditProfileForm
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import gettext as _
 from authentif.models import User
 logger = logging.getLogger(__name__)
 
@@ -14,9 +15,9 @@ def api_logout(request):
     logger.debug("api_logout")
     if request.method == 'GET':
         logout(request)
-        return JsonResponse({'status': 'success', 'message': 'Logged out successfully'})
+        return JsonResponse({'status': 'success', 'message': _('Logged out successfully')})
     else:
-        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+        return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
 def api_login(request):
     logger.debug("api_login")
@@ -29,15 +30,15 @@ def api_login(request):
               user = form.get_user()
               login(request, user)
               logger.debug('api_login > User logged in')
-              return JsonResponse({'status': 'success', 'message': 'Login successful'})
+              return JsonResponse({'status': 'success', 'message': _('Login successful')})
           else:
               logger.debug('api_login > Invalid username or password')
-              return JsonResponse({'status': 'error', 'message': 'Invalid username or password'}, status=401)
+              return JsonResponse({'status': 'error', 'message': _('Invalid username or password')}, status=401)
         except json.JSONDecodeError:
             logger.debug('api_login > Invalid JSON')
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+            return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
     logger.debug('api_login > Method not allowed')
-    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
 # Create a profile linked to user through call to profileapi service
 def createProfile(username, user_id, csrf_token):
@@ -91,7 +92,7 @@ def api_signup(request):
                   user.delete()
                   return JsonResponse({
                       'status': 'error', 
-                      'message': 'User not found'
+                      'message': _('User not found')
                   }, status=400)
 
               # Check if the user is active
@@ -100,7 +101,7 @@ def api_signup(request):
                   user.delete()
                   return JsonResponse({
                       'status': 'error', 
-                      'message': 'User is inactive'
+                      'message': _('User is inactive')
                   }, status=400)
               
               csrf_token = request.COOKIES.get('csrftoken')
@@ -109,7 +110,7 @@ def api_signup(request):
                     user.delete()
                     return JsonResponse({
                         'status': 'error', 
-                        'message': 'Failed to create profile'
+                        'message': _('Failed to create profile')
                     }, status=500)
 
               user = authenticate(username=username, password=password)
@@ -118,12 +119,12 @@ def api_signup(request):
                   login(request, user)
                   return JsonResponse({
                       'status': 'success',
-                      'message': 'Sign up successful',
+                      'message': _('Sign up successful'),
                   })
               else:
                   user.delete()
                   logger.debug('api_signup > Authentication failed')
-                  return JsonResponse({'status': 'error', 'message': 'Authentication failed'}, status=401)
+                  return JsonResponse({'status': 'error', 'message': _('Authentication failed')}, status=401)
           else:
               logger.debug('api_signup > Invalid form')
               errors = json.loads(form.errors.as_json())
@@ -136,15 +137,15 @@ def api_signup(request):
               return JsonResponse({'status': 'error', 'message': message}, status=400)
         except json.JSONDecodeError:
             logger.debug('api_signup > Invalid JSON')
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+            return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
         except Exception as e:
             logger.error(f'api_signup > Unexpected error: {e}')
             return JsonResponse({
                 'status': 'error', 
-                'message': 'An unexpected error occurred'
+                'message': _('An unexpected error occurred')
             }, status=500)
     logger.debug('api_signup > Method not allowed')
-    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
 def api_check_exists(request):
     logger.debug("api_check_exists")
@@ -154,15 +155,15 @@ def api_check_exists(request):
           username = data.get('username')
           if User.objects.filter(username=username).exists():
               logger.debug('api_check_exists > User exists')
-              return JsonResponse({'status': 'success', 'message': 'User exists'})
+              return JsonResponse({'status': 'success', 'message': _('User exists')})
           else:
               logger.debug('api_check_exists > User does not exist')
-              return JsonResponse({'status': 'failure', 'message': 'User does not exist'}, status=404)
+              return JsonResponse({'status': 'failure', 'message': _('User does not exist')}, status=404)
         except json.JSONDecodeError:
             logger.debug('api_check_exists > Invalid JSON')
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+            return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
     logger.debug('api_check_exists > Method not allowed')
-    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
 
 def api_edit_profile(request):
@@ -177,23 +178,23 @@ def api_edit_profile(request):
         try:
           user_obj = User.objects.get(id=user_id)
         except User.DoesNotExist:
-          return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+          return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
         #user_obj = User.objects.filter(id=user_id).first()
         logger.debug(f'user_obj username: {user_obj.username}')
         form = EditProfileForm(data, instance=user_obj)
         logger.debug(f'form: {form}')
       except User.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
       if form.is_valid():
         logger.debug('api_edit_profile > Form is valid')
         form.save()
-        return JsonResponse({'status': 'success', 'message': 'Profile updated', 'status': 200})
+        return JsonResponse({'status': 'success', 'message': _('Profile updated'), 'status': 200})
       else:
         logger.debug('api_edit_profile > Form is invalid')
-        return JsonResponse({'status': 'error', 'message': 'Invalid profile update'}, status=400)
+        return JsonResponse({'status': 'error', 'message': _('Invalid profile update')}, status=400)
     except json.JSONDecodeError:
       logger.debug('api_edit_profile > Invalid JSON')
-      return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+      return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
   else:
     logger.debug('api_edit_profile > Method not allowed')
-    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)

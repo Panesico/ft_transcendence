@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 # from django.contrib.auth.models import User
 from authentif.models import User
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 import logging
 logger = logging.getLogger(__name__)
 
@@ -11,7 +12,7 @@ class SignUpForm(forms.ModelForm):
 
     confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control', 'id': 'signupConfirmPassword'
-    }), label='Confirm Password')
+    }), label=_('Confirm Password'))
 
     class Meta:
         model = User
@@ -35,7 +36,7 @@ class SignUpForm(forms.ModelForm):
             logger.debug("SignUpForm > clean > if password and confirm_password")
             if password != confirm_password:
                 logger.debug("SignUpForm > clean > if password != confirm_password")
-                raise ValidationError("Passwords do not match")
+                raise ValidationError(_("Passwords do not match"))
         return cleaned_data
 
 
@@ -54,15 +55,15 @@ class EditProfileForm(UserChangeForm):
     # }), label='Current Password')
     new_username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 'id': 'newUsername'
-    }), label='New Username', required=False)
+    }), label=_('New Username'), required=False)
 
     new_password = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control', 'id': 'newPassword'
-    }), label='New Password', required=False)
+    }), label=_('New Password'), required=False)
 
     confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control', 'id': 'signupConfirmPassword'
-    }), label='Confirm Password', required=False)
+    }), label=_('Confirm Password'), required=False)
 
     def __init__(self, *args, **kwargs):
         logger.debug("EditProfileForm > __init__")
@@ -96,7 +97,7 @@ class EditProfileForm(UserChangeForm):
             logger.debug("EditProfileForm > clean > if password and confirm_password")
             if new_password != confirm_password:
                 logger.debug("EditProfileForm > clean > if password != confirm_password")
-                raise ValidationError("Passwords do not match")
+                raise ValidationError(_("Passwords do not match"))
             else:
               self.instance.set_password(new_password)
               if new_username:
