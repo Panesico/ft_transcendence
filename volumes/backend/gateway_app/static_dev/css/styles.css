@@ -83,3 +83,19 @@ height: 80px;
 width: 80px;
 border-radius: 50%;
 }
+
+.btn-check:checked + .btn-outline-primary {
+  background-color: #ffffff;
+  color: #181a1b;
+  border-color: #ffffff;
+}
+
+.btn-outline-primary {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.btn-outline-primary:hover {
+  background-color: #adadad;
+  color: white;
+}

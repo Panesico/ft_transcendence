@@ -66,7 +66,7 @@ class EditProfileForm(forms.ModelForm):
         max_length=16, 
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'id': 'editProfileCity'
+            'id': 'editProfileDisplayName'
           }),
         label='City', 
         required=False,
@@ -77,10 +77,9 @@ class EditProfileForm(forms.ModelForm):
         required=False,
         )
 
-  prefered_language = forms.CharField(
-        max_length=2,
+  preferred_language = forms.ChoiceField(
         choices=[('en', 'English'), ('fr', 'French'), ('es', 'Spanish')],
-        default='en'
+        initial='en',
         label='Language',
         required=False,
         )
