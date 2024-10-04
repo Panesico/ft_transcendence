@@ -87,7 +87,7 @@ class EditProfileForm(forms.ModelForm):
   class Meta:
         model = Profile  # Specify the model if needed
         logger.debug(f"model: {model}")
-        fields = ['country', 'city', 'user_id', 'display_name', 'prefered_language']
+        fields = ['country', 'city', 'user_id', 'display_name', 'preferred_language']
         logger.debug(f"fields: {fields}")
 
   def clean(self):

@@ -72,6 +72,11 @@ def post_edit_profile_security(request):
       return redirect('login')
     if request.method != 'POST':
         return redirect('405')
+
+     # Redirection usage
+    form = EditProfileFormFrontend()
+    profile_data = get_profileapi_variables(request=request)
+
     logger.debug("")
     logger.debug("post_edit_profile_security")
     csrf_token = request.COOKIES.get('csrftoken')
@@ -81,20 +86,22 @@ def post_edit_profile_security(request):
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
     }
-#    data = json.loads(request.body)
+
+    # Recover data from the form
     data = request.POST.copy()
     logger.debug(f"post data : {data}")
     data['user_id'] = request.user.id
     logger.debug(f"data : {data['user_id']}")
     logger.debug(f"post_edit_profile > data: {data}")
+
+    # Send and recover response from the profileapi service
     authentif_url = 'https://authentif:9001/api/editprofile/' 
-
     response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
-
     status = response.json().get("status")
     message = response.json().get("message")
     logger.debug(f"status: {status}, message: {message}")
     logger.debug(f"post_edit_profile > Response: {response.json()}")
+
     if response.ok:
       # logger.debug('post_edit_profile > Response OK')
       # html = render_to_string('partials/login.html', context={}, request=request)
@@ -102,7 +109,7 @@ def post_edit_profile_security(request):
       # for cookie in response.cookies:
       #   user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
       # return user_response
-      return render(request, 'partials/home.html', {'status': status, 'message': message})#create a page to redirect to login page
+      return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})#create a page to redirect to login page
     #handle wrong confirmation password
     else:
       logger.debug('post_edit_profile > Response KO')
@@ -111,7 +118,7 @@ def post_edit_profile_security(request):
       #form.add_error(None, message)
       #html = render_to_string('fragments/edit_profile_fragment.html', request=request)
       #return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
-      return render(request, 'partials/profile.html', {'status': status, 'message': message})#change this line to return only the fragment
+      return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})#change this line to return only the fragment
       
 
 def post_edit_profile_general(request):
@@ -128,34 +135,41 @@ def post_edit_profile_general(request):
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
     }
-    #data = json.loads(request.body)
+
+    # Redirection usage
+    form = EditProfileFormFrontend()
+    profile_data = get_profileapi_variables(request=request)
+
+    # Recover data from the form
     data = request.POST.copy()
     logger.debug(f"post data : {data}")
     data['user_id'] = request.user.id
     logger.debug(f"user_id : {data['user_id']}")
     logger.debug(f"post_edit_profile > data: {data}")
+
+    # Send and recover response from the profileapi service
     authentif_url = 'https://profileapi:9002/api/editprofile/' 
-
     response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
-
     status = response.json().get("status")
     message = response.json().get("message")
     logger.debug(f"status: {status}, message: {message}")
     logger.debug(f"post_edit_profile_general > Response: {response.json()}")
+  
     if response.ok:
         logger.debug('post_edit_profile_general > Response OK')      
-        user_response =  JsonResponse({'status': status, 'message': message})
-        for cookie in response.cookies:
-            user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
             #construct html to return
+        #html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+        #user_response =  JsonResponse({'status': 'success', 'message': 'Profile updated successfully'})
+        #for cookie in response.cookies:
+        #    user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
         #return user_response
-        return render(request, 'partials/edit_profile.html', {'status': status, 'message': message})#change this line to return only the fragment
+        return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})#change this line to return only the fragment
     #handle wrong confirmation password
     else:
       logger.debug('post_edit_profile_general > Response KO')
       #data = json.loads(request.body)
 #      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form}, request=request)
-      return render(request, 'partials/edit_profile.html', {'status': status, 'message': message})
+      return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})
 
 
 def post_edit_profile_avatar(request):
@@ -163,6 +177,8 @@ def post_edit_profile_avatar(request):
     return redirect('login')
   if request.method != 'POST':
       return redirect('405')
+
+  # Cookies & headers
   logger.debug("")
   logger.debug("post_edit_profile_avatar")
   csrf_token = request.COOKIES.get('csrftoken')
@@ -172,24 +188,33 @@ def post_edit_profile_avatar(request):
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
     }
+
+  # Redirection usage
+  form = EditProfileFormFrontend()
+  profile_data = get_profileapi_variables(request=request)
+
+  # Recover data from the form
   data = request.POST.copy()
   logger.debug("request.FILES: %s", request.FILES)
   logger.debug(f"post data : {data}")
   uploaded_file = request.FILES['avatar']
+
   # Save the uploaded file
   avatar_dir = os.path.join(settings.MEDIA_ROOT, 'avatars')
   fs = FileSystemStorage(location=avatar_dir)
   filename = fs.save(uploaded_file.name, uploaded_file)
 
+  # Construct the data to send to the profileapi service
   data['user_id'] = request.user.id
   data['avatar'] = '/avatars/' + filename
   logger.debug(f"post_edit_profile_avatar > data: {data}")
-  authentif_url = 'https://authentif:9001/api/editprofile/' 
+  authentif_url = 'https://authentif:9001/api/editprofiles/' 
   response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
   status = response.json().get("status")
   message = response.json().get("message")
   logger.debug(f"status: {status}, message: {message}")
   logger.debug(f"post_edit_profile > Response: {response.json()}")
+
   if response.ok:
     logger.debug('post_edit_profile_avatar > Response OK')
     user_response =  JsonResponse({'status': 'success', 'message': 'Avatar updated successfully'})
@@ -198,19 +223,12 @@ def post_edit_profile_avatar(request):
     return user_response
 #    return render(request, 'partials/home.html', {'status': status, 'message': message})#create a page to redirect to login page
   else:
+    form = EditProfileFormFrontend()
+    profile_data = get_profileapi_variables(request=request)
     logger.debug('post_edit_profile > Response KO')
-    return render(request, 'partials/profile.html', {'status': status, 'message': message})#change this line to return only the fragment
-  # send the file path to the profile api
-  if response.ok:
-    logger.debug('post_edit_profile_avatar > Response OK')
-    user_response =  JsonResponse({'status': 'success', 'message': 'Avatar updated successfully'})
-    for cookie in response.cookies:
-      user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
-    return user_response
-    #return render(request, 'partials/home.html')
-  else:
-    logger.debug('post_edit_profile_avatar > Response KO')
-    return JsonResponse({'status': 'error', 'message': 'An error occurred while updating the avatar'}, status=response.status_code)
+    html = render_to_string('fragments/edit_profile_fragment.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data}, request=request)
+    return JsonResponse({'html': html, 'status': status, 'message': message})
+
  
 def upload_file(request):
   if request.method == 'POST' and request.FILES['myfile']:
