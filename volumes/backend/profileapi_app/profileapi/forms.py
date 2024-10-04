@@ -77,10 +77,18 @@ class EditProfileForm(forms.ModelForm):
         required=False,
         )
 
+  prefered_language = forms.CharField(
+        max_length=2,
+        choices=[('en', 'English'), ('fr', 'French'), ('es', 'Spanish')],
+        default='en'
+        label='Language',
+        required=False,
+        )
+
   class Meta:
         model = Profile  # Specify the model if needed
         logger.debug(f"model: {model}")
-        fields = ['country', 'city', 'user_id', 'display_name']
+        fields = ['country', 'city', 'user_id', 'display_name', 'prefered_language']
         logger.debug(f"fields: {fields}")
 
   def clean(self):

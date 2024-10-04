@@ -32,7 +32,19 @@ def api_saveGame(request):
             )
             logger.debug('api_saveGame > Game saved')
 
-            return JsonResponse({'status': 'success', 'message': 'Game saved'})
+            info = {
+                'tournament_id': 0,
+                'tournament_round': 'Single',
+                'p1_name': data.get('p1_name'),
+                'p2_name': data.get('p2_name'),
+                'p1_id': data.get('p1_id'),
+                'p2_id': data.get('p2_id'),
+                'previous_round': 'Single',
+                'previous_winner_name': data.get('game_winner_name'),
+                'previous_p1_score': data.get('p1_score'),
+                'previous_p2_score': data.get('p2_score'),
+            }
+            return JsonResponse({'status': 'success', 'message': 'Game saved', 'info': info})
         except (json.JSONDecodeError, DatabaseError) as e:
             logger.debug(f'api_saveGame > Error: {str(e)}')
             return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
@@ -72,7 +84,7 @@ def api_newTournament(request):
               'p2_id': tournament.t_p2_id,
           }
 
-          message = (f"{tournament_round}: {tournament.t_p1_name} against {tournament.t_p2_name}")
+          message = ("starting Semi-Final 1")
           
           return JsonResponse({'status': 'success', 'message': message, 'info': info})
         except (json.JSONDecodeError, DatabaseError) as e:
@@ -132,8 +144,14 @@ def api_updateTournament(request):
                   'p2_name': tournament.t_p4_name,
                   'p1_id': tournament.t_p3_id,
                   'p2_id': tournament.t_p4_id,
+                  'previous_round': 'Semi-Final 1',
+                  'previous_winner_name': game_winner_name,
+                  'previous_p1_name': data.get('p1_name'),
+                  'previous_p2_name': data.get('p2_name'),
+                  'previous_p1_score': p1_score,
+                  'previous_p2_score': p2_score,
               }
-              message = (f"{tournament_round}: {tournament.t_p3_name} against {tournament.t_p4_name}")
+              message = ("starting Semi-Final 2")
             # If SF2, start Final
             elif game_round == 'Semi-Final 2':
               tournament.create_final()
@@ -145,8 +163,14 @@ def api_updateTournament(request):
                   'p2_name': tournament.semifinal2.game_winner_name,
                   'p1_id': tournament.semifinal1.game_winner_id,
                   'p2_id': tournament.semifinal2.game_winner_id,
+                  'previous_round': 'Semi-Final 2',
+                  'previous_winner_name': game_winner_name,
+                  'previous_p1_name': tournament.semifinal2.p1_name,
+                  'previous_p2_name': tournament.semifinal2.p2_name,
+                  'previous_p1_score': p1_score,
+                  'previous_p2_score': p2_score,
               }
-              message = (f"{tournament_round}: {tournament.semifinal1.game_winner_name} against {tournament.semifinal2.game_winner_name}")
+              message = ("starting Final")
             # If Final, end Tournament
             elif game_round == 'Final':
               tournament.date_finished = timezone.now()
@@ -159,7 +183,7 @@ def api_updateTournament(request):
                   'tournament': model_to_dict(tournament),
                   'tournament_round': tournament_round
               }
-              message = (f"{tournament.t_winner_name} has won the tournament!")
+              message = ("tournament ended")
             logger.debug(f'api_updateTournament > {tournament_round}: {message}')
             logger.debug(f'api_updateTournament > info: {info}')
             return JsonResponse({'status': 'success', 'message': message, 'info': info})

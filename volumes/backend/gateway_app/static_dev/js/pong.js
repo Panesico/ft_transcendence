@@ -22,12 +22,13 @@
 //   gameCalcSocket.send(JSON.stringify({'message': message}));
 // }
 
-function executePongGame(
-    tournament_id, game_round, p1_name, p1_id, p2_name, p2_id) {
+async function executePongGame(p1_name, p2_name) {
   // Get the game container
   const gameContainer = document.querySelector('#game-container');
   const scorePlayer1Element = document.querySelector('.scorePlayer1');
   const scorePlayer2Element = document.querySelector('.scorePlayer2');
+  scorePlayer1Element.textContent = 0;
+  scorePlayer2Element.textContent = 0;
 
   // Set up the canvas
   const canvas = document.createElement('canvas');
@@ -85,135 +86,6 @@ function executePongGame(
       keys[e.key] = false;
     }
   });
-
-  async function resetAndStartGame() {
-    scorePlayer1 = 0;
-    scorePlayer2 = 0;
-    const scorePlayer1Element = document.querySelector('.scorePlayer1');
-    const scorePlayer2Element = document.querySelector('.scorePlayer2');
-    scorePlayer1Element.textContent = scorePlayer1;
-    scorePlayer2Element.textContent = scorePlayer2;
-    gameStarted = true;
-    gameEnded = false;
-
-    leftPaddleY = (canvas.height - paddleHeight) / 2;
-    rightPaddleY = (canvas.height - paddleHeight) / 2;
-    ballSpeedX = (ballSpeedX > 0) ? -getRandomInt(4, 6) : getRandomInt(4, 6);
-    ballSpeedY = (ballSpeedY > 0) ? -getRandomInt(1, 3) : getRandomInt(1, 3);
-
-    await showCountdown();
-    gameLoop();
-  }
-
-  // Display name of winner
-  function showWinner(winner) {
-    ctx.font = '40px PixeloidSans';
-    ctx.textAlign = 'center';
-    ctx.fillText(`${winner} wins!`, canvas.width / 2, canvas.height / 2 - 50);
-  }
-
-  async function saveGameResultInDatabase(winner) {
-    let path = window.location.pathname;
-    let url = '';
-    // console.log('path: ', path);
-    if (path === '/game/') {
-      url = 'saveGame/';
-    } else if (path === '/game') {
-      url = path + '/saveGame/';
-    } else if (path === '/tournament/') {
-      url = 'update/';
-    } else if (path === '/tournament') {
-      url = path + '/update/';
-    }
-    // console.log('url: ', url);
-
-    const jsonData = {
-      'tournament_id': tournament_id,
-      'game_type': 'pong',
-      'game_round': game_round,
-      'p1_name': p1_name,
-      'p2_name': p2_name,
-      'p1_id': p1_id,
-      'p2_id': p2_id,
-      'p1_score': scorePlayer1,
-      'p2_score': scorePlayer2,
-      'game_winner_name': winner,
-      'game_winner_id': (winner == p1_name) ? p1_id : p2_id,
-    };
-
-    let request = new Request(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken')
-      },
-      credentials: 'include',
-      body: JSON.stringify(jsonData)
-    });
-    const response = await fetch(request);
-    console.log('response: ', response);
-    const data = await response.json();
-    console.log('data.status: ', data.status);
-    console.log('data.message: ', data.message);
-
-    if (game_round != 'Single') {
-      document.querySelector('main').innerHTML = data.html;
-      showMessage(data);
-      return;
-    }
-  }
-
-  // Display winner splash screen with "Play Again" button
-  function playAgain(winner, displayWinner) {
-    gameEnded = true;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
-
-    // Display winner's name if displayWinner is true
-    if (displayWinner) {
-      showWinner(winner);
-      saveGameResultInDatabase(winner);
-    }
-
-    // Display "Play Again" button
-    ctx.font = '30px PixeloidSans';
-    ctx.fillText('Play Again', canvas.width / 2, canvas.height / 2 + 50);
-
-    // Draw rectangle around "Play Again" text
-    const buttonX = canvas.width / 2 - 106;
-    const buttonY = canvas.height / 2 + 50;
-    const buttonWidth = 210;
-    const buttonHeight = 70;
-    ctx.lineWidth = 4;
-    ctx.strokeRect(
-        buttonX, buttonY - buttonHeight / 2, buttonWidth, buttonHeight);
-
-    // Event listener to play again
-    canvas.addEventListener('click', playAgainClickHandler);
-  }
-
-  // Click handler for "Play Again"
-  function playAgainClickHandler(event) {
-    if (!gameEnded) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    const buttonX = canvas.width / 2 - 106;
-    const buttonY = canvas.height / 2 + 50;
-    const buttonWidth = 210;
-    const buttonHeight = 70;
-
-    // Check if the click is inside the "Play Again" button
-    if (mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
-        mouseY >= buttonY && mouseY <= buttonY + buttonHeight) {
-      // Remove the event listener
-      canvas.removeEventListener('click', playAgainClickHandler);
-
-      resetAndStartGame();
-    }
-  }
 
   // Calculate coordinates for the paddles and ball
   function calculatePaddleAndBallCoordinates() {
@@ -316,8 +188,6 @@ function executePongGame(
 
   // Check if ball out of bounds
   function checkBallOutOfBounds() {
-    const scorePlayer1Element = document.querySelector('.scorePlayer1');
-    const scorePlayer2Element = document.querySelector('.scorePlayer2');
     // Update score
     if (ballX < 0) {
       scorePlayer2++;
@@ -334,18 +204,6 @@ function executePongGame(
       ballSpeedX = (ballSpeedX > 0) ? -getRandomInt(4, 6) : getRandomInt(4, 6);
       ballSpeedY = (ballSpeedY > 0) ? -getRandomInt(1, 3) : getRandomInt(1, 3);
     }
-  }
-
-  // Check for winner
-  function checkWinner() {
-    if (scorePlayer1 === maxScore) {
-      playAgain(p1_name, true);
-      return true;
-    } else if (scorePlayer2 === maxScore) {
-      playAgain(p2_name, true);
-      return true;
-    }
-    return false;
   }
 
   // Draw canvas with playing field
@@ -387,21 +245,18 @@ function executePongGame(
   }
 
   // Game loop
-  function gameLoop() {
+  function gameLoop(resolve) {
     frameCount++;
 
-    if (keys[' '] && frameCount > pauseFrameCount + 10) {
+    // Toggle pause game if spacebar or escape is pressed
+    if ((keys[' '] || keys.Escape) && frameCount > pauseFrameCount + 10) {
       gamePaused = !gamePaused;
       pauseFrameCount = frameCount;
-    }
-    if (keys.Escape) {
-      playAgain('', false);
-      return;
     }
 
     if (gamePaused) {
       drawPauseCanvas();
-      requestAnimationFrame(gameLoop);
+      requestAnimationFrame(() => gameLoop(resolve));
       return;
     }
 
@@ -411,21 +266,31 @@ function executePongGame(
 
     checkBallOutOfBounds();
 
-    // Check for winner and exit game loop if true
-    if (checkWinner()) return;
+    // ----- Exit game if maxScore is reached -----
+    if (scorePlayer1 === maxScore || scorePlayer2 === maxScore) {
+      gameEnded = true;
+      const game_result = {
+        'winner': (scorePlayer1 === maxScore) ? p1_name : p2_name,
+        'scorePlayer1': scorePlayer1,
+        'scorePlayer2': scorePlayer2
+      };
+      // return (game_result);
+      resolve(game_result);
+      return;
+    }
 
     drawPlayCanvas();
 
     // Continue next frame
-    requestAnimationFrame(gameLoop);
-  }
-
-  function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    requestAnimationFrame(() => gameLoop(resolve));
   }
 
   async function showCountdown() {
     let count = 3;
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     while (count > 0) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -439,49 +304,27 @@ function executePongGame(
     }
   }
 
-  // Draw the "Start" text on the canvas
-  function drawStartScreen() {
-    // Draw "Start" text
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = '40px PixeloidSans';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Start', canvas.width / 2, canvas.height / 2);
+  async function resetAndStartGame() {
+    scorePlayer1 = 0;
+    scorePlayer2 = 0;
+    scorePlayer1Element.textContent = scorePlayer1;
+    scorePlayer2Element.textContent = scorePlayer2;
+    gameStarted = true;
+    gameEnded = false;
 
-    // Draw rectangle around "Start" text
-    const buttonX = canvas.width / 2 - 76;
-    const buttonY = canvas.height / 2;
-    const buttonWidth = 150;
-    const buttonHeight = 70;
-    ctx.lineWidth = 4;
-    ctx.strokeRect(
-        buttonX, buttonY - buttonHeight / 2 - 2, buttonWidth, buttonHeight);
+    leftPaddleY = (canvas.height - paddleHeight) / 2;
+    rightPaddleY = (canvas.height - paddleHeight) / 2;
+    ballSpeedX = (ballSpeedX > 0) ? -getRandomInt(4, 6) : getRandomInt(4, 6);
+    ballSpeedY = (ballSpeedY > 0) ? -getRandomInt(1, 3) : getRandomInt(1, 3);
 
-    // Listen for click to start game
-    canvas.addEventListener('click', async (event) => {
-      if (!gameStarted) {
-        // Get mouse coordinates with canvas offset
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = event.clientX - rect.left;
-        const mouseY = event.clientY - rect.top;
+    await showCountdown();
 
-        if (mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
-            mouseY >= buttonY && mouseY <= buttonY + buttonHeight) {
-          resetAndStartGame();
-        }
-      }
+    return new Promise(resolve => {
+      gameLoop(resolve);
     });
   }
-  resetAndStartGame();
-  console.log('Tournament game ended');
-}
-// Wait for fonts to load
-// document.fonts.ready.then(() => {
-//   drawStartScreen();
-// });
 
-function startGame(tournament_id, game_round, p1_name, p1_id, p2_name, p2_id) {
-  console.log(tournament_id, game_round, p1_name, p1_id, p2_name, p2_id);
-  document.getElementById('startGame-button').remove();
-  executePongGame(tournament_id, game_round, p1_name, p1_id, p2_name, p2_id);
+  const game_result = await resetAndStartGame();
+  console.log('Game ended');
+  return game_result;
 }
