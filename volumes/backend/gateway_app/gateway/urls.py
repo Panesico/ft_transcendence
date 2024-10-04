@@ -37,6 +37,7 @@ urlpatterns = [
     path('game/saveGame/', viewsPlay.save_game, name='saveGame'),
     path('tournament/', viewsPlay.view_tournament, name='tournament'),
     path('tournament/update/', viewsPlay.view_tournament_update, name='tournamentUpdate'),
+    path('remote/', viewsPlay.get_remote, name='remote'),
 
     # Languages API
     path('i18n/', include('django.conf.urls.i18n')),
