@@ -46,6 +46,20 @@
             <input type="text" id="{{ form.city.id_for_label }}" class="form-control" name="{{ form.city.name }}" value="{{ profile_data.city }}" >
             <div class="text-danger fs-6">{{ form.city.errors }}</div>
           </div>
+          <div class="mb-3">
+            <label for="preferred_language" class="form-group">Preferred Language</label>
+            <div id="preferred_language" role="group" aria-label="Basic radio toggle button group">
+              <input type="radio" class="btn-check" name="preferred_language" id="btnradio1" value="en" autocomplete="off" {% if profile_data.preferred_language == 'en' %}checked{% endif %}>
+              <label class="btn btn-outline-primary" for="btnradio1">English</label>
+              
+              <input type="radio" class="btn-check" name="preferred_language" id="btnradio2" value="es" autocomplete="off" {% if profile_data.preferred_language == 'es' %}checked{% endif %}>
+              <label class="btn btn-outline-primary" for="btnradio2">Spanish</label>
+              
+              <input type="radio" class="btn-check" name="preferred_language" id="btnradio3" value="fr" autocomplete="off" {% if profile_data.preferred_language == 'fr' %}checked{% endif %}>
+              <label class="btn btn-outline-primary" for="btnradio3">French</label>
+            </div>
+            <div class="text-danger fs-6">{{ form.preferred_language.errors }}</div>
+          </div>
           <button type="submit" class="btn btn-success">Submit</button>
         </form>
       </div>

@@ -48,7 +48,7 @@ class EditProfileForm(forms.ModelForm):
         max_length=100, 
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'id': 'editProfileCountry'
+            'id': 'editProfileAvatar'
           }),
         label='Avatar', 
         required=False,
@@ -77,7 +77,7 @@ class EditProfileForm(forms.ModelForm):
         max_length=16, 
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'id': 'editProfileCity'
+            'id': 'editProfileDisplayName'
           }),
         label='City', 
         required=False,
@@ -88,10 +88,9 @@ class EditProfileForm(forms.ModelForm):
         required=False,
         )
 
-  prefered_language = forms.CharField(
-        max_length=2,
+  preferred_language = forms.ChoiceField(
         choices=[('en', 'English'), ('fr', 'French'), ('es', 'Spanish')],
-        default='en'
+        initial='en',
         label='Language',
         required=False,
         )
@@ -99,7 +98,7 @@ class EditProfileForm(forms.ModelForm):
   class Meta:
         model = Profile  # Specify the model if needed
         logger.debug(f"model: {model}")
-        fields = ['avatar', 'country', 'city', 'user_id', 'display_name', 'prefered_language']
+        fields = ['avatar', 'country', 'city', 'user_id', 'display_name', 'preferred_language']
         logger.debug(f"fields: {fields}")
 
   def clean(self):
