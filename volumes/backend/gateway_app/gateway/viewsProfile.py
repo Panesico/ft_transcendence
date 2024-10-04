@@ -24,7 +24,10 @@ def get_profileapi_variables(request):
     logger.debug(f"-------> get_edit_profile > Response: {response.status_code}")
     return {'avatar': '/media/avatars/default.png',
             'country': 'Spain',
-            'city': 'Málaga'}
+            'city': 'Málaga'
+            'display_name': 'MyDisplayName',
+            'preferred_language': 'en',
+            }
 
 def get_profile(request):
     logger.debug("")
