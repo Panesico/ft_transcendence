@@ -86,7 +86,9 @@ async function handleFormSubmission() {
     formUpload.addEventListener('submit', async (e) => {
       e.preventDefault();
       // console.log('Form submitted', e);
-
+      const formData = new FormData(form);
+      let url = form.action;
+      
       try {
         // Create a new request for file upload
         let request = new Request(url, {
@@ -128,7 +130,6 @@ async function handleFormSubmission() {
       }
     });
   }
-
 
   else if (form) {
     // console.log('form: ', form);
