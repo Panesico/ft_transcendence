@@ -169,7 +169,10 @@ def save_game(request):
     message = response.json().get("message")
     logger.debug(f"save_game > Response message: {message}")
     if response.ok:        
-        user_response =  JsonResponse({'status': status, 'message': message})
+        user_response =  JsonResponse({
+                'status': status,
+                'message': message
+            })
         for cookie in response.cookies:
             user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True, secure=True)
         return user_response
