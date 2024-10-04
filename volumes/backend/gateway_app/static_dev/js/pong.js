@@ -156,10 +156,9 @@ function executePongGame(
     console.log('data.status: ', data.status);
     console.log('data.message: ', data.message);
 
-    document.querySelector('main').innerHTML = data.html;
-    showMessage(data);
-
     if (game_round != 'Single') {
+      document.querySelector('main').innerHTML = data.html;
+      showMessage(data);
       return;
     }
   }
