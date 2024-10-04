@@ -33,7 +33,6 @@ class InviteFriendForm(forms.ModelForm):
             print('Played Games:', profile.played_games)
             print('Wins:', profile.wins)
             print('Defeats:', profile.defeats)
-            print('Avatar:', profile.avatar)
             print('Friends:', profile.friends.all())
           except Profile.DoesNotExist:
             print('Profile not found')
@@ -43,16 +42,6 @@ class InviteFriendForm(forms.ModelForm):
           return friend_name
 
 class EditProfileForm(forms.ModelForm):
-
-  avatar = forms.CharField(
-        max_length=100, 
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'id': 'editProfileCountry'
-          }),
-        label='Avatar', 
-        required=False,
-        )
 
   country = forms.CharField(
         max_length=16, 
@@ -91,13 +80,11 @@ class EditProfileForm(forms.ModelForm):
   class Meta:
         model = Profile  # Specify the model if needed
         logger.debug(f"model: {model}")
-        fields = ['avatar', 'country', 'city', 'user_id', 'display_name']
+        fields = ['country', 'city', 'user_id', 'display_name']
         logger.debug(f"fields: {fields}")
 
   def clean(self):
         cleaned_data = super().clean() # call the clean method of the parent class
-        avatar = cleaned_data.get('avatar')
-        logger.debug(f'avatar: {avatar}')
         display_name = cleaned_data.get('display_name')
         country = cleaned_data.get('country')
         logger.debug(f'country: {country}')
@@ -108,8 +95,6 @@ class EditProfileForm(forms.ModelForm):
         try:
           profile = Profile.objects.get(user_id=user_id)
           print('User ID:', profile.user_id)
-          if avatar:
-            profile.avatar = avatar
           if country:
             profile.country = country
           if city:
@@ -182,11 +167,4 @@ class EditProfileForm(forms.ModelForm):
 #     overflow: hidden;
 #     padding-left: 20px;
 #     color: #999999;
-# }
-# .profile-avatar {
-#   width: 200px;
-#   position: relative;
-#   margin: 0px auto;
-#   margin-top: 196px;
-#   border: 4px solid #f3f3f3;
 # }

@@ -162,7 +162,6 @@ def post_edit_profile_avatar(request):
       return redirect('405')
   logger.debug("")
   logger.debug("post_edit_profile_avatar")
-  authentif_url = 'https://profileapi:9002/api/editprofile/'
   csrf_token = request.COOKIES.get('csrftoken')
   headers = {
         'X-CSRFToken': csrf_token,
@@ -171,6 +170,8 @@ def post_edit_profile_avatar(request):
         'Referer': 'https://gateway:8443',
     }
   data = request.POST.copy()
+  logger.debug("request.FILES: %s", request.FILES)
+  logger.debug(f"post data : {data}")
   uploaded_file = request.FILES['avatar']
   # Save the uploaded file
   avatar_dir = os.path.join(settings.MEDIA_ROOT, 'avatars')
@@ -178,11 +179,25 @@ def post_edit_profile_avatar(request):
   filename = fs.save(uploaded_file.name, uploaded_file)
 
   data['user_id'] = request.user.id
-  data['avatar'] = '/media/avatars/' + filename
+  data['avatar'] = '/avatars/' + filename
   logger.debug(f"post_edit_profile_avatar > data: {data}")
-
-  # send the file path to the profile api
+  authentif_url = 'https://authentif:9001/api/editprofile/' 
   response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
+  status = response.json().get("status")
+  message = response.json().get("message")
+  logger.debug(f"status: {status}, message: {message}")
+  logger.debug(f"post_edit_profile > Response: {response.json()}")
+  if response.ok:
+    logger.debug('post_edit_profile_avatar > Response OK')
+    user_response =  JsonResponse({'status': 'success', 'message': 'Avatar updated successfully'})
+    for cookie in response.cookies:
+      user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
+    return user_response
+#    return render(request, 'partials/home.html', {'status': status, 'message': message})#create a page to redirect to login page
+  else:
+    logger.debug('post_edit_profile > Response KO')
+    return render(request, 'partials/profile.html', {'status': status, 'message': message})#change this line to return only the fragment
+  # send the file path to the profile api
   if response.ok:
     logger.debug('post_edit_profile_avatar > Response OK')
     user_response =  JsonResponse({'status': 'success', 'message': 'Avatar updated successfully'})

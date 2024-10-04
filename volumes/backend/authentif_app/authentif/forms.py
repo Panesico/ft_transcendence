@@ -65,6 +65,10 @@ class EditProfileForm(UserChangeForm):
         'class': 'form-control', 'id': 'signupConfirmPassword'
     }), label=_('Confirm Password'), required=False)
 
+    avatar = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control', 'id': 'avatar'
+    }), label=_('Avatar'), required=False) 
+
     def __init__(self, *args, **kwargs):
         logger.debug("EditProfileForm > __init__")
         super(EditProfileForm, self).__init__(*args, **kwargs)
@@ -90,7 +94,12 @@ class EditProfileForm(UserChangeForm):
         new_password = cleaned_data.get('new_password')
         confirm_password = cleaned_data.get('confirm_password')
         new_username = cleaned_data.get('username')
-        # current_password = cleaned_data.get('current_password')
+        avatar = cleaned_data.get('avatar')
+        logger.debug(f'avatar: {avatar}')
+
+        # Change avatar
+        if avatar:
+            self.instance.avatar = avatar
 
         # Validate current password
         if new_password and confirm_password:

@@ -8,5 +8,4 @@ class Profile(models.Model):
     played_games = models.IntegerField(default=0)
     wins = models.IntegerField(default=0)
     defeats = models.IntegerField(default=0)
-    avatar = models.ImageField(upload_to='media/avatars/', blank=True, null=True, default='media/avatars/default.png')
     friends = models.ManyToManyField('self', blank=True)

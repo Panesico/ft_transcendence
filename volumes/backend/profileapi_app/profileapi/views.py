@@ -71,7 +71,6 @@ def api_edit_profile(request):
             logger.debug('user_obj recovered')
 
             # Log the current profile data
-            logger.debug(f'avatar: {user_obj.avatar}')
             logger.debug(f'country: {user_obj.country}')
             logger.debug(f'city: {user_obj.city}')
 
@@ -80,7 +79,6 @@ def api_edit_profile(request):
             logger.debug(f'form: {form}')
             # Log the current profile data
             logger.debug('------------------------------')
-            logger.debug(f'avatar: {user_obj.avatar}')
             logger.debug(f'country: {user_obj.country}')
             logger.debug(f'city: {user_obj.city}')
 
@@ -108,7 +106,6 @@ def get_profile_api(request, user_id):
         logger.debug('user_obj recovered')
         data = {
             'user_id': user_obj.user_id,
-            'avatar': user_obj.avatar.url if user_obj.avatar else None,
             'country': user_obj.country,
             'city': user_obj.city,
             'display_name': user_obj.display_name,

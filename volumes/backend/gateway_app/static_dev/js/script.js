@@ -108,6 +108,7 @@ async function handleFormSubmission() {
         console.log('handleFormSubmission > response: ', response);
 
         if (!response.ok) {
+          console.error('HTTP error - status:', response.status);
           throw new Error(`HTTP error - status: ${response.status}`);
         }
 

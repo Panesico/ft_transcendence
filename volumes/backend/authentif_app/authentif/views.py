@@ -171,6 +171,7 @@ def api_edit_profile(request):
   if request.method == 'POST':
     try:
       data = json.loads(request.body)
+      logger.debug(f'data: {data}')
       user_id = data.get('user_id')
       logger.debug(f'user_id: {user_id}')
       try :

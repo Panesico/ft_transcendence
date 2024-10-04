@@ -39,7 +39,7 @@ for templates:
 
 # Explore postgres
 docker container exec -it postgres sh
-psql -U postgres_main_user -d transcendence_db
+<!-- psql -U postgres_main_user -d transcendence_db -->
 \dt
 SELECT * FROM authentif_user;
 
