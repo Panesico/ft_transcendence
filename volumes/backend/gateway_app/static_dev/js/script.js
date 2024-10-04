@@ -234,3 +234,30 @@ document.addEventListener('DOMContentLoaded', () => {
     sessionStorage.removeItem('afterSignup');
   }
 });
+
+function changeLanguage(lang) {
+  console.log('CHANGELANGUAGE > lang: ', lang);
+
+  const formData = new FormData();
+  formData.append('language', lang);
+  // Redirects the user back to the current page after changing the language
+  formData.append('next', window.location.pathname);
+
+  fetch(`/i18n/setlang/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    credentials: 'include',
+    body: formData,
+  })
+  .then(response => {
+    if (response.ok) {
+      window.location.reload();
+    } else {
+      console.error('Error changing language:', response.statusText);
+    }
+  })
+  .catch(error => console.error('Fetch error:', error));
+}
