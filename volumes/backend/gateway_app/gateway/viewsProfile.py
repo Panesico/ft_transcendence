@@ -141,11 +141,11 @@ def post_edit_profile_general(request):
     logger.debug(f"post_edit_profile_general > Response: {response.json()}")
     if response.ok:
         logger.debug('post_edit_profile_general > Response OK')      
-        # user_response =  JsonResponse({'status': status, 'message': message})
-        # for cookie in response.cookies:
-        #     user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
-        # return user_response
-        return render(request, 'partials/home.html', {'status': status, 'message': message})#change this line to return only the fragment
+        user_response =  JsonResponse({'status': status, 'message': message})
+        for cookie in response.cookies:
+            user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
+        return user_response
+        #return render(request, 'partials/home.html', {'status': status, 'message': message})#change this line to return only the fragment
     #handle wrong confirmation password
     else:
       logger.debug('post_edit_profile_general > Response KO')
@@ -153,28 +153,6 @@ def post_edit_profile_general(request):
 #      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form}, request=request)
       return render(request, 'partials/edit_profile.html', {'status': status, 'message': message})
 
-
-def handle_uploaded_file(f, user_id):
-    # Define the directory where you want to save the uploaded files
-    logger.debug("handle_uploaded_file")
-    upload_dir = os.path.join(settings.MEDIA_ROOT, 'uploads', str(user_id))
-    logger.debug(f"upload_dir: {upload_dir}")
-    # Ensure the directory exists
-    if not os.path.exists(upload_dir):
-        os.makedirs(upload_dir)
-    
-    # Generate a custom filename
-    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-    filename = f"{timestamp}_{f.name}"
-    file_path = os.path.join(upload_dir, filename)
-    
-    # Save the uploaded file
-    with open(file_path, "wb+") as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-    
-    logger.debug(f"File saved to {file_path}")
-    return file_path
 
 def post_edit_profile_avatar(request):
   if request.user.is_authenticated == False:
@@ -215,25 +193,6 @@ def post_edit_profile_avatar(request):
     logger.debug('post_edit_profile_avatar > Response KO')
     return JsonResponse({'status': 'error', 'message': 'An error occurred while updating the avatar'}, status=response.status_code)
  
-def get_test_profileapi(request):
-    if request.user.is_authenticated == False:
-        return redirect('login')
-    logger.debug("")
-    logger.debug("get_test_profileapi")
-    if request.method != 'GET':
-        return redirect('405')
-    user_id = request.user.id
-    profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
-    logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
-    response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
-    data = response.json()
-    if response.status_code == 200:
-      logger.debug(f"-------> get_edit_profile > Response: {response.json()}")
-    else:
-      logger.debug(f"-------> get_edit_profile > Response: {response.status_code}")
-    return render(request, 'partials/test_profileapi.html', data)
-
-
 def upload_file(request):
   if request.method == 'POST' and request.FILES['myfile']:
       print('request.FILES: ', request.FILES)
