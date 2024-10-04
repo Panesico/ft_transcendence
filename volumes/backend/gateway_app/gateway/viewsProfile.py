@@ -208,7 +208,7 @@ def post_edit_profile_avatar(request):
   data['user_id'] = request.user.id
   data['avatar'] = '/avatars/' + filename
   logger.debug(f"post_edit_profile_avatar > data: {data}")
-  authentif_url = 'https://authentif:9001/api/editprofiles/' 
+  authentif_url = 'https://authentif:9001/api/editprofile/' 
   response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
   status = response.json().get("status")
   message = response.json().get("message")
