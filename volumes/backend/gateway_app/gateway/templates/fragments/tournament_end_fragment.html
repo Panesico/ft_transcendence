@@ -1,6 +1,7 @@
 {% load static %}
-<div id="tournament" class="page p-4">
-  <h1>{{ info.tournament.t_winner_name }} is the grand winner!</h1>
+{% load i18n %}
+<div id="tournament" class="page p-4 d-flex justify-content-center">
+  <h1>🏆 {{ info.tournament.t_winner_name }} {% trans "is the grand winner" %}! 🏆</h1>
   
   </div>
 </div>

@@ -30,7 +30,7 @@ body {
   width: 650px;
 }
 
-#startGame-button {
+#startGame-button, #nextRound-button, #playAgain-button {
   background-color: #000;
   color: #d3d3d3;
   border: solid 4px #d3d3d3;

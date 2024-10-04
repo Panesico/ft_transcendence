@@ -275,16 +275,16 @@ msgstr "S'inscrire"
 msgid "Already have an account?"
 msgstr "Vous avez déjà un compte ?"
 
-#: gateway/templates/fragments/tournament_fragment.html:7
+#: gateway/templates/fragments/tournament_form_fragment.html:7
 #: gateway/templates/includes/header.html:25
 msgid "Tournament"
 msgstr "Tournoi"
 
-#: gateway/templates/fragments/tournament_fragment.html:12
+#: gateway/templates/fragments/tournament_form_fragment.html:12
 msgid "Enter player names:"
 msgstr "Saisissez les noms des joueurs :"
 
-#: gateway/templates/fragments/tournament_fragment.html:46
+#: gateway/templates/fragments/tournament_form_fragment.html:46
 msgid "Start Tournament"
 msgstr "Démarrer le tournoi"
 
