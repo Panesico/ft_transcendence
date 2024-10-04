@@ -111,6 +111,7 @@ def get_profile_api(request, user_id):
             'avatar': user_obj.avatar.url if user_obj.avatar else None,
             'country': user_obj.country,
             'city': user_obj.city,
+            'display_name': user_obj.display_name,
         }
         return JsonResponse(data, status=200)
     except Profile.DoesNotExist:

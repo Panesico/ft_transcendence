@@ -18,3 +18,5 @@
 - test avatar upload
 - Invite friend request -> Profile : check if user exist
 - Delete render in edit profile action
+- Bug when changing user info when redirect to a form
+- Put back avatar in User

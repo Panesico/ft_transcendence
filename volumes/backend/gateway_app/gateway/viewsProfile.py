@@ -41,7 +41,7 @@ def get_profile(request):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_profile XMLHttpRequest")
         html = render_to_string('fragments/profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
-        return JsonResponse({'html': html})
+        return JsonResponse({'html': html, 'status': 'success'})
     return render(request, 'partials/profile.html', {'form': form, 'profile_data': profile_data})
     #return render(request, 'partials/my_template.html', {'my_avatar': my_avatar})
 
@@ -108,7 +108,7 @@ def post_edit_profile_security(request):
       #form.add_error(None, message)
       #html = render_to_string('fragments/edit_profile_fragment.html', request=request)
       #return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
-      return render(request, 'partials/edit_profile.html', {'status': status, 'message': message})#change this line to return only the fragment
+      return render(request, 'partials/profile.html', {'status': status, 'message': message})#change this line to return only the fragment
       
 
 def post_edit_profile_general(request):
@@ -144,8 +144,9 @@ def post_edit_profile_general(request):
         user_response =  JsonResponse({'status': status, 'message': message})
         for cookie in response.cookies:
             user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
-        return user_response
-        #return render(request, 'partials/home.html', {'status': status, 'message': message})#change this line to return only the fragment
+            #construct html to return
+        #return user_response
+        return render(request, 'partials/edit_profile.html', {'status': status, 'message': message})#change this line to return only the fragment
     #handle wrong confirmation password
     else:
       logger.debug('post_edit_profile_general > Response KO')

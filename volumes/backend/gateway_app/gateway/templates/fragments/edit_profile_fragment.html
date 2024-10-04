@@ -33,17 +33,17 @@
           {% csrf_token %}
           <div class="mb-3">
             <label for="{{ form.display_name.id_for_label }}" class="form-group">{{ form.display_name.label }}</label>
-            <input type="text" id="{{ form.display_name.id_for_label }}" class="form-control" name="{{ form.display_name.name }}" value="{{ profile_data.display_name }}" readonly>
+            <input type="text" id="{{ form.display_name.id_for_label }}" class="form-control" name="{{ form.display_name.name }}" value="{{ profile_data.display_name }}" >
             <div class="text-danger fs-6">{{ form.display_name.errors }}</div>
           </div>
           <div class="mb-3">
             <label for="{{ form.country.id_for_label }}" class="form-group">{{ form.country.label }}</label>
-            <input type="text" id="{{ form.country.id_for_label }}" class="form-control" name="{{ form.country.name }}" value="{{ profile_data.country }}" readonly>
+            <input type="text" id="{{ form.country.id_for_label }}" class="form-control" name="{{ form.country.name }}" value="{{ profile_data.country }}" >
             <div class="text-danger fs-6">{{ form.country.errors }}</div>
           </div>
           <div class="mb-3">
             <label for="{{ form.city.id_for_label }}" class="form-group">{{ form.city.label }}</label>
-            <input type="text" id="{{ form.city.id_for_label }}" class="form-control" name="{{ form.city.name }}" value="{{ profile_data.city }}" readonly>
+            <input type="text" id="{{ form.city.id_for_label }}" class="form-control" name="{{ form.city.name }}" value="{{ profile_data.city }}" >
             <div class="text-danger fs-6">{{ form.city.errors }}</div>
           </div>
           <button type="submit" class="btn btn-success">Submit</button>
@@ -61,7 +61,7 @@
           {% csrf_token %}
           <div class="mb-3">
             <label for="{{ form.username.id_for_label }}" class="form-group">{{ form.username.label }}</label>
-            <input type="text" id="{{ form.username.id_for_label }}" class="form-control" name="{{ form.username.name }}" value="{{ user.username }}" readonly>
+            <input type="text" id="{{ form.username.id_for_label }}" class="form-control" name="{{ form.username.name }}" value="{{ user.username }}" >
             <div class="text-danger fs-6">{{ form.username.errors }}</div>
           </div>
           <div class="mb-3">
