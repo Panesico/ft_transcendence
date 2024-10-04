@@ -27,6 +27,7 @@ def api_signup(request):
     try:
       profile = Profile(
       user_id=data['user_id'],
+      display_name=data['user_id'],
       )
       logger.debug("--> profile user_id created")
       profile.save()
