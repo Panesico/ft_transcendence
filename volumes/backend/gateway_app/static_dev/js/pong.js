@@ -32,8 +32,8 @@ async function executePongGame(p1_name, p2_name) {
 
   // Set up the canvas
   const canvas = document.createElement('canvas');
-  canvas.width = 650;
-  canvas.height = 450;
+  canvas.width = 900;
+  canvas.height = 550;
   gameContainer.appendChild(canvas);
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#d3d3d3';  // Set the fill color
