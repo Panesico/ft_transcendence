@@ -6,10 +6,11 @@ logger = logging.getLogger(__name__)
 class Game(models.Model):
     GAME_TYPES = [
         ('pong', 'pong'),
+        ('cows', 'cows'),
     ]
 
     GAME_ROUNDS = [
-        ('single', 'Single'),
+        ('single', 'single'),
         ('semifinal1', 'Semi-Final 1'),
         ('semifinal2', 'Semi-Final 2'),
         ('final', 'Final'),
@@ -44,6 +45,7 @@ class Tournament(models.Model):
 
     GAME_TYPES = [
         ('pong', 'pong'),
+        ('cows', 'cows'),
     ]
     tournament_type = models.CharField(max_length=16, choices=GAME_TYPES)
 

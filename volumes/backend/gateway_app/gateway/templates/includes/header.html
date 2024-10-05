@@ -21,24 +21,13 @@
         </li>
 
         <li class="nav-item d-flex align-items-center">
-          <a class="nav-link" href="{% url 'tournament' %}"
-            onclick="navigate(event, '/tournament')">{% trans "Tournament" %}</a>
+          <a class="nav-link" href="{% url 'play' %}"
+            onclick="navigate(event, '/play')">{% trans "Play" %}</a>
         </li>
 
-        <li class="nav-item dropdown d-flex align-items-center">
-          <p class="nav-link dropdown-toggle m-0" id="navbarDropdownGame"
-            role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            {% trans "Game" %}
-          </p>
-
-          <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownGame">
-            <li>
-              <a class="dropdown-item bg-dark text-light" href="{% url 'game' %}" onclick="navigate(event, '/game')">{% trans "Local" %}</a>
-            </li>
-            <li>
-              <a class="dropdown-item bg-dark text-light" href="{% url 'remote' %}" onclick="navigate(event, '/remote')">{% trans "Remote" %}</a>
-            </li>
-          </ul>          
+        <li class="nav-item d-flex align-items-center">
+          <a class="nav-link" href="{% url 'tournament' %}"
+            onclick="navigate(event, '/tournament')">{% trans "Tournament" %}</a>
         </li>
 
         <li class="nav-item d-flex align-items-center">

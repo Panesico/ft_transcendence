@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='game',
             name='game_round',
-            field=models.CharField(choices=[('single', 'Single'), ('semifinal1', 'Semi-Final 1'), ('semifinal2', 'Semi-Final 2'), ('final', 'Final')], default='single', max_length=16),
+            field=models.CharField(choices=[('single', 'single'), ('semifinal1', 'Semi-Final 1'), ('semifinal2', 'Semi-Final 2'), ('final', 'Final')], default='single', max_length=16),
         ),
         migrations.AlterField(
             model_name='game',

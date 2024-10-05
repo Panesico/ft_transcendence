@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='game',
             name='game_round',
-            field=models.CharField(choices=[('single', 'Single'), ('semifinal1', 'Semi-Final 1'), ('semifinal2', 'Semi-Final 2'), ('final', 'Final')], default='single', max_length=20),
+            field=models.CharField(choices=[('single', 'single'), ('semifinal1', 'Semi-Final 1'), ('semifinal2', 'Semi-Final 2'), ('final', 'Final')], default='single', max_length=20),
         ),
         migrations.AlterField(
             model_name='game',

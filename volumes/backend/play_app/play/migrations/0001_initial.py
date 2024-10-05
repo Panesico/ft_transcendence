@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='Game',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('game_type', models.CharField(choices=[('Single', 'Single'), ('Semi-Final 1', 'Semi-Final 1'), ('Semi-Final 2', 'Semi-Final 2'), ('Final', 'Final')], max_length=20)),
+                ('game_type', models.CharField(choices=[('single', 'single'), ('Semi-Final 1', 'Semi-Final 1'), ('Semi-Final 2', 'Semi-Final 2'), ('Final', 'Final')], max_length=20)),
                 ('score_player1', models.IntegerField()),
                 ('score_player2', models.IntegerField()),
                 ('date', models.DateTimeField(auto_now_add=True)),

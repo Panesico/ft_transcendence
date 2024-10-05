@@ -37,8 +37,9 @@ urlpatterns = [
     path('my_friends/', views.list_friends, name='list_friends'),
 
     # play api
-    path('game/', viewsPlay.get_game, name='game'),
-    path('game/saveGame/', viewsPlay.save_game, name='saveGame'),
+    path('play/', viewsPlay.get_play, name='play'),
+    path('game/', viewsPlay.post_game, name='game'),
+    path('play/saveGame/', viewsPlay.save_game, name='saveGame'),
     path('tournament/', viewsPlay.view_tournament, name='tournament'),
     path('tournament/update/', viewsPlay.view_tournament_update, name='tournamentUpdate'),
     path('remote/', viewsPlay.get_remote, name='remote'),

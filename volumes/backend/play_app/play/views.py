@@ -34,12 +34,13 @@ def api_saveGame(request):
 
             info = {
                 'tournament_id': 0,
-                'tournament_round': 'Single',
+                'game_type': data.get('game_type'),
+                'game_round': 'single',
                 'p1_name': data.get('p1_name'),
                 'p2_name': data.get('p2_name'),
                 'p1_id': data.get('p1_id'),
                 'p2_id': data.get('p2_id'),
-                'previous_round': 'Single',
+                'previous_round': 'single',
                 'previous_winner_name': data.get('game_winner_name'),
                 'previous_p1_score': data.get('p1_score'),
                 'previous_p2_score': data.get('p2_score'),
@@ -74,10 +75,10 @@ def api_newTournament(request):
           logger.debug(f'api_newTournament > Starting tournament: {tournament}')
           tournament.start_tournament()
 
-          tournament_round = 'Semi-Final 1'
+          game_round = 'Semi-Final 1'
           info = {
               'tournament_id': tournament.id,
-              'tournament_round': tournament_round,
+              'game_round': game_round,
               'p1_name': tournament.t_p1_name,
               'p2_name': tournament.t_p2_name,
               'p1_id': tournament.t_p1_id,
@@ -136,10 +137,10 @@ def api_updateTournament(request):
 
             # If SF1, start SF2
             if game_round == 'Semi-Final 1':
-              tournament_round = 'Semi-Final 2'
+              game_round = 'Semi-Final 2'
               info = {
                   'tournament_id': tournament.id,
-                  'tournament_round': tournament_round,
+                  'game_round': game_round,
                   'p1_name': tournament.t_p3_name,
                   'p2_name': tournament.t_p4_name,
                   'p1_id': tournament.t_p3_id,
@@ -155,10 +156,10 @@ def api_updateTournament(request):
             # If SF2, start Final
             elif game_round == 'Semi-Final 2':
               tournament.create_final()
-              tournament_round = 'Final'
+              game_round = 'Final'
               info = {
                   'tournament_id': tournament.id,
-                  'tournament_round': tournament_round,
+                  'game_round': game_round,
                   'p1_name': tournament.semifinal1.game_winner_name,
                   'p2_name': tournament.semifinal2.game_winner_name,
                   'p1_id': tournament.semifinal1.game_winner_id,
@@ -177,14 +178,14 @@ def api_updateTournament(request):
               tournament.t_winner_name = game_winner_name
               tournament.t_winner_id = game_winner_id
               tournament.save()
-              tournament_round = 'has_ended'
+              game_round = 'has_ended'
               tournament = Tournament.objects.get(id=tournament_id)
               info = {
                   'tournament': model_to_dict(tournament),
-                  'tournament_round': tournament_round
+                  'game_round': game_round
               }
               message = ("tournament ended")
-            logger.debug(f'api_updateTournament > {tournament_round}: {message}')
+            logger.debug(f'api_updateTournament > {game_round}: {message}')
             logger.debug(f'api_updateTournament > info: {info}')
             return JsonResponse({'status': 'success', 'message': message, 'info': info})
         except (json.JSONDecodeError, DatabaseError) as e:

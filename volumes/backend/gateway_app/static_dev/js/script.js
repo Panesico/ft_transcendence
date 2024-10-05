@@ -66,52 +66,53 @@ function listenForm(form) {
 
 function listenFormUpload(form) {
   console.log('listenFormUpload: ', form);
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      // console.log('Form submitted', e);
-      const formData = new FormData(form);
-      let url = form.action;
-      
-      try {
-        // Create a new request for file upload
-        let request = new Request(url, {
-          method: 'POST',
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',  // To identify as AJAX request
-            'X-CSRFToken': getCookie('csrftoken')  // If CSRF token is required
-          },
-          credentials: 'include',  // Include cookies (if necessary)
-          body: formData  // FormData handles the file and other fields automatically
-        });
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // console.log('Form submitted', e);
+    const formData = new FormData(form);
+    let url = form.action;
 
-        // Send the request and wait a response
-        const response = await fetch(request);
-        const data = await response.json();
+    try {
+      // Create a new request for file upload
+      let request = new Request(url, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',  // To identify as AJAX request
+          'X-CSRFToken': getCookie('csrftoken')  // If CSRF token is required
+        },
+        credentials: 'include',  // Include cookies (if necessary)
+        body: formData           // FormData handles the file and other fields
+                                 // automatically
+      });
 
-        console.log('handleFormSubmission > response: ', response);
+      // Send the request and wait a response
+      const response = await fetch(request);
+      const data = await response.json();
 
-        if (!response.ok) {
-          console.error('HTTP error - status:', response.status);
-          throw new Error(`HTTP error - status: ${response.status}`);
-        }
+      console.log('handleFormSubmission > response: ', response);
 
-        // Handle the response data
-        if (data.status != 'error' && data.message) {
-          console.log('data.message: ', data.message);
-          window.location.replace('/');
-        }
-        else
-          document.querySelector('main').innerHTML = data.html;
-        if (!data?.html?.includes('class="errorlist nonfield')) {
-          showMessage(data);
-        }
-        loadAdditionalJs(window.location.pathname);
-
-      } catch (error) {
-        console.error('Form submission error:', error);
-        document.querySelector('main').innerHTML = '<h1>Form submission error</h1>';
+      if (!response.ok) {
+        console.error('HTTP error - status:', response.status);
+        throw new Error(`HTTP error - status: ${response.status}`);
       }
-    });
+
+      // Handle the response data
+      if (data.status != 'error' && data.message) {
+        console.log('data.message: ', data.message);
+        window.location.replace('/');
+      } else
+        document.querySelector('main').innerHTML = data.html;
+      if (!data?.html?.includes('class="errorlist nonfield')) {
+        showMessage(data);
+      }
+      loadAdditionalJs(window.location.pathname);
+
+    } catch (error) {
+      console.error('Form submission error:', error);
+      document.querySelector('main').innerHTML =
+          '<h1>Form submission error</h1>';
+    }
+  });
 }
 
 // Intercept form submissions for AJAX processing
@@ -132,7 +133,7 @@ async function handleFormSubmission() {
     console.log('form: ', form);
     listenForm(form);
   }
-  
+
   if (formGeneral) {
     console.log('formGeneral: ', formGeneral);
     listenForm(formGeneral);
@@ -142,7 +143,6 @@ async function handleFormSubmission() {
     console.log('formSecurity: ', formSecurity);
     listenForm(formSecurity);
   }
-
 }
 
 // Load content based on current path
@@ -244,12 +244,12 @@ function changeLanguage(lang) {
     credentials: 'include',
     body: formData,
   })
-  .then(response => {
-    if (response.ok) {
-      window.location.reload();
-    } else {
-      console.error('Error changing language:', response.statusText);
-    }
-  })
-  .catch(error => console.error('Fetch error:', error));
+      .then(response => {
+        if (response.ok) {
+          window.location.reload();
+        } else {
+          console.error('Error changing language:', response.statusText);
+        }
+      })
+      .catch(error => console.error('Fetch error:', error));
 }
