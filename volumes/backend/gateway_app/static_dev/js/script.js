@@ -1,4 +1,3 @@
-
 /* WebSocket */
 const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
 // const formSocket = new WebSocket('/wss/gamecalc/');
@@ -90,9 +89,9 @@ function listenFormSocket(form) {
   });
 }
 
-function listenFormUploadSocket(formUpload) {
-  console.log('formUpload: ', formUpload);
-    formUpload.addEventListener('submit', async (e) => {
+function listenFormUploadSocket(form) {
+  console.log('listenFormUploadSocket: ', form);
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       // console.log('Form submitted', e);
       const formData = new FormData(form);
