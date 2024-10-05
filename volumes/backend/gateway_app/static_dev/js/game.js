@@ -74,7 +74,8 @@ async function startGame(
   document.getElementById('startGame-winner')?.remove();
 
   // Execute the game
-  const game_result = await executePongGame(p1_name, p2_name);
+  // const game_result = await executePongGame(p1_name, p2_name);
+  const game_result = await executeCowGame(p1_name, p2_name);
   console.log('game_result: ', game_result);
 
   // Save the game result in the database
