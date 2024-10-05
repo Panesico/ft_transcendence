@@ -109,10 +109,10 @@ def view_tournament_update(request):
     if response.ok:
         info = response.json().get("info")
         logger.debug(f"post_tournament > Response info: {info}")
-        logger.debug(f"post_tournament > Response info.tournament_round: {info['tournament_round']}")
-        if info['tournament_round'] == 'Semi-Final 2' or info['tournament_round'] == 'Final':
+        logger.debug(f"post_tournament > Response info.game_round: {info['game_round']}")
+        if info['game_round'] == 'Semi-Final 2' or info['game_round'] == 'Final':
             html = render_to_string('fragments/tournament_game_fragment.html', {'info': info}, request=request)
-        elif info['tournament_round'] == 'has_ended':
+        elif info['game_round'] == 'has_ended':
             html = render_to_string('fragments/tournament_end_fragment.html', {'info': info}, request=request)
     else:
         logger.debug(f"post_tournament > Response NOT OK: {response.json()}")
@@ -132,16 +132,47 @@ def view_tournament_update(request):
 #     else:
 #       return redirect('405')
 
-def get_game(request):
+
+def get_play(request):
     logger.debug("")
-    logger.debug("get_game")
+    logger.debug("get_play")
     if request.method != 'GET': 
       return redirect('405')
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_game XMLHttpRequest")
-        html = render_to_string('fragments/game_fragment.html', context={}, request=request)
+        logger.debug("get_play XMLHttpRequest")
+        html = render_to_string('fragments/play_fragment.html', context={}, request=request)
         return JsonResponse({'html': html})
-    return render(request, 'partials/game.html')
+    return render(request, 'partials/play.html')
+
+def post_game(request):
+    logger.debug("")
+    logger.debug("post_game")
+    if request.method != 'POST': 
+      return redirect('405')
+    
+    # csrf_token = request.COOKIES.get('csrftoken')
+    # headers = {
+    #     'X-CSRFToken': csrf_token,
+    #     'Cookie': f'csrftoken={csrf_token}',
+    #     'Content-Type': 'application/json',
+    #     'Referer': 'https://gateway:8443',
+    # }
+    data = json.loads(request.body)
+    # logger.debug(f'post_game > JSON data: {data}')
+    
+    p1_id = request.user.id if request.user.is_authenticated else 0
+    info = {
+        'tournament_id': 0,
+        'game_round': 'single',
+        'game_type': data['game_type'],
+        'p1_name': data['p1_name'],
+        'p2_name': data['p2_name'],
+        'p1_id': p1_id,
+        'p2_id': 0,
+    }
+
+    html = render_to_string('fragments/game_fragment.html', {'info': info}, request=request)
+    return JsonResponse({'html': html})
 
 def save_game(request):
     if request.method != 'POST': 
@@ -171,10 +202,7 @@ def save_game(request):
     if response.ok:
         info = response.json().get("info")
         html = render_to_string('fragments/game_next_fragment.html', {'info': info}, request=request)
-        # user_response =  JsonResponse({'status': status, 'message': message, 'html': html})
-        # for cookie in response.cookies:
-        #     user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True, secure=True)
-        return JsonResponse({'status': status, 'message': message, 'html': html})
+        return JsonResponse({'html': html, 'status': status, 'message': message})
     else:
         logger.debug(f"save_game > Response NOT OK: {response.json()}")
         logger.debug(message)

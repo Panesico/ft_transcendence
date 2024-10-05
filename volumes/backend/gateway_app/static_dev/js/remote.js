@@ -31,3 +31,22 @@ function findRemoteGame(params) {
   remoteGameSocket.send(JSON.stringify(message));
   console.log('Message sent:', message);
 }
+
+function toggleRemoteMode() {
+  const remoteMode = document.getElementById('remoteMode').checked;
+  const player2Container = document.getElementById('form-player2');
+  const player2Input = document.getElementById('player2-input');
+  const button = document.getElementById('play-game-button');
+
+  if (remoteMode) {
+    player2Container.style.display = 'none';
+    player2Input.required = false;
+    button.textContent = 'Find remote game';
+    button.setAttribute('onclick', 'findRemoteGame()');
+  } else {
+    player2Container.style.display = 'block';
+    player2Input.required = true;
+    button.textContent = 'Play game';
+    button.setAttribute('onclick', 'playLocalGame()');
+  }
+}

@@ -1,0 +1,70 @@
+{% load i18n %}
+{% load static %}
+<div id="play" class="page p-4">
+  <div
+    class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto col-10">
+    
+    <h1 class="mb-3 align-self-start">{% trans "Choose your Game" %}</h1>
+    
+    <form method="dialog" class="d-flex flex-column justify-content-center">
+      {% comment %} {% csrf_token %} {% endcomment %}
+
+      {% comment %} {% if form.non_field_errors %}
+        <div class="alert alert-danger fs-6 p-3">
+          <div class="errorlist nonfield m-0 p-0">
+            {{ form.non_field_errors.0 }}
+          </div>
+        </div>
+      {% endif %} {% endcomment %}
+
+      <div class="mb-3 btn-group mx-auto col-9" role="group" aria-label="{% trans 'Game selection' %}">
+
+        <input type="radio" class="btn-check" name="chosenGame" id="pong" autocomplete="off" checked>
+        <label class="btn btn-outline-success d-flex flex-column justify-content-between align-items-center p-3" for="pong">
+          <h4 class="mb-3">Space Pong</h4>
+          <img src="{% static 'images/cover-pong-8bits.jpg' %}" alt="Space Pong" class="img-fluid">
+        </label>
+      
+        <input type="radio" class="btn-check" name="chosenGame" id="cows" autocomplete="off">
+        <label class="btn btn-outline-success d-flex flex-column justify-content-between align-items-center p-3" for="cows">
+          <h4 class="mb-3">Space Cows</h4>
+          <img src="{% static 'images/cover-space-cows.jpg' %}" alt="Space Cows" class="img-fluid">
+        </label>
+      
+      </div>
+
+      <div class="mb-3">
+        <p class="fs-6 mb-2">{% trans 'Select game mode:' %}</p>
+        <div class="btn-group" role="group" aria-label="{% trans 'Game mode selection' %}">
+
+          <input type="radio" class="btn-check" name="gameMode" id="localMode" autocomplete="off" checked onchange="toggleRemoteMode()">
+          <label class="btn btn-outline-success" for="localMode">{% trans 'Local' %}</label>
+        
+          <input type="radio" class="btn-check" name="gameMode" id="remoteMode" autocomplete="off" onchange="toggleRemoteMode()">
+          <label class="btn btn-outline-success" for="remoteMode">{% trans 'Remote' %}</label>
+        
+        </div>
+      </div>
+
+      <div id="error-div" class="alert alert-danger fs-6 p-3" style="display: none;";>
+        <div class="errorlist nonfield m-0 p-0">
+        </div>
+      </div>
+
+      <div class="mb-3 d-flex">
+        <div class="me-3">
+          <label for="player1-input" class="form-label">{% if user.is_authenticated %}{{ user.username }}{% else %}{% trans 'Name Player' %} 1{% endif %}</label>
+          <input type="text" class="form-control" id="player1-input" name="p1_name" value="{% if user.is_authenticated %}{{ user.username }}{% else %}{% trans 'Name1' %}{% endif %}" required>
+        </div>
+        <div id="form-player2">
+          <label for="player2-input" class="form-label">{% trans 'Name Player' %} 2</label>
+          <input type="text" class="form-control" id="player2-input" name="p2_name" value="{% trans 'Name2' %}" required>
+        </div>
+      </div>
+      
+      <button id="play-game-button" type="button" class="btn btn-secondary" onclick="playLocalGame()">{% trans "Play game" %}</button>
+
+    </form>
+
+  </div>
+</div>

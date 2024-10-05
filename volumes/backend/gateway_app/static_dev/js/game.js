@@ -1,12 +1,13 @@
 
 async function saveGameResultInDatabase(
-    tournament_id, game_round, p1_name, p1_id, p2_name, p2_id, game_result) {
+    game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id,
+    game_result) {
   let path = window.location.pathname;
   let url = '';
   // console.log('path: ', path);
-  if (path === '/game/') {
+  if (path === '/play/') {
     url = 'saveGame/';
-  } else if (path === '/game') {
+  } else if (path === '/play') {
     url = path + '/saveGame/';
   } else if (path === '/tournament/') {
     url = 'update/';
@@ -17,7 +18,7 @@ async function saveGameResultInDatabase(
 
   const jsonData = {
     'tournament_id': tournament_id,
-    'game_type': 'pong',
+    'game_type': game_type,
     'game_round': game_round,
     'p1_name': p1_name,
     'p2_name': p2_name,
@@ -47,7 +48,7 @@ async function saveGameResultInDatabase(
 }
 
 // Show the winner and next round button
-function nextRound(tournament_round, p1_name, p2_name) {
+function nextRound(game_round, p1_name, p2_name) {
   document.getElementById('startGame-winner').remove();
   document.getElementById('nextRound-button').remove();
   document.getElementById('startGame-button').style.display = 'block';
@@ -55,17 +56,19 @@ function nextRound(tournament_round, p1_name, p2_name) {
   document.getElementById('namePlayer2').textContent = p2_name;
   document.querySelector('.scorePlayer1').textContent = 0;
   document.querySelector('.scorePlayer2').textContent = 0;
-  document.querySelector('h1').textContent = tournament_round;
+  document.querySelector('h1').textContent = game_round;
 
-  announceGame(tournament_round, `${p1_name} vs ${p2_name}`);
+  announceGame(game_round, `${p1_name} vs ${p2_name}`);
 }
 
 // Start button clicked from game or tournament page
 async function startGame(
-    tournament_id, game_round, p1_name, p1_id, p2_name, p2_id) {
-  console.log(tournament_id, game_round, p1_name, p1_id, p2_name, p2_id);
-  // If normal game: startGame(0, 'Single','Player1', 0, 'Player2', 0)
-  // Tournament: startGame('3', 'Semi-Final 1', 'django_superuser',1, 'Name2',0)
+    game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id) {
+  console.log(
+      game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id);
+  // If normal game: startGame('pong', 0, 'single','Player1', 0, 'Player2', 0)
+  // Tournament: startGame('pong', '3', 'Semi-Final 1', 'django_superuser',1,
+  // 'Name2',0)
 
   // Remove the start game button and previous winner name
   document.getElementById('startGame-button')?.remove();
@@ -73,12 +76,65 @@ async function startGame(
   document.getElementById('nextRound-button')?.remove();
   document.getElementById('startGame-winner')?.remove();
 
+  let game_result = {};
   // Execute the game
-  // const game_result = await executePongGame(p1_name, p2_name);
-  const game_result = await executeCowGame(p1_name, p2_name);
+  if (game_type === 'pong') {
+    game_result = await executePongGame(p1_name, p2_name);
+  } else if (game_type === 'cows') {
+    game_result = await executeCowGame(p1_name, p2_name);
+  }
   console.log('game_result: ', game_result);
 
   // Save the game result in the database
   saveGameResultInDatabase(
-      tournament_id, game_round, p1_name, p1_id, p2_name, p2_id, game_result);
+      game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id,
+      game_result);
+}
+
+async function playLocalGame() {
+  const player1Input = document.getElementById('player1-input');
+  const player2Input = document.getElementById('player2-input');
+
+  if (player1Input.value === player2Input.value) {
+    document.getElementById('error-div').style.display = 'block'
+    document.querySelector('.errorlist').textContent =
+        'Names must be different';
+    return;
+  }
+
+  let url = 'https://localhost:8443/game/';
+  const jsonData = {
+    'p1_name': player1Input.value,
+    'p2_name': player2Input.value,
+    'game_type': document.querySelector('input[name="chosenGame"]:checked').id
+  };
+
+  try {
+    // console.log('url: ', url);
+    let request = new Request(url, {
+      method: 'POST',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      credentials: 'include',
+      body: JSON.stringify(jsonData)
+    });
+    // console.log('playLocalGame > request: ', request);
+    const response = await fetch(request);
+    const data = await response.json();
+
+    console.log('playLocalGame > response: ', response);
+
+    if (!response.ok && !data.html.includes('class="errorlist nonfield')) {
+      throw new Error(`HTTP error - status: ${response.status}`);
+    }
+
+    document.querySelector('main').innerHTML = data.html;
+
+  } catch (error) {
+    console.error('Submission error:', error);
+    document.querySelector('main').innerHTML = '<h1>Submission error</h1>';
+  }
 }

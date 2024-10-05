@@ -33,7 +33,8 @@
         <p id="startGame-winner" class="fs-1">{{ info.previous_winner_name }} {% trans "won" %}!</p>
         <button id="playAgain-button" class="btn btn-secondary rounded-0 fs-1 px-4"
         onclick="startGame(
-          {{ info.tournament_id }}, '{{ info.tournament_round }}',
+          '{{ info.game_type }}',
+          {{ info.tournament_id }}, '{{ info.game_round }}',
           '{{ info.p1_name }}', {{ info.p1_id }},
           '{{ info.p2_name }}', {{ info.p2_id }}
         )">{% trans "Play Again" %}</button>
