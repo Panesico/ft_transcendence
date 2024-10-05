@@ -22,13 +22,76 @@ function sendMessage(message) {
   formSocket.send(JSON.stringify({'message': message}));
 }
 
-// Intercept form submissions for AJAX processing
-async function handleFormSubmission() {
-  const form = document.querySelector('form');
-  const formUpload = document.getElementById('file-upload')
+function listenFormSocket(form) {
+  // console.log('form: ', form);
+  console.log('form: ', form);
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // console.log('Form submitted', e);
 
-  if (formUpload) {
-    console.log('formUpload: ', formUpload);
+    const formData = new FormData(form);
+    let url = form.action;
+
+    const jsonObject = {};
+    formData.forEach((value, key) => {
+      jsonObject[key] = value;
+    });
+    // console.log('formData: ', formData);
+    try {
+      // console.log('url: ', url);
+      let request = new Request(url, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        credentials: 'include',
+        body: JSON.stringify(jsonObject)
+      });
+      // console.log('handleFormSubmission > request: ', request);
+      const response = await fetch(request);
+      const data = await response.json();
+
+      console.log('handleFormSubmission > response: ', response);
+
+      if (!response.ok && !data.html.includes('class="errorlist nonfield')) {
+        throw new Error(`HTTP error - status: ${response.status}`);
+      }
+
+      // console.log('data: ', data);
+      if (data.status != 'error' && data.message && !data.html) {
+        console.log('data.message: ', data.message);
+        if (data.message === 'Login successful') {
+          sendMessage('websocket: data received');
+          sessionStorage.setItem('afterLogin', 'true');
+        } else if (data.message === 'Sign up successful') {
+          sessionStorage.setItem('afterSignup', 'true');
+        }
+        window.location.replace('/');
+      } else
+        document.querySelector('main').innerHTML = data.html;
+
+      if (!data?.html?.includes('class="errorlist nonfield')) {
+        if (data.message != 'starting Semi-Final 1')
+          showMessage(data.message);
+        else
+          announceGame(
+              document.querySelector('h1').textContent,
+              `${document.getElementById('namePlayer1').textContent} vs ${
+                  document.getElementById('namePlayer2').textContent}`);
+      }
+      handleFormSubmission();
+    } catch (error) {
+      console.error('Form submission error:', error);
+      document.querySelector('main').innerHTML =
+          '<h1>Form submission error</h1>';
+    }
+  });
+}
+
+function listenFormUploadSocket(formUpload) {
+  console.log('formUpload: ', formUpload);
     formUpload.addEventListener('submit', async (e) => {
       e.preventDefault();
       // console.log('Form submitted', e);
@@ -76,75 +139,33 @@ async function handleFormSubmission() {
         document.querySelector('main').innerHTML = '<h1>Form submission error</h1>';
       }
     });
-  }
+}
 
+// Intercept form submissions for AJAX processing
+async function handleFormSubmission() {
+  const form = document.querySelector('form');
+  const formUpload = document.getElementById('file-upload')
+  const formGeneral = document.getElementById('type-general')
+  const formSecurity = document.getElementById('type-security')
+
+  if (formUpload) {
+    listenFormUploadSocket(formUpload);
+  }
   else if (form) {
-    // console.log('form: ', form);
     console.log('form: ', form);
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      // console.log('Form submitted', e);
-
-      const formData = new FormData(form);
-      let url = form.action;
-
-      const jsonObject = {};
-      formData.forEach((value, key) => {
-        jsonObject[key] = value;
-      });
-      // console.log('formData: ', formData);
-      try {
-        // console.log('url: ', url);
-        let request = new Request(url, {
-          method: 'POST',
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-          },
-          credentials: 'include',
-          body: JSON.stringify(jsonObject)
-        });
-        // console.log('handleFormSubmission > request: ', request);
-        const response = await fetch(request);
-        const data = await response.json();
-
-        console.log('handleFormSubmission > response: ', response);
-
-        if (!response.ok && !data.html.includes('class="errorlist nonfield')) {
-          throw new Error(`HTTP error - status: ${response.status}`);
-        }
-
-        // console.log('data: ', data);
-        if (data.status != 'error' && data.message && !data.html) {
-          console.log('data.message: ', data.message);
-          if (data.message === 'Login successful') {
-            sendMessage('websocket: data received');
-            sessionStorage.setItem('afterLogin', 'true');
-          } else if (data.message === 'Sign up successful') {
-            sessionStorage.setItem('afterSignup', 'true');
-          }
-          window.location.replace('/');
-        } else
-          document.querySelector('main').innerHTML = data.html;
-
-        if (!data?.html?.includes('class="errorlist nonfield')) {
-          if (data.message != 'starting Semi-Final 1')
-            showMessage(data.message);
-          else
-            announceGame(
-                document.querySelector('h1').textContent,
-                `${document.getElementById('namePlayer1').textContent} vs ${
-                    document.getElementById('namePlayer2').textContent}`);
-        }
-        handleFormSubmission();
-      } catch (error) {
-        console.error('Form submission error:', error);
-        document.querySelector('main').innerHTML =
-            '<h1>Form submission error</h1>';
-      }
-    });
+    listenFormSocket(form);
   }
+  
+  if (formGeneral) {
+    console.log('formGeneral: ', formGeneral);
+    listenFormSocket(formGeneral);
+  }
+
+  if (formSecurity) {
+    console.log('formSecurity: ', formSecurity);
+    listenFormSocket(formSecurity);
+  }
+
 }
 
 // Load content based on current path

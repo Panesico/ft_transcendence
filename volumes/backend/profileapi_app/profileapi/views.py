@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from profileapi.forms import InviteFriendForm
 from profileapi.models import Profile
 from profileapi.forms import EditProfileForm
+from django.db import DatabaseError
 import json
 import os
 import requests
@@ -90,9 +91,9 @@ def api_edit_profile(request):
             else:
                 logger.debug('api_edit_profile > Form is invalid')
                 return JsonResponse({'status': 'error', 'message': 'Invalid profile data'}, status=400)
-        except json.JSONDecodeError:
-            logger.debug('api_edit_profile > Invalid JSON')
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+        except (json.JSONDecodeError, DatabaseError) as e:
+            logger.debug(f'api_edit_profile > Invalid JSON error: {str(e)}')
+            return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
     else:
         logger.debug('api_edit_profile > Method not allowed')
         return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
