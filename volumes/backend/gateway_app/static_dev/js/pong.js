@@ -45,13 +45,13 @@ async function executePongGame(p1_name, p2_name) {
   const paddleWidth = 15;
   const paddleHeight = 80;
   const borderWidth = 15;
+  const paddleSpeed = 10;
   let leftPaddleY = (canvas.height - paddleHeight) / 2;
   let rightPaddleY = (canvas.height - paddleHeight) / 2;
   let ballX = canvas.width / 2;
   let ballY = canvas.height / 2;
   let ballSpeedX = 6;  // 6
   let ballSpeedY = 4;  // 4
-  const paddleSpeed = 10;
   let scorePlayer1 = 0;
   let scorePlayer2 = 0;
   let frameCount = 0;        // frame count
