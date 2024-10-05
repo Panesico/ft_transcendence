@@ -4,3 +4,18 @@
 {% block content %}
 {% include '../fragments/404_fragment.html' %}
 {% endblock %}
+
+<div class="mb-3">
+	<label for="preferred_language" class="form-label">Preferred Language</label>
+	<div id="preferred_language" role="group" aria-label="Basic radio toggle button group">
+	  <input type="radio" class="btn-check" name="preferred_language" id="btnradio1" value="en" autocomplete="off" {% if profile_data.preferred_language == 'en' %}checked{% endif %}>
+	  <label id="language-button" class="btn btn-outline-primary" for="btnradio1">English</label>
+	  
+	  <input type="radio" class="btn-check" name="preferred_language" id="btnradio2" value="es" autocomplete="off" {% if profile_data.preferred_language == 'es' %}checked{% endif %}>
+	  <label id="language-button" class="btn btn-outline-primary" for="btnradio2">Spanish</label>
+	  
+	  <input type="radio" class="btn-check" name="preferred_language" id="btnradio3" value="fr" autocomplete="off" {% if profile_data.preferred_language == 'fr' %}checked{% endif %}>
+	  <label id="language-button" class="btn btn-outline-primary" for="btnradio3">French</label>
+	</div>
+	<div class="text-danger fs-6">{{ form.preferred_language.errors }}</div>
+	</div>

@@ -183,3 +183,16 @@ def save_game(request):
         form.add_error(None, message)
         html = render_to_string('fragments/game_fragment.html', {'form': form}, request=request)
         return JsonResponse({'html': html, 'status': status, 'message': message})
+    
+
+
+def get_remote(request):
+    logger.debug("")
+    logger.debug("get_remote")
+    if request.method != 'GET': 
+      return redirect('405')
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        logger.debug("get_remote XMLHttpRequest")
+        html = render_to_string('fragments/remote_fragment.html', context={}, request=request)
+        return JsonResponse({'html': html})
+    return render(request, 'partials/remote.html')

@@ -84,18 +84,18 @@ width: 80px;
 border-radius: 50%;
 }
 
-.btn-check:checked + .btn-outline-primary {
+#language-button:checked {
   background-color: #ffffff;
   color: #181a1b;
   border-color: #ffffff;
 }
 
-.btn-outline-primary {
+#language-button {
   color: #ffffff;
   border-color: #ffffff;
 }
 
-.btn-outline-primary:hover {
+#language-button:hover {
   background-color: #adadad;
   color: white;
 }
