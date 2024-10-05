@@ -84,18 +84,36 @@ width: 80px;
 border-radius: 50%;
 }
 
-#language-button:checked {
+#preferred_language .language-button-input:checked + label {
   background-color: #ffffff;
   color: #181a1b;
-  border-color: #ffffff;
+  border-color: #198754;
+  border-width: 2px;
 }
 
-#language-button {
+#preferred_language .language-button-input {
   color: #ffffff;
   border-color: #ffffff;
 }
 
-#language-button:hover {
+#preferred_language .language-button-input:hover {
   background-color: #adadad;
   color: white;
+}
+
+.hero h1 {
+  font-size: 4rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+.hero p {
+  font-size: 1.5rem;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+.section {
+  padding: 60px 0;
+  --bs-bg-opacity: 0;
+}
+.section h2 {
+  margin-bottom: 40px;
 }
