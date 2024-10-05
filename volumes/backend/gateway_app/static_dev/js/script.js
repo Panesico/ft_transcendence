@@ -120,9 +120,10 @@ async function handleFormSubmission() {
   const formUpload = document.getElementById('file-upload')
   const formGeneral = document.getElementById('type-general')
   const formSecurity = document.getElementById('type-security')
-  const formInviteFriend = document.getElementById('type-invite-friend')
+  const formInviteFriend = document.getElementById('inviteFriendModal')
 
   if (formInviteFriend) {
+    listenFriendInvitation(formInviteFriend);
     console.log('formInviteFriend: ', formInviteFriend);
   }
   else if (formUpload) {

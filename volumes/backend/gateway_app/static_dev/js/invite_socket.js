@@ -1,38 +1,51 @@
-function init_socket() {
-  console.log('formInviteFriend');
-  /* WebSocket */
-  const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
-  // const formSocket = new WebSocket('/wss/gamecalc/');
+let inviteFriendSocket; // Make the websocket accessible globally
 
-  formSocket.onopen = function(e) {
-    console.log('formSocket socket connected');
+function sendMessage(message) {
+  console.log('Sending message to socket: ', message);
+  inviteFriendSocket.send(JSON.stringify({'message': message}));
+}
+
+function onModalOpen() {
+  console.log('Modal is open');
+
+  /* WebSocket */
+  inviteFriendSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
+  // const inviteFriendSocket = new WebSocket('/wss/gamecalc/');
+
+  inviteFriendSocket.onopen = function(e) {
+    console.log('inviteFriendSocket socket connected');
   };
 
-  formSocket.onmessage = function(e) {
+  inviteFriendSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
     const message = data['message'];
     console.log('Received message from socket: ', message);
   };
 
-  formSocket.onclose = function(e) {
-    console.error('formSocket socket closed unexpectedly');
-  };
+  inviteFriendSocket.onclose = function(e) {
+    console.warn('inviteFriendSocket socket closed unexpectedly');
+  };  
+}
 
-  function sendMessage(message) {
-    console.log('Sending message to socket: ', message);
-    formSocket.send(JSON.stringify({'message': message}));
+function onModalClose()
+{
+  if (inviteFriendSocket && inviteFriendSocket.readyState === WebSocket.OPEN) {
+    inviteFriendSocket.close();
+    console.log('Modal is closed and WebSocket is closed');
+  } else {
+    console.warn('WebSocket is not open or already closed');
   }
 }
 
-function invite_socket() {
-    console.log('formInviteFriend');
+function listenFriendInvitation(modal) {
+    console.log('inviteFrienModal');
 
-    const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
-    const body = document.getElementById('body');
-    const modalIsOpen = body.classList.contains('modal-open');
-    
-    if (modalIsOpen) {
-      init_socket();
-      console.log('modalIsOpen');
-    }
+    modal.addEventListener('show.bs.modal', () => {
+      onModalOpen();
+    })
+
+    modal.addEventListener('hidden.bs.modal', () => {
+      onModalClose();
+
+  });
 }
