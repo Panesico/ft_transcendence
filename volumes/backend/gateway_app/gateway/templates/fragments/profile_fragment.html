@@ -38,7 +38,7 @@
 				  </div>
 		  <a href="{% url 'edit_profile' %}" class="btn btn-light" role="button" style="margin-right: 10px;">{% trans "Edit my profile" %}</a>
 				  <a href="{% url 'list_friends' %}" class="btn btn-dark" role="button" style="margin-right: 10px;">{% trans "All my friends" %}</a>
-				  <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#inviteFrienModal">
+				  <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#inviteFriendModal">
 					  {% trans "Invite a friend" %}
 				  </button>
 			  </div>
@@ -49,12 +49,12 @@
   
   <!-- Modal -->
   
-  <div class="modal fade" id="inviteFrienModal" tabindex="-1" aria-labelledby="inviteFrienModalLabel" aria-hidden="true">
+  <div class="modal fade" id="inviteFriendModal" tabindex="-1" aria-labelledby="inviteFriendModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		  <div class="profile-modal-content">
 			  <div class="modal-content" style="background-color: #333; color: #fff;">
 			  <div class="modal-header">
-				  <h1 class="modal-title fs-5" id="inviteFrienModalLabel">{% trans "Let's invite a friend" %}</h1>
+				  <h1 class="modal-title fs-5" id="inviteFriendModalLabel">{% trans "Let's invite a friend" %}</h1>
 		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></button>
 		</div>
 		<div class="modal-body">

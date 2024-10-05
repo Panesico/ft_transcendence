@@ -1,27 +1,4 @@
-/* WebSocket */
-const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
-// const formSocket = new WebSocket('/wss/gamecalc/');
-
-formSocket.onopen = function(e) {
-  console.log('formSocket socket connected');
-};
-
-formSocket.onmessage = function(e) {
-  const data = JSON.parse(e.data);
-  const message = data['message'];
-  console.log('Received message from socket: ', message);
-};
-
-formSocket.onclose = function(e) {
-  console.error('formSocket socket closed unexpectedly');
-};
-
-function sendMessage(message) {
-  console.log('Sending message to socket: ', message);
-  formSocket.send(JSON.stringify({'message': message}));
-}
-
-function listenFormSocket(form) {
+function listenForm(form) {
   // console.log('form: ', form);
   console.log('form: ', form);
   form.addEventListener('submit', async (e) => {
@@ -62,7 +39,6 @@ function listenFormSocket(form) {
       if (data.status != 'error' && data.message && !data.html) {
         console.log('data.message: ', data.message);
         if (data.message === 'Login successful') {
-          sendMessage('websocket: data received');
           sessionStorage.setItem('afterLogin', 'true');
         } else if (data.message === 'Sign up successful') {
           sessionStorage.setItem('afterSignup', 'true');
@@ -80,7 +56,6 @@ function listenFormSocket(form) {
               `${document.getElementById('namePlayer1').textContent} vs ${
                   document.getElementById('namePlayer2').textContent}`);
       }
-      handleFormSubmission();
     } catch (error) {
       console.error('Form submission error:', error);
       document.querySelector('main').innerHTML =
@@ -89,8 +64,8 @@ function listenFormSocket(form) {
   });
 }
 
-function listenFormUploadSocket(form) {
-  console.log('listenFormUploadSocket: ', form);
+function listenFormUpload(form) {
+  console.log('listenFormUpload: ', form);
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       // console.log('Form submitted', e);
@@ -130,7 +105,6 @@ function listenFormUploadSocket(form) {
         if (!data?.html?.includes('class="errorlist nonfield')) {
           showMessage(data);
         }
-        handleFormSubmission();
         loadAdditionalJs(window.location.pathname);
 
       } catch (error) {
@@ -146,23 +120,27 @@ async function handleFormSubmission() {
   const formUpload = document.getElementById('file-upload')
   const formGeneral = document.getElementById('type-general')
   const formSecurity = document.getElementById('type-security')
+  const formInviteFriend = document.getElementById('type-invite-friend')
 
-  if (formUpload) {
-    listenFormUploadSocket(formUpload);
+  if (formInviteFriend) {
+    console.log('formInviteFriend: ', formInviteFriend);
+  }
+  else if (formUpload) {
+    listenFormUpload(formUpload);
   }
   else if (form) {
     console.log('form: ', form);
-    listenFormSocket(form);
+    listenForm(form);
   }
   
   if (formGeneral) {
     console.log('formGeneral: ', formGeneral);
-    listenFormSocket(formGeneral);
+    listenForm(formGeneral);
   }
 
   if (formSecurity) {
     console.log('formSecurity: ', formSecurity);
-    listenFormSocket(formSecurity);
+    listenForm(formSecurity);
   }
 
 }
