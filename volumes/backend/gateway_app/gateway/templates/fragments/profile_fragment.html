@@ -58,7 +58,7 @@
 		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></button>
 		</div>
 		<div class="modal-body">
-				  <form method="post" action="{% url 'post_invite' %}">
+				  <form method="post" id="type-invite-friend" action="{% url 'post_invite' %}">
 					  <label for="{{ form.username.id_for_label }}" class="col-form-label">{{ form.username.label }}</label>
 					  {% csrf_token %}
 					  {{ form.as_p }}

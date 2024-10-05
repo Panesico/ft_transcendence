@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path #, re_path
-from gateway import views, viewsAuth, viewsErrors, viewsProfile, viewsPlay
+from gateway import views, viewsAuth, viewsErrors, viewsProfile, viewsPlay, viewsInvitation
 from django.conf.urls.static import static
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
@@ -32,6 +32,10 @@ urlpatterns = [
     path('edit_profile_security/', viewsProfile.post_edit_profile_security, name='edit_profile_security'),
     path('edit_profile_avatar/', viewsProfile.post_edit_profile_avatar, name='edit_profile_avatar'),
 
+    # invite friends
+    path('invite_a_friend', viewsInvitation.post_invite, name='post_invite'),
+    path('my_friends/', views.list_friends, name='list_friends'),
+
     # play api
     path('game/', viewsPlay.get_game, name='game'),
     path('game/saveGame/', viewsPlay.save_game, name='saveGame'),
@@ -42,8 +46,7 @@ urlpatterns = [
     # Languages API
     path('i18n/', include('django.conf.urls.i18n')),
 
-    path('api/invite/', views.post_invite, name='post_invite'),
-    path('my_friends/', views.list_friends, name='list_friends'),
+    
 
     # path('api/data/', views.get_files, name='files'),
     # re_path(r'^.*$', views.get_other),  # Catch-all route to serve the SPA

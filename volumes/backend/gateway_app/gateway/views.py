@@ -45,36 +45,7 @@ def list_friends(request):
 	# 	html = render_to_string('fragments/405_fragment.html', {'my_variable': my_variable}, request=request)
 	# 	return JsonResponse({'html': html}, status=405)
 
-def post_invite(request):
-  logger.debug('post_invite')
-  authentif_url = 'https://profileapi:9002/api/inviterequest/'
-  if request.method != 'POST':
-    return redirect('405')
-  logger.debug('post_invite > POST')
-  csrf_token = request.COOKIES.get('csrftoken')
-  headers = {
-        'X-CSRFToken': csrf_token,
-        'Cookie': f'csrftoken={csrf_token}',
-        'Content-Type': 'application/json',
-        'Referer': 'https://gateway:8443',
-    }
-  data = json.loads(request.body)
-  logger.debug('post_invite > data: %s', data)
-  response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
-  logger.debug('post_invite > Response: %s', response)
-  status = response.json().get("status")
-  message = response.json().get("message")
-  if response.ok:
-    user_response =  JsonResponse({'status': status, 'message': message})
-    for cookie in response.cookies:
-      user_response.set_cookie(cookie.key, cookie.value)
-    return user_response
-  else:
-    logger.debug('post_invite > Response NOT OK')
-    logger.debug(message)
-    data = json.loads(request.body)
-    html = render_to_string('fragments/profile_fragment.html', {'form': data}, request=request)
-    return JsonResponse({'html': html, 'status': status, 'message': message})
+
     #Handle form error
 
 
