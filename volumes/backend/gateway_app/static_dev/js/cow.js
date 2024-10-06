@@ -1,9 +1,11 @@
 
 async function executeCowGame(p1_name, p2_name) {
+  console.log('executeCowGame is called')
   // Get the game container
   const gameContainer = document.querySelector('#game-container');
   const scorePlayer1Element = document.querySelector('.scorePlayer1');
   const scorePlayer2Element = document.querySelector('.scorePlayer2');
+  const maxScore = 5;
   scorePlayer1Element.textContent = 0;
   scorePlayer2Element.textContent = 0;
 
@@ -138,14 +140,25 @@ async function executeCowGame(p1_name, p2_name) {
     });
   }
 
+  const baseUrl = window.location.origin;
+  console.log('baseUrl: ', baseUrl);
+  console.log('window.location.origin: ', window.location.origin);
+
   const player1Image = new Image();
-  player1Image.src = 'static/images/game/spaceship1.png';
-  
+  player1Image.src = `${baseUrl}/static/images/game/spaceship1.png`;
+  console.log('player1Image.src: ', player1Image.src);
+
   const player2Image = new Image();
-  player2Image.src = 'static/images/game/spaceship2.png';
-  
+  player2Image.src = `${baseUrl}/static/images/game/spaceship2.png`;
+
   const cowImage = new Image();
-  cowImage.src = 'static/images/game/cow400.png';
+  cowImage.src = `${baseUrl}/static/images/game/cow400.png`;
+
+  const backgroundImage = new Image();
+  backgroundImage.src = `${baseUrl}/static/images/game/stars_background.jpg`;
+
+  const earthImage = new Image();
+  earthImage.src = `${baseUrl}/static/images/game/earth.png`;
   
   function moveCows() {
     cows.forEach(cow => {
@@ -163,14 +176,21 @@ async function executeCowGame(p1_name, p2_name) {
         }
     });
   }
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar canvas
 
-    // Dibujar jugadores
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+
+    // Draw background
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+    // Draw earth
+    ctx.drawImage(earthImage, canvas.width / 2, canvas.height / 2, 100, 100);
+
+    // Dibujar players
     ctx.drawImage(player1Image, player1.x, player1.y, player1.width, player1.height);
     ctx.drawImage(player2Image, player2.x, player2.y, player2.width, player2.height);
 
-    // Dibujar vacas
+    // Dibujar cows
     cows.forEach(cow => {
         if (!cow.captured) {
             ctx.drawImage(cowImage, cow.x, cow.y, cow.width, cow.height);
@@ -179,16 +199,61 @@ async function executeCowGame(p1_name, p2_name) {
   }
 
   // Función principal del juego
-  function gameLoop() {
+  function gameLoop(resolve) {
     movePlayers();
     moveCows();
     detectCollisions();
+    if (player1.score === maxScore || player2.score === maxScore) {
+      gameEnded = true;
+      const game_result = {
+        'winner': (player1.score === maxScore) ? p1_name : p2_name,
+        'scorePlayer1': player1.score,
+        'scorePlayer2': player2.score
+      };
+      // return (game_result);
+      resolve(game_result);
+      return;
+    }
     draw();
     requestAnimationFrame(gameLoop); // Loop del juego
   }
   
-  // Inicialización
-  createCows();
-  console.log('Game Started');
-  gameLoop(); // Inicia el juego
+  async function showCountdown() {
+    let count = 3;
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    while (count > 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = '60px PixeloidSans';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(count, canvas.width / 2, canvas.height / 2);
+
+      count--;
+      await delay(800);
+    }
+  }
+
+  async function resetAndStartGame() {
+    player1.score = 0;
+    player2.score = 0;
+    scorePlayer1Element.textContent =  player1.score;
+    scorePlayer2Element.textContent =  player1.score;
+    gameStarted = true;
+    gameEnded = false;
+    createCows();
+    
+    await showCountdown();
+
+    return new Promise(resolve => {
+      gameLoop(resolve);
+    });
+  }
+
+  const game_result = await resetAndStartGame();
+  console.log('Game ended');
+  return game_result;
 }
