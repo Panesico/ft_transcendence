@@ -105,7 +105,7 @@ function listenFormUpload(form) {
       if (!data?.html?.includes('class="errorlist nonfield')) {
         showMessage(data);
       }
-      loadAdditionalJs(window.location.pathname);
+      //loadAdditionalJs(window.location.pathname);
 
     } catch (error) {
       console.error('Form submission error:', error);

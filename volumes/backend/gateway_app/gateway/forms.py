@@ -122,6 +122,7 @@ class EditProfileFormFrontend(forms.Form):
         label=_('Confirm new Password'), 
         required=False
         )
+
   
 class TournamentFormFrontend(forms.Form):
   player1 = forms.CharField(

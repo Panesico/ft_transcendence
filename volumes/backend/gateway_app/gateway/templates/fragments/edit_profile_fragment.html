@@ -22,7 +22,7 @@
           <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="Default avatar" style="height: 10rem; width: 10rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
           {% endif %}
         </div>
-        <form action="{% url 'edit_profile_avatar' %}" id="file-upload" method="post" enctype="multipart/form-data">
+        <form action="{% url 'edit_profile_avatar' %}" id="file-upload" method="post" enctype="multipart/form-data" onsubmit="return uploadFileNotEmpty()">
           {% csrf_token %}
           <div class="mb-3">
             <label for="{{ form.avatar.id_for_label }}" class="form-group">{{ form.avatar.label }}</label>
@@ -120,5 +120,20 @@
       return false; // Prevent form submission
     }
     return true; // Allow form submission
+  }
+</script>
+
+<script>
+  function uploadFileNotEmpty() {
+    var fileUpload = document.getElementById("file-upload");
+    if (!fileUpload) {
+      alert("fileUpload is null");
+      return false;
+    } else if (!fileUpload.files || fileUpload.files.length === 0) {
+      alert("No file selected");
+      return false;
+    } else {
+      return true;
+    }
   }
 </script>

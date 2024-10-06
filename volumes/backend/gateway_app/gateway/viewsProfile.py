@@ -208,38 +208,48 @@ def post_edit_profile_avatar(request):
   data = request.POST.copy()
   logger.debug("request.FILES: %s", request.FILES)
   logger.debug(f"post data : {data}")
-  uploaded_file = request.FILES['avatar']
 
-  # Save the uploaded file
-  avatar_dir = os.path.join(settings.MEDIA_ROOT, 'avatars')
-  fs = FileSystemStorage(location=avatar_dir)
-  filename = fs.save(uploaded_file.name, uploaded_file)
+  # Check if the avatar file is empty
+  if request.FILES.get('avatar') is not None:
+      
+    # Get the uploaded file   
+    uploaded_file = request.FILES['avatar']
 
-  # Construct the data to send to the profileapi service
-  data['user_id'] = request.user.id
-  data['avatar'] = '/avatars/' + filename
-  logger.debug(f"post_edit_profile_avatar > data: {data}")
-  authentif_url = 'https://authentif:9001/api/editprofile/' 
-  response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
-  status = response.json().get("status")
-  message = response.json().get("message")
-  logger.debug(f"status: {status}, message: {message}")
-  logger.debug(f"post_edit_profile > Response: {response.json()}")
-  html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+    # Save the uploaded file
+    avatar_dir = os.path.join(settings.MEDIA_ROOT, 'avatars')
+    fs = FileSystemStorage(location=avatar_dir)
+    filename = fs.save(uploaded_file.name, uploaded_file)
 
-  if  response.ok:
-      logger.debug('post_edit_profile_avatar > Response OK')
-      user_response =  JsonResponse({'html': html, 'status': 'success', 'message': 'Avatar updated successfully'})
-      for cookie in response.cookies:
-        user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
-      return user_response
-#    return render(request, 'partials/home.html', {'status': status, 'message': message})#create a page to redirect to login page
+    # Construct the data to send to the profileapi service
+    data['user_id'] = request.user.id
+    data['avatar'] = '/avatars/' + filename
+    logger.debug(f"post_edit_profile_avatar > data: {data}")
+    authentif_url = 'https://authentif:9001/api/editprofile/' 
+    response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
+    status = response.json().get("status")
+    message = response.json().get("message")
+    logger.debug(f"status: {status}, message: {message}")
+    logger.debug(f"post_edit_profile > Response: {response.json()}")
+    html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+
+    if  response.ok:
+        logger.debug('post_edit_profile_avatar > Response OK')
+        user_response =  JsonResponse({'html': html, 'status': 'success', 'message': 'Avatar updated successfully'})
+        for cookie in response.cookies:
+          user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
+        return user_response
+  #    return render(request, 'partials/home.html', {'status': status, 'message': message})#create a page to redirect to login page
+    else:
+      form = EditProfileFormFrontend()
+      profile_data = get_profileapi_variables(request=request)
+      logger.debug('post_edit_profile > Response KO')
+      html = render_to_string('fragments/edit_profile_fragment.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data}, request=request)
+      return JsonResponse({'html': html, 'status': status, 'message': message})
   else:
+    logger.debug('post_edit_profile_avatar > No file uploaded')
     form = EditProfileFormFrontend()
-    profile_data = get_profileapi_variables(request=request)
-    logger.debug('post_edit_profile > Response KO')
-    html = render_to_string('fragments/edit_profile_fragment.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data}, request=request)
-    return JsonResponse({'html': html, 'status': status, 'message': message})
+    html = render_to_string('fragments/edit_profile_fragment.html', {'status': 'error', 'message': 'No file uploaded', 'form': form, 'profile_data': profile_data}, request=request)
+    return JsonResponse({'html': html, 'status': 'error', 'message': 'No file uploaded'})
 
  
 def upload_file(request):
