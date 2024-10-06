@@ -102,7 +102,15 @@ async function playLocalGame() {
     return;
   }
 
-  let url = 'https://localhost:8443/game/';
+
+  let path = window.location.pathname;
+  // let url = 'https://localhost:8443/game/';
+  if (path === '/play/') {
+    url = 'game/';
+  } else if (path === '/play') {
+    url = path + '/game/';
+  }
+
   const jsonData = {
     'p1_name': player1Input.value,
     'p2_name': player2Input.value,
