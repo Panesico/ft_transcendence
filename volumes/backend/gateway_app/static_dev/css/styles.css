@@ -24,10 +24,14 @@ body {
   background-color: #181a1b;
 }
 
+.scorePlayer1, .scorePlayer2 {
+  font-size: 2.2rem !important;
+}
+
 #game-container {
   background-color: #000;
-  height: 450px;
-  width: 650px;
+  height: 550px;
+  width: 900px;
 }
 
 #startGame-button, #nextRound-button, #playAgain-button {
@@ -110,10 +114,7 @@ border-radius: 50%;
   font-size: 1.5rem;
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
 }
-.section {
-  padding: 60px 0;
-  --bs-bg-opacity: 0;
-}
+
 .section h2 {
   margin-bottom: 40px;
 }
