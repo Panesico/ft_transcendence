@@ -25,6 +25,8 @@ def get_logout(request):
 
 def view_login(request):
     logger.debug('view_login')
+    if request.user.is_authenticated:
+      return redirect('home')
     if request.method == 'GET': 
        return get_login(request)      
     elif request.method == 'POST':
@@ -83,6 +85,8 @@ def post_login(request):
 
 def view_signup(request):
     logger.debug('view_login')
+    if request.user.is_authenticated:
+      return redirect('home')
     if request.method == 'GET': 
        return get_signup(request)      
     elif request.method == 'POST':
