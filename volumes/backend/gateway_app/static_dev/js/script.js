@@ -1,6 +1,5 @@
 function listenForm(form) {
   // console.log('form: ', form);
-  console.log('form: ', form);
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     // console.log('Form submitted', e);
@@ -187,7 +186,7 @@ function navigate(e, path) {
   e.preventDefault();
 
   // Push the new state into the browser's history
-  if (path === '/api/auth/logout') {
+  if (path === '/logout') {
     window.history.pushState({}, '', '/');
   } else
     window.history.pushState({}, '', path);
