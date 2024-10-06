@@ -23,7 +23,7 @@ urlpatterns = [
     # authentif api
     path('signup/', viewsAuth.view_signup, name='signup'),
     path('login/', viewsAuth.view_login, name='login'),
-    path('api/auth/logout/', viewsAuth.get_logout, name='logout'),
+    path('logout/', viewsAuth.get_logout, name='logout'),
 
     # profile api
     path('profile/', viewsProfile.get_profile, name='profile'),
@@ -42,7 +42,7 @@ urlpatterns = [
     path('play/saveGame/', viewsPlay.save_game, name='saveGame'),
     path('tournament/', viewsPlay.view_tournament, name='tournament'),
     path('tournament/update/', viewsPlay.view_tournament_update, name='tournamentUpdate'),
-    path('remote/', viewsPlay.get_remote, name='remote'),
+    # path('remote/', viewsPlay.get_remote, name='remote'),
 
     # Languages API
     path('i18n/', include('django.conf.urls.i18n')),
@@ -52,5 +52,6 @@ urlpatterns = [
     # path('api/data/', views.get_files, name='files'),
     # re_path(r'^.*$', views.get_other),  # Catch-all route to serve the SPA
 ]
+
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

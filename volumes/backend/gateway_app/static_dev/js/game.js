@@ -104,7 +104,6 @@ async function playLocalGame() {
 
 
   let path = window.location.pathname;
-  // let url = 'https://localhost:8443/game/';
   if (path === '/play/') {
     url = 'game/';
   } else if (path === '/play') {

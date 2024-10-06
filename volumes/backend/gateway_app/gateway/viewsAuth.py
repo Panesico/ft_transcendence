@@ -1,18 +1,15 @@
-import os
+import os, json, requests, logging
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
-from django.contrib import messages
-from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 from .forms import SignUpFormFrontend, LogInFormFrontend
-import json
-import requests
-import logging
 logger = logging.getLogger(__name__)
 
 # Logout
 
+@login_required
 def get_logout(request):
     authentif_url = 'https://authentif:9001/api/logout/' 
     if request.method != 'GET':
@@ -28,6 +25,8 @@ def get_logout(request):
 
 def view_login(request):
     logger.debug('view_login')
+    if request.user.is_authenticated:
+      return redirect('home')
     if request.method == 'GET': 
        return get_login(request)      
     elif request.method == 'POST':
@@ -67,37 +66,11 @@ def post_login(request):
 
     status = response.json().get("status")
     message = response.json().get("message")
-    if response.ok:
-        # if 'HTTP_X_REQUESTED_WITH' in request.META:
-        #     logger.debug("Removing 'x-requested-with' header from request")
-        #     request.META.pop('HTTP_X_REQUESTED_WITH', None)
-        
-        # for cookie in response.cookies:
-        #     request.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True)
-        
-        # # user_response = render(request, 'partials/home.html', {'status': status, 'message': message})
-        # # user_response = render(request, 'partials/home.html')
-
-        # # user_response = redirect(f"{reverse('home')}?status={status}&message={message}")
-        # # logger.debug(request.headers.get('x-requested-with'))
-
-        # htmlMain = render_to_string('fragments/home_fragment.html', context={}, request=request)
-        # htmlHeader = render_to_string('includes/header.html', context={}, request=request)
-        # user_response =  JsonResponse({'htmlMain': htmlMain, 'htmlHeader': htmlHeader, 'status': status, 'message': message})
-        
-        # for cookie in response.cookies:
-        #     user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True)
-        # # logger.debug(f"post_login > authentif_cookies: {user_response.cookies}")
-        # return user_response
-
-        # Build the redirect response to the home page with status and message
-        # user_response = redirect(f"{reverse('home')}?status={status}&message={message}")
-        
+    if response.ok:        
         user_response =  JsonResponse({'status': status, 'message': message})
         # Set cookies from the external response if available
         for cookie in response.cookies:
             user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True, secure=True)
-
         return user_response
     else:
         logger.debug(f"post_login > Response NOT OK: {response.json()}")
@@ -112,6 +85,8 @@ def post_login(request):
 
 def view_signup(request):
     logger.debug('view_login')
+    if request.user.is_authenticated:
+      return redirect('home')
     if request.method == 'GET': 
        return get_signup(request)      
     elif request.method == 'POST':
