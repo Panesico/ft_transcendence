@@ -7,11 +7,12 @@ from .forms import InviteFriendFormFrontend, EditProfileFormFrontend, LogInFormF
 from django.contrib import messages
 from datetime import datetime
 from django.core.files.storage import FileSystemStorage
-import json
+from django.contrib.auth.decorators import login_requiredimport json
 import logging
 import requests
 logger = logging.getLogger(__name__)
 
+@login_required
 def get_profileapi_variables(request):
   user_id = request.user.id
   profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
@@ -29,6 +30,7 @@ def get_profileapi_variables(request):
             'preferred_language': 'en',
             }
 
+@login_required
 def get_profile(request):
     logger.debug("")
     logger.debug("get_profile")
@@ -48,12 +50,10 @@ def get_profile(request):
     return render(request, 'partials/profile.html', {'form': form, 'profile_data': profile_data})
     #return render(request, 'partials/my_template.html', {'my_avatar': my_avatar})
 
+@login_required
 def get_edit_profile(request):
-    if request.user.is_authenticated == False:
-        return redirect('login')
     logger.debug("")
-    if request.method != 'GET':
-        return redirect('405')
+    logger.debug("get_edit_profile")
 
     # GET profile user's variables
     profile_data = get_profileapi_variables(request=request)
@@ -67,15 +67,12 @@ def get_edit_profile(request):
         return JsonResponse({'html': html})
     return render(request, 'partials/edit_profile.html', {'form': form, 'profile_data': profile_data})
 
+@login_required
 def post_edit_profile_security(request):
-    if request.user.is_authenticated == False:
-      return redirect('login')
-    if request.method != 'POST':
-        return redirect('405')
-
-
     logger.debug("")
     logger.debug("post_edit_profile_security")
+
+    # Cookies & headers
     csrf_token = request.COOKIES.get('csrftoken')
     headers = {
         'X-CSRFToken': csrf_token,
@@ -85,7 +82,6 @@ def post_edit_profile_security(request):
     }
 
     # Recover data from the form
-    #data = request.POST.copy()
     data = json.loads(request.body)
     logger.debug(f"post data : {data}")
     data['user_id'] = request.user.id
@@ -111,7 +107,7 @@ def post_edit_profile_security(request):
       for cookie in response.cookies:
         user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
       return user_response
-      #return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})#create a page to redirect to login page
+
     #handle wrong confirmation password
     else:
       data = json.loads(request.body)
@@ -124,14 +120,12 @@ def post_edit_profile_security(request):
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
       #return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})#change this line to return only the fragment
       
-
+@login_required
 def post_edit_profile_general(request):
-    if request.user.is_authenticated == False:
-      return redirect('login')
-    if request.method != 'POST':
-        return redirect('405')
     logger.debug("")
     logger.debug("post_edit_profile_general")
+
+    # Cookies & headers
     csrf_token = request.COOKIES.get('csrftoken')
     headers = {
         'X-CSRFToken': csrf_token,
@@ -142,7 +136,6 @@ def post_edit_profile_general(request):
 
 
     # Recover data from the form
-    #data = request.POST.copy()
     data = json.loads(request.body)
     logger.debug(f"post data : {data}")
     data['user_id'] = request.user.id
@@ -169,8 +162,8 @@ def post_edit_profile_general(request):
         for cookie in response.cookies:
             user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
         return user_response
-        #return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})#change this line to return only the fragment
-    #handle wrong confirmation password
+        
+    #handle displayName already taken
     else:
       data = json.loads(request.body)
       form = EditProfileFormFrontend(data)
@@ -180,12 +173,9 @@ def post_edit_profile_general(request):
       logger.debug(f"post_edit_profile > response: {response.json()}")
       html = render_to_string('fragments/edit_profile_fragment.html', {'form': form}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
-      #return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})
 
-
+@login_required
 def post_edit_profile_avatar(request):
-  if request.user.is_authenticated == False:
-    return redirect('login')
   if request.method != 'POST':
       return redirect('405')
 
@@ -238,28 +228,17 @@ def post_edit_profile_avatar(request):
         for cookie in response.cookies:
           user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
         return user_response
-  #    return render(request, 'partials/home.html', {'status': status, 'message': message})#create a page to redirect to login page
     else:
       form = EditProfileFormFrontend()
       profile_data = get_profileapi_variables(request=request)
       logger.debug('post_edit_profile > Response KO')
       html = render_to_string('fragments/edit_profile_fragment.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message})
+  
+  # Handle the case where no file is uploaded
   else:
     logger.debug('post_edit_profile_avatar > No file uploaded')
     form = EditProfileFormFrontend()
     html = render_to_string('fragments/edit_profile_fragment.html', {'status': 'error', 'message': 'No file uploaded', 'form': form, 'profile_data': profile_data}, request=request)
     return JsonResponse({'html': html, 'status': 'error', 'message': 'No file uploaded'})
 
- 
-def upload_file(request):
-  if request.method == 'POST' and request.FILES['myfile']:
-      print('request.FILES: ', request.FILES)
-      myfile = request.FILES['myfile']
-      fs = FileSystemStorage()
-      filename = fs.save(myfile.name, myfile)
-      uploaded_file_url = fs.url(filename)
-      return render(request, 'partials/upload.html', {
-          'uploaded_file_url': uploaded_file_url
-      })
-  return render(request, 'partials/upload.html')
