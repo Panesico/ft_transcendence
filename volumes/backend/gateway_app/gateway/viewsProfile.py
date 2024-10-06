@@ -1,4 +1,4 @@
-import os
+import os, json, logging, requests
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
@@ -7,13 +7,13 @@ from .forms import InviteFriendFormFrontend, EditProfileFormFrontend, LogInFormF
 from django.contrib import messages
 from datetime import datetime
 from django.core.files.storage import FileSystemStorage
-from django.contrib.auth.decorators import login_requiredimport json
-import logging
-import requests
+from django.contrib.auth.decorators import login_required
 logger = logging.getLogger(__name__)
 
 @login_required
 def get_profileapi_variables(request):
+  if request.method != 'GET':
+      return redirect('405')
   user_id = request.user.id
   profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
   logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
@@ -34,8 +34,6 @@ def get_profileapi_variables(request):
 def get_profile(request):
     logger.debug("")
     logger.debug("get_profile")
-    if request.user.is_authenticated == False:
-      return redirect('login')
     if request.method != 'GET':
       return redirect('405')
     form = InviteFriendFormFrontend()
@@ -52,6 +50,8 @@ def get_profile(request):
 
 @login_required
 def get_edit_profile(request):
+    if request.method != 'GET':
+        return redirect('405')
     logger.debug("")
     logger.debug("get_edit_profile")
 
@@ -69,6 +69,8 @@ def get_edit_profile(request):
 
 @login_required
 def post_edit_profile_security(request):
+    if request.method != 'POST':
+        return redirect('405')
     logger.debug("")
     logger.debug("post_edit_profile_security")
 
@@ -122,6 +124,8 @@ def post_edit_profile_security(request):
       
 @login_required
 def post_edit_profile_general(request):
+    if request.method != 'GET':
+        return redirect('405')
     logger.debug("")
     logger.debug("post_edit_profile_general")
 
