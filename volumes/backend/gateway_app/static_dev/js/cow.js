@@ -73,21 +73,18 @@ async function executeCowGame(p1_name, p2_name) {
     score: 0,
   };
 
-  const cows = [];
-  const cowCount = 9; 
+  let cows = [];
 
-  function createCows() {
-    for (let i = 0; i < cowCount; i++) {
+  function spawnCows() {
         cows.push({
-            x: Math.random() * (canvas.width - 50),
-            y: Math.random() * (canvas.height - 50),
+            x: canvas.width / 2 - 15,
+            y: canvas.height / 2 - 15,
             width: 30,
             height: 30,
             captured: false,
             vx: (Math.random() - 0.5) * 2,
             vy: (Math.random() - 0.5) * 2
         });
-    }
   }
 
   function movePlayers() {
@@ -184,7 +181,7 @@ async function executeCowGame(p1_name, p2_name) {
     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
     // Draw earth
-    ctx.drawImage(earthImage, canvas.width / 2, canvas.height / 2, 100, 100);
+    ctx.drawImage(earthImage, canvas.width / 2 - 50, canvas.height / 2 - 50, 100, 100);
 
     // Dibujar players
     ctx.drawImage(player1Image, player1.x, player1.y, player1.width, player1.height);
@@ -200,7 +197,11 @@ async function executeCowGame(p1_name, p2_name) {
 
   // Función principal del juego
   function gameLoop(resolve) {
+    frameCount++;
     movePlayers();
+    if (frameCount % (2 * 60) === 0) {
+      spawnCows();
+    }
     moveCows();
     detectCollisions();
     if (player1.score === maxScore || player2.score === maxScore) {
@@ -215,7 +216,7 @@ async function executeCowGame(p1_name, p2_name) {
       return;
     }
     draw();
-    requestAnimationFrame(gameLoop); // Loop del juego
+    requestAnimationFrame(() => gameLoop(resolve)); // Loop del juego
   }
   
   async function showCountdown() {
@@ -244,8 +245,7 @@ async function executeCowGame(p1_name, p2_name) {
     scorePlayer2Element.textContent =  player1.score;
     gameStarted = true;
     gameEnded = false;
-    createCows();
-    
+    cows = [];
     await showCountdown();
 
     return new Promise(resolve => {

@@ -29,16 +29,20 @@
     </div>
 
     <!-- Game is displayed inside game-container -->
-    <div id="game-container" class="d-flex align-items-center justify-content-center">
-        <button id="startGame-button" class="btn btn-secondary rounded-0 fs-1 px-4"
-        onclick="startGame(
-          '{{ info.game_type }}',
-          {{ info.tournament_id }}, '{{ info.game_round }}',
-          '{{ info.p1_name }}', {{ info.p1_id }},
-          '{{ info.p2_name }}', {{ info.p2_id }}
-        )">{% trans "Start" %}</button>
+    <div id="game-container" class="d-flex flex-column align-items-center justify-content-center">
+      <div id="game-introduction" class="text-center mb-4">
+        <p class="fs-4">
+          {% trans "Bienvenido al juego de las vacas espaciales. El objetivo del juego es capturar más vacas que tu oponente. Usa las teclas de dirección para mover tu nave espacial y atrapar las vacas antes que tu oponente. ¡Buena suerte!" %}
+        </p>
+      </div>
+      <button id="startGame-button" class="btn btn-secondary rounded-0 fs-1 px-4"
+      onclick="startGame(
+        '{{ info.game_type }}',
+        {{ info.tournament_id }}, '{{ info.game_round }}',
+        '{{ info.p1_name }}', {{ info.p1_id }},
+        '{{ info.p2_name }}', {{ info.p2_id }}
+      )">{% trans "Start" %}</button>
     </div>
-
   </div>
 
 </div>
