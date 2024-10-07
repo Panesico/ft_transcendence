@@ -2,9 +2,9 @@
 {% load static %}
 <div id="play" class="page p-4">
   <div
-    class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto col-10">
+    class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto">
     
-    <h1 class="mb-3 align-self-start">{% trans "Choose your Game" %}</h1>
+    <h1 class="mb-3 align-self-start pb-1">{% trans "Choose your Game" %}</h1>
     
     <form method="dialog" class="d-flex flex-column justify-content-center">
       {% comment %} {% csrf_token %} {% endcomment %}
@@ -37,10 +37,10 @@
           <img src="{% static 'images/cowCover.png' %}" alt="Space Cows" class="img-fluid">
         </label>
 
-        <input type="radio" class="btn-check" name="chosenGame" id="buildplanet" autocomplete="off">
-        <label class="btn btn-outline-success d-flex flex-column justify-content-between align-items-center p-3" for="buildplanet">
-          <h4 class="mb-3">Build Your Own Planet</h4>
-          <img src="{% static 'images/cover-build-planet.png' %}" alt="Space Cows" class="img-fluid">
+        <input type="radio" class="btn-check" name="chosenGame" id="exoploring" autocomplete="off">
+        <label class="btn btn-outline-success d-flex flex-column justify-content-between align-items-center p-3" for="exoploring">
+          <h4 class="mb-3">ExoPloring</h4>
+          <img src="{% static 'images/cover-exoploring.png' %}" alt="ExoPloring" class="img-fluid">
         </label>
       
       </div>
