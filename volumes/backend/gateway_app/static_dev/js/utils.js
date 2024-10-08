@@ -9,9 +9,9 @@ function announceGame(round, message) {
   document.getElementById('messageContent').classList.add('text-center');
 }
 // Show message modal
-function showMessage(message) {
+function displayMessageInModal(message) {
   if (message) {
-    console.log('showMessage > message: ', message);
+    console.log('displayMessageInModal > message: ', message);
     let messageModal =
         new bootstrap.Modal(document.getElementById('messageModal'));
     messageModal.show();

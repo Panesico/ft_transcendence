@@ -74,7 +74,7 @@ function listenForm(form) {
 
       if (!data?.html?.includes('class="errorlist nonfield')) {
         if (data.message != 'starting Semi-Final 1')
-          showMessage(data.message);
+          displayMessageInModal(data.message);
         else
           announceGame(
               document.querySelector('h1').textContent,
@@ -131,7 +131,7 @@ function listenFormUpload(form) {
 
         if (!response.ok && response.status == 400) {
           // window.location.replace('/edit_profile');
-          // showMessage('No file selected');
+          // displayMessageInModal('No file selected');
         }
 
         else if (!response.ok) {
@@ -147,7 +147,7 @@ function listenFormUpload(form) {
         else
           document.querySelector('main').innerHTML = data.html;
         if (!data?.html?.includes('class="errorlist nonfield')) {
-          showMessage(data);
+          displayMessageInModal(data);
         }
         // if (uploadFileNotEmpty() == false) {
         //   alert("No file selected");
@@ -224,7 +224,7 @@ async function loadContent(path) {
     } else
       document.querySelector('main').innerHTML = data.html;
 
-    showMessage(data.message);
+    displayMessageInModal(data.message);
     handleFormSubmission();
   } catch (error) {
     console.error('Error loading content:', error);
@@ -265,15 +265,15 @@ document.addEventListener('DOMContentLoaded', () => {
   //     sessionStorage.getItem('afterLogin'));
   if (sessionStorage.getItem('afterLogin') === 'true') {
     let message = 'Login successful';
-    showMessage(message);
+    displayMessageInModal(message);
     sessionStorage.removeItem('afterLogin');
   } else if (sessionStorage.getItem('afterLogout') === 'true') {
     let message = 'Logged out successfully';
-    showMessage(message);
+    displayMessageInModal(message);
     sessionStorage.removeItem('afterLogout');
   } else if (sessionStorage.getItem('afterSignup') === 'true') {
     let message = 'Signup successful';
-    showMessage(message);
+    displayMessageInModal(message);
     sessionStorage.removeItem('afterSignup');
   }
 });
