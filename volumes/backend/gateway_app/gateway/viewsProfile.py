@@ -12,8 +12,6 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def get_profileapi_variables(request):
-  if request.method != 'GET':
-      return redirect('405')
   user_id = request.user.id
   profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
   logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
@@ -112,22 +110,22 @@ def post_edit_profile_security(request):
 
     #handle wrong confirmation password
     else:
+      profile_data = get_profileapi_variables(request=request)
       data = json.loads(request.body)
       form = EditProfileFormFrontend(data)
       form.add_error(None, message)
       logger.debug('post_edit_profile_general > Response KO')
-      logger.debug(f"post_edit_profile > data: {data}")
-      logger.debug(f"post_edit_profile > response: {response.json()}")
-      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form}, request=request)
+
+      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
       #return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})#change this line to return only the fragment
       
 @login_required
 def post_edit_profile_general(request):
-    if request.method != 'GET':
-        return redirect('405')
     logger.debug("")
     logger.debug("post_edit_profile_general")
+    if request.method != 'POST':
+        return redirect('405')
 
     # Cookies & headers
     csrf_token = request.COOKIES.get('csrftoken')
@@ -169,13 +167,15 @@ def post_edit_profile_general(request):
         
     #handle displayName already taken
     else:
+      profile_data = get_profileapi_variables(request=request)
+      logger.debug('profile_data: %s', profile_data)
       data = json.loads(request.body)
       form = EditProfileFormFrontend(data)
       form.add_error(None, message)
       logger.debug('post_edit_profile_general > Response KO')
       logger.debug(f"post_edit_profile > data: {data}")
       logger.debug(f"post_edit_profile > response: {response.json()}")
-      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form}, request=request)
+      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
 
 @login_required
@@ -242,7 +242,10 @@ def post_edit_profile_avatar(request):
   # Handle the case where no file is uploaded
   else:
     logger.debug('post_edit_profile_avatar > No file uploaded')
-    form = EditProfileFormFrontend()
-    html = render_to_string('fragments/edit_profile_fragment.html', {'status': 'error', 'message': 'No file uploaded', 'form': form, 'profile_data': profile_data}, request=request)
-    return JsonResponse({'html': html, 'status': 'error', 'message': 'No file uploaded'})
+    profile_data = get_profileapi_variables(request=request)
+    logger.debug('profile_data: %s', profile_data)
+    form = EditProfileFormFrontend(data)
+    form.add_error(None, 'Please select a file to upload')
+    html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+    return JsonResponse({'html': html, 'status': 'error'}, status=400)
 

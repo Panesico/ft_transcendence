@@ -1,7 +1,32 @@
+/* WebSocket */
+const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
+// const formSocket = new WebSocket('/wss/gamecalc/');
+
+formSocket.onopen = function(e) {
+  console.log('formSocket socket connected');
+};
+
+formSocket.onmessage = function(e) {
+  const data = JSON.parse(e.data);
+  const message = data['message'];
+  console.log('Received message from socket: ', message);
+};
+
+formSocket.onclose = function(e) {
+  console.error('formSocket socket closed unexpectedly');
+};
+
+function sendMessage(message) {
+  console.log('Sending message to socket: ', message);
+  formSocket.send(JSON.stringify({'message': message}));
+}
+
 function listenForm(form) {
   // console.log('form: ', form);
+  console.log('form: ', form);
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
     // console.log('Form submitted', e);
 
     const formData = new FormData(form);
@@ -38,6 +63,7 @@ function listenForm(form) {
       if (data.status != 'error' && data.message && !data.html) {
         console.log('data.message: ', data.message);
         if (data.message === 'Login successful') {
+          sendMessage('websocket: data received');
           sessionStorage.setItem('afterLogin', 'true');
         } else if (data.message === 'Sign up successful') {
           sessionStorage.setItem('afterSignup', 'true');
@@ -55,6 +81,7 @@ function listenForm(form) {
               `${document.getElementById('namePlayer1').textContent} vs ${
                   document.getElementById('namePlayer2').textContent}`);
       }
+      handleFormSubmission();
     } catch (error) {
       console.error('Form submission error:', error);
       document.querySelector('main').innerHTML =
@@ -64,54 +91,60 @@ function listenForm(form) {
 }
 
 function listenFormUpload(form) {
-  console.log('listenFormUpload: ', form);
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    // console.log('Form submitted', e);
-    const formData = new FormData(form);
-    let url = form.action;
+  console.log('form: ', form);
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      // console.log('Form submitted', e);
+      const formData = new FormData(form);
+      let url = form.action;
+      
+      try {
+        // Create a new request for file upload
+        let request = new Request(url, {
+          method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',  // To identify as AJAX request
+            'X-CSRFToken': getCookie('csrftoken')  // If CSRF token is required
+          },
+          credentials: 'include',  // Include cookies (if necessary)
+          body: formData  // FormData handles the file and other fields automatically
+        });
 
-    try {
-      // Create a new request for file upload
-      let request = new Request(url, {
-        method: 'POST',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',  // To identify as AJAX request
-          'X-CSRFToken': getCookie('csrftoken')  // If CSRF token is required
-        },
-        credentials: 'include',  // Include cookies (if necessary)
-        body: formData           // FormData handles the file and other fields
-                                 // automatically
-      });
+        // Send the request and wait a response
+        const response = await fetch(request);
+        const data = await response.json();
 
-      // Send the request and wait a response
-      const response = await fetch(request);
-      const data = await response.json();
+        console.log('handleFormSubmission > response: ', response);
 
-      console.log('handleFormSubmission > response: ', response);
+        if (!response.ok && response.status == 400) {
+          // window.location.replace('/edit_profile');
+          // showMessage('No file selected');
+        }
 
-      if (!response.ok) {
-        console.error('HTTP error - status:', response.status);
-        throw new Error(`HTTP error - status: ${response.status}`);
+        else if (!response.ok) {
+          console.error('HTTP error - status:', response.status);
+          throw new Error(`HTTP error - status: ${response.status}`);
+        }
+
+        // Handle the response data
+        if (data.status != 'error' && data.message) {
+          console.log('data.message: ', data.message);
+          window.location.replace('/');
+        }
+        else
+          document.querySelector('main').innerHTML = data.html;
+        if (!data?.html?.includes('class="errorlist nonfield')) {
+          showMessage(data);
+        }
+
+        handleFormSubmission();
+        //loadAdditionalJs(window.location.pathname);
+
+      } catch (error) {
+        console.error('Form submission error:', error);
+        document.querySelector('main').innerHTML = '<h1>Form submission error</h1>';
       }
-
-      // Handle the response data
-      if (data.status != 'error' && data.message) {
-        console.log('data.message: ', data.message);
-        window.location.replace('/');
-      } else
-        document.querySelector('main').innerHTML = data.html;
-      if (!data?.html?.includes('class="errorlist nonfield')) {
-        showMessage(data);
-      }
-      //loadAdditionalJs(window.location.pathname);
-
-    } catch (error) {
-      console.error('Form submission error:', error);
-      document.querySelector('main').innerHTML =
-          '<h1>Form submission error</h1>';
-    }
-  });
+    });
 }
 
 // Intercept form submissions for AJAX processing
@@ -120,20 +153,15 @@ async function handleFormSubmission() {
   const formUpload = document.getElementById('file-upload')
   const formGeneral = document.getElementById('type-general')
   const formSecurity = document.getElementById('type-security')
-  const formInviteFriend = document.getElementById('inviteFriendModal')
 
-  if (formInviteFriend) {
-    listenFriendInvitation(formInviteFriend);
-    console.log('formInviteFriend: ', formInviteFriend);
-  }
-  else if (formUpload) {
+  if (formUpload) {
     listenFormUpload(formUpload);
   }
   else if (form) {
     console.log('form: ', form);
     listenForm(form);
   }
-
+  
   if (formGeneral) {
     console.log('formGeneral: ', formGeneral);
     listenForm(formGeneral);
@@ -143,6 +171,7 @@ async function handleFormSubmission() {
     console.log('formSecurity: ', formSecurity);
     listenForm(formSecurity);
   }
+
 }
 
 // Load content based on current path
@@ -186,7 +215,7 @@ function navigate(e, path) {
   e.preventDefault();
 
   // Push the new state into the browser's history
-  if (path === '/logout') {
+  if (path === '/api/auth/logout') {
     window.history.pushState({}, '', '/');
   } else
     window.history.pushState({}, '', path);
@@ -244,12 +273,12 @@ function changeLanguage(lang) {
     credentials: 'include',
     body: formData,
   })
-      .then(response => {
-        if (response.ok) {
-          window.location.reload();
-        } else {
-          console.error('Error changing language:', response.statusText);
-        }
-      })
-      .catch(error => console.error('Fetch error:', error));
+  .then(response => {
+    if (response.ok) {
+      window.location.reload();
+    } else {
+      console.error('Error changing language:', response.statusText);
+    }
+  })
+  .catch(error => console.error('Fetch error:', error));
 }
