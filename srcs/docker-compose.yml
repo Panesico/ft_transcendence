@@ -41,6 +41,10 @@ services:
     depends_on:
       - postgres
       - authentif
+      - calcgame
+      - profileapi
+      - play
+      - redis
     # command:
     #   - daphne
     #   - -e
@@ -71,6 +75,7 @@ services:
       - certs:/certs
     depends_on:
       - postgres
+      - redis
     command: uvicorn authentif.asgi:application --host 0.0.0.0 --port 9001 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
   #   restart: unless-stopped
 
@@ -96,6 +101,7 @@ services:
     depends_on:
       - postgres
       - authentif
+      - redis
     command: uvicorn profileapi.asgi:application --host 0.0.0.0 --port 9002 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
   play:
@@ -119,31 +125,35 @@ services:
       - certs:/certs
     depends_on:
       - postgres
+      - redis
     command: uvicorn play.asgi:application --host 0.0.0.0 --port 9003 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
-  # gamecalc:
-  #   build:
-  #     context: ./gamecalc
-  #     dockerfile: Dockerfile
-  #     args:
-  #       SERVICE_NAME: gamecalc
-  #   image: gamecalc
-  #   container_name: gamecalc
-  #   #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
-  #   env_file:
-  #     - .env
-  #   expose:
-  #     - 9003
-  #   networks:
-  #     - transcendence
-  #   volumes:
-  #     - backend:/usr/src/app
-  #     - frontend:/usr/src/frontend
-  #     - certs:/certs
-  #   depends_on:
-  #     - postgres
-  #     - authentif
-  #   command: uvicorn gamecalc.asgi:application --host 0.0.0.0 --port 9003 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
+  calcgame:
+    build:
+      context: ./calcgame
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: calcgame
+    image: calcgame
+    container_name: calcgame
+    #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=redis
+    expose:
+      - 9004
+    networks:
+      - transcendence
+    volumes:
+      - backend:/usr/src/app
+      - frontend:/usr/src/frontend
+      - certs:/certs
+    depends_on:
+      - postgres
+      - authentif
+      - redis
+    command: uvicorn calcgame.asgi:application --host 0.0.0.0 --port 9004 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
   postgres:
     image: postgres:16.4-alpine3.20
@@ -159,6 +169,17 @@ services:
     volumes:
       - postgres_db:/var/lib/postgresql/data
       - certs:/certs
+    networks:
+      - transcendence
+    # restart: unless-stopped
+
+  redis:
+    image: redis:7.4.1-alpine3.20
+    container_name: redis
+    env_file:
+      - .env
+    expose:
+      - 6379
     networks:
       - transcendence
     # restart: unless-stopped

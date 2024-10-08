@@ -6,7 +6,7 @@ from channels.auth import AuthMiddlewareStack
 from channels.security.websocket import AllowedHostsOriginValidator
 from . import websocket_routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gateway.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'calcgame.settings')
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(), # through django
@@ -23,4 +23,5 @@ application = ProtocolTypeRouter({
             websocket_routing.websocket_urlpatterns
         )
     ),
+    
 })

@@ -53,7 +53,7 @@ echo "--Collecting static files..."
 python manage.py collectstatic --noinput
 
 echo "--Making migrations..."
-python manage.py makemigrations gamecalc
+python manage.py makemigrations calcgame
 python manage.py makemigrations
 
 echo "--Applying migrations..."

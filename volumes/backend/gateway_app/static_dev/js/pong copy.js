@@ -1,8 +1,8 @@
 // pong.js
 
 // const gameCalcSocket = new
-// WebSocket('wss://localhost:8443/wss/gamecalc/pong/');
-// // const gameCalcSocket = new WebSocket('/wss/gamecalc/pong/');
+// WebSocket('wss://localhost:8443/wss/calcgame/pong/');
+// // const gameCalcSocket = new WebSocket('/wss/calcgame/pong/');
 
 // gameCalcSocket.onopen = function(e) {
 //   console.log('GameCalc socket connected');

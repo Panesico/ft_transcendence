@@ -1,6 +1,6 @@
 /* WebSocket */
 const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
-// const formSocket = new WebSocket('/wss/gamecalc/');
+// const formSocket = new WebSocket('/wss/calcgame/');
 
 // formSocket.onopen = function(e) {
 //   console.log('formSocket socket connected');
@@ -25,7 +25,7 @@ function listenForm(form) {
   // console.log('form: ', form);
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     // console.log('Form submitted', e);
 
     const formData = new FormData(form);
@@ -53,15 +53,17 @@ function listenForm(form) {
       const data = await response.json();
 
       console.log('handleFormSubmission > response: ', response);
-      
+
       if (!response.ok && !data.html.includes('class="errorlist nonfield')) {
         throw new Error(`HTTP error - status: ${response.status}`);
       }
       console.log('listenForm > data: ', data);
-      console.log('listenForm > data.preferred_language ', data.preferred_language);
+      console.log(
+          'listenForm > data.preferred_language ', data.preferred_language);
       console.log('listenForm > data.message: ', data.message);
       console.log('listenForm > data.html: ', data.html);
-      if (data.status != 'error' && data.message && !data.html || data.message === 'Profile updated') {
+      if (data.status != 'error' && data.message && !data.html ||
+          data.message === 'Profile updated') {
         console.log('data.message: ', data.message);
         if (data.message === 'Login successful') {
           // sendMessage('websocket: data received');
@@ -108,63 +110,64 @@ function listenForm(form) {
 
 function listenFormUpload(form) {
   console.log('form: ', form);
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      // console.log('Form submitted', e);
-      const formData = new FormData(form);
-      let url = form.action;
-      
-      try {
-        // Create a new request for file upload
-        let request = new Request(url, {
-          method: 'POST',
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',  // To identify as AJAX request
-            'X-CSRFToken': getCookie('csrftoken')  // If CSRF token is required
-          },
-          credentials: 'include',  // Include cookies (if necessary)
-          body: formData  // FormData handles the file and other fields automatically
-        });
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // console.log('Form submitted', e);
+    const formData = new FormData(form);
+    let url = form.action;
 
-        // Send the request and wait a response
-        const response = await fetch(request);
-        const data = await response.json();
+    try {
+      // Create a new request for file upload
+      let request = new Request(url, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',  // To identify as AJAX request
+          'X-CSRFToken': getCookie('csrftoken')  // If CSRF token is required
+        },
+        credentials: 'include',  // Include cookies (if necessary)
+        body: formData           // FormData handles the file and other fields
+                                 // automatically
+      });
 
-        console.log('handleFormSubmission > response: ', response);
+      // Send the request and wait a response
+      const response = await fetch(request);
+      const data = await response.json();
 
-        if (!response.ok && response.status == 400) {
-          // window.location.replace('/edit_profile');
-          // displayMessageInModal('No file selected');
-        }
+      console.log('handleFormSubmission > response: ', response);
 
-        else if (!response.ok) {
-          console.error('HTTP error - status:', response.status);
-          throw new Error(`HTTP error - status: ${response.status}`);
-        }
-
-        // Handle the response data
-        if (data.status != 'error' && data.message) {
-          console.log('data.message: ', data.message);
-          window.location.replace('/');
-        }
-        else
-          document.querySelector('main').innerHTML = data.html;
-        if (!data?.html?.includes('class="errorlist nonfield')) {
-          displayMessageInModal(data);
-        }
-        // if (uploadFileNotEmpty() == false) {
-        //   alert("No file selected");
-        //   window.location.replace('/edit_profile');
-        // }
-
-        handleFormSubmission();
-        //loadAdditionalJs(window.location.pathname);
-
-      } catch (error) {
-        console.error('Form submission error:', error);
-        document.querySelector('main').innerHTML = '<h1>Form submission error</h1>';
+      if (!response.ok && response.status == 400) {
+        // window.location.replace('/edit_profile');
+        // displayMessageInModal('No file selected');
       }
-    });
+
+      else if (!response.ok) {
+        console.error('HTTP error - status:', response.status);
+        throw new Error(`HTTP error - status: ${response.status}`);
+      }
+
+      // Handle the response data
+      if (data.status != 'error' && data.message) {
+        console.log('data.message: ', data.message);
+        window.location.replace('/');
+      } else
+        document.querySelector('main').innerHTML = data.html;
+      if (!data?.html?.includes('class="errorlist nonfield')) {
+        displayMessageInModal(data);
+      }
+      // if (uploadFileNotEmpty() == false) {
+      //   alert("No file selected");
+      //   window.location.replace('/edit_profile');
+      // }
+
+      handleFormSubmission();
+      // loadAdditionalJs(window.location.pathname);
+
+    } catch (error) {
+      console.error('Form submission error:', error);
+      document.querySelector('main').innerHTML =
+          '<h1>Form submission error</h1>';
+    }
+  });
 }
 
 // Intercept form submissions for AJAX processing
@@ -181,12 +184,11 @@ async function handleFormSubmission() {
   }
   if (formUpload) {
     listenFormUpload(formUpload);
-  }
-  else if (form) {
+  } else if (form) {
     console.log('form: ', form);
     listenForm(form);
   }
-  
+
   if (formGeneral) {
     console.log('formGeneral: ', formGeneral);
     listenForm(formGeneral);
@@ -196,7 +198,6 @@ async function handleFormSubmission() {
     console.log('formSecurity: ', formSecurity);
     listenForm(formSecurity);
   }
-
 }
 
 // Load content based on current path
@@ -227,11 +228,19 @@ async function loadContent(path) {
       document.querySelector('main').innerHTML = data.html;
 
     displayMessageInModal(data.message);
+    displayMessageInModal(data.message);
     handleFormSubmission();
   } catch (error) {
     console.error('Error loading content:', error);
     document.querySelector('main').innerHTML = '<h1>Error loading content</h1>';
   }
+}
+
+function isUserLoggedIn() {
+  console.log(
+      'isUserLoggedIn > sessionStorage.getItem(afterLogin): ',
+      sessionStorage.getItem('afterLogin'));
+  return sessionStorage.getItem('afterLogin') === 'true';
 }
 
 // Handle navigation
@@ -321,13 +330,12 @@ function changeLanguage(lang) {
     credentials: 'include',
     body: formData,
   })
-  .then(response => {
-    if (response.ok) {
-      console.log('Language changed:', lang);
-      window.location.reload();
-    } else {
-      console.error('Error changing language:', response.statusText);
-    }
-  })
-  .catch(error => console.error('Fetch error:', error));
+      .then(response => {
+        if (response.ok) {
+          window.location.reload();
+        } else {
+          console.error('Error changing language:', response.statusText);
+        }
+      })
+      .catch(error => console.error('Fetch error:', error));
 }
