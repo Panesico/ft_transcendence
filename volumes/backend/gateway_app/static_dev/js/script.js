@@ -90,6 +90,19 @@ function listenForm(form) {
   });
 }
 
+// function uploadFileNotEmpty() {
+//   var fileUpload = document.getElementById("file-upload");
+//   if (!fileUpload) {
+//     alert("fileUpload is null");
+//     return false;
+//   } else if (!fileUpload.files || fileUpload.files.length === 0) {
+//     alert("No file selected");
+//     return false;
+//   } else {
+//     return true;
+//   }
+// }
+
 function listenFormUpload(form) {
   console.log('form: ', form);
     form.addEventListener('submit', async (e) => {
@@ -136,6 +149,10 @@ function listenFormUpload(form) {
         if (!data?.html?.includes('class="errorlist nonfield')) {
           showMessage(data);
         }
+        // if (uploadFileNotEmpty() == false) {
+        //   alert("No file selected");
+        //   window.location.replace('/edit_profile');
+        // }
 
         handleFormSubmission();
         //loadAdditionalJs(window.location.pathname);
@@ -153,7 +170,12 @@ async function handleFormSubmission() {
   const formUpload = document.getElementById('file-upload')
   const formGeneral = document.getElementById('type-general')
   const formSecurity = document.getElementById('type-security')
+  const formInviteFriend = document.getElementById('inviteFriendModal')
 
+  if (formInviteFriend) {
+    listenFriendInvitation(formInviteFriend);
+    console.log('formInviteFriend: ', formInviteFriend);
+  }
   if (formUpload) {
     listenFormUpload(formUpload);
   }

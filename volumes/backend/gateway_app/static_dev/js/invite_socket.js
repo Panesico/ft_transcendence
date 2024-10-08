@@ -1,19 +1,5 @@
 let inviteFriendSocket; // Make the websocket accessible globally
 
-function notifyKeyPressed() {
-  // console.log('keys:', keys);
-  // Filter out the keys that are pressed
-  const pressedKeys = Object.keys(keys).filter(key => keys[key]);
-  // console.log('pressedKeys:', pressedKeys);
-  gameCalcSocket.send(
-      JSON.stringify({type: 'key_press', keys: pressedKeys}));
-}
-
-function sendMessage(message) {
-  console.log('Sending message to socket: ', message);
-  inviteFriendSocket.send(JSON.stringify({'message': message}));
-}
-
 function onModalOpen() {
   console.log('Modal is open');
 
@@ -23,6 +9,7 @@ function onModalOpen() {
 
   inviteFriendSocket.onopen = function(e) {
     console.log('inviteFriendSocket socket connected');
+    inviteFriendSocket.send(JSON.stringify({'query': 'inviteFriendSocket is connected'}));
   };
 
   inviteFriendSocket.onmessage = function(e) {
@@ -33,7 +20,20 @@ function onModalOpen() {
 
   inviteFriendSocket.onclose = function(e) {
     console.warn('inviteFriendSocket socket closed unexpectedly');
-  };  
+  };
+
+  // Ensure inviteFriendSocket is defined before calling send
+  if (inviteFriendSocket) {
+    console.log('inviteFriendSocket.readyState:', inviteFriendSocket.readyState);
+  }
+  else {
+    console.error('inviteFriendSocket is not defined');
+  }
+// if (inviteFriendSocket && inviteFriendSocket.readyState === WebSocket.OPEN) {
+//   inviteFriendSocket.send(JSON.stringify({'query': 'test'}));
+// } else {
+//   console.error('WebSocket is not open or not defined.');
+// }
 }
 
 function onModalClose()
@@ -44,31 +44,40 @@ function onModalClose()
   } else {
     console.warn('WebSocket is not open or already closed');
   }
+  
+}
+
+function sendMessage(message) {
+  console.log('Sending message to socket: ', message);
+  inviteFriendSocket.send(JSON.stringify({'message': message}));
 }
 
 function listenFriendInvitation(modal) {
-    console.log('inviteFrienModal');
-    let inputField = document.getElementById('username_input');
+  console.log('inviteFrienModal');
+  let inputField = document.getElementById('username_input');
 
-    modal.addEventListener('show.bs.modal', () => {
-      onModalOpen();
-    })
-
-    // Event listen for key press
-    inputField.addEventListener('keyup', (e) => {
-      clearTimeout(timeout);
-      let inputText = e.target.value;
+  modal.addEventListener('show.bs.modal', () => {
+    onModalOpen();
     
-      // Debounce the request (e.g., wait 300ms before sending)
-      timeout = setTimeout(() => {
-        if (socket.readyState === WebSocket.OPEN) {
-          socket.send(JSON.stringify({ query: inputText }));
-        }
-      }, 300);
-    });
+  })
 
-    modal.addEventListener('hidden.bs.modal', () => {
-      onModalClose();
+  // Event listen for key press
+  console.log('inputField.addEventListene:');
 
+  inputField.addEventListener('keyup', (e) => {
+  clearTimeout(timeout);
+  let inputText = e.target.value;
+  
+  console.log('inputText:', inputText);
+  // Debounce the request (e.g., wait 300ms before sending)
+  timeout = setTimeout(() => {
+    if (inviteFriendSocket.readyState === WebSocket.OPEN) {
+      inviteFriendSocket.send(JSON.stringify({ query: inputText }));
+    }}, 300);
   });
+
+  modal.addEventListener('hidden.bs.modal', () => {
+    onModalClose();
+
+});
 }
