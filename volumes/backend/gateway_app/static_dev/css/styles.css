@@ -24,9 +24,31 @@ body {
   background-color: #181a1b;
 }
 
-.scorePlayer1, .scorePlayer2 {
-  font-size: 2.2rem !important;
+/* floating animation*/
+
+.floating {
+  animation-name: spin, floating;
+  animation-duration: 15s;
+  animation-iteration-count: infinite;
 }
+
+@keyframes floating {
+  0% { translate: -25px 25px; }
+  25% { translate: -18px -22px; }
+  50% { translate: 15px -25px; }
+  75% { translate: 22px 18px; }
+  100% { translate: -25px 25px; }
+}
+
+@keyframes spin {
+  0% { rotate: -5deg; }
+  25% { rotate: 7deg; }
+  50% { rotate: -8deg; }
+  75% { rotate: 6deg; }
+  100% { rotate: -5deg; }
+}
+
+/* GAME and TOURNAMENT */
 
 #game-container {
   background-color: #000;

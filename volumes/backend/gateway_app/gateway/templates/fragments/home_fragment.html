@@ -1,45 +1,15 @@
+{% load static %}
 {% load i18n %}
 <div id="home" class="page p-4">
 
-  {% comment %} {% if user.is_authenticated %}
-  <h1>{% trans "Welcome to Pong," %} <span class="text-danger">{{ user.username }}</span>!</h1>
+  {% if user.is_authenticated %}
+  <h1>{% trans "Welcome," %} <span class="text-danger">{{ user.username }}</span>!</h1>
   {% else %}
-  <h1>{% trans "Welcome to Pong" %}</h1>
-  {% endif %} {% endcomment %}
+  <h1>{% trans "Welcome" %}</h1>
+  {% endif %}
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container text-center">
-        <h1>Welcome to Methane Hunters</h1>
-        <p>Exploring the cosmos to tackle the methane challenge.</p>
-    </div>
-  </section>
-  <!-- About Section -->
-  <section class="section" id="about">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <h2 class="display-4">The Methane Crisis</h2>
-                <p class="lead">Cows' methane emissions are a significant global issue, as methane is 25 times more effective than CO₂ at trapping heat, contributing heavily to global warming.</p>
-            </div>
-        </div>
-        <div class="row mt-5">
-            <div class="col-md-6">
-                <img src="static/images/game/cow400.png" alt="Cow in Space" class="img-fluid rounded">
-            </div>
-            <div class="col-md-6">
-                <h3>Our Mission</h3>
-                <p>At <strong>Methane Hunters</strong>, we combine agriculture and space technology, using satellites and solar-powered bioreactors to reduce methane emissions.</p>
-                <p>Join us as we embark on a mission to use technology, space exploration, and renewable energy to solve one of Earth’s biggest environmental challenges.</p>
-            </div>
-        </div>
-    </div>
-  </section>
+  <div class="col-md-6 floating">
+    <img src="{% static 'images/game/cow400.png' %}" alt="{% trans 'Cow in Space' %}" class="img-fluid rounded">
+  </div>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-        <p class="mb-0">&copy; 2024 Methane Hunters. All rights reserved.</p>
-    </div>
-  </footer>
 </div>
