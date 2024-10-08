@@ -63,7 +63,7 @@ function listenForm(form) {
       if (data.status != 'error' && data.message && !data.html) {
         console.log('data.message: ', data.message);
         if (data.message === 'Login successful') {
-          sendMessage('websocket: data received');
+          //sendMessage('websocket: data received');
           sessionStorage.setItem('afterLogin', 'true');
         } else if (data.message === 'Sign up successful') {
           sessionStorage.setItem('afterSignup', 'true');
@@ -223,7 +223,7 @@ async function loadContent(path) {
     } else
       document.querySelector('main').innerHTML = data.html;
 
-    showMessage(data.message);
+    displayMessageInModal(data.message);
     handleFormSubmission();
   } catch (error) {
     console.error('Error loading content:', error);
@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (sessionStorage.getItem('afterLogin') === 'true') {
     let message = 'Login successful';
-    showMessage(message);
+    displayMessageInModal(message);
     sessionStorage.removeItem('afterLogin');
   } else if (sessionStorage.getItem('afterLogout') === 'true') {
     let message = 'Logged out successfully';
