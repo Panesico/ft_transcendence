@@ -10,8 +10,9 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 logger = logging.getLogger(__name__)
 
-@login_required
+# @login_required
 def get_profileapi_variables(request):
+  logger.debug("LOGEADO")
   user_id = request.user.id
   profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
   logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
@@ -38,7 +39,7 @@ def get_profile(request):
 
     # GET profile user's variables
     profile_data = get_profileapi_variables(request=request)
-    
+    logger.debug(f"get_profile > profile_data: {profile_data}")
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_profile XMLHttpRequest")
@@ -59,7 +60,7 @@ def get_edit_profile(request):
     logger.debug(f"get_edit_profile > profile_data: {profile_data}")
 
     form = EditProfileFormFrontend()
-    logger.debug(f"get_edit_profile > form: {form}")
+    # logger.debug(f"get_edit_profile > form: {form}")
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_edit_profile > XMLHttpRequest")
@@ -157,14 +158,16 @@ def post_edit_profile_general(request):
     # Redirection usage
     form = EditProfileFormFrontend()
     profile_data = get_profileapi_variables(request=request)
-  
     if response.ok:
         logger.debug('post_edit_profile_general > Response OK')      
             #construct html to return
-        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
-        user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
+        preferred_language = profile_data.get('preferred_language')
+        logger.debug(f"post_edit_profile > preferred_language: {preferred_language}")
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'preferred_language': preferred_language}, request=request)
+        user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'preferred_language': preferred_language})
         for cookie in response.cookies:
             user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
+        user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
         return user_response
         
     #handle displayName already taken

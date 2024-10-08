@@ -23,7 +23,6 @@ const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
 
 function listenForm(form) {
   // console.log('form: ', form);
-  console.log('form: ', form);
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -58,15 +57,19 @@ function listenForm(form) {
       if (!response.ok && !data.html.includes('class="errorlist nonfield')) {
         throw new Error(`HTTP error - status: ${response.status}`);
       }
-
-      // console.log('data: ', data);
-      if (data.status != 'error' && data.message && !data.html) {
+      console.log('listenForm > data: ', data);
+      console.log('listenForm > data.preferred_language ', data.preferred_language);
+      console.log('listenForm > data.message: ', data.message);
+      console.log('listenForm > data.html: ', data.html);
+      if (data.status != 'error' && data.message && !data.html || data.message === 'Profile updated') {
         console.log('data.message: ', data.message);
         if (data.message === 'Login successful') {
-          //sendMessage('websocket: data received');
+          // sendMessage('websocket: data received');
           sessionStorage.setItem('afterLogin', 'true');
         } else if (data.message === 'Sign up successful') {
           sessionStorage.setItem('afterSignup', 'true');
+        } else if (data.message === 'Profile updated') {
+          sessionStorage.setItem('afterProfileUpdate', 'true');
         }
         window.location.replace('/');
       } else
@@ -231,11 +234,6 @@ async function loadContent(path) {
   }
 }
 
-function isUserLoggedIn() {
-  console.log('isUserLoggedIn > sessionStorage.getItem(afterLogin): ', sessionStorage.getItem('afterLogin'));
-  return sessionStorage.getItem('afterLogin') === 'true';
-}
-
 // Handle navigation
 function navigate(e, path) {
   e.preventDefault();
@@ -262,9 +260,28 @@ window.onload = () => {
   handleFormSubmission();
 };
 
+// async function getProfileData() {
+//   try {
+//     let request = new Request('/profile/', {
+//       headers: {'X-Requested-With': 'XMLHttpRequest'},
+//       credentials: 'include',
+//     });
+
+//     const response = await fetch(request);
+//     if (!response.ok) {
+//       throw new Error(`HTTP error - status: ${response.status}`);
+//     }
+//     const data = await response.json();
+//     console.log('getProfileData > data: ', data);
+//     return data;
+//   } catch (error) {
+//     console.error('Error getting profile data:', error);
+//     return null;
+//   }
+// }
+
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOMContentLoaded');
-
   if (sessionStorage.getItem('afterLogin') === 'true') {
     let message = 'Login successful';
     displayMessageInModal(message);
@@ -277,28 +294,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let message = 'Signup successful';
     displayMessageInModal(message);
     sessionStorage.removeItem('afterSignup');
+  } else if (sessionStorage.getItem('afterProfileUpdate') === 'true') {
+    let message = 'Profile updated';
+    displayMessageInModal(message);
+    sessionStorage.removeItem('afterProfileUpdate');
   }
 });
 
-async function getProfileData() {
-  try {
-    let request = new Request('/profile/', {
-      headers: {'X-Requested-With': 'XMLHttpRequest'},
-      credentials: 'include',
-    });
-
-    const response = await fetch(request);
-    if (!response.ok) {
-      throw new Error(`HTTP error - status: ${response.status}`);
-    }
-    const data = await response.json();
-    console.log('getProfileData > data: ', data);
-    return data;
-  } catch (error) {
-    console.error('Error getting profile data:', error);
-    return null;
-  }
-}
 
 // Display modal after redirect
 
@@ -321,6 +323,7 @@ function changeLanguage(lang) {
   })
   .then(response => {
     if (response.ok) {
+      console.log('Language changed:', lang);
       window.location.reload();
     } else {
       console.error('Error changing language:', response.statusText);

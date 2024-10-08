@@ -29,8 +29,9 @@ def api_login(request):
           if form.is_valid():
               user = form.get_user()
               login(request, user)
+              logger.debug(f'api_login > User.id: {user.id}')
               logger.debug('api_login > User logged in')
-              return JsonResponse({'status': 'success', 'message': _('Login successful')})
+              return JsonResponse({'status': 'success', 'message': _('Login successful'), 'user_id': user.id})
           else:
               logger.debug('api_login > Invalid username or password')
               return JsonResponse({'status': 'error', 'message': _('Invalid username or password')}, status=401)
