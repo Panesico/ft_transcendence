@@ -110,13 +110,8 @@ async function executeCowGame(p1_name, p2_name) {
                 player1.y + player1.height > cow.y
               ) {
                 cow.captured = true;
-                player1.score++;
-                scorePlayer1Element.textContent = player1.score;
-                // Speed boosting
-                player1.speed = 4;
-                setTimeout(() => {
-                    player1.speed = 2;
-                }, 1000);
+                player2.score++;
+                scorePlayer2Element.textContent = player2.score;
               }
               if (
                 player2.x < cow.x + cow.width &&
@@ -125,13 +120,8 @@ async function executeCowGame(p1_name, p2_name) {
                 player2.y + player2.height > cow.y
               ) {
                 cow.captured = true;
-                player2.score++;
-                scorePlayer2Element.textContent = player2.score;
-                // Speed boosting
-                player2.speed = 4;
-                setTimeout(() => {
-                    player2.speed = 2;
-                }, 1000);
+                player1.score++;
+                scorePlayer1Element.textContent = player1.score;
               }
             }
     });
@@ -199,7 +189,7 @@ async function executeCowGame(p1_name, p2_name) {
   function gameLoop(resolve) {
     frameCount++;
     movePlayers();
-    if (frameCount % (2 * 60) === 0) {
+    if (frameCount % (1 * 60) === 0) {
       spawnCows();
     }
     moveCows();
