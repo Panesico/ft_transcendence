@@ -21,7 +21,7 @@ def get_profileapi_variables(request):
     return response.json()
   else:
     logger.debug(f"-------> get_edit_profile > Response: {response.status_code}")
-    return {'avatar': '/media/avatars/default.png',
+    return {'avatar': '/media/avatars/default.png',#Need to be handled better
             'country': 'Spain',
             'city': 'Málaga',
             'display_name': 'MyDisplayName',
@@ -38,6 +38,7 @@ def get_profile(request):
 
     # GET profile user's variables
     profile_data = get_profileapi_variables(request=request)
+    
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_profile XMLHttpRequest")
@@ -51,10 +52,11 @@ def get_edit_profile(request):
     if request.method != 'GET':
         return redirect('405')
     logger.debug("")
-    logger.debug("get_edit_profile")
+    logger.debug("get_edit_profile called")
 
     # GET profile user's variables
     profile_data = get_profileapi_variables(request=request)
+    logger.debug(f"get_edit_profile > profile_data: {profile_data}")
 
     form = EditProfileFormFrontend()
     logger.debug(f"get_edit_profile > form: {form}")

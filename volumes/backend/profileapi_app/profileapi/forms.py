@@ -99,6 +99,9 @@ class EditProfileForm(forms.ModelForm):
         logger.debug(f'city: {city}')
         user_id = cleaned_data.get('user_id')
         logger.debug(f'user_id: {user_id}')
+        preferred_language = cleaned_data.get('preferred_language')
+        logger.debug(f'preferred_language: {preferred_language}')
+  
         try:
           profile = Profile.objects.get(user_id=user_id)
           print('User ID:', profile.user_id)
@@ -108,6 +111,8 @@ class EditProfileForm(forms.ModelForm):
             profile.city = city
           if display_name:
             profile.display_name = display_name
+          if preferred_language:
+             profile.preferred_language = preferred_language
           profile.save()
           logger.debug('forms.py > Profile updated')
         except Profile.DoesNotExist:

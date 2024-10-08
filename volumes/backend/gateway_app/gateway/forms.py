@@ -106,6 +106,17 @@ class EditProfileFormFrontend(forms.Form):
         required=False,
         )
 
+  preferred_language = forms.ChoiceField(
+      choices=[('en', 'English'), ('fr', 'French'), ('es', 'Spanish')],
+      initial='en',
+      label=_('Language'),
+      required=False,
+      widget=forms.Select(attrs={
+            'class': 'form-control',
+            'id': 'editProfilePreferredLanguage'
+        })
+      )
+
   new_password = forms.CharField(
         widget=forms.PasswordInput(attrs={
           'class': 'form-control',

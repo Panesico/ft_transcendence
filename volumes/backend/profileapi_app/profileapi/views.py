@@ -75,6 +75,7 @@ def api_edit_profile(request):
             # Log the current profile data
             logger.debug(f'country: {user_obj.country}')
             logger.debug(f'city: {user_obj.city}')
+            logger.debug(f'preferred_language: {user_obj.preferred_language}')
 
             # Ensure data is passed as a dictionary
             form = EditProfileForm(data, instance=user_obj)
@@ -111,6 +112,7 @@ def get_profile_api(request, user_id):
             'country': user_obj.country,
             'city': user_obj.city,
             'display_name': user_obj.display_name,
+            'preferred_language': user_obj.preferred_language,
         }
         return JsonResponse(data, status=200)
     except Profile.DoesNotExist:

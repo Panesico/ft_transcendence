@@ -2,24 +2,24 @@
 const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
 // const formSocket = new WebSocket('/wss/gamecalc/');
 
-formSocket.onopen = function(e) {
-  console.log('formSocket socket connected');
-};
+// formSocket.onopen = function(e) {
+//   console.log('formSocket socket connected');
+// };
 
-formSocket.onmessage = function(e) {
-  const data = JSON.parse(e.data);
-  const message = data['message'];
-  console.log('Received message from socket: ', message);
-};
+// formSocket.onmessage = function(e) {
+//   const data = JSON.parse(e.data);
+//   const message = data['message'];
+//   console.log('Received message from socket: ', message);
+// };
 
-formSocket.onclose = function(e) {
-  console.error('formSocket socket closed unexpectedly');
-};
+// formSocket.onclose = function(e) {
+//   console.error('formSocket socket closed unexpectedly');
+// };
 
-function sendMessage(message) {
-  console.log('Sending message to socket: ', message);
-  formSocket.send(JSON.stringify({'message': message}));
-}
+// function sendMessage(message) {
+//   console.log('Sending message to socket: ', message);
+//   formSocket.send(JSON.stringify({'message': message}));
+// }
 
 function listenForm(form) {
   // console.log('form: ', form);
@@ -36,7 +36,7 @@ function listenForm(form) {
     formData.forEach((value, key) => {
       jsonObject[key] = value;
     });
-    // console.log('formData: ', formData);
+    console.log('jsonObject: ', jsonObject);
     try {
       // console.log('url: ', url);
       let request = new Request(url, {
@@ -54,7 +54,7 @@ function listenForm(form) {
       const data = await response.json();
 
       console.log('handleFormSubmission > response: ', response);
-
+      
       if (!response.ok && !data.html.includes('class="errorlist nonfield')) {
         throw new Error(`HTTP error - status: ${response.status}`);
       }
@@ -217,19 +217,23 @@ async function loadContent(path) {
       throw new Error(`HTTP error - status: ${response.status}`);
     }
     const data = await response.json();
-    // console.log('data: ', data);
     if (data.message && (data.message === 'Logged out successfully')) {
       sessionStorage.setItem('afterLogout', 'true');
       window.location.replace('/');
     } else
       document.querySelector('main').innerHTML = data.html;
 
-    displayMessageInModal(data.message);
+    showMessage(data.message);
     handleFormSubmission();
   } catch (error) {
     console.error('Error loading content:', error);
     document.querySelector('main').innerHTML = '<h1>Error loading content</h1>';
   }
+}
+
+function isUserLoggedIn() {
+  console.log('isUserLoggedIn > sessionStorage.getItem(afterLogin): ', sessionStorage.getItem('afterLogin'));
+  return sessionStorage.getItem('afterLogin') === 'true';
 }
 
 // Handle navigation
@@ -258,14 +262,12 @@ window.onload = () => {
   handleFormSubmission();
 };
 
-// Display modal after redirect
 document.addEventListener('DOMContentLoaded', () => {
-  // console.log(
-  //     'sessionStorage.getItem(\'afterLogin\'): ',
-  //     sessionStorage.getItem('afterLogin'));
+  console.log('DOMContentLoaded');
+
   if (sessionStorage.getItem('afterLogin') === 'true') {
     let message = 'Login successful';
-    displayMessageInModal(message);
+    showMessage(message);
     sessionStorage.removeItem('afterLogin');
   } else if (sessionStorage.getItem('afterLogout') === 'true') {
     let message = 'Logged out successfully';
@@ -277,6 +279,28 @@ document.addEventListener('DOMContentLoaded', () => {
     sessionStorage.removeItem('afterSignup');
   }
 });
+
+async function getProfileData() {
+  try {
+    let request = new Request('/profile/', {
+      headers: {'X-Requested-With': 'XMLHttpRequest'},
+      credentials: 'include',
+    });
+
+    const response = await fetch(request);
+    if (!response.ok) {
+      throw new Error(`HTTP error - status: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log('getProfileData > data: ', data);
+    return data;
+  } catch (error) {
+    console.error('Error getting profile data:', error);
+    return null;
+  }
+}
+
+// Display modal after redirect
 
 function changeLanguage(lang) {
   console.log('CHANGELANGUAGE > lang: ', lang);

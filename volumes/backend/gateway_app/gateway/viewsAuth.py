@@ -69,6 +69,7 @@ def post_login(request):
     if response.ok:        
         user_response =  JsonResponse({'status': status, 'message': message})
         # Set cookies from the external response if available
+        
         for cookie in response.cookies:
             user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True, secure=True)
         return user_response
