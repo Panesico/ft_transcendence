@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpFormFrontend, LogInFormFrontend
+from .viewsProfile import get_profileapi_variables
 logger = logging.getLogger(__name__)
 
 # Logout
@@ -30,7 +31,7 @@ def view_login(request):
     if request.method == 'GET': 
        return get_login(request)      
     elif request.method == 'POST':
-       return post_login(request)
+       return post_login(request=request)
     else:
       return redirect('405')
 
@@ -66,12 +67,23 @@ def post_login(request):
 
     status = response.json().get("status")
     message = response.json().get("message")
-    if response.ok:        
-        user_response =  JsonResponse({'status': status, 'message': message})
+    user_id = response.json().get("user_id")
+    logger.debug(f"post_login > user_id: {user_id}")
+    if response.ok:
+        logger.debug(f'respoonse.json: {response.json()}')
+        request.user.id = user_id
+        logger.debug(f"post_login > request : {request}")
+        profile_data = get_profileapi_variables(request=request)
+        logger.debug(f"post_login > profile_data: {profile_data}")
+        preferred_language = profile_data.get('preferred_language')
+        logger.debug(f"post_login > preferred_language: {preferred_language}")
+        # extract the language from the profile data  
+        user_response =  JsonResponse({'status': status, 'message': message, 'preferred_language': preferred_language})
         # Set cookies from the external response if available
-        
         for cookie in response.cookies:
             user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True, secure=True)
+        user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
+        
         return user_response
     else:
         logger.debug(f"post_login > Response NOT OK: {response.json()}")
