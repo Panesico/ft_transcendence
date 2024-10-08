@@ -14,10 +14,12 @@ class FormConsumer(AsyncWebsocketConsumer):
     
     async def receive(self, text_data):
         logger.debug('FormConsumer > receive')
-        text_data_json = json.loads(text_data)
-        receivedMessage = text_data_json['message']
-        logger.debug(f'FormConsumer > receive > receivedMessage: {receivedMessage}')
-        messageToSend = "New message from FormConsumer"
-        await self.send(text_data=json.dumps({
-            'message': messageToSend
-        }))
+        query = json.loads(text_data).get('query', '')
+        logger.debug(f'FormConsumer > receive > query: {query}')
+        # matching_usernames = find_matching_usernames(query)
+        # self.send(text_data=json.dumps({
+        #     'suggestions': matching_usernames}))
+        # messageToSend = "New message from FormConsumer"
+        # await self.send(text_data=json.dumps({
+        #     'message': messageToSend
+        # }))

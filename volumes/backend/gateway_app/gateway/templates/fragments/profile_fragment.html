@@ -59,7 +59,7 @@
 		</div>
 		<div class="modal-body">
 				  <form method="post" id="type-invite-friend" action="{% url 'post_invite' %}">
-					  <label for="{{ form.username.id_for_label }}" class="col-form-label">{{ form.username.label }}</label>
+					  <label for="{{ form.username.id_for_label }}" class="col-form-label" id="username_input">{{ form.username.label }}</label>
 					  {% csrf_token %}
 					  {{ form.as_p }}
 					  <div class="modal-footer">
