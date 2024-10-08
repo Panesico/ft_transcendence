@@ -42,6 +42,9 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
   async def disconnect(self, close_code):
     # Handle WebSocket disconnection
     logger.debug("PongCalcConsumer > Client disconnected")
+    # Cancel the game task if it's still running
+    if hasattr(self, 'game_task'):
+        self.game_task.cancel()
 
   async def receive(self, text_data):
     # Handle messages received from the client
@@ -52,7 +55,6 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
     if data['type'] == 'key_press':
       logger.debug("PongCalcConsumer > key press event")
       self.update_pressed_keys(data['keys'])
-      # await self.handle_key_press(data)
 
     if data['type'] == 'game_start':
         await self.start_game()
@@ -65,7 +67,26 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
       'message': 'Game started!',
       "game_state": self.gs,
     }))
-    await self.game_loop()
+    # await self.game_loop()
+    self.game_task = asyncio.create_task(self.game_loop())
+
+  async def game_end(self):
+    logger.debug("PongCalcConsumer > Game ended")
+    winner = "Player 1" if self.gs['scorePlayer1'] > self.gs['scorePlayer2'] else "Player 2"
+
+    # End the game
+    await self.send(text_data=json.dumps({
+      'type': 'game_end',
+      'message': f'Game Over: {winner} wins!',
+      'game_result': {
+          'winner': winner,
+          'scorePlayer1': self.gs['scorePlayer1'],
+          'scorePlayer2': self.gs['scorePlayer2'],
+        }
+    }))
+
+    # Cancel the game loop task
+    self.game_task.cancel()
 
   async def game_loop(self):
       while True:
@@ -98,27 +119,6 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
             }))
           
       await self.game_end()
-
-  async def game_end(self):
-    logger.debug("PongCalcConsumer > Game ended")
-    winner = "Player 1" if self.gs['scorePlayer1'] > self.gs['scorePlayer2'] else "Player 2"
-
-    # End the game
-    await self.send(text_data=json.dumps({
-      'type': 'game_end',
-      'message': 'Game Over: Player wins!',
-      'game_result': {
-          'winner': winner,
-          'scorePlayer1': self.gs['scorePlayer1'],
-          'scorePlayer2': self.gs['scorePlayer2'],
-        }
-    }))
-
-  # async def handle_key_press(self, data):
-  #   # Handle key press events
-  #   keys = data['keys']
-  #   self.pressed_keys = set(keys)
-  #   # player = data['player']
 
   def update_pressed_keys(self, keys):
       # Update the set of pressed keys
