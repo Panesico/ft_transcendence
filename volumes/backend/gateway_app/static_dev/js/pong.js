@@ -58,7 +58,7 @@ async function executePongGame() {
   }
 
   return new Promise((resolve, reject) => {
-    const gameCalcSocket = new WebSocket('/wss/gamecalc/pong/');
+    const gameCalcSocket = new WebSocket('/wss/calcgame/pong/');
 
     // Handle connection open
     gameCalcSocket.onopen = function(event) {
@@ -70,7 +70,6 @@ async function executePongGame() {
     // Handle messages from the server
     gameCalcSocket.onmessage = function(event) {
       const data = JSON.parse(event.data);
-      // console.log('gameCalcSocket.onmessage data:', data);
 
       if (data.type === 'game_start') {
         console.log('Game start received', data);
@@ -84,7 +83,8 @@ async function executePongGame() {
         console.log('Game ended:', data.game_result);
         resolve(data.game_result);
         gameCalcSocket.close();
-      }
+      } else
+        console.log('gameCalcSocket.onmessage data:', data);
     };
 
     // Handle connection errors

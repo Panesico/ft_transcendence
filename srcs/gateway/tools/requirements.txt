@@ -9,5 +9,6 @@ requests==2.32.3
 uvicorn[standard]
 # Channels for WebSockets
 channels==4.1.0
+channels_redis==4.2.0
 # Image processing
 pillow==10.4.0

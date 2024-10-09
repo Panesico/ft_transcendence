@@ -36,8 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-		'gamecalc',
+		'calcgame',
     'channels',
+    'uvicorn',
 ]
 
 # AUTH_USER_MODEL = 'authentif.User'
@@ -52,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'gamecalc.urls'
+ROOT_URLCONF = 'calcgame.urls'
 
 TEMPLATES = [
     {
@@ -70,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'gamecalc.wsgi.application'
+WSGI_APPLICATION = 'calcgame.wsgi.application'
 
 
 # Database
@@ -175,12 +176,20 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('redis', 6379)],
+#         },
+#     },
+# }
 
 
 # SSL - HTTPS - Security
 
 # Defines a set of host/domain names that Django will accept requests from
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'gamecalc']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcgame', 'gateway', 'authentif', 'profileapi', 'play', 'redis']
 
 
 # Redirect all HTTP traffic to HTTPS
@@ -208,5 +217,9 @@ CSRF_TRUSTED_ORIGINS = [
     'https://gateway:8443',
     'https://authentif:9001',
     'https://profileapi:9002',
-    'https://gamecalc:9003',
+    'https://play:9003',
+    'https://calcgame:9004',
     ]
+
+
+ASGI_APPLICATION = 'calcgame.asgi.application'

@@ -1,6 +1,4 @@
-let inviteFriendSocket; // Make the websocket accessible globally
-
-isFocused = false;
+let inviteFriendSocket;  // Make the websocket accessible globally
 
 function onModalOpen(userID) {
   console.log('Modal is open');
@@ -27,38 +25,26 @@ function onModalOpen(userID) {
 
   // Ensure inviteFriendSocket is defined before calling send
   if (inviteFriendSocket) {
-    console.log('inviteFriendSocket.readyState:', inviteFriendSocket.readyState);
-  }
-  else {
+    console.log(
+        'inviteFriendSocket.readyState:', inviteFriendSocket.readyState);
+  } else {
     console.error('inviteFriendSocket is not defined');
   }
-// if (inviteFriendSocket && inviteFriendSocket.readyState === WebSocket.OPEN) {
-//   inviteFriendSocket.send(JSON.stringify({'query': 'test'}));
-// } else {
-//   console.error('WebSocket is not open or not defined.');
-// }
+  // if (inviteFriendSocket && inviteFriendSocket.readyState ===
+  // WebSocket.OPEN) {
+  //   inviteFriendSocket.send(JSON.stringify({'query': 'test'}));
+  // } else {
+  //   console.error('WebSocket is not open or not defined.');
+  // }
 }
 
-function onModalClose()
-{
-  const formInviteFriend = document.getElementById('type-invite-friend');
-
-  // Reset the form
-  if (formInviteFriend) {
-    formInviteFriend.reset();
-    console.log('Invite Friend form has been reset');
-  } else {
-    console.warn('Invite Friend form not found');
-  }
-
-  // Close the WebSocket
+function onModalClose() {
   if (inviteFriendSocket && inviteFriendSocket.readyState === WebSocket.OPEN) {
     inviteFriendSocket.close();
     console.log('Modal is closed and WebSocket is closed');
   } else {
     console.warn('WebSocket is not open or already closed');
   }
-  
 }
 
 function sendMessageInviteSocket(message) {
@@ -82,19 +68,6 @@ function listenFriendInvitation(modal) {
     
   })
 
-  // Listen for focus on the input field
-  modal.addEventListener('focus', () => {
-    isFocused = false;  // Mark input as not focused
-    console.log("Input lost focus");
-  });
-
-  // Listen for blur (when user leaves the input field)
-  modal.addEventListener('blur', () => {
-    isFocused = true;  // Mark input as focused
-    console.log("Input is focused");
-    
-  });
-
   // Event listen for key press
   console.log('inputField.addEventListene:');
   window.addEventListener('keydown', (e) => {
@@ -109,6 +82,5 @@ function listenFriendInvitation(modal) {
 
   modal.addEventListener('hidden.bs.modal', () => {
     onModalClose();
-
-});
+  });
 }
