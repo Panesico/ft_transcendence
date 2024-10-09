@@ -27,19 +27,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(blank=True, default='', unique=True, max_length=16)
     password = models.CharField(max_length=128)
 
-    city = models.CharField(max_length=100, blank=True, default='Málaga')
-    country = models.CharField(max_length=100, blank=True, default='Spain')
-    played_games = models.IntegerField(default=0)
-    wins = models.IntegerField(default=0)
-    defeats = models.IntegerField(default=0)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, default='avatars/default.png')
-    # friends = models.ManyToManyField('self', blank=True, related_name='friends_with')
-    friends = models.ManyToManyField('self', blank=True)
-    # elo = models.IntegerField(default=1000)
-    # wins = models.IntegerField(default=0)
-    # loses = models.IntegerField(default=0)
-    # ties = models.IntegerField(default=0)
-    # token = models.CharField(max_length=128, default='')
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -62,9 +50,3 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self):
         return self.name
 
-
-# If you have a through model, you can define it like this:
-# class Friendship(models.Model):
-#     from_user = models.ForeignKey(User, related_name='from_user', on_delete=models.CASCADE)
-#     to_user = models.ForeignKey(User, related_name='to_user', on_delete=models.CASCADE)
-#     created = models.DateTimeField(auto_now_add=True)

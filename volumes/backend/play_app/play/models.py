@@ -41,8 +41,6 @@ class Game(models.Model):
 
 # Tournament with 4 players, 2 semi-finals, final and winner
 class Tournament(models.Model):
-    logger.debug('class Tournament')
-
     GAME_TYPES = [
         ('pong', 'pong'),
         ('cows', 'cows'),

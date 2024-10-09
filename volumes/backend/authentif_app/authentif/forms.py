@@ -80,7 +80,7 @@ class EditProfileForm(UserChangeForm):
         logger.debug("EditProfileForm > Meta")
         model = User
         logger.debug(f"model: {model}")
-        fields = ('username','city','country', 'avatar')
+        fields = ('username', 'avatar')
         logger.debug(f"fields: {fields}")
 
 
