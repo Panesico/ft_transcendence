@@ -4,6 +4,7 @@ from . import consumerCalcGame
 
 websocket_urlpatterns = [
     path('wss/calcgame/pong/', consumerCalcGame.PongCalcConsumer.as_asgi()),
+    # re_path(r'wss/calcgame/pong/$', consumerCalcGame.PongCalcConsumer.as_asgi()),
 
     path('wss/inviteafriend', FormConsumer.as_asgi()),
     path('wss/inviteafriend/', FormConsumer.as_asgi()),

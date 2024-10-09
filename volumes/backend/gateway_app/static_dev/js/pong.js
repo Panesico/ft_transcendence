@@ -1,4 +1,4 @@
-async function executePongGame() {
+async function executePongGame(p1_name, p2_name) {
   // Get the game container
   const gameContainer = document.querySelector('#game-container');
   const scorePlayer1Element = document.querySelector('.scorePlayer1');
@@ -64,7 +64,8 @@ async function executePongGame() {
     gameCalcSocket.onopen = function(event) {
       console.log('gameCalcSocket WebSocket connection established.');
       // Start the game
-      gameCalcSocket.send(JSON.stringify({type: 'opening_connection'}));
+      gameCalcSocket.send(JSON.stringify(
+          {type: 'opening_connection', p1_name: p1_name, p2_name: p2_name}));
     };
 
     // Handle messages from the server

@@ -1,6 +1,9 @@
-import json, asyncio, logging
+import json, asyncio, logging, random
 from channels.generic.websocket import AsyncWebsocketConsumer 
 logger = logging.getLogger(__name__)
+
+def getRandomInt(min, max):
+  return int((max - min + 1) * random.random() + min)
 
 class PongCalcConsumer(AsyncWebsocketConsumer):
   canvas = {
@@ -13,6 +16,11 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
   paddleHeight = 80
   borderWidth = 15
   paddleSpeed = 10
+
+  frameCount = 0;        # frame count
+  lastContactFrame = 0;  # last frame where ball made contact with paddle
+  pauseFrameCount = 0;   # to avoid repeat pause key press
+  gamePaused = False;
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -50,6 +58,10 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
     data = json.loads(text_data)
     logger.debug(f"PongCalcConsumer > received data: {data}")
     
+    if data['type'] == 'opening_connection':
+       self.p1_name = data['p1_name']
+       self.p2_name = data['p2_name']
+       logger.debug(f"PongCalcConsumer > Opening connection with players: {self.p1_name}, {self.p2_name}")
     if data['type'] == 'key_press':
       # logger.debug("PongCalcConsumer > key press event")
       self.update_pressed_keys(data['keys'])
@@ -71,7 +83,7 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
 
   async def game_end(self):
     logger.debug("PongCalcConsumer > Game ended")
-    winner = "Player 1" if self.gs['scorePlayer1'] > self.gs['scorePlayer2'] else "Player 2"
+    winner = self.p1_name if self.gs['scorePlayer1'] > self.gs['scorePlayer2'] else self.p2_name
 
     # End the game
     await self.send(text_data=json.dumps({
@@ -88,28 +100,23 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
     if hasattr(self, 'game_task'):
       self.game_task.cancel()
 
+
   async def game_loop(self):
       while True:
           # Wait before continuing the loop (in seconds)
           await asyncio.sleep(0.02)
 
           self.update_paddle_pos()
-          
-          self.gs['ballX'] += self.gs['ballSpeedX']
-          self.gs['ballY'] += self.gs['ballSpeedY']
+          self.update_ball_pos()
+          self.check_ball_border_collision()
+          self.check_ball_paddle_collision() # to update
+          if self.check_ball_outofbounds() == True: 
+            logger.debug("PongCalcConsumer > resetting ball position...")
+            self.reset_ball_position()
 
-          # Check if the ball hits the top or bottom wall
-          # logger.debug(f"PongCalcConsumer > ballY: {self.gs['ballY']}, self.canvas['height'] - self.borderWidth: {self.canvas['height'] - self.borderWidth}")
-          if self.gs['ballY'] <= self.borderWidth \
-              or self.gs['ballY'] >= self.canvas['height'] - 2 * self.borderWidth:
-            logger.debug("PongCalcConsumer > Ball hits the top or bottom wall")
-            self.gs['ballSpeedY'] = -self.gs['ballSpeedY']
-          
-          # Check if the ball is out of bounds
-          if self.gs['ballX'] < 0:
-            self.gs['scorePlayer2'] += 1
-          elif self.gs['ballX'] >= self.canvas['width'] - self.ballSize:
-            self.gs['scorePlayer1'] += 1
+          # Break loop and end game if a player reaches the max score
+          if self.gs['scorePlayer1'] >= self.maxScore or self.gs['scorePlayer2'] >= self.maxScore:
+            logger.debug("PongCalcConsumer > Ending game...")
             break
           
           # Send the updated game state to the client
@@ -117,7 +124,7 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
               'type': 'game_update',
               'game_state': self.gs
             }))
-          logger.debug(f"Sending game_update, game_state: {self.gs}")
+          logger.debug(f"Sent game_update, game_state: {self.gs}")
           
       await self.game_end()
 
@@ -141,4 +148,51 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
 
     if '5' in self.pressed_keys and self.gs['rightPaddleY'] < self.canvas['height'] - self.paddleHeight - self.borderWidth:
         self.gs['rightPaddleY'] += self.paddleSpeed
+
+  def update_ball_pos(self):
+    self.gs['ballX'] += self.gs['ballSpeedX']
+    self.gs['ballY'] += self.gs['ballSpeedY']
+  
+  def check_ball_border_collision(self):
+     if self.gs['ballY'] <= self.borderWidth \
+        or self.gs['ballY'] >= self.canvas['height'] - self.ballSize - self.borderWidth:
+      logger.debug("PongCalcConsumer > Ball hits the top or bottom wall")
+      self.gs['ballSpeedY'] = -self.gs['ballSpeedY']
+
+  def check_ball_paddle_collision(self):
+    # Check if the ball hits the left paddle
+    if self.gs['ballX'] <= self.borderWidth + self.paddleWidth \
+        and self.gs['ballY'] >= self.gs['leftPaddleY'] \
+        and self.gs['ballY'] <= self.gs['leftPaddleY'] + self.paddleHeight:
+      logger.debug("PongCalcConsumer > Ball hits the left paddle")
+      self.gs['ballSpeedX'] = -self.gs['ballSpeedX']
+      self.lastContactFrame = self.frameCount
+
+    # Check if the ball hits the right
+    if self.gs['ballX'] >= self.canvas['width'] - self.borderWidth - self.paddleWidth - self.ballSize \
+        and self.gs['ballY'] >= self.gs['rightPaddleY'] \
+        and self.gs['ballY'] <= self.gs['rightPaddleY'] + self.paddleHeight:
+      logger.debug("PongCalcConsumer > Ball hits the right paddle")
+      self.gs['ballSpeedX'] = -self.gs['ballSpeedX']
+      self.lastContactFrame = self.frameCount
+
+  def check_ball_outofbounds(self):
+    # Check if the ball is out of bounds
+    if self.gs['ballX'] < 0:
+      logger.debug("PongCalcConsumer > Ball is out of bounds")
+      self.gs['scorePlayer2'] += 1
+      return True
+    elif self.gs['ballX'] >= self.canvas['width'] - self.ballSize:
+      logger.debug("PongCalcConsumer > Ball is out of bounds")
+      self.gs['scorePlayer1'] += 1
+      return True
+    return False
+  
+  def reset_ball_position(self):
+    logger.debug("PongCalcConsumer > reset_ball_position")
+    self.gs['ballX'] = self.canvas['width'] / 2
+    self.gs['ballY'] = getRandomInt(-125, 125) + self.canvas['height'] / 2
+    self.gs['ballSpeedX'] = -getRandomInt(4, 6) if self.gs['ballSpeedX'] > 0 else getRandomInt(4, 6)
+    self.gs['ballSpeedY'] = -getRandomInt(1, 3) if self.gs['ballSpeedY'] > 0 else getRandomInt(1, 3)
+
 
