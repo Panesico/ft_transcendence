@@ -31,16 +31,6 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
     
   async def connect(self):
     logger.debug("PongCalcConsumer > before accept")
-
-    self.room_name = 'calcgame'
-    self.room_group_name = f'calcgame_{self.room_name}'
-
-    # Join room group
-    await self.channel_layer.group_add(
-        self.room_group_name,
-        self.channel_name
-    )
-
     # Accept the WebSocket connection
     await self.accept()
     logger.debug("PongCalcConsumer > Client connected")
@@ -53,24 +43,15 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
   async def disconnect(self, close_code):
     # Handle WebSocket disconnection
     logger.debug("PongCalcConsumer > Client disconnected")
-
-    # Leave room group
-    await self.channel_layer.group_discard(
-        self.room_group_name,
-        self.channel_name
-    )
-    # Cancel the game task if it's still running
-    if hasattr(self, 'game_task'):
-        self.game_task.cancel()
+    pass
 
   async def receive(self, text_data):
     # Handle messages received from the client
-    logger.debug(f"PongCalcConsumer> message received from client: {text_data}")
     data = json.loads(text_data)
-    logger.debug(f"PongCalcConsumer > data: {data}")
+    logger.debug(f"PongCalcConsumer > received data: {data}")
     
     if data['type'] == 'key_press':
-      logger.debug("PongCalcConsumer > key press event")
+      # logger.debug("PongCalcConsumer > key press event")
       self.update_pressed_keys(data['keys'])
 
     if data['type'] == 'game_start':
@@ -110,7 +91,7 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
   async def game_loop(self):
       while True:
           # Wait before continuing the loop (in seconds)
-          await asyncio.sleep(0.1)
+          await asyncio.sleep(0.02)
 
           self.update_paddle_pos()
           

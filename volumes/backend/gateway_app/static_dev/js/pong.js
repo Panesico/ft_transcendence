@@ -64,7 +64,7 @@ async function executePongGame() {
     gameCalcSocket.onopen = function(event) {
       console.log('gameCalcSocket WebSocket connection established.');
       // Start the game
-      gameCalcSocket.send(JSON.stringify({type: 'game_start'}));
+      gameCalcSocket.send(JSON.stringify({type: 'opening_connection'}));
     };
 
     // Handle messages from the server
@@ -83,6 +83,9 @@ async function executePongGame() {
         console.log('Game ended:', data.game_result);
         resolve(data.game_result);
         gameCalcSocket.close();
+      } else if (data.type === 'connection_established') {
+        // Start the game
+        gameCalcSocket.send(JSON.stringify({type: 'game_start'}));
       } else
         console.log('gameCalcSocket.onmessage data:', data);
     };
