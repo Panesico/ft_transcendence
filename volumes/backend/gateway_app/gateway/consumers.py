@@ -83,8 +83,10 @@ class FormConsumer(AsyncWebsocketConsumer):
       # # Send back suggestions based on the constructed string
       await self.send(text_data=json.dumps({
         'type': 'suggestions',
-        'suggestions': matching_usernames
+        'suggestions': matching_usernames,
+        'message': 'Suggestions sent!'
       }))
+
   
 
 

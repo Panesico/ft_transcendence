@@ -1,5 +1,48 @@
-let inviteFriendSocket;  // Make the websocket accessible globally
+let inviteFriendSocket; // Make the websocket accessible globally
 
+isFocused = false;
+
+function update_dropdown(matching_usernames)
+{
+  const usernameInput = document.getElementById('usernameInput');
+  const dropdown = document.getElementById('suggestions-list');  // The dropdown element (create this in HTML)
+
+  // Clear any previous suggestions
+  dropdown.innerHTML = '';
+
+  if (matching_usernames.length === 0) {
+    //dropdown.classList.remove('show');
+    dropdown.style.display = 'none';
+    return;
+  }
+
+  dropdown.style.display = 'block';
+  matching_usernames.forEach(username => {
+    const suggestionItem = document.createElement('div');
+    suggestionItem.classList.add('suggestion-item');
+    suggestionItem.textContent = username;
+
+    // Click handler to fill the input field with the selected suggestion
+    suggestionItem.addEventListener('click', () => {
+      usernameInput.value = username;
+      dropdown.style.display = 'none';
+    });
+
+    suggestionItem.addEventListener('mouseenter', () => {
+      suggestionItem.classList.add('active'); // Bootstrap class for hover effect
+  });
+    
+    dropdown.appendChild(suggestionItem);
+  });
+
+  // Optionally close the dropdown when clicking outside
+  // document.addEventListener('click', (event) => {
+  //   if (!suggestionsList.contains(event.target) && event.target !== usernameInput) {
+  //       suggestionsList.style.display = 'none';
+  //   }
+  // });
+
+}
 function onModalOpen(userID) {
   console.log('Modal is open');
 
@@ -15,8 +58,14 @@ function onModalOpen(userID) {
   inviteFriendSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
     const message = data['message'];
+    const type = data['type'];
     console.log('Received message from socket: ', message);
     
+    if (type === 'suggestions') {
+      matching_usernames = data['suggestions'];
+      console.log('Matching usernames:', matching_usernames);
+      update_dropdown(matching_usernames);
+    }
   };
 
   inviteFriendSocket.onclose = function(e) {
@@ -25,33 +74,39 @@ function onModalOpen(userID) {
 
   // Ensure inviteFriendSocket is defined before calling send
   if (inviteFriendSocket) {
-    console.log(
-        'inviteFriendSocket.readyState:', inviteFriendSocket.readyState);
-  } else {
+    console.log('inviteFriendSocket.readyState:', inviteFriendSocket.readyState);
+  }
+  else {
     console.error('inviteFriendSocket is not defined');
   }
-  // if (inviteFriendSocket && inviteFriendSocket.readyState ===
-  // WebSocket.OPEN) {
-  //   inviteFriendSocket.send(JSON.stringify({'query': 'test'}));
-  // } else {
-  //   console.error('WebSocket is not open or not defined.');
-  // }
+// if (inviteFriendSocket && inviteFriendSocket.readyState === WebSocket.OPEN) {
+//   inviteFriendSocket.send(JSON.stringify({'query': 'test'}));
+// } else {
+//   console.error('WebSocket is not open or not defined.');
+// }
 }
 
-function onModalClose() {
+function onModalClose()
+{
+  const formInviteFriend = document.getElementById('type-invite-friend');
+
+  // Reset the form
+  if (formInviteFriend) {
+    formInviteFriend.reset();
+    console.log('Invite Friend form has been reset');
+  } else {
+    console.warn('Invite Friend form not found');
+  }
+
+  // Close the WebSocket
   if (inviteFriendSocket && inviteFriendSocket.readyState === WebSocket.OPEN) {
     inviteFriendSocket.close();
     console.log('Modal is closed and WebSocket is closed');
   } else {
     console.warn('WebSocket is not open or already closed');
   }
+  
 }
-
-function sendMessageInviteSocket(message) {
-  console.log('Sending message to socket: ', message);
-  inviteFriendSocket.send(JSON.stringify({'message': message}));
-}
-
 function listenFriendInvitation(modal) {
   console.log('inviteFrienModal');
   let inputField = document.getElementById('username_input');
@@ -68,6 +123,19 @@ function listenFriendInvitation(modal) {
     
   })
 
+  // Listen for focus on the input field
+  modal.addEventListener('focus', () => {
+    isFocused = false;  // Mark input as not focused
+    console.log("Input lost focus");
+  });
+
+  // Listen for blur (when user leaves the input field)
+  modal.addEventListener('blur', () => {
+    isFocused = true;  // Mark input as focused
+    console.log("Input is focused");
+    
+  });
+
   // Event listen for key press
   console.log('inputField.addEventListene:');
   window.addEventListener('keydown', (e) => {
@@ -82,5 +150,6 @@ function listenFriendInvitation(modal) {
 
   modal.addEventListener('hidden.bs.modal', () => {
     onModalClose();
-  });
+
+});
 }

@@ -58,16 +58,28 @@
 		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></button>
 		</div>
 		<div class="modal-body">
-				  <form method="post" id="type-invite-friend" action="{% url 'post_invite' %}">
-            <input type="hidden" id="userID" value="{{ request.user.id }}">
-					  <label for="{{ form.username.id_for_label }}" class="col-form-label" id="username_input">{{ form.username.label }}</label>
-					  {% csrf_token %}
-					  {{ form.as_p }}
-					  <div class="modal-footer">
-							  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Close" %}</button>
-							  <button type="submit" class="btn btn-light" data-bs-dismiss="modal">{% trans "Send invite" %}</button>
-					  </div>
-			  </form>
+      <form method="post" id="type-invite-friend" action="{% url 'post_invite' %}">
+        <label for="{{ form.username.id_for_label }}" class="col-form-label" id="username_input">{{ form.username.label }}</label>
+        
+        <!-- Input field for username -->
+        <input type="text" id="usernameInput" class="form-control" name="username" autocomplete="off" aria-autocomplete="list">
+        
+        <!-- Store the user ID in a hidden input -->
+        <input type="hidden" id="userID" value="{{ request.user.id }}">
+        
+        <!-- Dropdown list for suggestions -->
+        <div id="suggestions-list" class="dropdown" style="display: none;">
+            <!-- Suggestions will be populated here dynamically -->
+        </div>
+    
+        {% csrf_token %}
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Close" %}</button>
+            <button type="submit" class="btn btn-light">{% trans "Send invite" %}</button>
+        </div>
+    </form>
+    
 		</div>
 	  </div>
 	  </div>
