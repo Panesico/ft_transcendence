@@ -36,11 +36,11 @@
 						  <p>{% trans "Defeats" %}</p>
 					  </div>
 				  </div>
-		  <a href="{% url 'edit_profile' %}" class="btn btn-light" role="button" style="margin-right: 10px;">{% trans "Edit my profile" %}</a>
-				  <a href="{% url 'list_friends' %}" class="btn btn-dark" role="button" style="margin-right: 10px;">{% trans "All my friends" %}</a>
-				  <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#inviteFriendModal">
-					  {% trans "Invite a friend" %}
-				  </button>
+					<a href="{% url 'edit_profile' %}" class="btn btn-light" role="button" style="margin-right: 10px;">{% trans "Edit my profile" %}</a>
+					<a href="{% url 'match_history' %}" class="btn btn-light" role="button" style="margin-right: 10px;">{% trans "Statistics" %}</a>
+					<a href="{% url 'list_friends' %}" class="btn btn-dark" role="button" style="margin-right: 10px;">{% trans "All my friends" %}</a>
+					<button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#inviteFriendModal">
+						{% trans "Invite a friend" %} </button>
 			  </div>
 		  </header>
   </section>

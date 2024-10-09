@@ -113,7 +113,10 @@ def get_profile_api(request, user_id):
             'city': user_obj.city,
             'display_name': user_obj.display_name,
             'preferred_language': user_obj.preferred_language,
-        }
+            'played_games': user_obj.played_games,
+            'wins': user_obj.wins,
+            'defeats': user_obj.defeats,
+            }
         return JsonResponse(data, status=200)
     except Profile.DoesNotExist:
         logger.debug('get_profile > User not found')
