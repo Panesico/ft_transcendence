@@ -1,7 +1,5 @@
 import os, json, logging, websockets, ssl, asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(level=logging.DEBUG)
@@ -18,7 +16,7 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
         # Establish the WebSocket connection with the trusted certificate
         self.calcgame_ws = await websockets.connect(
             "wss://calcgame:9004/pongcalc_consumer/",
-            ssl=ssl_context 
+            ssl=ssl_context
         )
 
         # Listener Loop as background task that listens for messages from the calcgame WebSocket and sends those updates to the client. 
