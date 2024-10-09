@@ -14,5 +14,5 @@
 
 
   @BenjaminLarger
-- Invite friend request -> Profile : check if user exist
+- Redirection to edit_profile after update info
 - Delete render in edit profile action
