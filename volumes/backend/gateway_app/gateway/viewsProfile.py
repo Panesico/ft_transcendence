@@ -67,6 +67,30 @@ def get_edit_profile(request):
     return render(request, 'partials/edit_profile.html', {'form': form, 'profile_data': profile_data})
 
 @login_required
+def get_match_history(request):
+    logger.debug("")
+    logger.debug("get_match_history")
+    if request.method != 'GET':
+        return redirect('405')
+    logger.debug("get_match_history")
+    profile_data = get_profileapi_variables(request=request)
+    logger.debug(f"get_match_history > profile_data: {profile_data}")
+    # Calculate win rate
+    total_games = profile_data.get('played_games', 0)
+    total_wins = profile_data.get('wins', 0)
+    win_rate = (total_wins / total_games) * 100 if total_games > 0 else 0
+    profile_data['win_rate'] = round(win_rate, 2)
+    # Calculate total score
+    total_score = total_wins * 50
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        logger.debug("get_match_history > XMLHttpRequest")
+        html = render_to_string('fragments/match_history_fragment.html', {'profile_data': profile_data}, request=request)
+        return JsonResponse({'html': html, 'status': 'success'})
+    return render(request, 'partials/match_history.html', {'profile_data': profile_data})
+
+
+@login_required
 def post_edit_profile_security(request):
     if request.method != 'POST':
         return redirect('405')

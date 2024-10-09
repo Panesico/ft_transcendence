@@ -27,7 +27,8 @@ services:
     container_name: gateway
     environment:
       - PYTHONPATH=/usr/src/app/authentif_app
-    #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
+      # - REDIS_HOST=redis
+      # - REDIS_URL=redis://redis:6379/0
     env_file:
       - .env
     ports:
@@ -62,7 +63,6 @@ services:
         SERVICE_NAME: authentif
     image: authentif
     container_name: authentif
-    #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
     env_file:
       - .env
     expose:
@@ -75,7 +75,6 @@ services:
       - certs:/certs
     depends_on:
       - postgres
-      - redis
     command: uvicorn authentif.asgi:application --host 0.0.0.0 --port 9001 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
   #   restart: unless-stopped
 
@@ -87,7 +86,6 @@ services:
         SERVICE_NAME: profileapi
     image: profileapi
     container_name: profileapi
-    #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
     env_file:
       - .env
     expose:
@@ -101,7 +99,6 @@ services:
     depends_on:
       - postgres
       - authentif
-      - redis
     command: uvicorn profileapi.asgi:application --host 0.0.0.0 --port 9002 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
   play:
@@ -112,7 +109,6 @@ services:
         SERVICE_NAME: play
     image: play
     container_name: play
-    #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
     env_file:
       - .env
     expose:
@@ -125,7 +121,6 @@ services:
       - certs:/certs
     depends_on:
       - postgres
-      - redis
     command: uvicorn play.asgi:application --host 0.0.0.0 --port 9003 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
   calcgame:
@@ -136,11 +131,8 @@ services:
         SERVICE_NAME: calcgame
     image: calcgame
     container_name: calcgame
-    #   - DATABASE_URL=postgres://user:password@postgres:5432/mydb
     env_file:
       - .env
-    environment:
-      - REDIS_HOST=redis
     expose:
       - 9004
     networks:
@@ -152,7 +144,6 @@ services:
     depends_on:
       - postgres
       - authentif
-      - redis
     command: uvicorn calcgame.asgi:application --host 0.0.0.0 --port 9004 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
   postgres:
@@ -176,10 +167,12 @@ services:
   redis:
     image: redis:7.4.1-alpine3.20
     container_name: redis
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     expose:
       - 6379
+    # ports:
+    #   - "6379:6379"
     networks:
       - transcendence
     # restart: unless-stopped
