@@ -10,9 +10,7 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 logger = logging.getLogger(__name__)
 
-# @login_required
 def get_profileapi_variables(request):
-  logger.debug("LOGEADO")
   user_id = request.user.id
   profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
   logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")

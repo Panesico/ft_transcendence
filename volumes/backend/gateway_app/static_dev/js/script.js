@@ -1,5 +1,5 @@
 /* WebSocket */
-const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
+//const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
 // const formSocket = new WebSocket('/wss/gamecalc/');
 
 // formSocket.onopen = function(e) {

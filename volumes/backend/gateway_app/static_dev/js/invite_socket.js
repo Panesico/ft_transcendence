@@ -2,22 +2,23 @@ let inviteFriendSocket; // Make the websocket accessible globally
 
 isFocused = false;
 
-function onModalOpen() {
+function onModalOpen(userID) {
   console.log('Modal is open');
 
   /* WebSocket */
-  inviteFriendSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
+  inviteFriendSocket = new WebSocket('wss://localhost:8443/wss/inviteafriend/');
   // const inviteFriendSocket = new WebSocket('/wss/gamecalc/');
 
   inviteFriendSocket.onopen = function(e) {
     console.log('inviteFriendSocket socket connected');
-    inviteFriendSocket.send(JSON.stringify({type: 'start'}));
+    inviteFriendSocket.send(JSON.stringify({type: 'start', 'userID': userID}));
   };
 
   inviteFriendSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
     const message = data['message'];
     console.log('Received message from socket: ', message);
+    
   };
 
   inviteFriendSocket.onclose = function(e) {
@@ -68,9 +69,16 @@ function sendMessageInviteSocket(message) {
 function listenFriendInvitation(modal) {
   console.log('inviteFrienModal');
   let inputField = document.getElementById('username_input');
+  let userID = document.getElementById('userID').value;
+
+  console.warn('User ID:', userID);
+  if (userID === '' || userID === undefined) {
+    console.error('User ID is not defined');
+    // exit ===> handle error
+  }  
 
   modal.addEventListener('show.bs.modal', () => {
-    onModalOpen();
+    onModalOpen(userID);
     
   })
 
@@ -89,7 +97,6 @@ function listenFriendInvitation(modal) {
 
   // Event listen for key press
   console.log('inputField.addEventListene:');
-
   window.addEventListener('keydown', (e) => {
     // get the key pressed
   if (isFocused)

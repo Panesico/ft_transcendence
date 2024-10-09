@@ -8,7 +8,7 @@ websocket_urlpatterns = [
     path('wss/gamecalc/pong/', consumerGameCalc.PongCalcConsumer.as_asgi()),
     # re_path(r'wss/gamecalc/pong/$', consumerGameCalc.PongCalcConsumer.as_asgi()),
 
-    path('wss/profileapi', FormConsumer.as_asgi()),
-    path('wss/profileapi/', FormConsumer.as_asgi()),
+    path('wss/inviteafriend', FormConsumer.as_asgi()),
+    path('wss/inviteafriend/', FormConsumer.as_asgi()),
     # re_path(r'ws/somepath/$', consumers.YourConsumer.as_asgi()),
 ]

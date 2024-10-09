@@ -11,6 +11,21 @@ from django.utils.translation import gettext as _
 from authentif.models import User
 logger = logging.getLogger(__name__)
 
+def api_get_user_info(request, user_id):
+    logger.debug("api_get_user_info")
+    try:
+        users = User.objects.all()
+        logger.debug(f'api_get_user_info > Users: {users}')
+        user = User.objects.get(id=user_id)
+        if user:
+            username = user.username
+            logger.debug(f'api_get_user_info > User found: {username}')
+            return JsonResponse({'status': 'success', 'message': 'User found', 'username': username, 'usernames': [user.username for user in users]})
+        else:
+            logger.debug('api_get_user_info > User not found')
+            return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
 def api_logout(request):
     logger.debug("api_logout")
     if request.method == 'GET':
