@@ -108,9 +108,7 @@ def post_edit_profile_security(request):
 
     # Recover data from the form
     data = json.loads(request.body)
-    logger.debug(f"post data : {data}")
     data['user_id'] = request.user.id
-    logger.debug(f"data : {data['user_id']}")
     logger.debug(f"post_edit_profile > data: {data}")
 
     # Send and recover response from the profileapi service

@@ -17,6 +17,8 @@ function update_dropdown(matching_usernames)
   }
 
   dropdown.style.display = 'block';
+  dropdown.style.overflow = 'auto';
+  dropdown.style.maxHeight = '200px';
   matching_usernames.forEach(username => {
     const suggestionItem = document.createElement('div');
     suggestionItem.classList.add('suggestion-item');
@@ -28,10 +30,7 @@ function update_dropdown(matching_usernames)
       dropdown.style.display = 'none';
     });
 
-    suggestionItem.addEventListener('mouseenter', () => {
-      suggestionItem.classList.add('active'); // Bootstrap class for hover effect
-  });
-    
+   
     dropdown.appendChild(suggestionItem);
   });
 

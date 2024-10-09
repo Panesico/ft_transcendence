@@ -10,22 +10,60 @@ import logging
 import requests
 logger = logging.getLogger(__name__)
 
+def get_authentif_variables(user_id):
+  profile_api_url = 'https://authentif:9001/api/getUserInfo/' + str(user_id)
+  logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
+  response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+  if response.status_code == 200:
+    return response.json()
+  else:
+    logger.debug(f"-------> get_edit_profile > Response: {response}")
+    return None
+
 def post_invite(request):
+  logger.debug("")
   logger.debug('post_invite')
   if request.method != 'POST':
     return redirect('405')
-  logger.debug('post_invite > POST')
   csrf_token = request.COOKIES.get('csrftoken')
+
+  # Cookies & headers
   headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
     }
-  # logger.debug('post_invite > data: %s', data)
-  # logger.debug('post_invite > Response: %s', response)
-  #status = response.json().get("status")
-  #message = response.json().get("message")
+
+  # Recover data from the form
+  data = json.loads(request.body)
+  data['user_id'] = request.user.id
+  logger.debug(f"post_edit_profile > data: {data}")
+  form = InviteFriendFormFrontend(request.POST)
+
+  # Send and recover response from authentif service
+  user_data = get_authentif_variables(request.user.id)
+  usernames = user_data.get('usernames')
+  logger.debug(f"post_invite > Usernames: {usernames}")
+
+  # Check if username exists
+  if data['username'] not in usernames:
+    status = 'error'
+    message = 'Username does not exist'
+    form.add_error(None, 'Username does not exist')
+    html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
+    user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
+    return user_response
+  else:
+    status = 'success'
+    message = 'Invite request sent'
+    html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
+    user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
+    return user_response
+
+
+
+
   form = InviteFriendFormFrontend(request.POST)
   html = render_to_string('fragments/profile_fragment.html', {}, request=request)
   return render(request, 'partials//profile.html', {'status': 'success', 'form': form})
