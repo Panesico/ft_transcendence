@@ -94,14 +94,31 @@ async function startGame(
 async function playLocalGame() {
   const player1Input = document.getElementById('player1-input');
   const player2Input = document.getElementById('player2-input');
+  let lang = getCookie('django_language');
 
   if (player1Input.value === player2Input.value) {
     document.getElementById('error-div').style.display = 'block'
-    document.querySelector('.errorlist').textContent =
-        'Names must be different';
+    let error = 'Names must be different';
+    if (lang === 'fr')
+      error = 'Les noms doivent être différents';
+    else if (lang === 'es')
+      error = 'Los nombres deben ser diferentes';
+    document.querySelector('.errorlist').textContent = error;
     return;
   }
 
+  if (player1Input.value.length === 0 || player2Input.value.length === 0 ||
+      player1Input.value.trim().length === 0 ||
+      player2Input.value.trim().length === 0) {
+    document.getElementById('error-div').style.display = 'block'
+    let error = 'Name can\'t be empty';
+    if (lang === 'fr')
+      error = 'Le nom ne peut pas être vide';
+    else if (lang === 'es')
+      error = 'El nombre no puede estar vacío';
+    document.querySelector('.errorlist').textContent = error;
+    return;
+  }
 
   let path = window.location.pathname;
   if (path === '/play/') {

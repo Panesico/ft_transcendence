@@ -1,12 +1,13 @@
 import os, json, logging, websockets, ssl, asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.template.loader import render_to_string
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(level=logging.DEBUG)
 
-class PongCalcConsumer(AsyncWebsocketConsumer):
+class ProxyPongCalcLocal(AsyncWebsocketConsumer):
     async def connect(self):
-        logger.debug("GameConsumer > connect")
+        logger.debug("PongCalcLocal > connect")
         await self.accept()
 
         # Create an SSL context that explicitly trusts the calcgame certificate
@@ -15,7 +16,7 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
 
         # Establish the WebSocket connection with the trusted certificate
         self.calcgame_ws = await websockets.connect(
-            "wss://calcgame:9004/pongcalc_consumer/",
+            "wss://calcgame:9004/pongcalc_consumer/local/",
             ssl=ssl_context
         )
 
@@ -23,7 +24,7 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
         self.calcgame_task = asyncio.create_task(self.listen_to_calcgame())
 
     async def disconnect(self, close_code):
-        logger.debug("GameConsumer > disconnect")
+        logger.debug("PongCalcLocal > disconnect")
         # Close the WebSocket connection to the calcgame service
         if self.calcgame_ws:
             await self.calcgame_ws.close()
@@ -33,7 +34,7 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
             self.calcgame_task.cancel()
 
     async def receive(self, text_data):
-        logger.debug("GameConsumer > receive from client")
+        logger.debug("PongCalcLocal > receive from client")
         # Forward the message from the client to the calcgame WebSocket server
         await self.calcgame_ws.send(text_data)
 
@@ -43,11 +44,11 @@ class PongCalcConsumer(AsyncWebsocketConsumer):
                 # Continuously receive messages from calcgame
                 calcgame_response = await self.calcgame_ws.recv()
 
-                logger.debug("GameConsumer > received from calcgame, forwarding to client")
+                logger.debug("PongCalcLocal > received from calcgame, forwarding to client")
                 # Send the received message back to the client
                 await self.send(calcgame_response)
 
         except websockets.exceptions.ConnectionClosed:
-            logger.debug("GameConsumer > calcgame connection closed")
+            logger.debug("PongCalcLocal > calcgame connection closed")
             pass
 

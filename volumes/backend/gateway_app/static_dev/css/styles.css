@@ -24,7 +24,9 @@ body {
   background-color: #181a1b;
 }
 
-/* floating animation*/
+/**************************/
+/*** Floating animation ***/
+/**************************/
 
 .floating {
   animation-name: spin, floating;
@@ -48,7 +50,9 @@ body {
   100% { rotate: -5deg; }
 }
 
-/* GAME and TOURNAMENT */
+/***************************/
+/*** GAME and TOURNAMENT ***/
+/***************************/
 
 #game-container {
   background-color: #000;
@@ -62,6 +66,89 @@ body {
   border: solid 4px #d3d3d3;
   height: 80px;
 }
+
+
+/**************************/
+/***      KOW-PONG      ***/
+/**************************/
+
+.kow-pong-container {
+  position: relative;
+  width: 600px;
+  height: 400px;
+  margin: 50px auto;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.paddle {
+  position: absolute;
+  width: 20px;
+  height: 100px;
+  top: 0;
+  background-color: #d3d3d3;
+}
+.left-paddle {
+  left: 40px;
+  animation: moveLeftPaddle 5s linear infinite;
+}
+.right-paddle {
+  right: 40px;
+  animation: moveRightPaddle 5s linear infinite;
+}
+
+.kow-ball {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  animation: moveKowBall 5s linear infinite;
+}
+
+@keyframes moveLeftPaddle {
+  0% { top: 5%; }
+  25% { top: 5%; }
+  50% { top: calc(95% - 100px); }
+  75% { top: calc(95% - 100px); }
+  100% { top: 5%; }
+}
+@keyframes moveRightPaddle {
+  0% { top: calc(50% - 100px); }
+  25% { top: calc(70% - 100px); }
+  50% { top: calc(70% - 100px); }
+  75% { top: calc(50% - 100px); }
+  100% { top: calc(50% - 100px); }
+}
+
+@keyframes moveKowBall {
+  0% {
+    left: 40px;
+    top: 0;
+    rotate: -90deg;
+  }
+  25% {
+    left: calc(100% - 120px);
+    top: calc(70% - 80px);
+    rotate: 360deg;
+  }
+  50% {
+    left: 40px;
+    top: calc(90% - 80px);
+    rotate: -360deg;
+  }
+  75% {
+    left: calc(100% - 120px);
+    top: calc(50% - 80px);
+    rotate: -0deg;
+  }
+  100% {
+    left: 40px;
+    top: 0;
+    rotate: -90deg;
+  }
+}
+
+
+
 
 /* Custom styles for the Bootstrap modal */
 #inviteModal .profile-modal-content {
