@@ -121,7 +121,7 @@ body {
 
 @keyframes moveKowBall {
   0% {
-    left: 40px;
+    left: 60px;
     top: 0;
     rotate: -90deg;
   }
@@ -131,7 +131,7 @@ body {
     rotate: 360deg;
   }
   50% {
-    left: 40px;
+    left: 60px;
     top: calc(90% - 80px);
     rotate: -360deg;
   }
@@ -141,7 +141,7 @@ body {
     rotate: -0deg;
   }
   100% {
-    left: 40px;
+    left: 60px;
     top: 0;
     rotate: -90deg;
   }
