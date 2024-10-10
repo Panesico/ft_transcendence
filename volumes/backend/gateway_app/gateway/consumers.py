@@ -1,29 +1,7 @@
 import json, asyncio, logging, requests, os
-from channels.generic.websocket import AsyncWebsocketConsumer 
+from channels.generic.websocket import AsyncWebsocketConsumer
+from .handle_invite import get_authentif_variables, find_matching_usernames, is_valid_key
 logger = logging.getLogger(__name__)
-
-def get_authentif_variables(user_id):
-  profile_api_url = 'https://authentif:9001/api/getUserInfo/' + str(user_id)
-  logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
-  response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
-  if response.status_code == 200:
-    return response.json()
-  else:
-    logger.debug(f"-------> get_edit_profile > Response: {response}")
-    return None
-
-def find_matching_usernames(usernames, user_input):
-  # Perform a case-insensitive search for usernames containing the user input
-  matching_usernames = [username for username in usernames if user_input in username]
-  logger.debug(f'FormConsumer > matching_usernames: {matching_usernames}')
-
-  # Convert the QuerySet to a list and return it
-  return matching_usernames
-
-def is_valid_key(key):
-    # List of keys to ignore
-    ignored_keys = {'Shift', 'Ctrl', 'Alt', 'Meta', 'CapsLock', 'Tab', 'Enter', 'Backspace', 'Escape'}
-    return key not in ignored_keys
 
 class FormConsumer(AsyncWebsocketConsumer):
 
@@ -45,14 +23,6 @@ class FormConsumer(AsyncWebsocketConsumer):
       logger.debug('FormConsumer > disconnect')
       pass
     
-  # def find_matching_usernames(self, user_input):
-  #     # Perform a case-insensitive search for usernames containing the user input
-  #     matching_usernames = User.objects.filter(username__icontains=user_input).values_list('username', flat=True)
-  #     logger.debug(f'FormConsumer > matching_usernames: {matching_usernames}')
-
-  #     # Convert the QuerySet to a list and return it
-  #     return list(matching_usernames)
-
   async def receive(self, text_data):
       # Handle messages received from the client
       logger.debug(f"FormConsumer > message received from client: {text_data}")
@@ -90,8 +60,3 @@ class FormConsumer(AsyncWebsocketConsumer):
   
 
 
-
-  # def update_pressed_keys(self, keys):
-  #     logger.debug('FormConsumer > update_pressed_keys')
-  #     self.pressed_keys += keys
-  #     logger.debug(f'FormConsumer > self.pressed_keys: {self.pressed_keys}')

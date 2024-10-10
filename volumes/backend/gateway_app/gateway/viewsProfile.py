@@ -44,14 +44,13 @@ def get_profile(request):
         html = render_to_string('fragments/profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
         return JsonResponse({'html': html, 'status': 'success'})
     return render(request, 'partials/profile.html', {'form': form, 'profile_data': profile_data})
-    #return render(request, 'partials/my_template.html', {'my_avatar': my_avatar})
 
 @login_required
 def get_edit_profile(request):
-    if request.method != 'GET':
-        return redirect('405')
     logger.debug("")
     logger.debug("get_edit_profile called")
+    if request.method != 'GET':
+        return redirect('405')
 
     # GET profile user's variables
     profile_data = get_profileapi_variables(request=request)
@@ -109,6 +108,7 @@ def post_edit_profile_security(request):
     # Recover data from the form
     data = json.loads(request.body)
     data['user_id'] = request.user.id
+    logger.debug(f"data : {data['user_id']}")
     logger.debug(f"post_edit_profile > data: {data}")
 
     # Send and recover response from the profileapi service

@@ -17,8 +17,10 @@ function update_dropdown(matching_usernames)
   }
 
   dropdown.style.display = 'block';
-  dropdown.style.overflow = 'auto';
+  dropdown.style.overflowY = 'auto';
+  dropdown.style.overflowX = 'hidden';
   dropdown.style.maxHeight = '200px';
+  dropdown.style.border = '4px solid #fff';
   matching_usernames.forEach(username => {
     const suggestionItem = document.createElement('div');
     suggestionItem.classList.add('suggestion-item');

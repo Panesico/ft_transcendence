@@ -15,4 +15,5 @@
 
   @BenjaminLarger
 - Redirection to edit_profile after update info
-- Delete render in edit profile action
+- send friend request
+- windows.on_reload() => create websocket when a user is connected
