@@ -1,28 +1,3 @@
-// pong.js
-
-// const gameCalcSocket = new
-// WebSocket('wss://localhost:8443/wss/calcgame/pong/');
-// // const gameCalcSocket = new WebSocket('/wss/calcgame/pong/');
-
-// gameCalcSocket.onopen = function(e) {
-//   console.log('GameCalc socket connected');
-// };
-
-// gameCalcSocket.onmessage = function(e) {
-//   const data = JSON.parse(e.data);
-//   const message = data['message'];
-//   console.log('Received message from socket: ', message);
-// };
-
-// gameCalcSocket.onclose = function(e) {
-//   console.error('GameCalc socket closed unexpectedly');
-// };
-
-// function sendMessage(message) {
-//   console.log('Sending message to socket: ', message);
-//   gameCalcSocket.send(JSON.stringify({'message': message}));
-// }
-
 async function executePongGame(p1_name, p2_name) {
   // Get the game container
   const gameContainer = document.querySelector('#game-container');

@@ -91,11 +91,13 @@ async function startGame(
       game_result);
 }
 
+// User clicked on play game (2 players, local)
 async function playLocalGame() {
   const player1Input = document.getElementById('player1-input');
   const player2Input = document.getElementById('player2-input');
   let lang = getCookie('django_language');
 
+  // Check if the names are different
   if (player1Input.value === player2Input.value) {
     document.getElementById('error-div').style.display = 'block'
     let error = 'Names must be different';
@@ -106,7 +108,7 @@ async function playLocalGame() {
     document.querySelector('.errorlist').textContent = error;
     return;
   }
-
+  // Check if the names are empty
   if (player1Input.value.length === 0 || player2Input.value.length === 0 ||
       player1Input.value.trim().length === 0 ||
       player2Input.value.trim().length === 0) {
@@ -120,20 +122,21 @@ async function playLocalGame() {
     return;
   }
 
-  let path = window.location.pathname;
-  if (path === '/play/') {
-    url = 'game/';
-  } else if (path === '/play') {
-    url = path + '/game/';
-  }
-
-  const jsonData = {
-    'p1_name': player1Input.value,
-    'p2_name': player2Input.value,
-    'game_type': document.querySelector('input[name="chosenGame"]:checked').id
-  };
-
+  // POST request to https://localhost:8443/play/game/ to load game in game_type
   try {
+    let path = window.location.pathname;
+    if (path === '/play/') {
+      url = 'game/';
+    } else if (path === '/play') {
+      url = path + '/game/';
+    }
+
+    const jsonData = {
+      'p1_name': player1Input.value,
+      'p2_name': player2Input.value,
+      'game_type': document.querySelector('input[name="chosenGame"]:checked').id
+    };
+
     // console.log('url: ', url);
     let request = new Request(url, {
       method: 'POST',

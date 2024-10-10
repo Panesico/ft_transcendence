@@ -23,6 +23,18 @@ async function executePongGame(p1_name, p2_name) {
   const keys =
       {w: false, s: false, 8: false, 5: false, ' ': false, Escape: false};
 
+
+  function showCountdown(gameState, count) {
+    scorePlayer1Element.textContent = gameState.scorePlayer1;
+    scorePlayer2Element.textContent = gameState.scorePlayer2;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '60px PixeloidSans';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(count, canvas.width / 2, canvas.height / 2);
+  }
+
   // Render the game state on the canvas
   function renderGame(gameState) {
     scorePlayer1Element.textContent = gameState.scorePlayer1;
@@ -70,21 +82,22 @@ async function executePongGame(p1_name, p2_name) {
     gameCalcSocket.onmessage = function(e) {
       const data = JSON.parse(e.data);
 
-      if (data.type === 'game_start') {
+      if (data.type === 'connection_established') {
+        // Start the game
+        gameCalcSocket.send(JSON.stringify({type: 'game_start'}));
+
+      } else if (data.type === 'game_start') {
         console.log('Game start received', data);
-        renderGame(data.game_state);
+        showCountdown(data.game_state, data.countdown);
 
       } else if (data.type === 'game_update') {
-        console.log('Game update received:', data);
+        // console.log('Game update received:', data);
         renderGame(data.game_state);
 
       } else if (data.type === 'game_end') {
         console.log('Game ended:', data.game_result);
         resolve(data.game_result);
         gameCalcSocket.close();
-      } else if (data.type === 'connection_established') {
-        // Start the game
-        gameCalcSocket.send(JSON.stringify({type: 'game_start'}));
       } else
         console.log('gameCalcSocket.onmessage data:', data);
     };
@@ -207,7 +220,7 @@ async function executeRemotePongGame(p1_name) {
         renderGame(data.game_state);
 
       } else if (data.type === 'game_update') {
-        console.log('Game update received:', data);
+        // console.log('Game update received:', data);
         renderGame(data.game_state);
 
       } else if (data.type === 'game_end') {

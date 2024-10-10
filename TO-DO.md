@@ -1,5 +1,9 @@
+Auth:
 - Prevent log-in and sign-up if already logged in
 - Add password validator, or make AUTH_PASSWORD_VALIDATORS work
+
+Remote game:
+- user shouldn't be able to play against themselves through two remote games
 
 @iisaacc
 -	Minor module: Show in more languages (3 minimum).

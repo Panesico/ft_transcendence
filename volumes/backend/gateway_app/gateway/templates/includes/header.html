@@ -38,34 +38,34 @@
           </li>
         {% endif %}
 
-        {% comment %} {% if user.is_authenticated %} {% endcomment %}
-        <li class="nav-item dropdown d-flex align-items-center">
-          <p class="nav-link dropdown-toggle m-0" id="navbarDropdownUser"
-            role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            {% if user.is_authenticated and user.avatar and user.avatar.url %}
-            <img src="{{ user.avatar.url }}" alt="{{ user.username }}"
-              style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
-            {% else %}
-            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="{% trans "default icon" %}"
-              style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
-            {% endif %}
-          </p>
-          <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownUser">
-            <li>
-              <a class="dropdown-item bg-dark text-light" href="{% url 'profile' %}" onclick="navigate(event, '/profile')">{% trans "Profile" %}</a>
-            </li>
-            <li>
-              <a class="dropdown-item bg-dark text-light" href="#">{% trans "Settings" %}</a>
-            </li>
-            <li><a class="dropdown-item bg-dark text-light" href="#">{% trans "Stats" %}</a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li><a class="dropdown-item bg-dark text-light" href="{% url 'logout' %}" onclick="navigate(event, '/logout')">{% trans "Logout" %}</a></li> 
-          </ul>
-        </li>
-        {% comment %} {% endif %} {% endcomment %}
+        {% if user.is_authenticated %}
+          <li class="nav-item dropdown d-flex align-items-center">
+            <p class="nav-link dropdown-toggle m-0" id="navbarDropdownUser"
+              role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {% if user.is_authenticated and user.avatar and user.avatar.url %}
+              <img src="{{ user.avatar.url }}" alt="{{ user.username }}"
+                style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
+              {% else %}
+              <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="{% trans "default icon" %}"
+                style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
+              {% endif %}
+            </p>
+            <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownUser">
+              <li>
+                <a class="dropdown-item bg-dark text-light" href="{% url 'profile' %}" onclick="navigate(event, '/profile')">{% trans "Profile" %}</a>
+              </li>
+              <li>
+                <a class="dropdown-item bg-dark text-light" href="#">{% trans "Settings" %}</a>
+              </li>
+              <li><a class="dropdown-item bg-dark text-light" href="#">{% trans "Stats" %}</a>
+              </li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item bg-dark text-light" href="{% url 'logout' %}" onclick="navigate(event, '/logout')">{% trans "Logout" %}</a></li> 
+            </ul>
+          </li>
+        {% endif %}
 
         <!-- Dropdown to change the language -->
         <li class="nav-item dropdown d-flex align-items-center">
