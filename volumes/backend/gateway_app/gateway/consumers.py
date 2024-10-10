@@ -1,6 +1,6 @@
 import json, asyncio, logging, requests, os
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .handle_invite import get_authentif_variables, find_matching_usernames, is_valid_key
+from .handleInvite import get_authentif_variables, find_matching_usernames, is_valid_key
 logger = logging.getLogger(__name__)
 
 class FormConsumer(AsyncWebsocketConsumer):

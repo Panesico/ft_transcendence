@@ -99,7 +99,7 @@ window.onpopstate = () => {
 
 // Initialise the correct content on page load
 window.onload = () => {
-  // console.log('onload');
+   console.log('onload');
   // loadContent(window.location.pathname);
   handleFormSubmission();
 };

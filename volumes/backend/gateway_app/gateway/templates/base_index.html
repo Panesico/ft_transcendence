@@ -42,7 +42,9 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
     
-    
+  <!-- Store the user ID in a hidden input -->
+  <input type="hidden" id="userID" value="{{ request.user.id }}">
+      
   <!-- Custom JS -->
   <script src="{% static 'js/script.js' %}"></script>
   <script src="{% static 'js/utils.js' %}"></script>

@@ -1,21 +1,26 @@
 let mainRoomSocket;
 
 window.onload = () => {
+  // Handle form submission
+  handleFormSubmission();
+
   // Get the User ID
-  // const userID = document.getElementById('userID').value;
-  const userID = 1;
-  // if (userID === '' || userID === undefined) {
-  //   console.error('User ID is not defined');
-  //   return;
+  const userID = document.getElementById('userID').value;
+  //const userID = 1;
+  if (userID === '' || userID === undefined || userID === null) {
+    return;
+  }
 
   // Establish connection to the main room
-  mainRoomSocket = new WebSocket(`wss://localhost:8443/wss/mainroom/`);
+  main_room_socketPath = 'wss://localhost:8443/wss/mainroom/' + userID;
+  console.log('main_room_socketPath:', main_room_socketPath);
+  mainRoomSocket = new WebSocket(`wss://localhost:8443/wss/mainroom/${userID}/`);
   console.log('mainRoomSocket.readyState:', mainRoomSocket.readyState);
 
   // On websocket open
   mainRoomSocket.onopen = function(e) {
     console.log('mainRoomSocket opened');
-    mainRoomSocket.send(JSON.stringify({'message': 'main socket opened', 'userID': userID}));
+    mainRoomSocket.send(JSON.stringify({'type': 'message', 'message': 'main socket opened',}));
   };
 
   // On websocket message
@@ -34,6 +39,14 @@ window.onload = () => {
     console.warn('mainRoomSocket socket closed unexpectedly');
   };
 }
+
+// Close the main room socket when the window is closed
+window.onbeforeunload = () => {
+  if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
+    mainRoomSocket.close();
+  }
+}
+
 
 // Close the main room socket when the window is closed
 window.onbeforeunload = () => {

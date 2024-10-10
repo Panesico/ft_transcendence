@@ -3,12 +3,12 @@ logger = logging.getLogger(__name__)
 
 def get_authentif_variables(user_id):
   profile_api_url = 'https://authentif:9001/api/getUserInfo/' + str(user_id)
-  logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
+  logger.debug(f"get_authentif_variables > profile_api_url: {profile_api_url}")
   response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
   if response.status_code == 200:
     return response.json()
   else:
-    logger.debug(f"-------> get_edit_profile > Response: {response}")
+    logger.debug(f"-------> get_authentif_variables > Response: {response}")
     return None
 
 def find_matching_usernames(usernames, user_input):

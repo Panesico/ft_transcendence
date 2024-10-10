@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def get_profileapi_variables(request):
   user_id = request.user.id
   profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id)
-  logger.debug(f"get_edit_profile > profile_api_url: {profile_api_url}")
+  logger.debug(f"get_profileapi_variables > profile_api_url: {profile_api_url}")
   response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
   if response.status_code == 200:
     logger.debug(f"-------> get_edit_profile > Response: {response.json()}")

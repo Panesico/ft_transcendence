@@ -48,7 +48,8 @@ function onModalOpen(userID) {
   console.log('Modal is open');
 
   /* WebSocket */
-  inviteFriendSocket = new WebSocket('wss://localhost:8443/wss/inviteafriend/');
+  WebSocketPath = window.location.protocol = 'wss://localhost:8443/wss/inviteafriend/' + userID;
+  inviteFriendSocket = new WebSocket(WebSocketPath);
   // const inviteFriendSocket = new WebSocket('/wss/gamecalc/');
 
   inviteFriendSocket.onopen = function(e) {
@@ -154,3 +155,4 @@ function listenFriendInvitation(modal) {
 
 });
 }
+
