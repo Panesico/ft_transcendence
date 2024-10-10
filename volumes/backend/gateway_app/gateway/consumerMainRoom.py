@@ -1,6 +1,6 @@
 import json, asyncio, logging, requests, os
 from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
-#from .handleMainRoom import 
+from .handleMainRoom import readMessage
 logger = logging.getLogger(__name__)
 
 #----------------- MAIN ROOM -----------------#
@@ -35,7 +35,7 @@ class mainRoom(AsyncJsonWebsocketConsumer):
   async def disconnect(self, close_code):
     # Remove user from users_connected
     if self.user_id in users_connected:
-      users_connected.remove(self.user_id)
+      del users_connected[self.user_id]
       # Broadcast message to room group
       for user, connection in users_connected.items():
         await connection.send_json({
@@ -53,16 +53,9 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     # Receive message from room group
     typeMessage = content.get('type', '')
     if typeMessage == 'message':
-      message = content.get('message', '')
-      logger.debug(f'mainRoom > message: {message}')
-      # Broadcast message to room group
-      await self.channel_layer.group_send(
-        self.room_group_name,
-        {
-          'type': 'chat_message',
-          'message': message
-        }
-      )
+      readMessage(content.get('message', ''))
+
+      
 
 
 

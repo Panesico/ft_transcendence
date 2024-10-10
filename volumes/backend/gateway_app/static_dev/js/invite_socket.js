@@ -48,8 +48,7 @@ function onModalOpen(userID) {
   console.log('Modal is open');
 
   /* WebSocket */
-  WebSocketPath = window.location.protocol = 'wss://localhost:8443/wss/inviteafriend/' + userID;
-  inviteFriendSocket = new WebSocket(WebSocketPath);
+  inviteFriendSocket = new WebSocket('wss://localhost:8443/wss/inviteafriend/');
   // const inviteFriendSocket = new WebSocket('/wss/gamecalc/');
 
   inviteFriendSocket.onopen = function(e) {

@@ -56,7 +56,7 @@ def post_invite(request):
     return user_response
   else:
     status = 'success'
-    message = 'Invite request sent'
+    message = 'Username does exist'
     html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
     user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
     return user_response
