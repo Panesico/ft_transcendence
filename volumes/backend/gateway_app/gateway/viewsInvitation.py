@@ -36,15 +36,17 @@ def post_invite(request):
     }
 
   # Recover data from the form
-  data = json.loads(request.body)
+#  data = json.loads(request.body)
+  data = request.POST.dict()
   data['user_id'] = request.user.id
   logger.debug(f"post_edit_profile > data: {data}")
   form = InviteFriendFormFrontend(request.POST)
 
   # Send and recover response from authentif service
   user_data = get_authentif_variables(request.user.id)
+  logger.debug(f"post_invite > User data: {user_data}")
   usernames = user_data.get('usernames')
-  logger.debug(f"post_invite > Usernames: {usernames}")
+  users_id = user_data.get('users_id')
 
   # Check if username exists
   if data['username'] not in usernames:
@@ -56,9 +58,11 @@ def post_invite(request):
     return user_response
   else:
     status = 'success'
-    message = 'Username does exist'
+    message = 'Invitation sent!'
     html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
-    user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
+    user_id = users_id[usernames.index(data['username'])]
+    logger.debug(f"post_invite > user_id: {user_id}")
+    user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'username': data['username'], 'user_id': user_id}) 
     return user_response
 
 

@@ -1,5 +1,3 @@
-
-
 function listenForm(form) {
 	// console.log('form: ', form);
 	form.addEventListener('submit', async (e) => {
@@ -120,13 +118,7 @@ function listenFormUpload(form) {
 	  if (!data?.html?.includes('class="errorlist nonfield')) {
 		displayMessageInModal(data);
 	  }
-	  // if (uploadFileNotEmpty() == false) {
-	  //   alert("No file selected");
-	  //   window.location.replace('/edit_profile');
-	  // }
-
 	  handleFormSubmission();
-	  // loadAdditionalJs(window.location.pathname);
 
 	} catch (error) {
 	  console.error('Form submission error:', error);
@@ -143,12 +135,13 @@ async function handleFormSubmission() {
 	const formInviteFriend = document.getElementById('inviteFriendModal')
   
 	if (formInviteFriend) {
-	  listenFriendInvitation(formInviteFriend);
-	  console.log('formInviteFriend: ', formInviteFriend);
+	  listenFriendInvitation(formInviteFriend, form);
+	  console.log('form: ', form);
 	}
-	if (formUpload) {
+	else if (formUpload) {
 	  listenFormUpload(formUpload);
-	} else if (form) {
+	}
+  else if (form) {
 	  console.log('form: ', form);
 	  listenForm(form);
 	}
@@ -163,4 +156,3 @@ async function handleFormSubmission() {
 	  listenForm(formSecurity);
 	}
   }
-  

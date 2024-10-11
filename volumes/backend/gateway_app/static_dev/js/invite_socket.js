@@ -2,6 +2,74 @@ let inviteFriendSocket; // Make the websocket accessible globally
 
 isFocused = false;
 
+function listenSubmit(form) {
+  console.log('form: ', form);
+  form.addEventListener('submit', async (e) => {
+	e.preventDefault();
+	// console.log('Form submitted', e);
+	const formData = new FormData(form);
+	let url = form.action;
+
+	try {
+	  // Create a new request for file upload
+	  let request = new Request(url, {
+		method: 'POST',
+		headers: {
+		  'X-Requested-With': 'XMLHttpRequest',  // To identify as AJAX request
+		  'X-CSRFToken': getCookie('csrftoken')  // If CSRF token is required
+		},
+		credentials: 'include',  // Include cookies (if necessary)
+		body: formData           // FormData handles the file and other fields
+								 // automatically
+	  });
+
+	  // Send the request and wait a response
+	  const response = await fetch(request);
+	  const data = await response.json();
+
+	  console.log('handleFormSubmission > response: ', response);
+
+	  if (!response.ok && response.status == 400) {
+		// window.location.replace('/edit_profile');
+		// displayMessageInModal('No file selected');
+	  }
+
+	  else if (!response.ok) {
+		console.error('HTTP error - status:', response.status);
+		throw new Error(`HTTP error - status: ${response.status}`);
+	  }
+
+	  // // Handle the response data
+	  // if (data.status != 'error' && data.message) {
+		// console.log('data.message: ', data.message);
+		// window.location.replace('/');
+	  // } else
+		// document.querySelector('main').innerHTML = data.html;
+	  if (!data?.html?.includes('class="errorlist nonfield')) {
+	  	displayMessageInModal(data.message);
+      if (data.message === 'Invitation sent!') {
+        console.warn('Send invitation to ', data.username);
+        // send invitation to the user
+        sendFriendRequest(data.username, data.user_id);
+      }
+
+	  }
+	  // if (uploadFileNotEmpty() == false) {
+	  //   alert("No file selected");
+	  //   window.location.replace('/edit_profile');
+	  // }
+
+	  handleFormSubmission();
+	  // loadAdditionalJs(window.location.pathname);
+
+	} catch (error) {
+	  console.error('Form submission error:', error);
+	  document.querySelector('main').innerHTML =
+		  '<h1>Form submission error</h1>';
+	}
+  });
+}
+
 function update_dropdown(matching_usernames)
 {
   const usernameInput = document.getElementById('usernameInput');
@@ -87,7 +155,7 @@ function onModalOpen(userID) {
 // }
 }
 
-function onModalClose()
+function onModalClose(modal)
 {
   const formInviteFriend = document.getElementById('type-invite-friend');
 
@@ -108,7 +176,7 @@ function onModalClose()
   }
   
 }
-function listenFriendInvitation(modal) {
+function listenFriendInvitation(modal, form) {
   console.log('inviteFrienModal');
   let inputField = document.getElementById('username_input');
   let userID = document.getElementById('userID').value;
@@ -150,8 +218,10 @@ function listenFriendInvitation(modal) {
   });
 
   modal.addEventListener('hidden.bs.modal', () => {
-    onModalClose();
-
-});
+    onModalClose(modal);
+    
+  });
+  if (form)
+    listenSubmit(form);
 }
 

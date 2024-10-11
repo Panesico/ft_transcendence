@@ -27,12 +27,8 @@ window.onload = () => {
   mainRoomSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
     console.log('Received message from socket: ', data);
+    parseSocketMessage(data);
   };
-    // if (type === 'suggestions') {
-    //   matching_usernames = data['suggestions'];
-    //   console.log('Matching usernames:', matching_usernames);
-    //   update_dropdown(matching_usernames);
-    // }
 
   // On websocket close
   mainRoomSocket.onclose = function(e) {
@@ -53,4 +49,43 @@ window.onbeforeunload = () => {
   if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
     mainRoomSocket.close();
   }
+}
+
+function sendFriendRequest(username, user_id)
+{
+  console.log('sendFriendRequest > username:', username);
+  console.log('sendFriendRequest > user_id:', user_id);
+  mainRoomSocket.send(JSON.stringify({'type': 'friend_request', 'user_id': user_id, 'username': username}));
+}
+
+function parseSocketMessage(data)
+{
+  if (data.type === 'friend_request') {
+    handleFriendRequest(data);
+  }
+}
+
+function handleFriendRequest(data)
+{
+  incoming_username = data.username;
+  console.log('handleFriendRequest > data:', data);
+  incoming_user_id = data.user_id;
+  console.log('handleFriendRequest > incoming_user_id:', incoming_user_id);
+  // console.log('handleFriendRequest > data:', data);
+  // const friendRequestModal = document.getElementById('friendRequestModal');
+  // const friendRequestModalContent = document.getElementById('friendRequestModalContent');
+  // const friendRequestModalAccept = document.getElementById('friendRequestModalAccept');
+  // const friendRequestModalDecline = document.getElementById('friendRequestModalDecline');
+
+  // friendRequestModalContent.innerHTML = `You have a friend request from ${data.username}`;
+  // friendRequestModal.style.display = 'block';
+
+  // friendRequestModalAccept.onclick = function() {
+  //   mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'accept', 'user_id': data.user_id}));
+  //   friendRequestModal.style.display = 'none';
+  // }
+
+  // friendRequestModalDecline.onclick = function() {
+  //   mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'decline', 'user_id': data.user_id}));
+  //   friendRequestModal.style.display = 'none';
 }

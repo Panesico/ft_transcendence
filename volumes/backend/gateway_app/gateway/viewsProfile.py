@@ -38,7 +38,6 @@ def get_profile(request):
     # GET profile user's variables
     profile_data = get_profileapi_variables(request=request)
     logger.debug(f"get_profile > profile_data: {profile_data}")
-
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_profile XMLHttpRequest")
         html = render_to_string('fragments/profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)

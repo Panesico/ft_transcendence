@@ -54,6 +54,19 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     typeMessage = content.get('type', '')
     if typeMessage == 'message':
       readMessage(content.get('message', ''))
+    
+    # Friend request
+    if typeMessage == 'friend_request':
+      outgoing_user_id = content.get('user_id', '')
+      outgoing_username = content.get('username', '')
+      # Check if user_id is in users_connected
+      if outgoing_user_id in users_connected:
+        await users_connected[outgoing_user_id].send_json({
+          'type': 'friend_request',
+          'message': f'You have a friend request from {outgoing_username}',
+          'user_id': self.user_id,
+        })
+      
 
       
 

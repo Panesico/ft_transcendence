@@ -1,40 +1,3 @@
-/* WebSocket */
-//const formSocket = new WebSocket('wss://localhost:8443/wss/profileapi/');
-// const formSocket = new WebSocket('/wss/gamecalc/');
-
-// formSocket.onopen = function(e) {
-//   console.log('formSocket socket connected');
-// };
-
-// formSocket.onmessage = function(e) {
-//   const data = JSON.parse(e.data);
-//   const message = data['message'];
-//   console.log('Received message from socket: ', message);
-// };
-
-// formSocket.onclose = function(e) {
-//   console.error('formSocket socket closed unexpectedly');
-// };
-
-// function sendMessage(message) {
-//   console.log('Sending message to socket: ', message);
-//   formSocket.send(JSON.stringify({'message': message}));
-// }
-
-
-// function uploadFileNotEmpty() {
-//   var fileUpload = document.getElementById("file-upload");
-//   if (!fileUpload) {
-//     alert("fileUpload is null");
-//     return false;
-//   } else if (!fileUpload.files || fileUpload.files.length === 0) {
-//     alert("No file selected");
-//     return false;
-//   } else {
-//     return true;
-//   }
-// }
-
 // Load content based on current path
 async function loadContent(path) {
   // console.log('loadContent');
@@ -98,11 +61,11 @@ window.onpopstate = () => {
 };
 
 // Initialise the correct content on page load
-window.onload = () => {
-   console.log('onload');
-  // loadContent(window.location.pathname);
-  handleFormSubmission();
-};
+// window.onload = () => {
+//   console.log('onload');
+//   // loadContent(window.location.pathname);
+//   handleFormSubmission();
+// };
 
 // async function getProfileData() {
 //   try {
