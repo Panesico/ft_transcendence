@@ -227,3 +227,17 @@ border-radius: 50%;
 .section h2 {
   margin-bottom: 40px;
 }
+
+.victory-border {
+  border: 2px solid #28a745 !important; /* Verde */
+}
+
+.defeat-border {
+  border: 2px solid #dc3545 !important; /* Rojo */
+}
+
+.table th.date-column,
+.table td.date-column {
+    width: 20%;
+    white-space: nowrap;
+}

@@ -66,27 +66,53 @@ def get_edit_profile(request):
 
 @login_required
 def get_match_history(request):
-    logger.debug("")
-    logger.debug("get_match_history")
     if request.method != 'GET':
         return redirect('405')
     logger.debug("get_match_history")
-    profile_data = get_profileapi_variables(request=request)
-    logger.debug(f"get_match_history > profile_data: {profile_data}")
-    # Calculate win rate
-    total_games = profile_data.get('played_games', 0)
-    total_wins = profile_data.get('wins', 0)
-    win_rate = (total_wins / total_games) * 100 if total_games > 0 else 0
-    profile_data['win_rate'] = round(win_rate, 2)
-    # Calculate total score
-    total_score = total_wins * 50
-    
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_match_history > XMLHttpRequest")
-        html = render_to_string('fragments/match_history_fragment.html', {'profile_data': profile_data}, request=request)
-        return JsonResponse({'html': html, 'status': 'success'})
-    return render(request, 'partials/match_history.html', {'profile_data': profile_data})
-
+    user_id = request.user.id
+    get_history_url = 'https://play:9003/api/getGames/' + str(user_id)
+    response = requests.get(get_history_url, verify=os.getenv("CERTFILE"))
+    if response.status_code == 200:
+        games = response.json().get('games')
+        if games is None:
+            logger.debug("get_match_history > No games found")
+            games = []
+        total_games = 0
+        wins = 0
+        game_registry = []
+        for game in games:
+            total_games += 1
+            if game.get('game_winner_id') == user_id:
+                wins += 1
+            game_registry.append({
+              'game_type': game.get('game_type'),
+              'game_round': game.get('game_round'),
+              'p1_name': game.get('p1_name'),
+              'p2_name': game.get('p2_name'),
+              'p1_score': game.get('p1_score'),
+              'p2_score': game.get('p2_score'),
+              'game_winner_name': game.get('game_winner_name'),
+              'game_winner_id': game.get('game_winner_id'),
+              'date': game.get('date')
+            })
+        defeats = total_games - wins
+        total_score = wins * 50
+        winrate = round((wins / total_games) * 100, 2) if total_games > 0 else 0
+        games_data = {
+            'total_games': total_games,
+            'wins': wins,
+            'defeats': defeats,
+            'total_score': total_score,
+            'winrate': winrate,
+            'game_registry': game_registry
+        }
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+          html = render_to_string('fragments/match_history_fragment.html', {'games_data' : games_data, 'user_id' : user_id}, request=request)
+          return JsonResponse({'html': html, 'status': 'success'})
+        return render(request, 'partials/match_history.html', {'games_data': games_data, 'user_id' : user_id})
+    else:
+        logger.debug(f"-------> get_match_history > Response: {response.status_code}")
+        return JsonResponse({'status': 'error', 'message': 'Error retrieving match history'})
 
 @login_required
 def post_edit_profile_security(request):

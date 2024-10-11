@@ -193,3 +193,19 @@ def api_updateTournament(request):
             return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
     logger.debug('api_updateTournament > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+def api_getUserGames(request, user_id):
+    logger.debug("api_getUserGames")
+    if request.method == 'GET':
+        try:
+            games = Game.objects.filter(p1_id=user_id) | Game.objects.filter(p2_id=user_id)
+            games_list = []
+            for game in games:
+                game_dict = (model_to_dict(game))
+                game_dict['date'] = game.date.strftime('%Y-%m-%d %H:%M:%S')
+                games_list.append(game_dict)
+            return JsonResponse({'status': 'success', 'games': games_list})
+        except (json.JSONDecodeError, DatabaseError) as e:
+            return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
+    logger.debug('api_getUserGames > Method not allowed')
+    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
