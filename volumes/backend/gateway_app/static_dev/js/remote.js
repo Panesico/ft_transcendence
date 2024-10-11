@@ -171,7 +171,6 @@ async function newRemoteGame(game_type, p1_name) {
         console.log('newRemoteGame > .onmessage opponent_ready:', data.message);
         updateOpponentReadyCheckBoxes(data.opponent)
 
-
       } else if (data.type === 'game_countdown') {
         console.log('newRemoteGame > .onmessage game_countdown:', data.message);
         if (data.countdown === 3) displayCanvasElement();
