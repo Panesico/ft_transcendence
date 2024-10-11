@@ -1,10 +1,10 @@
 from django.urls import path, re_path
 from .consumers import FormConsumer
-from . import consumerPongLocal, consumerPongRemote, consumerMainRoom
+from . import consumerProxyPongLocal, consumerProxyPongRemote, consumerMainRoom
 
 websocket_urlpatterns = [
-    path('wss/calcgame/pong/local/', consumerPongLocal.ProxyPongCalcLocal.as_asgi()),
-    path('wss/calcgame/pong/remote/', consumerPongRemote.ProxyPongCalcRemote.as_asgi()),
+    path('wss/calcgame/pong/local/', consumerProxyPongLocal.ProxyPongCalcLocal.as_asgi()),
+    path('wss/calcgame/pong/remote/', consumerProxyPongRemote.ProxyPongCalcRemote.as_asgi()),
     # re_path(r'wss/calcgame/pong/$', consumerCalcGame.PongCalcConsumer.as_asgi()),
 
     # Friend Invite suggestion

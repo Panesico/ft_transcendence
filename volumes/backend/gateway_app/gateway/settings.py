@@ -92,8 +92,11 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-            ],
-        },
+            ],     
+            'libraries':{
+                'custom_filters': 'gateway.templatetags.custom_filters',
+                }
+        },     
     },
 ]
 
@@ -196,12 +199,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-from django.conf import settings
-from django.conf.urls.static import static
+# from django.conf import settings
+# from django.conf.urls.static import static
 
-urlpatterns = [
-    # ... your url patterns
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# urlpatterns = [
+#     # ... your url patterns
+# ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 # Channels
