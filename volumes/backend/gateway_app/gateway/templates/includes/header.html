@@ -92,7 +92,6 @@
     </li>
   </ul>
 </li>
-
       <!-- Dropdown notifications -->
       <li class="nav-item dropdown d-flex align-items-center">
         {% if notifications %}
@@ -113,16 +112,12 @@
           <img src="/media/utils_icons/bell_down.png" alt="{{ user.username }}"
             style="height: rem; width: 2rem; object-fit: cover;">
         </p>
-        <ul class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="navbarDropdownNotifications">
-            <li class="dropdown-item text-white">
-              You have no notifications
+        <ul class="dropdown-menu dropdown-menu-end bg-dark" id="notificationClassContent" aria-labelledby="navbarDropdownNotifications">
+            <li class="dropdown-item text-white" id="notificationContent">You have no notifications
             </li>
           {% endif %}
         </ul>
       </li>
-      
-      
-      
     </ul>
   </div>
 </div>
