@@ -71,7 +71,8 @@
       <li class="nav-item dropdown d-flex align-items-center">
         <p class="nav-link dropdown-toggle m-0" id="navbarDropdownLanguage"
           role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          {% trans "Language" %}
+          <img src="/media/utils_icons/language.png" alt="{{ user.username }}"
+             style="height: 2rem; width: 2rem; object-fit: cover; ">
         </p>
         <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownLanguage">
           <li>
@@ -86,8 +87,39 @@
         </ul>
       </li>
 
+      <!-- Dropdown notifications -->
+      <li class="nav-item dropdown d-flex align-items-center">
+        {% if notifications %}
+        <p class="nav-link dropdown-toggle m-0" id="navbarDropdownNotifications"
+        role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="/media/utils_icons/bell_up.png" alt="{{ user.username }}"
+          style="height: rem; width: 2rem; object-fit: cover;">
+      </p>
+      <ul class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="navbarDropdownNotifications">
+        {% for notification in notifications %}
+        <li class="dropdown-item text-white">
+          {{ notification.message }}
+        </li>
+        {% endfor %}
+        {% else %}
+        <p class="nav-link dropdown-toggle m-0" id="navbarDropdownNotifications"
+          role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="/media/utils_icons/bell_down.png" alt="{{ user.username }}"
+            style="height: rem; width: 2rem; object-fit: cover;">
+        </p>
+        <ul class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="navbarDropdownNotifications">
+            <li class="dropdown-item text-white">
+              You have no notifications
+            </li>
+          {% endif %}
+        </ul>
+      </li>
+      
+      
+      
     </ul>
   </div>
 </div>
 
+{% comment %} <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('en')">{% trans "English" %}</a> {% endcomment %}
 
