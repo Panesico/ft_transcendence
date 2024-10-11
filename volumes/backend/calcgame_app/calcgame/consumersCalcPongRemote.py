@@ -45,7 +45,7 @@ class PongCalcRemote(AsyncWebsocketConsumer):
     logger.debug("PongCalcLocal > Client connected")
     # Send an initial message to confirm the connection
     await self.send(text_data=json.dumps({
-      'type': 'connection_established',
+      'type': 'connection_established, calcgame says hello',
       'message': 'You are connected!'
     }))
 
@@ -59,23 +59,28 @@ class PongCalcRemote(AsyncWebsocketConsumer):
     data = json.loads(text_data)
     logger.debug(f"PongCalcLocal > received data: {data}")
     
-    if data['type'] == 'opening_connection':
-       self.p1_name = data['p1_name']
-       self.p2_name = data['p2_name']
-       logger.debug(f"PongCalcLocal > Opening connection with players: {self.p1_name}, {self.p2_name}")
+    if data['type'] == 'opening_connection, game details':
+      self.game_id = data['game_id']
+      self.p1_name = data['p1_name']
+      self.p2_name = data['p2_name']
+      logger.debug(f"PongCalcLocal > Opening connection with players: {self.p1_name}, {self.p2_name}")
+
+    if data['type'] == 'players_ready':
+      logger.debug("")
+      logger.debug(f"PongCalcLocal > players ready for self.game_id: {self.game_id}, data['game_id']: {data['game_id']}")
+      await self.start_game(self.game_id)
+
     if data['type'] == 'key_press':
       # logger.debug("PongCalcLocal > key press event")
       self.update_pressed_keys(data['keys'])
 
-    if data['type'] == 'game_start':
-        await self.start_game()
-
-  async def start_game(self):
+  async def start_game(self, game_id):
     # Start the game and send initial game state to the client
     logger.debug("PongCalcLocal > Game started")
     for i in range(3, 0, -1):
         await self.send(text_data=json.dumps({
-          'type': 'game_start',
+          'type': 'game_countdown',
+          'game_id': game_id,
           'message': f'Game starting in {i}...',
           'game_state': self.gs,
           'countdown': i,
@@ -85,13 +90,14 @@ class PongCalcRemote(AsyncWebsocketConsumer):
     logger.debug("PongCalcLocal > sending first game_update")
     await self.send(text_data=json.dumps({
         'type': 'game_update',
+        'game_id': game_id,
         'game_state': self.gs
       }))
 
     # Start the game loop as a task
-    self.game_task = asyncio.create_task(self.game_loop())
+    self.game_task = asyncio.create_task(self.game_loop(game_id))
 
-  async def game_end(self):
+  async def game_end(self, game_id):
     logger.debug("PongCalcLocal > Game ended")
     winner = self.p1_name if self.gs['scorePlayer1'] > self.gs['scorePlayer2'] else self.p2_name
 
@@ -100,6 +106,7 @@ class PongCalcRemote(AsyncWebsocketConsumer):
       'type': 'game_end',
       'message': f'Game Over: {winner} wins!',
       'game_result': {
+          'game_id': game_id,
           'winner': winner,
           'scorePlayer1': self.gs['scorePlayer1'],
           'scorePlayer2': self.gs['scorePlayer2'],
@@ -111,7 +118,7 @@ class PongCalcRemote(AsyncWebsocketConsumer):
       self.game_task.cancel()
 
 
-  async def game_loop(self):
+  async def game_loop(self, game_id):
       logger.debug("PongCalcLocal > game_loop")
       while True:
           # Wait before continuing the loop (in seconds)
@@ -138,7 +145,7 @@ class PongCalcRemote(AsyncWebsocketConsumer):
             }))
           # logger.debug(f"Sent game_update, game_state: {self.gs}")
           
-      await self.game_end()
+      await self.game_end(game_id)
 
   def update_pressed_keys(self, keys):
       # Update the set of pressed keys

@@ -75,16 +75,16 @@ class PongCalcLocal(AsyncWebsocketConsumer):
     logger.debug("PongCalcLocal > Game started")
     for i in range(3, 0, -1):
         await self.send(text_data=json.dumps({
-          'type': 'game_start',
+          'type': 'game_countdown',
           'message': f'Game starting in {i}...',
           'game_state': self.gs,
           'countdown': i,
         }))
         await asyncio.sleep(0.8)
 
-    logger.debug("PongCalcLocal > sending first game_update")
+    logger.debug("PongCalcLocal > sending game_start")
     await self.send(text_data=json.dumps({
-        'type': 'game_update',
+        'type': 'game_start',
         'game_state': self.gs
       }))
 

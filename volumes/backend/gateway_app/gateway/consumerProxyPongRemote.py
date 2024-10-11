@@ -15,6 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
             #         "player_id": "player_id",
             #         "ws": "ws",
             #         "context": "context",
+            #         "ready": False,
             #     },
             #     "player2": {
             #     },
@@ -116,16 +117,18 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
             await player1['ws'].send(json.dumps({
                 'type': 'game_start',
                 'game_id': game_id,
-                'message': 'Game starting', # to translate
-                'player_role': 'You are the player on the left', # to translate
+                'title': 'Game starting...', # to translate
+                'message': 'You are the player on the left', # to translate
+                'player_role': '1',
                 'html': html1,
             }))
 
             await player2['ws'].send(json.dumps({
                 'type': 'game_start',
                 'game_id': game_id,
-                'message': 'Game starting', # to translate
-                'player_role': 'You are the player on the right', # to translate
+                'title': 'Game starting...', # to translate
+                'message': 'You are the player on the right', # to translate
+                'player_role': '2',
                 'html': html2,
             }))
             
@@ -169,23 +172,61 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
             
 
     async def receive(self, text_data):
+        # Handle messages received from the client
         logger.debug(f"ProxyPongCalcRemote > receive from {self.channel_name}")
         logger.debug(f"ProxyPongCalcRemote > receive from client: {text_data}")
         data = json.loads(text_data)
+        connect_id = self.channel_name
 
-        if data['type'] == 'opening_connection':
-            connect_id = self.channel_name
+        if data['type'] == 'opening_connection, my name is':
+            # Client confirms connection with their player name
             if connect_id in self.waiting_players:
                 self.waiting_players[connect_id]['player_name'] = data['p1_name']
+                self.waiting_players[connect_id]['ready'] = False
                 if self.scope['user'].is_authenticated:
                   self.waiting_players[connect_id]['player_id'] = self.scope['user'].id
                 logger.debug(f"Updated waiting_players[{connect_id}] with player_name: {data['p1_name']}, player_id: {self.waiting_players[connect_id]['player_id']}")
             else:
                 logger.error(f"Player {connect_id} not found in waiting_players")
 
-        # Forward the message from the client to the calcgame WebSocket server
-        if hasattr(self, 'calcgame_ws'):
-            await self.calcgame_ws.send(text_data)
+        elif data['type'] == 'player_ready':
+            game = self.active_games[data['game_id']]
+            
+            # Mark player as ready
+            if connect_id == game['player1']['channel_name']:
+                game['player1']['ready'] = True
+            elif connect_id == game['player2']['channel_name']:
+                game['player2']['ready'] = True
+
+            # notify other player that this player is ready
+            if connect_id == game['player1']['channel_name']:
+                await game['player2']['ws'].send(json.dumps({
+                    'type': 'opponent_ready',
+                    'game_id': data['game_id'],
+                    'opponent': '1',
+                }))
+            elif connect_id == game['player2']['channel_name']:
+                await game['player1']['ws'].send(json.dumps({
+                    'type': 'opponent_ready',
+                    'game_id': data['game_id'],
+                    'opponent': '2',
+                }))
+            logger.debug(f"player1 ready: {game['player1']['ready']}, player2 ready: {game['player2']['ready']}")
+
+            # If both players are ready, notify calcgame
+            if game['player1']['ready'] and game['player2']['ready']:
+                await game['calcgame_ws'].send(
+                    json.dumps({
+                        'type': 'players_ready',
+                        'game_id': data['game_id'],
+                    })
+                )
+            
+        else:
+            # Forward client message to calcgame websocket
+            if data['game_id'] and data['game_id'] in self.active_games and 'calcgame_ws' in self.active_games[data['game_id']]:
+                calcgame_ws = self.active_games[data['game_id']]['calcgame_ws']
+                await calcgame_ws.send(text_data)
 
     async def listen_to_calcgame(self, game_id):
         try:
@@ -200,10 +241,10 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
                     self.active_games.pop(game_id)
                     logger.debug(f"ProxyPongCalcRemote > Game ended, removed game {game_id} from active_games")
                     break
-                elif data['type'] == 'connection_established':
-                    # Connection established with calcgame, send opening_connection message
+                elif data['type'] == 'connection_established, calcgame says hello':
+                    # Connection established with calcgame, send back game info
                     text_data = json.dumps({
-                        'type': 'opening_connection',
+                        'type': 'opening_connection, game details',
                         'game_id': game_id,
                         'p1_name': self.active_games[game_id]['player1']['player_name'],
                         'p2_name': self.active_games[game_id]['player2']['player_name'],

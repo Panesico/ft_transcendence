@@ -23,6 +23,19 @@ async function executePongGame(p1_name, p2_name) {
   const keys =
       {w: false, s: false, 8: false, 5: false, ' ': false, Escape: false};
 
+  function showCountdown(gameState, count) {
+    document.querySelector('.scorePlayer1').textContent =
+        gameState.scorePlayer1;
+    document.querySelector('.scorePlayer2').textContent =
+        gameState.scorePlayer2;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '60px PixeloidSans';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(count, canvas.width / 2, canvas.height / 2);
+  }
+
   // Render the game state on the canvas
   function renderGame(gameState) {
     scorePlayer1Element.textContent = gameState.scorePlayer1;
@@ -70,7 +83,11 @@ async function executePongGame(p1_name, p2_name) {
     gameCalcSocket.onmessage = function(e) {
       const data = JSON.parse(e.data);
 
-      if (data.type === 'game_start') {
+      if (data.type === 'game_countdown') {
+        console.log('game_countdown:', data);
+        showCountdown(data.game_state, data.countdown);
+
+      } else if (data.type === 'game_start') {
         console.log('Game start received', data);
         renderGame(data.game_state);
 
