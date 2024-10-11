@@ -67,25 +67,31 @@
         </li>
       {% endif %}
 
-      <!-- Dropdown to change the language -->
-      <li class="nav-item dropdown d-flex align-items-center">
-        <p class="nav-link dropdown-toggle m-0" id="navbarDropdownLanguage"
-          role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="/media/utils_icons/language.png" alt="{{ user.username }}"
-             style="height: 2rem; width: 2rem; object-fit: cover; ">
-        </p>
-        <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownLanguage">
-          <li>
-            <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('en')">{% trans "English" %}</a>
-          </li>
-          <li>
-            <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('es')">{% trans "Spanish" %}</a>
-          </li>
-          <li>
-            <a class="dropdown-item bg-dark text-light" href="#" onclick="changeLanguage('fr')">{% trans "French" %}</a>
-          </li>
-        </ul>
-      </li>
+<!-- Dropdown to change the language -->
+<li class="nav-item dropdown d-flex align-items-center" >
+  <p class="nav-link dropdown-toggle m-0" id="navbarDropdownLanguage"
+    role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <img src="/media/utils_icons/language.png" alt="{{ user.username }}"
+      style="height: 2rem; width: 2rem; object-fit: cover;">
+  </p>
+  <ul class="dropdown-menu dropdown-menu-end bg-dark p-0" aria-labelledby="navbarDropdownLanguage" style="--bs-dropdown-min-width: 5rem">
+    <li class="dropdown-item bg-dark text-light p-0">
+      <a href="#" onclick="changeLanguage('en')" class="d-flex justify-content-center align-items-center p-1">
+        <img src="/media/utils_icons/usa.png" alt="English" class="img-fluid" style="height: 2rem; width: 2rem; object-fit: cover;">
+      </a>
+    </li>
+    <li class="dropdown-item bg-dark text-light p-0">
+      <a href="#" onclick="changeLanguage('es')" class="d-flex justify-content-center align-items-center p-1">
+        <img src="/media/utils_icons/spain.png" alt="Spanish" class="img-fluid" style="height: 2rem; width: 2rem; object-fit: cover;">
+      </a>
+    </li>
+    <li class="dropdown-item bg-dark text-light p-0">
+      <a href="#" onclick="changeLanguage('fr')" class="d-flex justify-content-center align-items-center p-1">
+        <img src="/media/utils_icons/france.png" alt="French" class="img-fluid" style="height: 2rem; width: 2rem; object-fit: cover;">
+      </a>
+    </li>
+  </ul>
+</li>
 
       <!-- Dropdown notifications -->
       <li class="nav-item dropdown d-flex align-items-center">
