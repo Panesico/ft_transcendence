@@ -43,8 +43,7 @@ async function newRemoteGame(game_type, p1_name) {
   const paddleHeight = 80
   const borderWidth = 15
 
-  const keys =
-      {w: false, s: false, 8: false, 5: false, ' ': false, Escape: false};
+  const keys = {w: false, s: false, ' ': false, Escape: false};
 
   function displayCanvasElement() {
     const gameContainer = document.querySelector('#game-container');
@@ -101,8 +100,8 @@ async function newRemoteGame(game_type, p1_name) {
 
   return new Promise((resolve, reject) => {
     const gameCalcSocket = new WebSocket('/wss/calcgame/pong/remote/');
-    let game_id = 0;
-
+    let game_id;
+    let player_role;
 
     function setPlayerReadyCheckBoxes(player_role) {
       const player1Ready = document.getElementById('player1-ready');
@@ -164,8 +163,9 @@ async function newRemoteGame(game_type, p1_name) {
         // Load game html
         document.querySelector('main').innerHTML = data.html;
         game_id = data.game_id;
+        player_role = data.player_role;
         announceGame(data.title, data.message);
-        setPlayerReadyCheckBoxes(data.player_role);
+        setPlayerReadyCheckBoxes(player_role);
 
       } else if (data.type === 'opponent_ready') {
         console.log('newRemoteGame > .onmessage opponent_ready:', data.message);
@@ -181,7 +181,13 @@ async function newRemoteGame(game_type, p1_name) {
         renderGame(data.game_state);
 
       } else if (data.type === 'game_end') {
-        console.log('newRemoteGame > .onmessage game_end:', data);
+        console.log('newRemoteGame > .onmessage game_end:', data.message);
+        document.querySelector('#game-container').innerHTML = data.html;
+        document.querySelector('.scorePlayer1').textContent =
+            data.game_result.p1_score;
+        document.querySelector('.scorePlayer2').textContent =
+            data.game_result.p2_score;
+
         resolve(data.game_result);
         gameCalcSocket.close();
 
@@ -194,8 +200,31 @@ async function newRemoteGame(game_type, p1_name) {
     };
 
     gameCalcSocket.onerror = function(e) {
-      console.log('newRemoteGame > .onerror, error occurred', data);
+      console.error('newRemoteGame > .onerror, error occurred: ', e);
     };
+
+    // Event listeners for controls
+    window.addEventListener('keydown', (e) => {
+      if (e.key in keys) {
+        keys[e.key] = true;
+        notifyKeyPressed();
+      }
+    });
+    window.addEventListener('keyup', (e) => {
+      if (e.key in keys) {
+        keys[e.key] = false;
+        notifyKeyPressed();
+      }
+    });
+
+    function notifyKeyPressed() {
+      // console.log('keys:', keys);
+      // Filter out the keys that are pressed
+      const pressedKeys = Object.keys(keys).filter(key => keys[key]);
+      // console.log('pressedKeys:', pressedKeys);
+      gameCalcSocket.send(JSON.stringify(
+          {type: 'key_press', keys: pressedKeys, game_id, player_role}));
+    }
   });
 }
 
@@ -221,10 +250,7 @@ async function findRemoteGame() {
   game_result = await newRemoteGame(game_type, p1_name);
   console.log('findRemoteGame > game_result: ', game_result);
 
-  // Save the game result in the database
-  // saveGameResultInDatabase(
-  //   game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id,
-  //   game_result);
+  // Display the winner and find another game
 }
 
 function toggleRemoteMode() {

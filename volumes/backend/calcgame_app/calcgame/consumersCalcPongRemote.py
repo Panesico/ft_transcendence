@@ -20,7 +20,8 @@ class PongCalcRemote(AsyncWebsocketConsumer):
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
-    self.pressed_keys = set()
+    self.pressed_keys1 = set()
+    self.pressed_keys2 = set()
     # Game state
     self.gs = {
       "leftPaddleY": (self.cfg['canvas']['height'] - self.cfg['paddleHeight']) / 2,
@@ -39,10 +40,10 @@ class PongCalcRemote(AsyncWebsocketConsumer):
     self.gamePaused = False;
     
   async def connect(self):
-    logger.debug("PongCalcLocal > before accept")
+    logger.debug("PongCalcRemote > before accept")
     # Accept the WebSocket connection
     await self.accept()
-    logger.debug("PongCalcLocal > Client connected")
+    logger.debug("PongCalcRemote > Client connected")
     # Send an initial message to confirm the connection
     await self.send(text_data=json.dumps({
       'type': 'connection_established, calcgame says hello',
@@ -51,32 +52,32 @@ class PongCalcRemote(AsyncWebsocketConsumer):
 
   async def disconnect(self, close_code):
     # Handle WebSocket disconnection
-    logger.debug("PongCalcLocal > Client disconnected")
+    logger.debug("PongCalcRemote > Client disconnected")
     pass
 
   async def receive(self, text_data):
     # Handle messages received from the client
     data = json.loads(text_data)
-    logger.debug(f"PongCalcLocal > received data: {data}")
+    logger.debug(f"PongCalcRemote > received data: {data}")
     
     if data['type'] == 'opening_connection, game details':
       self.game_id = data['game_id']
       self.p1_name = data['p1_name']
       self.p2_name = data['p2_name']
-      logger.debug(f"PongCalcLocal > Opening connection with players: {self.p1_name}, {self.p2_name}")
+      logger.debug(f"PongCalcRemote > Opening connection with players: {self.p1_name}, {self.p2_name}")
 
     if data['type'] == 'players_ready':
       logger.debug("")
-      logger.debug(f"PongCalcLocal > players ready for self.game_id: {self.game_id}, data['game_id']: {data['game_id']}")
+      logger.debug(f"PongCalcRemote > players ready for self.game_id: {self.game_id}, data['game_id']: {data['game_id']}")
       await self.start_game(self.game_id)
 
     if data['type'] == 'key_press':
-      # logger.debug("PongCalcLocal > key press event")
-      self.update_pressed_keys(data['keys'])
+      # logger.debug("PongCalcRemote > key press event")
+      self.update_pressed_keys(data['keys'], data['player_role'])
 
   async def start_game(self, game_id):
     # Start the game and send initial game state to the client
-    logger.debug("PongCalcLocal > Game started")
+    logger.debug("PongCalcRemote > Game started")
     for i in range(3, 0, -1):
         await self.send(text_data=json.dumps({
           'type': 'game_countdown',
@@ -87,7 +88,7 @@ class PongCalcRemote(AsyncWebsocketConsumer):
         }))
         await asyncio.sleep(0.8)
 
-    logger.debug("PongCalcLocal > sending first game_update")
+    logger.debug("PongCalcRemote > sending first game_update")
     await self.send(text_data=json.dumps({
         'type': 'game_update',
         'game_id': game_id,
@@ -98,18 +99,18 @@ class PongCalcRemote(AsyncWebsocketConsumer):
     self.game_task = asyncio.create_task(self.game_loop(game_id))
 
   async def game_end(self, game_id):
-    logger.debug("PongCalcLocal > Game ended")
-    winner = self.p1_name if self.gs['scorePlayer1'] > self.gs['scorePlayer2'] else self.p2_name
+    logger.debug("PongCalcRemote > Game ended")
+    game_winner_name = 'p1_name' if self.gs['scorePlayer1'] > self.gs['scorePlayer2'] else 'p2_name'
 
     # End the game
     await self.send(text_data=json.dumps({
       'type': 'game_end',
-      'message': f'Game Over: {winner} wins!',
+      'message': f'Game Over: {game_winner_name} wins!',
       'game_result': {
           'game_id': game_id,
-          'winner': winner,
-          'scorePlayer1': self.gs['scorePlayer1'],
-          'scorePlayer2': self.gs['scorePlayer2'],
+          'game_winner_name': game_winner_name,
+          'p1_score': self.gs['scorePlayer1'],
+          'p2_score': self.gs['scorePlayer2'],
         }
     }))
 
@@ -119,7 +120,7 @@ class PongCalcRemote(AsyncWebsocketConsumer):
 
 
   async def game_loop(self, game_id):
-      logger.debug("PongCalcLocal > game_loop")
+      logger.debug("PongCalcRemote > game_loop")
       while True:
           # Wait before continuing the loop (in seconds)
           await asyncio.sleep(0.02)
@@ -130,12 +131,12 @@ class PongCalcRemote(AsyncWebsocketConsumer):
           check_ball_border_collision(self.gs, self.cfg)
           check_ball_paddle_collision(self.gs, self.cfg, self.frameCount, self.lastContactFrame) # to update
           if check_ball_outofbounds(self.gs, self.cfg) == True: 
-            logger.debug("PongCalcLocal > resetting ball position...")
+            logger.debug("PongCalcRemote > resetting ball position...")
             reset_ball_position(self.gs, self.cfg)
 
           # Break loop and end game if a player reaches the max score
           if self.gs['scorePlayer1'] >= self.cfg['maxScore'] or self.gs['scorePlayer2'] >= self.cfg['maxScore']:
-            logger.debug("PongCalcLocal > Ending game...")
+            logger.debug("PongCalcRemote > Ending game...")
             break
           
           # Send the updated game state to the client
@@ -147,23 +148,24 @@ class PongCalcRemote(AsyncWebsocketConsumer):
           
       await self.game_end(game_id)
 
-  def update_pressed_keys(self, keys):
+  def update_pressed_keys(self, keys, player_role):
       # Update the set of pressed keys
-      self.pressed_keys = {key: True for key in keys}
+      if player_role == '1':
+          self.pressed_keys1 = {key: True for key in keys}
+      elif player_role == '2':
+          self.pressed_keys2 = {key: True for key in keys}
 
   def update_paddle_pos(self):
-    if 'w' in self.pressed_keys and self.gs['leftPaddleY'] > self.cfg['borderWidth']:
-        logger.debug("PongCalcLocal > update_paddle_pos > w pressed")
-      # if player == 'left':
+    if 'w' in self.pressed_keys1 and self.gs['leftPaddleY'] > self.cfg['borderWidth']:
+        logger.debug("PongCalcRemote > update_paddle_pos > w1 pressed")
         self.gs['leftPaddleY'] -= self.cfg['paddleSpeed']
-      # elif player == 'right':
-      #   self.gs['rightPaddleY'] -= self.cfg['paddleSpeed']
     
-    if 's' in self.pressed_keys and self.gs['leftPaddleY'] < self.cfg['canvas']['height'] - self.cfg['paddleHeight'] - self.cfg['borderWidth']:
+    if 's' in self.pressed_keys1 and self.gs['leftPaddleY'] < self.cfg['canvas']['height'] - self.cfg['paddleHeight'] - self.cfg['borderWidth']:
         self.gs['leftPaddleY'] += self.cfg['paddleSpeed']
 
-    if '8' in self.pressed_keys and self.gs['rightPaddleY'] > self.cfg['borderWidth']:
+    if 'w' in self.pressed_keys2 and self.gs['rightPaddleY'] > self.cfg['borderWidth']:
+        logger.debug("PongCalcRemote > update_paddle_pos > w2 pressed")
         self.gs['rightPaddleY'] -= self.cfg['paddleSpeed']
 
-    if '5' in self.pressed_keys and self.gs['rightPaddleY'] < self.cfg['canvas']['height'] - self.cfg['paddleHeight'] - self.cfg['borderWidth']:
+    if 's' in self.pressed_keys2 and self.gs['rightPaddleY'] < self.cfg['canvas']['height'] - self.cfg['paddleHeight'] - self.cfg['borderWidth']:
         self.gs['rightPaddleY'] += self.cfg['paddleSpeed']

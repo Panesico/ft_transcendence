@@ -1,6 +1,7 @@
-import os, json, logging, websockets, ssl, asyncio
+import os, json, logging, websockets, ssl, asyncio, requests, aiohttp
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
+from django.middleware.csrf import get_token
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(level=logging.DEBUG)
@@ -17,8 +18,7 @@ logging.basicConfig(level=logging.DEBUG)
             #         "context": "context",
             #         "ready": False,
             #     },
-            #     "player2": {
-            #     },
+            #     "player2": { ... },
             #     "calcgame_ws": "calcgame_ws",
             #     "calcgame_task": "calcgame_task",
         # }
@@ -30,7 +30,7 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
     waiting_players = {}
 
     # Add check 
-    # user shouldn't be able to play against themselves through two remote games
+    # user should not be able to play against themselves through two remote games
 
     async def connect(self):
         logger.debug("ProxyPongCalcRemote > connect")
@@ -45,6 +45,7 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
             'session': self.scope['session'],
             'cookies': self.scope['cookies'],
         }
+        
         self.waiting_players[connect_id] = {
             'channel_name': self.channel_name,
             'player_name': None,
@@ -231,17 +232,12 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
     async def listen_to_calcgame(self, game_id):
         try:
             while True:
-                logger.debug("ProxyPongCalcRemote > listen_to_calcgame")
-                calcgame_ws = self.active_games[game_id]['calcgame_ws']
                 # Continuously receive messages from calcgame
+                calcgame_ws = self.active_games[game_id]['calcgame_ws']
                 calcgame_response = await calcgame_ws.recv()
                 data = json.loads(calcgame_response)
-                if data['type'] == 'game_end':
-                    # Game ended, remove the game from active_games
-                    self.active_games.pop(game_id)
-                    logger.debug(f"ProxyPongCalcRemote > Game ended, removed game {game_id} from active_games")
-                    break
-                elif data['type'] == 'connection_established, calcgame says hello':
+                
+                if data['type'] == 'connection_established, calcgame says hello':
                     # Connection established with calcgame, send back game info
                     text_data = json.dumps({
                         'type': 'opening_connection, game details',
@@ -250,6 +246,12 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
                         'p2_name': self.active_games[game_id]['player2']['player_name'],
                     })
                     await calcgame_ws.send(text_data)
+
+                elif data['type'] == 'game_end':
+                    # Game ended
+                    await self.game_end(game_id, calcgame_response)
+                    break
+
                 else:
                     # Send message received from calcgame to both players
                     player1 = self.active_games[game_id]['player1']
@@ -276,3 +278,73 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
             'message': 'Waiting for another player to join...',
             'html': html,
         }))
+
+    async def game_end(self, game_id, calcgame_response):
+        logger.debug(f"ProxyPongCalcRemote > game_end game_id: {game_id}")
+        game = self.active_games[game_id]
+        player1 = game['player1']
+        player2 = game['player2']
+        dataCalcgame = json.loads(calcgame_response)
+        game_result = dataCalcgame.get('game_result')
+
+        # Update winner name with actual name
+        if game_result.get('game_winner_name') == 'p1_name':
+            game_result['game_winner_name'] = player1['player_name']
+        else:
+            game_result['game_winner_name'] = player2['player_name']
+
+        html = render_to_string('fragments/game_remote_end_fragment.html', {'game_result': game_result})
+        dataCalcgame['html'] = html
+        updated_calcgame_response = json.dumps(dataCalcgame)
+
+        # Notify players that the game has ended
+        await player1['ws'].send(updated_calcgame_response)
+        await player2['ws'].send(updated_calcgame_response)
+
+        # Save game to database
+        play_url = 'https://play:9003/api/saveGame/'
+
+        csrf_token = player1['context']['cookies'].get('csrftoken')        
+        headers = {
+            'X-CSRFToken': csrf_token,
+            'Cookie': f'csrftoken={csrf_token}',
+            'Content-Type': 'application/json',
+            'Referer': 'https://gateway:8443',
+        }
+        
+        data = {
+            'game_type': 'pong',
+            'game_round': 'single',
+            'p1_name': player1['player_name'],
+            'p2_name': player2['player_name'],
+            'p1_id': player1['player_id'],
+            'p2_id': player2['player_id'],
+            'p1_score': game_result.get('p1_score'),
+            'p2_score': game_result.get('p2_score'),
+            'game_winner_name': player1['player_name'] if game_result.get('game_winner_id') == 'p1_name' else player2['player_name'],
+            'game_winner_id': player1['player_id'] if game_result.get('game_winner_id') == 'p1_name' else player2['player_id'],
+        }
+        
+        ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        ssl_context.load_verify_locations(os.getenv("CERTFILE"))
+
+        # async http request to save game in play container
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.post(play_url, json=data, headers=headers, ssl=ssl_context) as response:
+                    # Check if response status is 200 OK
+                    if response.status == 200:
+                        response_json = await response.json()
+                        logger.debug(f"ProxyPongCalcRemote > calcgame responds: {response_json.get('message')}")
+                    else:
+                        logger.error(f"ProxyPongCalcRemote > Failed to save game. Status code: {response.status}")
+            except aiohttp.ClientError as e:
+                logger.error(f"ProxyPongCalcRemote > Error during request: {e}")
+
+        # Close the websocket connection to the calcgame service
+        await game['calcgame_ws'].close()
+        logger.debug(f"ProxyPongCalcRemote > calcgame_ws closed")
+
+        # Remove the game from active_games
+        self.active_games.pop(game_id)
+        logger.debug("ProxyPongCalcRemote > game removed from active_games")
