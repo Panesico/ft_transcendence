@@ -68,10 +68,8 @@ function parseSocketMessage(data)
 function handleFriendRequest(data)
 {
   incoming_username = data.username;
-  console.log('handleFriendRequest > data:', data);
   incoming_user_id = data.user_id;
-  console.log('handleFriendRequest > incoming_user_id:', incoming_user_id);
-  // console.log('handleFriendRequest > data:', data);
+  console.log('handleFriendRequest > incoming_username:', incoming_username);
   // const friendRequestModal = document.getElementById('friendRequestModal');
   // const friendRequestModalContent = document.getElementById('friendRequestModalContent');
   // const friendRequestModalAccept = document.getElementById('friendRequestModalAccept');
