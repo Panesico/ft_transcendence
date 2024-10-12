@@ -45,6 +45,16 @@ async function newRemoteGame(game_type, p1_name) {
 
   const keys = {w: false, s: false, ' ': false, Escape: false};
 
+  function addIndicatorToThisPlayer(player_role) {
+    const player1Container = document.querySelector('#player1-container');
+    if (player1Container && player_role === '1')
+      player1Container.style.borderLeft = '8px solid #198754';
+
+    const player2Container = document.querySelector('#player2-container');
+    if (player2Container && player_role === '2')
+      player2Container.style.borderRight = '8px solid #198754';
+  }
+
   function displayCanvasElement() {
     const gameContainer = document.querySelector('#game-container');
     gameContainer.innerHTML = '';
@@ -164,6 +174,7 @@ async function newRemoteGame(game_type, p1_name) {
         document.querySelector('main').innerHTML = data.html;
         game_id = data.game_id;
         player_role = data.player_role;
+        addIndicatorToThisPlayer(player_role);
         announceGame(data.title, data.message);
         setPlayerReadyCheckBoxes(player_role);
 
@@ -249,8 +260,6 @@ async function findRemoteGame() {
   let game_result = {};
   game_result = await newRemoteGame(game_type, p1_name);
   console.log('findRemoteGame > game_result: ', game_result);
-
-  // Display the winner and find another game
 }
 
 function toggleRemoteMode() {

@@ -67,6 +67,10 @@ body {
   height: 80px;
 }
 
+#player1-container, #player2-container {
+  min-width: 296px;
+}
+
 
 /**************************/
 /***      KOW-PONG      ***/
