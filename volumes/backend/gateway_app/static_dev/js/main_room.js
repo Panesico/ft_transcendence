@@ -1,5 +1,36 @@
 let mainRoomSocket;
 
+unreadNotifications = false;
+
+// Add event listener to the notification
+document.addEventListener('DOMContentLoaded', function() {
+  const notificationDropdown = document.getElementById('navbarDropdownNotifications');
+  notificationDropdown.addEventListener('click', function() {
+    console.log('Notification dropdown clicked');
+    unreadNotifications = false;
+    const bellIcon = notificationDropdown.querySelector('img');
+    if (bellIcon) {
+      bellIcon.src = '/media/utils_icons/bell_down.png';
+    }
+  }
+  );
+});
+
+// // Check if user read notifications
+// function checkNotifications()
+// {
+//   console.log('checkNotifications > unreadNotifications:', unreadNotifications);
+//   if (unreadNotifications === true)
+//   {
+//     console.log('checkNotifications > unreadNotifications:', unreadNotifications);
+//     const notificationDropdown = document.getElementById('navbarDropdownNotifications');
+//     const bellIcon = notificationDropdown.querySelector('img');
+//     if (bellIcon) {
+//       bellIcon.src = '/media/utils_icons/bell_down.png';
+//     }
+//   }
+// }
+
 window.onload = () => {
   // Handle form submission
   handleFormSubmission();
@@ -55,6 +86,11 @@ window.onbeforeunload = () => {
 
 function sendFriendRequest(sender_username, sender_id, sender_avatar_url, receiver_username, receiver_id)
 {
+  console.log('sendFriendRequest > sender_username:', sender_username);
+  console.log('sendFriendRequest > sender_id:', sender_avatar_url);
+  console.log('sendFriendRequest > sender_avatar_url:', sender_avatar_url);
+  console.log('sendFriendRequest > receiver_username:', receiver_username);
+  console.log('sendFriendRequest > receiver_id:', receiver_id);
   mainRoomSocket.send(JSON.stringify({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}));
 }
 
@@ -66,58 +102,5 @@ function parseSocketMessage(data)
   else
   {
     console.log('parseSocketMessage > data.type:', data.type);
-  }
-}
-
-function addNotification(data)
-{
-  const notificationDropdown = document.getElementById('navbarDropdownNotifications');
-  const notificationDropdownClass = document.getElementById('notificationClassContent');
-  receiver_username = data.receiver_username;
-  receiver_id = data.receiver_id;
-  sender_username = data.receiver_username;
-  sender_username = data.sender_username;
-  sender_id = data.sender_id;
-  sender_avatar_url = data.sender_avatar_url;
-  console.log('addNotification > receiver_username:', receiver_username);
-  console.log('addNotification > receiver_id:', receiver_id);
-  console.log('addNotification > sender_username:', sender_username);
-  console.log('addNotification > sender_id:', sender_id);
-  console.log('addNotification > sender_avatar_url:', sender_avatar_url);
-
-  // Remove the 'no notifications' message
-  const emptyMessage = document.getElementById('notificationContent');
-  if (emptyMessage)
-  {
-    if (emptyMessage.innerHTML.trim() === 'You have no notifications') {
-      console.log('addNotification > Removing empty message');
-      emptyMessage.remove();
-    }
-    else {
-      console.log('addNotification > No empty message to remove');
-      console.log('addNotification > emptyMessage.innerHTML:', emptyMessage.innerHTML);
-    }
-
-  }
-
-  // Create a new notification element
-  const newNotification = document.createElement('li');
-  newNotification.classList.add('dropdown-item');
-  const message = 'You have a friend request from ' + sender_username;
-  newNotification.textContent = message;
-  newNotification.style.color = 'red';
-  console.log('addNotification > receiver_id:', receiver_id);
-
-  // Change default empty message to the new notification
-  if (notificationDropdownClass) {
-    notificationDropdownClass.appendChild(newNotification);
-    console.log('addNotification > notificationDropdown:', notificationDropdown);
-    const bellIcon = notificationDropdown.querySelector('img');
-    if (bellIcon) {
-      bellIcon.src = '/media/utils_icons/bell_up.png';
-    }
-  }
-  else {
-    console.log('addNotification > notificationDropdown is null');
   }
 }

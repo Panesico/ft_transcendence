@@ -84,6 +84,7 @@ function update_dropdown(matching_usernames)
   dropdown.style.maxHeight = '200px';
   dropdown.style.border = '4px solid #fff';
 
+
   // Create a suggestion item for each matching username
   matching_usernames.forEach(username => {
     const suggestionItem = document.createElement('div');
@@ -124,6 +125,7 @@ function onModalOpen(userID, modal) {
 
   inviteFriendSocket.onopen = function(e) {
     console.log('inviteFriendSocket socket connected');
+    inviteFriendSocket.send(JSON.stringify({type: 'start', 'userID': userID}));
   };
 
   inviteFriendSocket.onmessage = function(e) {

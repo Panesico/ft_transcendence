@@ -7,6 +7,7 @@ class FormConsumer(AsyncWebsocketConsumer):
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
+    self.usernames = []
 
   async def connect(self):
     # Accept the WebSocket connection
@@ -30,6 +31,7 @@ class FormConsumer(AsyncWebsocketConsumer):
       # Parse the JSON message
       key_pressed = json.loads(text_data).get('key', '')
       user_id = json.loads(text_data).get('userID', '')
+      logger.debug(f'FormConsumer > user_id: {user_id}')
       if user_id:
         self.user_id = user_id
         logger.debug(f'FormConsumer > self.user_id: {self.user_id}')
