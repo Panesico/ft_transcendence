@@ -21,8 +21,9 @@ def api_get_user_info(request, user_id):
         user = User.objects.get(id=user_id)
         if user:
             username = user.username
+            avatar_url = user.avatar.url if user.avatar else None
             logger.debug(f'api_get_user_info > User found: {username}')
-            return JsonResponse({'status': 'success', 'message': 'User found', 'username': username, 'usernames': [user.username for user in users], 'users_id': users_id})
+            return JsonResponse({'status': 'success', 'message': 'User found', 'username': username, 'usernames': [user.username for user in users], 'users_id': users_id, 'avatar_url': avatar_url})
         else:
             logger.debug('api_get_user_info > User not found')
             return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)

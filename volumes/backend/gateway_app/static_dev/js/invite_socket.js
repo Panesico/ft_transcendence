@@ -1,7 +1,12 @@
-let inviteFriendSocket; // Make the websocket accessible globally
+/* ----------INVITE FRIEND SEARCH */
+// The file aim is to handle the search for friends to invite
 
+// Make the websocket accessible globally
+let inviteFriendSocket;
+//Boolean to check if the input field is focused
 isFocused = false;
 
+// Function to get the CSRF token
 function listenSubmit(form) {
   console.log('form: ', form);
   form.addEventListener('submit', async (e) => {
@@ -29,38 +34,25 @@ function listenSubmit(form) {
 
 	  console.log('handleFormSubmission > response: ', response);
 
-	  if (!response.ok && response.status == 400) {
-		// window.location.replace('/edit_profile');
-		// displayMessageInModal('No file selected');
-	  }
 
-	  else if (!response.ok) {
+	  if (!response.ok) {
 		console.error('HTTP error - status:', response.status);
 		throw new Error(`HTTP error - status: ${response.status}`);
 	  }
 
-	  // // Handle the response data
-	  // if (data.status != 'error' && data.message) {
-		// console.log('data.message: ', data.message);
-		// window.location.replace('/');
-	  // } else
-		// document.querySelector('main').innerHTML = data.html;
 	  if (!data?.html?.includes('class="errorlist nonfield')) {
 	  	displayMessageInModal(data.message);
       if (data.message === 'Invitation sent!') {
         console.warn('Send invitation to ', data.username);
         // send invitation to the user
-        sendFriendRequest(data.username, data.user_id);
+        sendFriendRequest(data.sender_username, data.sender_id, data.sender_avatar_url,
+          data.receiver_username, data.receiver_id
+        );
       }
 
 	  }
-	  // if (uploadFileNotEmpty() == false) {
-	  //   alert("No file selected");
-	  //   window.location.replace('/edit_profile');
-	  // }
-
+    console.log('handleFormSubmission > data: ', data);
 	  handleFormSubmission();
-	  // loadAdditionalJs(window.location.pathname);
 
 	} catch (error) {
 	  console.error('Form submission error:', error);
@@ -70,6 +62,7 @@ function listenSubmit(form) {
   });
 }
 
+// Function to upate the dropdown with matching usernames
 function update_dropdown(matching_usernames)
 {
   const usernameInput = document.getElementById('usernameInput');
@@ -84,11 +77,14 @@ function update_dropdown(matching_usernames)
     return;
   }
 
+  // Dropdown styling
   dropdown.style.display = 'block';
   dropdown.style.overflowY = 'auto';
   dropdown.style.overflowX = 'hidden';
   dropdown.style.maxHeight = '200px';
   dropdown.style.border = '4px solid #fff';
+
+  // Create a suggestion item for each matching username
   matching_usernames.forEach(username => {
     const suggestionItem = document.createElement('div');
     suggestionItem.classList.add('suggestion-item');
@@ -98,30 +94,36 @@ function update_dropdown(matching_usernames)
     suggestionItem.addEventListener('click', () => {
       usernameInput.value = username;
       dropdown.style.display = 'none';
+
+      //Click on submit button
+      const submitButton = document.getElementById('submit-invite-friend');
+      if (submitButton) {
+        submitButton.click();
+      }
     });
 
-   
+    // Append the suggestion item to the dropdown
     dropdown.appendChild(suggestionItem);
   });
 
-  // Optionally close the dropdown when clicking outside
-  // document.addEventListener('click', (event) => {
-  //   if (!suggestionsList.contains(event.target) && event.target !== usernameInput) {
-  //       suggestionsList.style.display = 'none';
-  //   }
-  // });
+  // Close the dropdown when clicking outside
+  document.addEventListener('click', (event) => {
+    if (!dropdown.contains(event.target) && event.target !== usernameInput) {
+      dropdown.style.display = 'none';
+    }
+  });
 
 }
-function onModalOpen(userID) {
+
+// We open the websocket only when the modal is open
+function onModalOpen(userID, modal) {
   console.log('Modal is open');
 
   /* WebSocket */
   inviteFriendSocket = new WebSocket('wss://localhost:8443/wss/inviteafriend/');
-  // const inviteFriendSocket = new WebSocket('/wss/gamecalc/');
 
   inviteFriendSocket.onopen = function(e) {
     console.log('inviteFriendSocket socket connected');
-    inviteFriendSocket.send(JSON.stringify({type: 'start', 'userID': userID}));
   };
 
   inviteFriendSocket.onmessage = function(e) {
@@ -148,16 +150,16 @@ function onModalOpen(userID) {
   else {
     console.error('inviteFriendSocket is not defined');
   }
-// if (inviteFriendSocket && inviteFriendSocket.readyState === WebSocket.OPEN) {
-//   inviteFriendSocket.send(JSON.stringify({'query': 'test'}));
-// } else {
-//   console.error('WebSocket is not open or not defined.');
-// }
+
+  modal.addEventListener('hidden.bs.modal', () => {
+    onModalClose(modal);
+});
 }
 
 function onModalClose(modal)
 {
   const formInviteFriend = document.getElementById('type-invite-friend');
+  console.log('Modal is closed');
 
   // Reset the form
   if (formInviteFriend) {
@@ -167,7 +169,7 @@ function onModalClose(modal)
     console.warn('Invite Friend form not found');
   }
 
-  // Close the WebSocket
+  // Close properly the websocket
   if (inviteFriendSocket && inviteFriendSocket.readyState === WebSocket.OPEN) {
     inviteFriendSocket.close();
     console.log('Modal is closed and WebSocket is closed');
@@ -176,8 +178,9 @@ function onModalClose(modal)
   }
   
 }
+
+// Function to listen for the friend invitation
 function listenFriendInvitation(modal, form) {
-  console.log('inviteFrienModal');
   let inputField = document.getElementById('username_input');
   let userID = document.getElementById('userID').value;
 
@@ -187,41 +190,35 @@ function listenFriendInvitation(modal, form) {
     // exit ===> handle error
   }  
 
+  // Listen for modal open
   modal.addEventListener('show.bs.modal', () => {
-    onModalOpen(userID);
+    onModalOpen(userID, modal);
     
   })
 
   // Listen for focus on the input field
   modal.addEventListener('focus', () => {
     isFocused = false;  // Mark input as not focused
-    console.log("Input lost focus");
   });
 
   // Listen for blur (when user leaves the input field)
   modal.addEventListener('blur', () => {
-    isFocused = true;  // Mark input as focused
-    console.log("Input is focused");
-    
+    isFocused = true;  
   });
 
   // Event listen for key press
   console.log('inputField.addEventListene:');
   window.addEventListener('keydown', (e) => {
-    // get the key pressed
-  if (isFocused)
+
+  // get the key pressed
+  if (isFocused && inviteFriendSocket.readyState === WebSocket.OPEN)
     {
       const pressedKey = e.key;
-      console.log(`Key pressed: ${pressedKey}`);
       inviteFriendSocket.send(JSON.stringify({type: 'input', 'key': pressedKey}));
     }
   });
 
-  modal.addEventListener('hidden.bs.modal', () => {
-    onModalClose(modal);
-    
-  });
+  // Listen for form submission
   if (form)
     listenSubmit(form);
 }
-

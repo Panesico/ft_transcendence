@@ -132,11 +132,13 @@ async function handleFormSubmission() {
 	const formUpload = document.getElementById('file-upload')
 	const formGeneral = document.getElementById('type-general')
 	const formSecurity = document.getElementById('type-security')
-	const formInviteFriend = document.getElementById('inviteFriendModal')
+	const modalInviteFriend = document.getElementById('inviteFriendModal')
+  const formFriendInvite = document.getElementById('type-invite-friend')
   
-	if (formInviteFriend) {
-	  listenFriendInvitation(formInviteFriend, form);
-	  console.log('form: ', form);
+	if (modalInviteFriend && formFriendInvite) {
+    console.log('modalInviteFriend && formFriendInvite');
+	  listenFriendInvitation(modalInviteFriend, formFriendInvite);
+	  console.log('form: ', formFriendInvite);
 	}
 	else if (formUpload) {
 	  listenFormUpload(formUpload);

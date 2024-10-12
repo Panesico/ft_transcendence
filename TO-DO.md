@@ -21,3 +21,4 @@ Remote game:
 - Redirection to edit_profile after update info
 - send friend request
 - windows.on_reload() => create websocket when a user is connected
+- Handle websocket if user not connected
