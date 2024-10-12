@@ -50,10 +50,13 @@
         <div class="btn-group" role="group" aria-label="{% trans 'Game mode selection' %}">
 
           <input type="radio" class="btn-check" name="gameMode" id="localMode" autocomplete="off" checked onchange="toggleRemoteMode()">
-          <label class="btn btn-outline-success" for="localMode">{% trans 'Local' %}</label>
+          <label class="btn btn-outline-success" for="localMode" style="min-width: 90px">{% trans 'Local' %}</label>
         
           <input type="radio" class="btn-check" name="gameMode" id="remoteMode" autocomplete="off" onchange="toggleRemoteMode()">
-          <label class="btn btn-outline-success" for="remoteMode">{% trans 'Remote' %}</label>
+          <label class="btn btn-outline-success" for="remoteMode" style="min-width: 90px">{% trans 'Remote' %}</label>
+
+          {% comment %} <input type="radio" class="btn-check" name="gameMode" id="AiMode" autocomplete="off" onchange="toggleRemoteMode()" disabled>
+          <label class="btn btn-outline-success" for="AiMode" style="min-width: 90px">{% trans 'AI' %}</label> {% endcomment %}
         
         </div>
       </div>
