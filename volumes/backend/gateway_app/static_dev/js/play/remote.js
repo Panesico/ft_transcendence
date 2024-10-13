@@ -1,34 +1,3 @@
-
-// Start button clicked from game or tournament page
-async function startRemoteGame(
-    game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id) {
-  console.log(
-      game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id);
-  // If normal game: startGame('pong', 0, 'single','Player1', 0, 'Player2', 0)
-  // Tournament: startGame('pong', '3', 'Semi-Final 1', 'django_superuser',1,
-  // 'Name2',0)
-
-  // Remove the start game button and previous winner name
-  document.getElementById('startGame-button')?.remove();
-  document.getElementById('playAgain-button')?.remove();
-  document.getElementById('nextRound-button')?.remove();
-  document.getElementById('startGame-winner')?.remove();
-
-  let game_result = {};
-  // Execute the game
-  if (game_type === 'pong') {
-    game_result = await executeRemotePongGame(p1_name);
-  } else if (game_type === 'cows') {
-    game_result = await executeCowGame(p1_name, p2_name);
-  }
-  console.log('game_result: ', game_result);
-
-  // Save the game result in the database
-  // saveGameResultInDatabase(
-  //     game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id,
-  //     game_result);
-}
-
 async function newRemoteGame(game_type, p1_name) {
   // Set up the canvas
   const canvas = document.createElement('canvas');
@@ -260,23 +229,4 @@ async function findRemoteGame() {
   let game_result = {};
   game_result = await newRemoteGame(game_type, p1_name);
   console.log('findRemoteGame > game_result: ', game_result);
-}
-
-function toggleRemoteMode() {
-  const remoteMode = document.getElementById('remoteMode').checked;
-  const player2Container = document.getElementById('form-player2');
-  const player2Input = document.getElementById('player2-input');
-  const button = document.getElementById('play-game-button');
-
-  if (remoteMode) {
-    player2Container.style.display = 'none';
-    player2Input.required = false;
-    button.textContent = 'Find remote game';
-    button.setAttribute('onclick', 'findRemoteGame()');
-  } else {
-    player2Container.style.display = 'block';
-    player2Input.required = true;
-    button.textContent = 'Play game';
-    button.setAttribute('onclick', 'playLocalGame()');
-  }
 }

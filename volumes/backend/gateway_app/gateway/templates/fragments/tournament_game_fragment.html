@@ -29,14 +29,17 @@
     <div id="game-container" class="d-flex flex-column align-items-center justify-content-center">
         <p id="startGame-winner" class="fs-1">{{ info.previous_winner_name }} {% trans "won" %}!</p>
         <button id="nextRound-button" class="btn btn-secondary rounded-0 fs-1 px-4"
-        onclick="nextRound('{{ info.game_round }}', '{{ info.p1_name }}', '{{ info.p2_name }}')">{% trans "Next Round" %}</button>
+        onclick="tournamentNextRound('{{ info.game_round }}', '{{ info.p1_name }}', '{{ info.p2_name }}')">{% trans "Next Round" %}</button>
         <button id="startGame-button" class="btn btn-secondary rounded-0 fs-1 px-4" style="display: none;"
-        onclick="startGame('pong',
+        onclick="
+        startGame('pong',
             '{{ info.tournament_id }}',
             '{{ info.game_round }}',
             '{{ info.p1_name }}',{{ info.p1_id }},
             '{{ info.p2_name }}',{{ info.p2_id }}
-          )">{% trans "Start" %}</button>
+            )
+            {% comment %} startNewGame('local', 'pong', '{{ info.game_round }}', '{{ info.p1_name }}', '{{ info.p2_name }}') {% endcomment %}
+          ">{% trans "Start" %}</button>
     </div>
 
   </div>

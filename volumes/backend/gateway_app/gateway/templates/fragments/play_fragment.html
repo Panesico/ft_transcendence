@@ -49,13 +49,13 @@
         <p class="fs-6 mb-2">{% trans 'Select game mode:' %}</p>
         <div class="btn-group" role="group" aria-label="{% trans 'Game mode selection' %}">
 
-          <input type="radio" class="btn-check" name="gameMode" id="localMode" autocomplete="off" checked onchange="toggleRemoteMode()">
+          <input type="radio" class="btn-check" name="gameMode" id="localMode" autocomplete="off" checked onchange="toggleGameMode()">
           <label class="btn btn-outline-success" for="localMode" style="min-width: 90px">{% trans 'Local' %}</label>
         
-          <input type="radio" class="btn-check" name="gameMode" id="remoteMode" autocomplete="off" onchange="toggleRemoteMode()">
+          <input type="radio" class="btn-check" name="gameMode" id="remoteMode" autocomplete="off" onchange="toggleGameMode()">
           <label class="btn btn-outline-success" for="remoteMode" style="min-width: 90px">{% trans 'Remote' %}</label>
 
-          {% comment %} <input type="radio" class="btn-check" name="gameMode" id="AiMode" autocomplete="off" onchange="toggleRemoteMode()" disabled>
+          {% comment %} <input type="radio" class="btn-check" name="gameMode" id="AiMode" autocomplete="off" onchange="toggleGameMode()" disabled>
           <label class="btn btn-outline-success" for="AiMode" style="min-width: 90px">{% trans 'AI' %}</label> {% endcomment %}
         
         </div>
@@ -77,7 +77,7 @@
         </div>
       </div>
       
-      <button id="play-game-button" type="button" class="btn btn-secondary" onclick="playLocalGame()">{% trans "Play game" %}</button>
+      <button id="play-game-button" type="button" class="btn btn-secondary" onclick="playGame()">{% trans "Play game" %}</button>
 
     </form>
 

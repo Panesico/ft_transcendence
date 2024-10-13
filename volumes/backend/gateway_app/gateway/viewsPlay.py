@@ -53,7 +53,7 @@ def post_tournament(request):
     data['p2_id'] = 0
     data['p3_id'] = 0
     data['p4_id'] = 0
-    data['tournament_type'] = 'Pong'
+    data['tournament_type'] = 'pong'
     logger.debug(f'post_tournament > extracted data from JSON: {data}')
 
     form = TournamentFormFrontend(data)

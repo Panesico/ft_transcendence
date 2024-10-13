@@ -45,7 +45,7 @@ class PongCalcLocal(AsyncWebsocketConsumer):
     logger.debug("PongCalcLocal > Client connected")
     # Send an initial message to confirm the connection
     await self.send(text_data=json.dumps({
-      'type': 'connection_established',
+      'type': 'connection_established, calcgame says hello',
       'message': 'You are connected!'
     }))
 
@@ -59,16 +59,17 @@ class PongCalcLocal(AsyncWebsocketConsumer):
     data = json.loads(text_data)
     logger.debug(f"PongCalcLocal > received data: {data}")
     
-    if data['type'] == 'opening_connection':
+    if data['type'] == 'opening_connection, game details':
        self.p1_name = data['p1_name']
        self.p2_name = data['p2_name']
-       logger.debug(f"PongCalcLocal > Opening connection with players: {self.p1_name}, {self.p2_name}")
+       logger.debug(f"PongCalcLocal > opening_connection with players: {self.p1_name}, {self.p2_name}")
+
+    if data['type'] == 'players_ready':
+        await self.start_game()
+
     if data['type'] == 'key_press':
       # logger.debug("PongCalcLocal > key press event")
       self.update_pressed_keys(data['keys'])
-
-    if data['type'] == 'game_start':
-        await self.start_game()
 
   async def start_game(self):
     # Start the game and send initial game state to the client
@@ -82,9 +83,9 @@ class PongCalcLocal(AsyncWebsocketConsumer):
         }))
         await asyncio.sleep(0.8)
 
-    logger.debug("PongCalcLocal > sending game_start")
+    logger.debug("PongCalcLocal > sending first game_update")
     await self.send(text_data=json.dumps({
-        'type': 'game_start',
+        'type': 'game_update',
         'game_state': self.gs
       }))
 
@@ -100,9 +101,9 @@ class PongCalcLocal(AsyncWebsocketConsumer):
       'type': 'game_end',
       'message': f'Game Over: {winner} wins!',
       'game_result': {
-          'winner': winner,
-          'scorePlayer1': self.gs['scorePlayer1'],
-          'scorePlayer2': self.gs['scorePlayer2'],
+          'game_winner_name': winner,
+          'p1_score': self.gs['scorePlayer1'],
+          'p2_score': self.gs['scorePlayer2'],
         }
     }))
 

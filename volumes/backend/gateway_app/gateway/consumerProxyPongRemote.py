@@ -293,14 +293,28 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
         else:
             game_result['game_winner_name'] = player2['player_name']
 
-        html = render_to_string('fragments/game_remote_end_fragment.html', {'game_result': game_result})
-        dataCalcgame['html'] = html
-        updated_calcgame_response = json.dumps(dataCalcgame)
+        # Save game to database
+        await self.save_game_to_database(game_id, game, player1, player2, game_result)
 
         # Notify players that the game has ended
-        await player1['ws'].send(updated_calcgame_response)
-        await player2['ws'].send(updated_calcgame_response)
+        html1 = render_to_string('fragments/game_end_fragment.html', {
+              'context': player1['context'],
+              'game_result': game_result
+            })
+        html2 = render_to_string('fragments/game_end_fragment.html', {
+              'context': player2['context'],
+              'game_result': game_result
+            })
 
+        dataCalcgame['html'] = html1
+        await player1['ws'].send(json.dumps(dataCalcgame))
+
+        dataCalcgame['html'] = html2
+        await player2['ws'].send(json.dumps(dataCalcgame))
+
+
+    async def save_game_to_database(self, game_id, game, player1, player2, game_result):
+        logger.debug(f"ProxyPongCalcRemote > save_game_to_database game_id: {game_id}")
         # Save game to database
         play_url = 'https://play:9003/api/saveGame/'
 
@@ -321,8 +335,8 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
             'p2_id': player2['player_id'],
             'p1_score': game_result.get('p1_score'),
             'p2_score': game_result.get('p2_score'),
-            'game_winner_name': player1['player_name'] if game_result.get('game_winner_id') == 'p1_name' else player2['player_name'],
-            'game_winner_id': player1['player_id'] if game_result.get('game_winner_id') == 'p1_name' else player2['player_id'],
+            'game_winner_name': player1['player_name'] if game_result.get('game_winner_name') == 'p1_name' else player2['player_name'],
+            'game_winner_id': player1['player_id'] if game_result.get('game_winner_name') == 'p1_name' else player2['player_id'],
         }
         
         ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
