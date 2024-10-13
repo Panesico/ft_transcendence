@@ -1,6 +1,9 @@
 #!/bin/sh
 
-sleep 6
+sleep 1
+until nc -z -v -w30 calcgame 9004 > /dev/null 2>&1; do
+  sleep 1
+done
 
 # ex: 
 # PROJECT_NAME: gateway
