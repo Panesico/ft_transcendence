@@ -7,7 +7,7 @@ def readMessage(message):
   logger.debug(f"readMessage > message: {message}")
   return message
 
-async def friendRequestResponse(content, users_connected, receiver_avatar_url):
+async def friendRequestResponse(content, users_connected, receiver_avatar_url, self):
   logger.debug(f'friendRequestResponse > Friend request response: {content}')
 
   sender_id = content.get('sender_id', '')
@@ -38,33 +38,58 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url):
       'receiver_avatar_url': receiver_avatar_url,
       'receiver_id': receiver_id
     })
+  
+  # Set the notification as read
+  profileapi_url = 'https://profileapi:9002/api/setnotifasread/' + str(sender_id) + '/' + str(receiver_id) + '/friend_request/'
+  csrf_token = self.scope['cookies']['csrftoken']
+  headers = {
+          'X-CSRFToken': csrf_token,
+          'Cookie': f'csrftoken={csrf_token}',
+          'Content-Type': 'application/json',
+          'HTTP_HOST': 'profileapi',
+          'Referer': 'https://gateway:8443',
+      }
+  try:
+    response = requests.get(profileapi_url, headers=headers, verify=os.getenv("CERTFILE"))
+    logger.debug(f'friendRequestResponse > response: {response}')
+    logger.debug(f'friendRequestResponse > response.json(): {response.json()}')
+
+    response.raise_for_status()
+    if response.status_code == 200:
+      logger.debug(f'friendRequestResponse > Notification marked as read')
+    else:
+      logger.debug(f'friendRequestResponse > Error marking notification as read')
+  except Exception as e:
+    logger.debug(f'friendRequestResponse > Error marking notification as read: {e}')
+    return
+
 
 async def friendRequest(content, users_connected, self):
-    sender_id = content.get('sender_id', '')
-    sender_username = content.get('sender_username', '')
-    receiver_username = content.get('receiver_username', '')
-    receiver_id = content.get('receiver_id', '')
-    sender_avatar_url = content.get('sender_avatar_url', '')
+  sender_id = content.get('sender_id', '')
+  sender_username = content.get('sender_username', '')
+  receiver_username = content.get('receiver_username', '')
+  receiver_id = content.get('receiver_id', '')
+  sender_avatar_url = content.get('sender_avatar_url', '')
 
-    logger.debug(f'friendRequest > sender_id: {sender_id}')
-    logger.debug(f'friendRequest > Friend request: {content}')
-    logger.debug(f'friendRequest > sender_username: {sender_username}')
-    logger.debug(f'friendRequest > receiver_username: {receiver_username}')
-    logger.debug(f'friendRequest > receiver_id: {receiver_id}')
+  logger.debug(f'friendRequest > sender_id: {sender_id}')
+  logger.debug(f'friendRequest > Friend request: {content}')
+  logger.debug(f'friendRequest > sender_username: {sender_username}')
+  logger.debug(f'friendRequest > receiver_username: {receiver_username}')
+  logger.debug(f'friendRequest > receiver_id: {receiver_id}')
 
-    # Check if user_id is in users_connected
-    if receiver_id in users_connected:
-      logger.debug(f'friendRequest > receiver_id: {receiver_id} is in users_connected')
-      await users_connected[receiver_id].send_json({
-        'type': 'friend_request',
-        'message': f'{receiver_username} sent you a friend request.',
-        'sender_username': sender_username,
-        'sender_id': sender_id,
-        'sender_avatar_url': sender_avatar_url,
-        'receiver_avatar_url': self.avatar_url,
-        'receiver_username': receiver_username,
-        'receiver_id': receiver_id
-      })
+  # Check if user_id is in users_connected
+  if receiver_id in users_connected:
+    logger.debug(f'friendRequest > receiver_id: {receiver_id} is in users_connected')
+    await users_connected[receiver_id].send_json({
+      'type': 'friend_request',
+      'message': f'{receiver_username} sent you a friend request.',
+      'sender_username': sender_username,
+      'sender_id': sender_id,
+      'sender_avatar_url': sender_avatar_url,
+      'receiver_avatar_url': self.avatar_url,
+      'receiver_username': receiver_username,
+      'receiver_id': receiver_id
+    })
 
     # Save friend request in database
     logger.debug(f'friendRequest > Save friend request in database')
@@ -86,6 +111,8 @@ async def friendRequest(content, users_connected, self):
 
       response.raise_for_status()
       if response.status_code == 201:
+        # We can now mark the notification as read
+
         logger.debug(f'friendRequest > Friend request saved in database')
       else:
         logger.debug(f'friendRequest > Error saving friend request in database')

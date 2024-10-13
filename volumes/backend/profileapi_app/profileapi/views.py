@@ -169,3 +169,23 @@ def get_notifications(request, user_id):
     except Exception as e:
         logger.debug(f'get_notifications > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+# Receive as parameter sender_id, receiver_id 
+def set_notif_as_readen(request, sender_id, receiver_id, type):
+    logger.debug("set_notif_as_readen")
+    try:
+        sender_obj = Profile.objects.get(user_id=sender_id)
+        receiver_obj = Profile.objects.get(user_id=receiver_id)
+        logger.debug('sender_obj and receiver_obj recovered')
+        notifications = Notification.objects.filter(sender=sender_obj, receiver=receiver_obj, type=type)
+        logger.debug('notifications recovered')
+        for notification in notifications:
+            notification.status = 'read'
+            notification.save()
+        return JsonResponse({'status': 'success', 'message': 'Notification marked as read'}, status=200)
+    except Profile.DoesNotExist:
+        logger.debug('set_notif_as_readen > User not found')
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+
+    
+    

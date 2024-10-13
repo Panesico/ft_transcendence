@@ -55,7 +55,7 @@ class mainRoom(AsyncJsonWebsocketConsumer):
 
     # Friend request response
     if typeMessage == 'friend_request_response':
-      await friendRequestResponse(content, users_connected, self.avatar_url)
+      await friendRequestResponse(content, users_connected, self.avatar_url, self)
       
 
       

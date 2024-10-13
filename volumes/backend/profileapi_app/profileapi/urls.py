@@ -20,4 +20,5 @@ urlpatterns = [
     # Notifications
     path('api/createnotif/', views.create_notifications, name='create_notifications'),
     path('api/getnotif/<str:user_id>/', views.get_notifications, name='get_notifications'),
+    path('api/setnotifasread/<str:sender_id>/<str:receiver_id>/<str:type>/', views.set_notif_as_readen, name='set_notif_as_readen'),
 ]
