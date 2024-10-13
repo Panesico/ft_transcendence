@@ -1,6 +1,6 @@
 import json, asyncio, logging, requests, os
 from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
-from .handleMainRoom import readMessage
+from .handleMainRoom import readMessage, friendRequestResponse
 from .handleInvite import get_authentif_variables
 logger = logging.getLogger(__name__)
 
@@ -70,6 +70,7 @@ class mainRoom(AsyncJsonWebsocketConsumer):
   async def receive_json(self, content):
     # Receive message from room group
     typeMessage = content.get('type', '')
+    logger.debug(f'mainRoom > typeMessage: {typeMessage}')
     if typeMessage == 'message':
       readMessage(content.get('message', ''))
     
@@ -94,11 +95,18 @@ class mainRoom(AsyncJsonWebsocketConsumer):
           'sender_username': sender_username,
           'sender_id': sender_id,
           'sender_avatar_url': sender_avatar_url,
+          'receiver_avatar_url': self.avatar_url,
           'receiver_username': receiver_username,
           'receiver_id': receiver_id
         })
       else:
         logger.debug(f'mainRoom > receiver_id: {receiver_id} is NOT in users_connected')
+    
+    # Friend request response
+    if typeMessage == 'friend_request_response':
+      await friendRequestResponse(content, users_connected, self.avatar_url)
+      
+
       
 
       

@@ -22,3 +22,5 @@ Remote game:
 - send friend request
 - windows.on_reload() => create websocket when a user is connected
 - Handle websocket if user not connected
+- Error handling of friend request -> send a request to himself + send more than a request to the same person
+- Add an href associated to the avatar displayed in notification

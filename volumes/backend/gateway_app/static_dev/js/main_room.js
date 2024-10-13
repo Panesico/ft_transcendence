@@ -2,6 +2,20 @@ let mainRoomSocket;
 
 unreadNotifications = false;
 
+// Safe way to send messages by socket
+function sendMessagesBySocket(message, socket)
+{
+  console.log('sendMessagesBySocket > message:', message);
+  if (socket.readyState === WebSocket.OPEN)
+  {
+    socket.send(JSON.stringify(message));
+  }
+  else
+  {
+    console.warn('sendMessagesBySocket > socket.readyState:', socket.readyState);
+  }
+}
+
 // Add event listener to the notification
 document.addEventListener('DOMContentLoaded', function() {
   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
@@ -16,21 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
   );
 });
 
-// // Check if user read notifications
-// function checkNotifications()
-// {
-//   console.log('checkNotifications > unreadNotifications:', unreadNotifications);
-//   if (unreadNotifications === true)
-//   {
-//     console.log('checkNotifications > unreadNotifications:', unreadNotifications);
-//     const notificationDropdown = document.getElementById('navbarDropdownNotifications');
-//     const bellIcon = notificationDropdown.querySelector('img');
-//     if (bellIcon) {
-//       bellIcon.src = '/media/utils_icons/bell_down.png';
-//     }
-//   }
-// }
-
+// Routine when user reload the page
 window.onload = () => {
   // Handle form submission
   handleFormSubmission();
@@ -53,7 +53,8 @@ window.onload = () => {
   // On websocket open
   mainRoomSocket.onopen = function(e) {
     console.log('mainRoomSocket opened');
-    mainRoomSocket.send(JSON.stringify({'type': 'message', 'message': 'main socket opened',}));
+    sendMessagesBySocket({'type': 'message', 'message': 'main socket opened',}, mainRoomSocket);
+//    mainRoomSocket.send(JSON.stringify({'type': 'message', 'message': 'main socket opened',}));
   };
 
   // On websocket message
@@ -91,13 +92,18 @@ function sendFriendRequest(sender_username, sender_id, sender_avatar_url, receiv
   console.log('sendFriendRequest > sender_avatar_url:', sender_avatar_url);
   console.log('sendFriendRequest > receiver_username:', receiver_username);
   console.log('sendFriendRequest > receiver_id:', receiver_id);
-  mainRoomSocket.send(JSON.stringify({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}));
+  sendMessagesBySocket({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}, mainRoomSocket);
+//  mainRoomSocket.send(JSON.stringify({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}));
 }
 
+// Parse the socket message
 function parseSocketMessage(data)
 {
   if (data.type === 'friend_request') {
-    addNotification(data);
+    addFriendRequestNotification(data);
+  }
+  if (data.type === 'friend_request_response') {
+    addFriendResponseNotification(data);
   }
   else
   {
