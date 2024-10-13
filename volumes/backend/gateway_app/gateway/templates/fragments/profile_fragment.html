@@ -43,12 +43,12 @@
       </div> {% endcomment %}
 
       <div class="btn-group flex-wrap" style="justify-content: center;">
-        <a href="{% url 'edit_profile' %}" class="btn btn-light mb-2" role="button" style="margin-right: 10px;">{% trans "Edit profile" %}</a>
+        <a href="{% url 'edit_profile' %}" class="btn btn-light mb-2" role="button" style="margin-right: 10px; border-bottom-left-radius: unset; border-top-left-radius: unset">{% trans "Edit profile" %}</a>
         <a href="{% url 'match_history' %}" class="btn btn-light mb-2" role="button" style="margin-right: 10px;">{% trans "Stats" %}</a>
-        <a href="{% url 'list_friends' %}" class="btn btn-light mb-2" role="button" style="margin-right: 10px;">{% trans "My friends" %}</a>
+        <a href="{% url 'list_friends' %}" class="btn btn-light mb-2" role="button" >{% trans "My friends" %}</a>
       
         <!-- This button will be below the others -->
-        <button type="button" class="btn btn-light mb-2" data-bs-toggle="modal" data-bs-target="#inviteFriendModal" style="width: 100%;">
+        <button type="button" class="btn btn-light mb-2" data-bs-toggle="modal" data-bs-target="#inviteFriendModal" style="width: 100%; border-top-right-radius: unset; border-bottom-right-radius: unset;">
           {% trans "Invite a friend" %}
         </button>
       </div>
@@ -89,3 +89,13 @@
     </div>
   </div>
 </div>
+
+
+<style>
+  .btn-light:hover {
+      background-color: #dc3545; /* Dark background color */
+      color: #fff; /* White text color */
+      border-color: #343a40; /* Dark border color */
+  }
+</style>
+
