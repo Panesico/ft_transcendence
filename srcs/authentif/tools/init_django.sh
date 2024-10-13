@@ -1,6 +1,9 @@
 #!/bin/sh
 
-sleep 3
+sleep 1
+until nc -z -v -w30 postgres 5432 > /dev/null 2>&1; do
+  sleep 1
+done
 
 # ex: 
 # PROJECT_NAME: gateway
