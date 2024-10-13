@@ -2,9 +2,9 @@ import json, asyncio, logging, requests, os
 logger = logging.getLogger(__name__)
 
 def get_authentif_variables(user_id):
-  profile_api_url = 'https://authentif:9001/api/getUserInfo/' + str(user_id)
-  logger.debug(f"get_authentif_variables > profile_api_url: {profile_api_url}")
-  response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+  authentif_api_url = 'https://authentif:9001/api/getUserInfo/' + str(user_id)
+  logger.debug(f"get_authentif_variables > authentif_api_url: {authentif_api_url}")
+  response = requests.get(authentif_api_url, verify=os.getenv("CERTFILE"))
   logger.debug(f"get_authentif_variables > Response: {response}")
   if response.status_code == 200:
     return response.json()

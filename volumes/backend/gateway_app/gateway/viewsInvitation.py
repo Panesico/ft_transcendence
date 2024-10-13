@@ -69,6 +69,13 @@ def post_invite(request):
     html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
     user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
     return user_response
+  elif data['username'] == sender_username:
+    status = 'error'
+    message = 'You cannot invite yourself'
+    form.add_error(None, 'You cannot invite yourself')
+    html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
+    user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
+    return user_response
   else:
     status = 'success'
     message = 'Invitation sent!'

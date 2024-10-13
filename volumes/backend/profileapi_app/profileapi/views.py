@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from profileapi.forms import InviteFriendForm
-from profileapi.models import Profile
+from profileapi.models import Profile, Notification
 from profileapi.forms import EditProfileForm
 from django.db import DatabaseError
 import json
@@ -39,25 +39,6 @@ def api_signup(request):
     else:
       return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-
-def api_invite_request(request):
-  logger.debug("api_invite_request")
-  if request.method == 'POST':
-    try:
-      data = json.loads(request.body)
-      form = InviteFriendForm(data)
-      if form.is_valid():
-        logger.debug('api_invite_request > Form is valid')         
-        return JsonResponse({'status': 'success', 'message': 'Invite request sent', 'status': 200})
-      else:
-        logger.debug('api_invite_request > Form is invalid')
-        return JsonResponse({'status': 'error', 'message': 'Invalid invite request'}, status=400)
-    except json.JSONDecodeError:
-      logger.debug('api_invite_request > Invalid JSON')
-      return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-  else:
-    logger.debug('api_invite_request > Method not allowed')
-    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
 def api_edit_profile(request):
     logger.debug("api_edit_profile")
@@ -124,3 +105,40 @@ def get_profile_api(request, user_id):
     except Exception as e:
         logger.debug(f'get_profile > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+def create_notifications(request):
+    logger.debug("create_notifications")
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            logger.debug(f'data: {data}')
+            sender_id = data.get('sender_id')
+            receiver_id = data.get('receiver_id')
+            message = data.get('message')
+            type = data.get('type')
+
+            logger.debug(f'sender: {sender_id}')
+            logger.debug(f'receiver: {receiver_id}')
+            logger.debug(f'message: {message}')
+            logger.debug(f'type: {type}')
+            
+            if (sender_id == receiver_id):
+                return JsonResponse({'status': 'error', 'message': 'You cannot send a notification to yourself'}, status=400)
+
+            sender_obj = Profile.objects.get(user_id=sender_id)
+            receiver_obj = Profile.objects.get(user_id=receiver_id)
+            logger.debug('sender_obj and receiver_obj recovered')
+            notification = Notification(
+                sender=sender_obj,
+                receiver=receiver_obj,
+                message=message,
+                type=type
+            )
+            notification.save()
+            return JsonResponse({'status': 'success', 'message': 'Notification created'}, status=201)
+        except (json.JSONDecodeError, DatabaseError) as e:
+            logger.debug(f'create_notifications > Invalid JSON error: {str(e)}')
+            return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
+    else:
+        logger.debug('create_notifications > Method not allowed')
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
