@@ -142,3 +142,30 @@ def create_notifications(request):
     else:
         logger.debug('create_notifications > Method not allowed')
         return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+def get_notifications(request, user_id):
+    logger.debug("get_notifications")
+    id = int(user_id)
+    logger.debug(f"id: {id}")
+    try:
+        user_obj = Profile.objects.get(user_id=id)
+        logger.debug('user_obj recovered')
+        notifications = Notification.objects.filter(receiver=user_obj)
+        logger.debug('notifications recovered')
+        data = []
+        for notification in notifications:
+            data.append({
+                'sender': notification.sender.user_id,
+                'receiver': notification.receiver.user_id,
+                'message': notification.message,
+                'type': notification.type,
+                'date': notification.date,
+                'status': notification.status,
+            })
+        return JsonResponse(data, status=200, safe=False)
+    except Profile.DoesNotExist:
+        logger.debug('get_notifications > User not found')
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    except Exception as e:
+        logger.debug(f'get_notifications > {str(e)}')
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

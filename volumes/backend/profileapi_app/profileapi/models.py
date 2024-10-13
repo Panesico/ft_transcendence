@@ -22,6 +22,7 @@ class Notification(models.Model):
     type = models.CharField(max_length=16) # friend_request, friend_request_response, message
     message = models.CharField(max_length=256)
     date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=16, default='unread') # unread, read
 
     def __str__(self):
         return f'{self.sender.user_id} to {self.receiver.user_id}'

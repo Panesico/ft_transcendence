@@ -19,5 +19,5 @@ urlpatterns = [
 
     # Notifications
     path('api/createnotif/', views.create_notifications, name='create_notifications'),
-    #path('api/getnotif/<str:user_id>/', views.get_notifications, name='get_notifications'),
+    path('api/getnotif/<str:user_id>/', views.get_notifications, name='get_notifications'),
 ]

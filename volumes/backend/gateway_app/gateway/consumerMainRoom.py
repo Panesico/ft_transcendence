@@ -1,6 +1,6 @@
 import json, asyncio, logging, requests, os
 from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
-from .handleMainRoom import readMessage, friendRequestResponse, friendRequest
+from .handleMainRoom import readMessage, friendRequestResponse, friendRequest, handleNewConnection, checkForNotifications
 from .handleInvite import get_authentif_variables
 logger = logging.getLogger(__name__)
 
@@ -19,36 +19,9 @@ class mainRoom(AsyncJsonWebsocketConsumer):
 
   async def connect(self):
         await self.accept()
-
-        # Get user id from URL
-        self.user_id = self.scope['url_route']['kwargs']['user_id']
-        logger.debug(f'mainRoom > self.user_id: {self.user_id}')
-
-        # Check if user is already connected
-        if self.user_id not in users_connected and self.user_id is not None:
-          users_connected[self.user_id] = self
-          await self.send_json({
-              'message': 'You are connected to the main room!'
-          })
-
-          # Get user info
-          user_data = get_authentif_variables(self.user_id)
-          if user_data is not None:
-            self.username = user_data.get('username', '')
-            logger.debug(f'mainRoom > self.username: {self.username}')
-            self.avatar_url = '/media/' + user_data.get('avatar_url', '')
-            logger.debug(f'mainRoom > self.avatar_url: {self.avatar_url}')
-            await self.send_json({
-              'message': f'Welcome {self.room_user_name}!'
-            })
-          # Broadcast message to room group
-          for user, connection in users_connected.items():
-            await connection.send_json({
-              'message': f'{self.user_id} has joined the main room.'
-            })
-        else:
-          logger.debug(f'mainRoom > self.user_id: {self.user_id} closed connection')
-          await self.close()
+        await handleNewConnection(self, users_connected)
+        await checkForNotifications(self)
+        
 
   async def disconnect(self, close_code):
     # Remove user from users_connected
@@ -71,6 +44,8 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     # Receive message from room group
     typeMessage = content.get('type', '')
     logger.debug(f'mainRoom > typeMessage: {typeMessage}')
+
+    # Message / Logs
     if typeMessage == 'message':
       readMessage(content.get('message', ''))
     
