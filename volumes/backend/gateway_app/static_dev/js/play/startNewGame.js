@@ -21,14 +21,21 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name) {
       {w: false, s: false, 5: false, 8: false, ' ': false, Escape: false} :
       {w: false, s: false, ' ': false, Escape: false};
 
+  // Gets WebSocket for the game mode and game type
   function getCalcGameSocket(gameMode, gameType) {
     let calcGameSocket;
-    if (gameMode === 'local' && (gameType === 'pong' || gameType === 'cows')) {
-      calcGameSocket = new WebSocket('/wss/calcgame/game/local/');
-    } else if (gameMode === 'remote' && gameType === 'pong') {
-      calcGameSocket = new WebSocket('/wss/calcgame/pong/remote/');
-    } else if (gameMode === 'remote' && gameType === 'cows') {
-      calcGameSocket = new WebSocket('/wss/calcgame/cows/remote/');
+    if ((gameMode === 'local' || gameMode === 'remote') &&
+        (gameType === 'pong' || gameType === 'cows')) {
+      calcGameSocket =
+          new WebSocket(`/wss/calcgame/${gameMode}/?gameType=${gameType}`);
+    } else {
+      let lang = getCookie('django_language');
+      let error = 'Input error';
+      if (lang === 'fr')
+        error = 'Erreur de saisie';
+      else if (lang === 'es')
+        error = 'Error de entrada';
+      displayError(error);
     }
     return calcGameSocket;
   }
@@ -101,6 +108,8 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name) {
 
   return new Promise((resolve, reject) => {
     const calcGameSocket = getCalcGameSocket(gameMode, gameType);
+    if (calcGameSocket === undefined) return;
+
     let game_id;
     let player_role;
 
@@ -148,11 +157,15 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name) {
         calcGameSocket.send(JSON.stringify({
           type: 'opening_connection, game details',
           p1_name: p1_name,
-          p2_name: p2_name
+          p2_name: p2_name,
+          game_type: gameType
         }));
       else if (gameMode === 'remote')
-        calcGameSocket.send(JSON.stringify(
-            {type: 'opening_connection, my name is', p1_name: p1_name}));
+        calcGameSocket.send(JSON.stringify({
+          type: 'opening_connection, my name is',
+          p1_name: p1_name,
+          game_type: gameType
+        }));
     };
 
     calcGameSocket.onmessage = function(e) {

@@ -1,3 +1,8 @@
+function displayError(errorMessage) {
+  document.getElementById('error-div').style.display = 'block';
+  document.querySelector('.errorlist').textContent = errorMessage;
+}
+
 function checkValidInput(gameMode, gameType, p1_name, p2_name) {
   let lang = getCookie('django_language');
 
@@ -5,13 +10,12 @@ function checkValidInput(gameMode, gameType, p1_name, p2_name) {
   if (!gameMode || !gameType ||
       (gameMode !== 'local' && gameMode !== 'remote') ||
       (gameType !== 'pong' && gameType !== 'cows')) {
-    document.getElementById('error-div').style.display = 'block'
     let error = 'Invalid selection';
     if (lang === 'fr')
       error = 'Sélection invalide';
     else if (lang === 'es')
       error = 'Selección inválida';
-    document.querySelector('.errorlist').textContent = error;
+    displayError(error);
 
     return false;
   }
@@ -22,26 +26,24 @@ function checkValidInput(gameMode, gameType, p1_name, p2_name) {
       (gameMode === 'local' &&
        (p1_name.length === 0 || p2_name.length === 0 ||
         p1_name.trim().length === 0 || p2_name.trim().length === 0))) {
-    document.getElementById('error-div').style.display = 'block'
     let error = 'Name can\'t be empty';
     if (lang === 'fr')
       error = 'Le nom ne peut pas être vide';
     else if (lang === 'es')
       error = 'El nombre no puede estar vacío';
-    document.querySelector('.errorlist').textContent = error;
+    displayError(error);
 
     return false;
   }
 
   // Check if the names are different
   if (gameMode === 'local' && (p1_name === p2_name)) {
-    document.getElementById('error-div').style.display = 'block'
     let error = 'Names must be different';
     if (lang === 'fr')
       error = 'Les noms doivent être différents';
     else if (lang === 'es')
       error = 'Los nombres deben ser diferentes';
-    document.querySelector('.errorlist').textContent = error;
+    displayError(error);
 
     return false;
   }

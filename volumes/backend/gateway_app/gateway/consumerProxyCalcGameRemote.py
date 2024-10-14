@@ -2,14 +2,17 @@ import os, json, logging, websockets, ssl, asyncio, requests, aiohttp
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
 from django.middleware.csrf import get_token
+from ppretty import ppretty
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+logging.getLogger('websockets').setLevel(logging.WARNING)
 
-# On connect, adds self to waiting_players
-# If 2 players in waiting_players, starts a game. Tracked in active_games
+# On connect, adds self to waiting
+# If 2 players in waiting, starts a game. Tracked in active_games
 # self.active_games = {
             # "game_id": {
+            #     "game_type": 'pong' or 'cows',
             #     "player1": {
             #         "channel_name": "channel_name",
             #         "player_name": "player_name",
@@ -23,21 +26,29 @@ logging.basicConfig(level=logging.DEBUG)
             #     "calcgame_task": "calcgame_task",
         # }
 
-class ProxyPongCalcRemote(AsyncWebsocketConsumer):
-    # Dictionary to store active games
-    active_games = {}
-    # Dictionary to store players waiting for a game
-    waiting_players = {}
+class ProxyCalcGameRemote(AsyncWebsocketConsumer):
+    active_games = {} # Dictionary to store active games
+    waiting = {} # Dictionary to store players waiting for a game
 
     # Add check 
     # user should not be able to play against themselves through two remote games
 
     async def connect(self):
-        logger.debug("ProxyPongCalcRemote > connect")
-
-        # Accept the WebSocket connection from the client
+        logger.debug("ProxyCalcGameRemote > connect")
         await self.accept()
-
+        
+        # Extract the query selector from the WebSocket URL
+        query_selector = self.scope['query_string'].decode('utf-8')
+        if '=' in query_selector and len(query_selector.split('=')) > 1:
+            game_type = query_selector.split('=')[1]
+        else:
+            game_type = None
+        
+        if game_type == None or game_type not in ['pong', 'cows']:
+            logger.error("ProxyCalcGameRemote > No game_type provided, connection closed")
+            await self.close()
+            return
+        
         # Generate a unique player ID for this connection
         connect_id = self.channel_name
         context = {
@@ -45,8 +56,11 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
             'session': self.scope['session'],
             'cookies': self.scope['cookies'],
         }
+
+        if game_type not in self.waiting:
+            self.waiting[game_type] = {}
         
-        self.waiting_players[connect_id] = {
+        self.waiting[game_type][connect_id] = {
             'channel_name': self.channel_name,
             'player_name': None,
             'player_id': 0,
@@ -54,64 +68,71 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
             'context': context,
         }
         
-        logger.debug(f"Player connected and added to waiting_players: {connect_id}")
+        logger.debug(f"Player connected and added to waiting: {connect_id}")
 
         await self.waiting_room()
         
-        self.check_waiting_players_task = asyncio.create_task(self.check_waiting_players())
+        self.check_waiting_task = asyncio.create_task(self.check_waiting(game_type))
 
-    async def check_waiting_players(self):
+    async def check_waiting(self, game_type):
         while True:
-            # Filter players with player_name not None
-            filtered_players = {k: v for k, v in self.waiting_players.items() 
-            if v['player_name'] is not None}
-            if len(filtered_players) >= 2:
-                # Pop two players from filtered_players
-                player1_id, player1 = filtered_players.popitem()
-                player2_id, player2 = filtered_players.popitem()
+            if game_type in self.waiting:
+                # Filter players with player_name not None
+                filtered_players = {k: v for k, v in self.waiting[game_type].items() if v['player_name'] is not None}
 
-                # Remove the popped players from waiting_players
-                self.waiting_players.pop(player1_id)
-                self.waiting_players.pop(player2_id)
+                # logger.debug(ppretty(filtered_players, indent='  ', width=80))
 
-                # Generate a unique game ID
-                game_id = f"game_{len(self.active_games) + 1}"
+                if len(filtered_players) >= 2:
+                    # Pop two players from filtered_players
+                    player1_id, player1 = filtered_players.popitem()
+                    player2_id, player2 = filtered_players.popitem()
 
-                # Add the game to the active_games dictionary
-                self.active_games[game_id] = {
-                    "player1": player1,
-                    "player2": player2,
-                }
+                    # Remove the popped players from waiting
+                    self.waiting[game_type].pop(player1_id)
+                    self.waiting[game_type].pop(player2_id)
 
-                # logger.debug(f"ProxyPongCalcRemote > Two players connected, starting with ID: {game_id}")
-                # logger.debug(f"ProxyPongCalcRemote > start_game player1: {player1}")
-                # logger.debug(f"ProxyPongCalcRemote > start_game player2: {player2}")
-                await asyncio.sleep(2)
-                await self.start_game(game_id)
+                    # Generate a unique game ID
+                    game_id = f"game_{len(self.active_games) + 1}"
+
+                    # Add the game to the active_games dictionary
+                    self.active_games[game_id] = {
+                        "game_type": player1['game_type'],
+                        "player1": player1,
+                        "player2": player2,
+                    }
+
+                    # logger.debug(f"ProxyCalcGameRemote > Two players connected, starting with ID: {game_id}")
+                    # logger.debug(f"ProxyCalcGameRemote > start_game player1: {player1}")
+                    # logger.debug(f"ProxyCalcGameRemote > start_game player2: {player2}")
+                    await asyncio.sleep(2)
+                    await self.start_game(game_id)
+                else:
+                    await asyncio.sleep(1)
             else:
                 await asyncio.sleep(1)
 
     async def start_game(self, game_id):
         logger.debug("")
-        logger.debug(f"ProxyPongCalcRemote > start_game game_id: {game_id}")
-        player1 = self.active_games[game_id]['player1']
-        player2 = self.active_games[game_id]['player2']
-        logger.debug(f"ProxyPongCalcRemote > start_game player1: {player1}")
-        logger.debug(f"ProxyPongCalcRemote > start_game player2: {player2}")
+        logger.debug(f"ProxyCalcGameRemote > start_game game_id: {game_id}")
+        game = self.active_games[game_id]
+        player1 = game['player1']
+        player2 = game['player2']
+        logger.debug(f"ProxyCalcGameRemote > start_game player1: {player1}")
+        logger.debug(f"ProxyCalcGameRemote > start_game player2: {player2}")
 
-        # logger.debug(f"ProxyPongCalcRemote > start_game p1 context: {player1['context']}")
-        # logger.debug(f"ProxyPongCalcRemote > start_game p2 context: {player2['context']}")
+        # logger.debug(f"ProxyCalcGameRemote > start_game p1 context: {player1['context']}")
+        # logger.debug(f"ProxyCalcGameRemote > start_game p2 context: {player2['context']}")
         info = {
             'tournament_id': 0,
             'game_round': 'single',
-            'game_type': 'pong',
+            'game_type': game['game_type'],
             'p1_name': player1['player_name'],
             'p2_name': player2['player_name'],
             'p1_id': player1['player_id'],
             'p2_id': player2['player_id'],
         }
         html1 = render_to_string('fragments/game_remote_fragment.html', {'context': player1['context'], 'info': info})
-        # logger.debug(f"ProxyPongCalcRemote > start_game html1: {html1}")
+        # logger.debug(f"ProxyCalcGameRemote > start_game html1: {html1}")
         html2 = render_to_string('fragments/game_remote_fragment.html', {'context': player1['context'], 'info': info})
 
         try: # Notify players that the game is starting            
@@ -134,7 +155,7 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
             }))
             
         except Exception as e:
-            logger.error(f"ProxyPongCalcRemote > start_game Error notifying players: {e}")
+            logger.error(f"ProxyCalcGameRemote > start_game Error notifying players: {e}")
 
         # Create an SSL context that explicitly trusts the calcgame certificate
         ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
@@ -142,7 +163,7 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
 
         # Establish the WebSocket connection with the calcgame service
         calcgame_ws = await websockets.connect(
-            "wss://calcgame:9004/pongcalc_consumer/remote/",
+            f"wss://calcgame:9004/pongcalc_consumer/remote/{game['game_type']}/",
             ssl=ssl_context
         )
 
@@ -155,40 +176,47 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
-        logger.debug("ProxyPongCalcRemote > disconnect")
+        logger.debug("ProxyCalcGameRemote > disconnect")
 
-        # Remove the player from waiting_players
         connect_id = self.channel_name
-        if connect_id in self.waiting_players:
-            del self.waiting_players[connect_id]
-        logger.debug(f"Player {connect_id} disconnected and removed from waiting_players")
 
-        # Close the WebSocket connection to the calcgame service
+        # Remove the player from the appropriate waiting[game_type] list if they exist
+        for game_type, waiting_players in self.waiting.items():
+            if connect_id in waiting_players:
+                del waiting_players[connect_id]
+                logger.debug(f"Player {connect_id} disconnected and removed from waiting[{game_type}]")
+                break  # Stop once the player is found and removed
+
+        # Close the WebSocket connection to the calcgame service if it exists
         if hasattr(self, 'calcgame_ws'):
             await self.calcgame_ws.close()
 
-        # Cancel the background task listening to calcgame
+        # Cancel the background task listening to calcgame if it exists
         if hasattr(self, 'calcgame_task'):
             self.calcgame_task.cancel()
-            
+
 
     async def receive(self, text_data):
         # Handle messages received from the client
-        logger.debug(f"ProxyPongCalcRemote > receive from {self.channel_name}")
-        logger.debug(f"ProxyPongCalcRemote > receive from client: {text_data}")
+        logger.debug(f"ProxyCalcGameRemote > receive from {self.channel_name}")
+        logger.debug(f"ProxyCalcGameRemote > receive from client: {text_data}")
         data = json.loads(text_data)
         connect_id = self.channel_name
 
         if data['type'] == 'opening_connection, my name is':
             # Client confirms connection with their player name
-            if connect_id in self.waiting_players:
-                self.waiting_players[connect_id]['player_name'] = data['p1_name']
-                self.waiting_players[connect_id]['ready'] = False
+            game_type = data['game_type']
+            if connect_id in self.waiting[game_type]:
+                player = self.waiting[game_type][connect_id]
+                player['player_name'] = data['p1_name']
+                player['ready'] = False
+                player['game_type'] = game_type
                 if self.scope['user'].is_authenticated:
-                  self.waiting_players[connect_id]['player_id'] = self.scope['user'].id
-                logger.debug(f"Updated waiting_players[{connect_id}] with player_name: {data['p1_name']}, player_id: {self.waiting_players[connect_id]['player_id']}")
+                  player['player_id'] = self.scope['user'].id
+
+                logger.debug(f"Updated waiting[{game_type}][{connect_id}] with player_name: {data['p1_name']}, player_id: {self.waiting[game_type][connect_id]['player_id']}")
             else:
-                logger.error(f"Player {connect_id} not found in waiting_players")
+                logger.error(f"Player {connect_id} not found in waiting")
 
         elif data['type'] == 'player_ready':
             game = self.active_games[data['game_id']]
@@ -237,6 +265,9 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
                 calcgame_response = await calcgame_ws.recv()
                 data = json.loads(calcgame_response)
                 
+                if not data['type'] == 'game_update' and data['message']:
+                    logger.debug(f"ProxyCalcGameLocal > from calcgame: {data['message']}")
+                    
                 if data['type'] == 'connection_established, calcgame says hello':
                     # Connection established with calcgame, send back game info
                     text_data = json.dumps({
@@ -260,11 +291,11 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
                     await player2['ws'].send(calcgame_response)                
 
         except websockets.exceptions.ConnectionClosed:
-            logger.debug("ProxyPongCalcRemote > calcgame connection closed")
+            logger.debug("ProxyCalcGameRemote > calcgame connection closed")
             pass
 
     async def waiting_room(self):
-        logger.debug("ProxyPongCalcRemote > player in waiting_room")
+        logger.debug("ProxyCalcGameRemote > player in waiting_room")
 
         context = {
             'user': self.scope['user'],
@@ -280,7 +311,7 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
         }))
 
     async def game_end(self, game_id, calcgame_response):
-        logger.debug(f"ProxyPongCalcRemote > game_end game_id: {game_id}")
+        logger.debug(f"ProxyCalcGameRemote > game_end game_id: {game_id}")
         game = self.active_games[game_id]
         player1 = game['player1']
         player2 = game['player2']
@@ -296,7 +327,7 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
         # Save game to database
         await self.save_game_to_database(game_id, game, player1, player2, game_result)
 
-        # Notify players that the game has ended
+        # Notify players that the game has ended and send game_end html
         html1 = render_to_string('fragments/game_end_fragment.html', {
               'context': player1['context'],
               'game_result': game_result
@@ -314,7 +345,7 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
 
 
     async def save_game_to_database(self, game_id, game, player1, player2, game_result):
-        logger.debug(f"ProxyPongCalcRemote > save_game_to_database game_id: {game_id}")
+        logger.debug(f"ProxyCalcGameRemote > save_game_to_database game_id: {game_id}")
         # Save game to database
         play_url = 'https://play:9003/api/saveGame/'
 
@@ -349,16 +380,16 @@ class ProxyPongCalcRemote(AsyncWebsocketConsumer):
                     # Check if response status is 200 OK
                     if response.status == 200:
                         response_json = await response.json()
-                        logger.debug(f"ProxyPongCalcRemote > calcgame responds: {response_json.get('message')}")
+                        logger.debug(f"ProxyCalcGameRemote > calcgame responds: {response_json.get('message')}")
                     else:
-                        logger.error(f"ProxyPongCalcRemote > Failed to save game. Status code: {response.status}")
+                        logger.error(f"ProxyCalcGameRemote > Failed to save game. Status code: {response.status}")
             except aiohttp.ClientError as e:
-                logger.error(f"ProxyPongCalcRemote > Error during request: {e}")
+                logger.error(f"ProxyCalcGameRemote > Error during request: {e}")
 
         # Close the websocket connection to the calcgame service
         await game['calcgame_ws'].close()
-        logger.debug(f"ProxyPongCalcRemote > calcgame_ws closed")
+        logger.debug(f"ProxyCalcGameRemote > calcgame_ws closed")
 
         # Remove the game from active_games
         self.active_games.pop(game_id)
-        logger.debug("ProxyPongCalcRemote > game removed from active_games")
+        logger.debug("ProxyCalcGameRemote > game removed from active_games")

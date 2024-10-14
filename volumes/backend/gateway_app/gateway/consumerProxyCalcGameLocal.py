@@ -1,22 +1,35 @@
 import os, json, logging, websockets, ssl, asyncio, aiohttp
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-logger = logging.getLogger(__name__)
 
-logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+logging.getLogger('websockets').setLevel(logging.WARNING)
+
 
 class ProxyCalcGameLocal(AsyncWebsocketConsumer):
     async def connect(self):
         logger.debug("ProxyCalcGameLocal > connect")
         await self.accept()
-
+        
+        # Extract the query selector from the WebSocket URL
+        query_selector = self.scope['query_string'].decode('utf-8')
+        if '=' in query_selector and len(query_selector.split('=')) > 1:
+            game_type = query_selector.split('=')[1]
+        else:
+            game_type = None
+        
+        if game_type == None or game_type not in ['pong', 'cows']:
+            logger.error("ProxyCalcGameRemote > No game_type provided, connection closed")
+            await self.close()
+            return
+        
         # Create an SSL context that explicitly trusts the calcgame certificate
         ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         ssl_context.load_verify_locations(os.getenv("CERTFILE"))
 
         # Establish the WebSocket connection with the trusted certificate
         self.calcgame_ws = await websockets.connect(
-            "wss://calcgame:9004/pongcalc_consumer/local/",
+            f"wss://calcgame:9004/pongcalc_consumer/local/{game_type}/",
             ssl=ssl_context
         )
 
@@ -41,6 +54,7 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
         if data['type'] == 'opening_connection, game details':
             self.p1_name = data['p1_name']
             self.p2_name = data['p2_name']
+            self.game_type = data['game_type']
             self.context = {
                 'user': self.scope['user'],
                 'session': self.scope['session'],
@@ -73,9 +87,13 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
     async def listen_to_calcgame(self):
         try:
             while True:
-                # Continuously receive messages from calcgame
+                # Continuously receive messages from calcgame and pass to client
                 calcgame_response = await self.calcgame_ws.recv()
                 data = json.loads(calcgame_response)
+
+                if not data['type'] == 'game_update' and data['message']:
+                    logger.debug(f"ProxyCalcGameLocal > from calcgame: {data['message']}")
+
                 if data['type'] == 'game_end':
                     # Game ended
                     await self.game_end(calcgame_response)
@@ -100,13 +118,13 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
         data_calcgame_response['html'] = html
 
         # Save game to database
-        await self.save_game_to_database(game_result, data_calcgame_response)
+        await self.save_game_to_database(game_result)
 
-        # Notify player that the game has ended
+        # Notify player that the game has ended and send game_end html
         await self.send(json.dumps(data_calcgame_response))
         
 
-    async def save_game_to_database(self, game_result, data_calcgame_response):
+    async def save_game_to_database(self, game_result):
         logger.debug("ProxyCalcGameLocal > save_game_to_database")
         # Save game to database
         play_url = 'https://play:9003/api/saveGame/'
@@ -142,8 +160,8 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
                     # Check if response status is 200 OK
                     if response.status == 200:
                         response_json = await response.json()
-                        logger.debug(f"ProxyPongCalcRemote > calcgame responds: {response_json.get('message')}")
+                        logger.debug(f"ProxyCalcGameLocal > calcgame responds: {response_json.get('message')}")
                     else:
-                        logger.error(f"ProxyPongCalcRemote > Failed to save game. Status code: {response.status}")
+                        logger.error(f"ProxyCalcGameLocal > Failed to save game. Status code: {response.status}")
             except aiohttp.ClientError as e:
-                logger.error(f"ProxyPongCalcRemote > Error during request: {e}")
+                logger.error(f"ProxyCalcGameLocal > Error during request: {e}")
