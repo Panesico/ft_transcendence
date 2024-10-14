@@ -24,16 +24,34 @@ def get_home(request):
     return render(request, 'partials/home.html', {'status': status, 'message': message})
 
 def list_friends(request):
-	if not request.user.is_authenticated:
-		return redirect('login')
-	logger.debug("")
-	logger.debug("list_friends")
-	context = {'username': "Mbappe", 'city': "Madrid", 'country': "Spain"}
-	name = "Mbappe"
-	city = "Madrid"
-	country = "Spain"
-	my_variable = {'name': name, 'city': city, 'country': country, 'played': 10, 'won': 5, 'lost': 5}
-	return (render(request, 'partials/myfriends.html', my_variable))
+    logger.debug("")
+    logger.debug(f"list_friends > request: {request}")
+    if not request.user.is_authenticated:
+      return redirect('login')
+    if request.method != 'GET':
+      return redirect('405')
+
+    # Get friends
+    profile_api_url = 'https://profileapi:9002/api/getfriends/' + str(request.user.id) + '/'
+    response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+    friends = response.json()
+    logger.debug(f"list_friends > friends: {friends}")
+    if response.status_code == 200:
+      if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        # if friends is empty
+        if not friends or len(friends) == 0:
+          html = render_to_string('fragments/myfriends_fragment.html', request=request)
+          return JsonResponse({'html': html, 'status': 200})
+        else:
+          html = render_to_string('fragments/myfriends_fragment.html', {'friends': friends}, request=request)
+          return JsonResponse({'html': html, 'status': 200})
+      return render(request, 'partials/myfriends.html', {'friends': friends})
+    else:
+      if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'error': 'Error retrieving friends'}, status=500)
+      return render(request, 'partials/myfriends.html', {'error': 'Error retrieving friends'})
+
+
 	# if request.method == 'GET':
 	# 	if request.headers.get('x-requested-with') == 'XMLHttpRequest':
 	# 		logger.debug("list_friends > GET")

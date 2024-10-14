@@ -9,7 +9,7 @@ class Profile(models.Model):
     played_games = models.IntegerField(default=0)
     wins = models.IntegerField(default=0)
     defeats = models.IntegerField(default=0)
-    friends = models.ManyToManyField('self', blank=True)
+    friends = models.ManyToManyField('self', blank=True, symmetrical=True)
     preferred_language = models.CharField(max_length=2,choices=[('en', 'English'),('fr', 'French'),('es', 'Spanish')],default='en')
 
     # This method is used to display the object in the admin panel

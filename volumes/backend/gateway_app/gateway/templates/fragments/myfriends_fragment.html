@@ -5,41 +5,55 @@
         <div class="col-md-10">
             <div class="people-nearby">
                 {% if user.is_authenticated %}
-                    {% for friend in user.friends.all %}
-                        <div class="card mb-3" style="background-color: grey;">
-                            <div class="row g-0">
-                                <div class="col-md-2 col-sm-2 d-flex align-items-center justify-content-center">
-                                    {% if friend.avatar %}
-                                        <img src="{{ friend.avatar.url }}" alt="{{ friend.username }}"
-                                            class="profile-photo-lg rounded-circle img-fluid" style="height: 7rem; width: 7rem; object-fit: cover;">
-                                    {% else %}
-                                        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="{% trans "default icon" %}"
-                                            class="profile-photo-lg rounded-circle img-fluid" style="height: 7rem; width: 7rem; object-fit: cover;">
-                                    {% endif %}
+                {% comment %} If user has no friends {% endcomment %}
+                  {% if friends %}
+                      {% for friend in friends %}
+                          <div class="card mb-3" style="background-color: grey;">
+                              <div class="row g-0">
+                                  <div class="col-md-2 col-sm-2 d-flex align-items-center justify-content-center">
+                                      {% if friend.avatar %}
+                                          <img src="{{ friend.avatar }}" alt="{{ friend.username }}"
+                                              style="height: 7rem; width: 7rem; object-fit: center; height: 7rem; width: 7rem; object-fit: center; border-radius: 50%; border: 2px solid #fff;">
+                                      {% else %}
+                                          <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="{% trans "default icon" %}"
+                                              style="height: 7rem; width: 7rem; object-fit: center; height: 7rem; width: 7rem; object-fit: center; border-radius: 50%; border: 2px solid #fff;">
+                                      {% endif %}
+                                  </div>
+                                  <div class="col-md-7 col-sm-7">
+                                      <div class="card-body">
+                                          <h4 class="card-title">
+                                              <a href="#" class="text-decoration-none" style="color: white">{{ friend.username }}</a>
+                                          </h4>
+                                          <p class="card-text">
+                                              <svg width="18" height="18" viewBox="0 0 24 24">
+                                                  <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12 ,2Z"></path>
+                                              </svg>
+                                              {{ friend.city }}, {{ friend.country }}<br>
+                                              <span class="text-muted">{% trans "Played" %}: 10, {% trans "Won" %}: 5, {% trans "Lost" %}: 5</span>
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
+                                      <div class="btn-group" role="group">
+                                          <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#chatModal">{% trans "Let's chat" %}</button>
+                                          <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#gameInvitationModal">{% trans "Let's play" %}</button>
+                                      </div>
+                                  </div>
                                 </div>
-                                <div class="col-md-7 col-sm-7">
-                                    <div class="card-body">
-                                        <h4 class="card-title">
-                                            <a href="#" class="text-decoration-none" style="color: white">{{ friend.username }}</a>
-                                        </h4>
-                                        <p class="card-text">
-                                            <svg width="18" height="18" viewBox="0 0 24 24">
-                                                <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12 ,2Z"></path>
-                                            </svg>
-                                            {{ friend.city }}, {{ friend.country }}<br>
-                                            <span class="text-muted">{% trans "Played" %}: 10, {% trans "Won" %}: 5, {% trans "Lost" %}: 5</span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
-                                    <div class="btn-group" role="group">
-                                        <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#chatModal">{% trans "Let's chat" %}</button>
-                                        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#gameInvitationModal">{% trans "Let's play" %}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
+                              </div>
+                        {% endfor %}
+                {% else%}
+                <div class="d-flex flex-column align-items-center mt-5">
+                  <p class="fs-5 text-white">
+                      {% trans "Let's make some " %}
+                      <span class="text-danger">{% trans "friends" %}</span>
+                      {% trans "!" %}
+                  </p>
+                  <a href="{% url 'profile' %}">
+                      <img src="/media/utils_icons/add_friends.png" role="button" alt="add friends" class="img-fluid" style="width: 100px; height: 100px;">
+                  </a>
+                </div>
+                {% endif %}
                 {% else %}
                     <p>{% trans "Please log in to see your friends." %}</p>
                 {% endif %}

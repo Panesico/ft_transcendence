@@ -106,6 +106,43 @@ def get_profile_api(request, user_id):
         logger.debug(f'get_profile > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
+def get_friends(request, user_id):
+    logger.debug("get_friends")
+    id = int(user_id)
+    logger.debug(f"id: {id}")
+    try:
+        user_obj = Profile.objects.get(user_id=id)
+        logger.debug('user_obj recovered')
+        friends = user_obj.friends.all()
+        logger.debug('friends recovered')
+        data = []
+        for friend in friends:
+            # Recover username and avatar from authentif app
+            authentif_url = 'https://authentif:9001/api/getUserInfo/' + str(friend.user_id) + '/'
+            response = requests.get(authentif_url, verify=os.getenv("CERTFILE"))
+            user_data = response.json()
+            logger.debug(f'get_friends > user_data: {user_data}')
+
+            data.append({
+                'user_id': friend.user_id,
+                'display_name': friend.display_name,
+                'country': friend.country,
+                'city': friend.city,
+                'preferred_language': friend.preferred_language,
+                'played_games': friend.played_games,
+                'wins': friend.wins,
+                'defeats': friend.defeats,
+                'avatar': '/media/' + user_data['avatar_url'],
+                'username': user_data['username'],
+            })
+        return JsonResponse(data, status=200, safe=False)
+    except Profile.DoesNotExist:
+        logger.debug('get_friends > User not found')
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    except Exception as e:
+        logger.debug(f'get_friends > {str(e)}')
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
 def create_notifications(request):
     logger.debug("create_notifications")
     if request.method == 'POST':
@@ -135,6 +172,7 @@ def create_notifications(request):
                 type=type
             )
             notification.save()
+
             return JsonResponse({'status': 'success', 'message': 'Notification created'}, status=201)
         except (json.JSONDecodeError, DatabaseError) as e:
             logger.debug(f'create_notifications > Invalid JSON error: {str(e)}')
@@ -171,7 +209,7 @@ def get_notifications(request, user_id):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 # Receive as parameter sender_id, receiver_id 
-def set_notif_as_readen(request, sender_id, receiver_id, type):
+def set_notif_as_readen(request, sender_id, receiver_id, type, response):
     logger.debug("set_notif_as_readen")
     try:
         sender_obj = Profile.objects.get(user_id=sender_id)
@@ -182,6 +220,17 @@ def set_notif_as_readen(request, sender_id, receiver_id, type):
         for notification in notifications:
             notification.status = 'read'
             notification.save()
+
+            # if friend request accepted, save friendship in database
+            if response == 'accept' and type == 'friend_request':
+                try:
+                    sender_obj.friends.add(receiver_obj)
+                    sender_obj.save()
+                    receiver_obj.save()
+                except Profile.DoesNotExist:
+                    logger.debug('set_notif_as_readen > User not found')
+                    return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+                logger.debug('Friendship saved in database')
         return JsonResponse({'status': 'success', 'message': 'Notification marked as read'}, status=200)
     except Profile.DoesNotExist:
         logger.debug('set_notif_as_readen > User not found')

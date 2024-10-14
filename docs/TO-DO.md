@@ -24,3 +24,7 @@ Remote game:
 - Handle websocket if user not connected
 - Error handling of friend request -> send a request to himself + send more than a request to the same person
 - Add an href associated to the avatar displayed in notification
+- Ensure modal close after friend request
+- Notification does not get there when user is disconnected
+- Add the correct data to friend page ->
+

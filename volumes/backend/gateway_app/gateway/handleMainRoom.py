@@ -40,7 +40,7 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url, s
     })
   
   # Set the notification as read
-  profileapi_url = 'https://profileapi:9002/api/setnotifasread/' + str(sender_id) + '/' + str(receiver_id) + '/friend_request/'
+  profileapi_url = 'https://profileapi:9002/api/setnotifasread/' + str(sender_id) + '/' + str(receiver_id) + '/friend_request/' + str(response) + '/'
   csrf_token = self.scope['cookies']['csrftoken']
   headers = {
           'X-CSRFToken': csrf_token,
