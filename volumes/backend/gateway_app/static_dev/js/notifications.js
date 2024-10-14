@@ -71,7 +71,7 @@ function createDateElement(dateString, newNotification) {
   return dateElement;
 }
 
-function appendElements(avatar, message, acceptButton, declineButton, newNotification)
+function appendElements(avatar, message, acceptButton, declineButton, newNotification, status)
 {
   // Style the notification
   newNotification.style.color = 'white';
@@ -82,8 +82,13 @@ function appendElements(avatar, message, acceptButton, declineButton, newNotific
   // Set data atribute to identify the notification
   newNotification.setAttribute('data-type', 'friend-invite');
   newNotification.setAttribute('data-userid', sender_id);
-  newNotification.appendChild(acceptButton);
-  newNotification.appendChild(declineButton);
+
+  // Set buttons only if status is pending
+  if (status !== 'read')
+  {
+    newNotification.appendChild(acceptButton);
+    newNotification.appendChild(declineButton);
+  }
 
   // Add a separator
   const separator = document.createElement('hr');
@@ -150,7 +155,7 @@ function appendAvatarAndMessage(avatar, message, newNotification)
   function changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown)
 {
   if (notificationDropdownClass) {
-    notificationDropdownClass.appendChild(newNotification);
+    //notificationDropdown.insertBefore(newNotification, notificationDropdown.firstChild);
     console.log('addFriendRequestNotification > notificationDropdown:', notificationDropdown);
     const bellIcon = notificationDropdown.querySelector('img');
     if (bellIcon) {
@@ -241,10 +246,18 @@ function addFriendRequestNotification(data)
   const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);
   
   // Append the avatar and message to the newNotification element
-  appendElements(avatar, message, acceptButton, declineButton, newNotification);
+  appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status);
 
   // Change default down icon notification to the new notification icon
   changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown);
+
+  // Set last notification on top
+  if (notificationDropdownClass.childElementCount === 0) {
+    notificationDropdownClass.appendChild(newNotification);
+  }
+  else {
+    notificationDropdownClass.insertBefore(newNotification, notificationDropdownClass.firstChild);
+  }
 
   // Set unreadNotifications to true
   unreadNotifications = true;
@@ -288,6 +301,15 @@ function addFriendResponseNotification(data)
   // Change default down icon notification to the new notification icon
   changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown);
 
+  // Set last notification on top
+  if (notificationDropdownClass.childElementCount === 0) {
+    notificationDropdownClass.appendChild(newNotification);
+  }
+  else {
+    notificationDropdownClass.insertBefore(newNotification, notificationDropdownClass.firstChild);
+  }
+
   // Set unreadNotifications to true
   unreadNotifications = true;
+
 }

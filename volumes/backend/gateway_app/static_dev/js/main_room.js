@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Notification dropdown clicked');
     unreadNotifications = false;
     const bellIcon = notificationDropdown.querySelector('img');
-    if (bellIcon) {
+    if (bellIcon.src.includes('bell_up')) {
       bellIcon.src = '/media/utils_icons/bell_down.png';
     }
   }
@@ -104,7 +104,7 @@ function parseSocketMessage(data)
   if (data.type === 'friend_request') {
     addFriendRequestNotification(data);
   }
-  if (data.type === 'friend_request_response') {
+  else if (data.type === 'friend_request_response') {
     addFriendResponseNotification(data);
   }
   else

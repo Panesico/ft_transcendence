@@ -1,4 +1,5 @@
 import json, asyncio, logging, requests, os
+from datetime import datetime
 from .handleInvite import get_authentif_variables
 
 logger = logging.getLogger(__name__)
@@ -36,7 +37,8 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url, s
       'sender_avatar_url': sender_avatar_url,
       'receiver_username': receiver_username,
       'receiver_avatar_url': receiver_avatar_url,
-      'receiver_id': receiver_id
+      'receiver_id': receiver_id,
+      'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     })
   
   # Set the notification as read
@@ -80,15 +82,19 @@ async def friendRequest(content, users_connected, self):
   # Check if user_id is in users_connected
   if receiver_id in users_connected:
     logger.debug(f'friendRequest > receiver_id: {receiver_id} is in users_connected')
+    # Get current date and time
+    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    message = f'{sender_username} sent you a friend request.'
     await users_connected[receiver_id].send_json({
       'type': 'friend_request',
-      'message': f'{sender_username} sent you a friend request.',
+      'message': message,
       'sender_username': sender_username,
       'sender_id': sender_id,
       'sender_avatar_url': sender_avatar_url,
       'receiver_avatar_url': self.avatar_url,
       'receiver_username': receiver_username,
-      'receiver_id': receiver_id
+      'receiver_id': receiver_id,
+      'date': date
     })
 
     # Save friend request in database
@@ -191,7 +197,8 @@ async def checkForNotifications(self):
         receiver_username = receiver_data.get('username', '')
         receiver_avatar_url = '/media/' + receiver_data.get('avatar_url', '')
 
-        await self.send_json({ # await users_connected[self.user_id].send_json({
+        # Send notification to frontend
+        await self.send_json({
           'type': notification['type'],
           'message': notification['message'],
           'sender_id': notification['sender'],
