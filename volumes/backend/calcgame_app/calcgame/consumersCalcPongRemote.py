@@ -40,7 +40,6 @@ class PongCalcRemote(AsyncWebsocketConsumer):
     self.gamePaused = False;
     
   async def connect(self):
-    logger.debug("PongCalcRemote > before accept")
     # Accept the WebSocket connection
     await self.accept()
     logger.debug("PongCalcRemote > Client connected")

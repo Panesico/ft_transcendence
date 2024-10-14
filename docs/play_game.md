@@ -7,10 +7,13 @@ flowchart TD
   B --> E[Click Button<br> Play game/Find remote game]
   
 
-  E -->|"playGame() -> startNewGame()"| F{Open websocket}
+  E -->|"playGame() -> startNewGame()"| F{Open websocket to gateway}
   
-  F -->|local - AI| G[Load start_game]
-  F -->|remote| H[Load waiting_room ]
+  F -->|ProxyCalcGameLocal| F2{Open websocket to calcgame}
+  F -->|ProxyCalcGameRemote| F2{Open websocket to calcgame}
+
+  F2 -->|PongCalcLocal / CowsCalcLocal| G[Load start_game]
+  F2 -->|PongCalcRemote / CowsCalcRemote| H[Load waiting_room ]
   
   H --> I[Opponent found] --> J[Load remote start_game ]
 
