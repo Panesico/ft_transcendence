@@ -222,18 +222,34 @@ def set_notif_as_readen(request, sender_id, receiver_id, type, response):
 
             # if friend request accepted, save friendship in database
             if response == 'accept' and type == 'friend_request':
-                try:
-                    sender_obj.friends.add(receiver_obj)
-                    sender_obj.save()
-                    receiver_obj.save()
-                except Profile.DoesNotExist:
-                    logger.debug('set_notif_as_readen > User not found')
-                    return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
-                logger.debug('Friendship saved in database')
-        return JsonResponse({'status': 'success', 'message': 'Notification marked as read'}, status=200)
+                sender_obj.friends.add(receiver_obj)
+                sender_obj.save()
+                receiver_obj.save()
+
+                # Save response to database
+                new_notification = Notification(
+                    sender=receiver_obj,
+                    receiver=sender_obj,
+                    message=response,
+                    type=type,
+                    status='unread'
+                )
+                new_notification.save()
+            else:
+                logger.debug('Friendship not saved in database')
+                # Save response to database
+                new_notification = Notification(
+                    sender=receiver_obj,
+                    receiver=sender_obj,
+                    message=response,
+                    type=type,
+                    status='unread'
+                )
+                new_notification.save()
     except Profile.DoesNotExist:
         logger.debug('set_notif_as_readen > User not found')
         return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    return JsonResponse({'status': 'success', 'message': 'Notification marked as read'}, status=200)
 
-    
+
     
