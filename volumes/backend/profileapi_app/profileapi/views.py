@@ -208,7 +208,6 @@ def get_notifications(request, user_id):
         logger.debug(f'get_notifications > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
-# Receive as parameter sender_id, receiver_id 
 def set_notif_as_readen(request, sender_id, receiver_id, type, response):
     logger.debug("set_notif_as_readen")
     try:

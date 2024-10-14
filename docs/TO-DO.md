@@ -27,4 +27,5 @@ Remote game:
 - Ensure modal close after friend request
 - Notification does not get there when user is disconnected
 - Add the correct data to friend page ->
+- Block a user
 

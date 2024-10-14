@@ -22,6 +22,7 @@ function removeEmptyMessage()
 function createAvatarElement(avatar_url)
 {
   const avatar = document.createElement('img');
+
   avatar.src = avatar_url;
   avatar.alt = 'Avatar';
   avatar.style.height = '3rem';
@@ -30,6 +31,7 @@ function createAvatarElement(avatar_url)
   avatar.style.borderRadius = '50%';
   avatar.style.marginRight = '10px';
   avatar.style.border = '1px solid white';
+
   return avatar;
 }
 
@@ -40,6 +42,62 @@ function createMessageElement(sender_username, response)
 //  message.textContent = `${sender_username} sent you a friend request.`;
   message.style.marginLeft = '10px';
   return message;
+}
+
+function createDateElement(dateString, newNotification) {
+  const date = new Date(dateString);
+  const formattedDate = date.toLocaleDateString();
+  const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const formattedDateTime = `${formattedDate} ${formattedTime}`;
+
+  const container = document.createElement('div');
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+  container.style.alignItems = 'center'; 
+
+  const dateElement = document.createElement('span');
+  dateElement.textContent = formattedDateTime;
+  dateElement.style.marginRight = '10px';
+  dateElement.style.fontSize = '0.8rem';
+  dateElement.style.color = 'grey';
+  container.appendChild(dateElement);
+
+  const endiv = document.createElement('div');
+
+  endiv.appendChild(container);
+
+  newNotification.appendChild(endiv);
+
+  return dateElement;
+}
+
+function appendElements(avatar, message, acceptButton, declineButton, newNotification)
+{
+  // Style the notification
+  newNotification.style.color = 'white';
+  newNotification.style.setProperty('--bs-dropdown-link-hover-bg', 'transparent');
+  
+  newNotification.appendChild(avatar);
+  newNotification.appendChild(message);
+  // Set data atribute to identify the notification
+  newNotification.setAttribute('data-type', 'friend-invite');
+  newNotification.setAttribute('data-userid', sender_id);
+  newNotification.appendChild(acceptButton);
+  newNotification.appendChild(declineButton);
+
+  // Add a separator
+  const separator = document.createElement('hr');
+  separator.style.border = '0';
+  separator.style.height = '1px';
+  separator.style.background = 'grey';
+  separator.style.margin = '10px 0'; // Adjust margin as needed
+
+  newNotification.appendChild(separator);
+
+  // Set data attribute to identify the notification
+  newNotification.setAttribute('data-type', 'friend-invite');
+  newNotification.setAttribute('data-userid', sender_id);
+
 }
 
 function appendAvatarAndMessage(avatar, message, newNotification)
@@ -53,6 +111,20 @@ function appendAvatarAndMessage(avatar, message, newNotification)
   // Set data atribute to identify the notification
   newNotification.setAttribute('data-type', 'friend-invite');
   newNotification.setAttribute('data-userid', sender_id);
+
+  // Add a separator
+  const separator = document.createElement('hr');
+  separator.style.border = '0';
+  separator.style.height = '1px';
+  separator.style.background = 'grey';
+  separator.style.margin = '10px 0'; // Adjust margin as needed
+
+  newNotification.appendChild(separator);
+
+  // Set data attribute to identify the notification
+  newNotification.setAttribute('data-type', 'friend-invite');
+  newNotification.setAttribute('data-userid', sender_id);
+
 }
 
   function createAcceptButton(sender_id, receiver_id, newNotification)
@@ -71,8 +143,6 @@ function appendAvatarAndMessage(avatar, message, newNotification)
   //     mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id}));
   // //    newNotification.remove(); uncomment
   //   }
-
-    newNotification.appendChild(acceptButton);
 
     return acceptButton;
   }
@@ -110,7 +180,6 @@ function createDeclineButton(sender_id, receiver_id, newNotification)
 //   }
 
   // Append the button to the newNotification element
-  newNotification.appendChild(declineButton);
 
   return declineButton;
 }
@@ -119,16 +188,25 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
 {
   acceptButton.addEventListener('click', function() {
     console.log('Accept button clicked');
-    sendMessagesBySocket({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username}, mainRoomSocket);
+    if (sendMessagesBySocket({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username}, mainRoomSocket) == true)
+    {
+      acceptButton.remove();
+      declineButton.remove();
+    }
 //    mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id}));
   });
 
   declineButton.addEventListener('click', function() {
     console.log('Decline button clicked');
-    sendMessagesBySocket({'type': 'friend_request_response', 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username}, mainRoomSocket);
+    if (sendMessagesBySocket({'type': 'friend_request_response', 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username}, mainRoomSocket) == true)
+    {
+      acceptButton.remove();
+      declineButton.remove();   
+    }
 //    mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id}));
   });
 }
+
 function addFriendRequestNotification(data)
 {
   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
@@ -147,20 +225,23 @@ function addFriendRequestNotification(data)
   const newNotification = document.createElement('li');
   newNotification.classList.add('dropdown-item');
 
+  // Create an element for the date
+  const date = createDateElement(data.date, newNotification);
+
   // Create an img element for the avatar
   const avatar = createAvatarElement(sender_avatar_url);
 
   // Create a span element for the message
   const message = createMessageElement(sender_username, ' sent you a friend request.');
-
-  // Append the avatar and message to the newNotification element
-  appendAvatarAndMessage(avatar, message, newNotification);
-
+  
   // Add button to accept the friend request represented by accept png
   const acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
   
   // Add button to decline the friend request represented by decline png
   const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);
+  
+  // Append the avatar and message to the newNotification element
+  appendElements(avatar, message, acceptButton, declineButton, newNotification);
 
   // Change default down icon notification to the new notification icon
   changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown);

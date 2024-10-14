@@ -125,7 +125,8 @@ function onModalOpen(userID, modal) {
 
   inviteFriendSocket.onopen = function(e) {
     console.log('inviteFriendSocket socket connected');
-    inviteFriendSocket.send(JSON.stringify({type: 'start', 'userID': userID}));
+//    inviteFriendSocket.send(JSON.stringify({type: 'start', 'userID': userID}));
+    sendMessagesBySocket({type: 'start', 'userID': userID}, inviteFriendSocket);
   };
 
   inviteFriendSocket.onmessage = function(e) {
@@ -216,7 +217,8 @@ function listenFriendInvitation(modal, form) {
   if (isFocused && inviteFriendSocket.readyState === WebSocket.OPEN)
     {
       const pressedKey = e.key;
-      inviteFriendSocket.send(JSON.stringify({type: 'input', 'key': pressedKey}));
+//      inviteFriendSocket.send(JSON.stringify({type: 'input', 'key': pressedKey}));
+      sendMessagesBySocket({type: 'input', 'key': pressedKey}, inviteFriendSocket);
     }
   });
 

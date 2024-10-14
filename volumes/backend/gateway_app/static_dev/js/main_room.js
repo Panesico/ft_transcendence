@@ -9,10 +9,12 @@ function sendMessagesBySocket(message, socket)
   if (socket.readyState === WebSocket.OPEN)
   {
     socket.send(JSON.stringify(message));
+    return true;
   }
   else
   {
     console.warn('sendMessagesBySocket > socket.readyState:', socket.readyState);
+    return false;
   }
 }
 

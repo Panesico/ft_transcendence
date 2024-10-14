@@ -82,7 +82,7 @@ async def friendRequest(content, users_connected, self):
     logger.debug(f'friendRequest > receiver_id: {receiver_id} is in users_connected')
     await users_connected[receiver_id].send_json({
       'type': 'friend_request',
-      'message': f'{receiver_username} sent you a friend request.',
+      'message': f'{sender_username} sent you a friend request.',
       'sender_username': sender_username,
       'sender_id': sender_id,
       'sender_avatar_url': sender_avatar_url,
@@ -94,7 +94,7 @@ async def friendRequest(content, users_connected, self):
     # Save friend request in database
     logger.debug(f'friendRequest > Save friend request in database')
     profileapi_url = 'https://profileapi:9002/api/createnotif/'
-    notification_data = { 'sender_id': sender_id, 'receiver_id': receiver_id, 'message': f'{receiver_username} sent you a friend request.', 'type': 'friend_request' }
+    notification_data = { 'sender_id': sender_id, 'receiver_id': receiver_id, 'message': message, 'type': 'friend_request' }
     csrf_token = self.scope['cookies']['csrftoken']
     headers = {
         'X-CSRFToken': csrf_token,
@@ -169,15 +169,17 @@ async def checkForNotifications(self):
 
   response.raise_for_status()
   if response.status_code == 200:
-    notifications = response.json()
+    notifications = sorted(response.json(), key=lambda x: x['date'])
     logger.debug(f'checkForNotifications > notifications: {notifications}')
+    logger.debug(f'checkForNotifications > info user connected: {self.user_id}')
+    
     for notification in notifications:
       logger.debug(f'checkForNotifications > notification: {notification}')
 
       # Find notification concerning the user_id that are unread
-      if notification['receiver'] == self.user_id and notification['status'] == 'unread':
+      if notification['receiver'] == self.user_id:
         logger.debug(f'checkForNotifications > notification concerning user_id: {self.user_id}')
-        logger.debug(f'checkForNotifications > notification unread: {notification}')
+        logger.debug(f'checkForNotifications > notification: {notification}')
 
         # Get sender info
         sender_data = get_authentif_variables(notification['sender'])
@@ -189,9 +191,8 @@ async def checkForNotifications(self):
         receiver_username = receiver_data.get('username', '')
         receiver_avatar_url = '/media/' + receiver_data.get('avatar_url', '')
 
-
         await self.send_json({ # await users_connected[self.user_id].send_json({
-          'type': 'friend_request',
+          'type': notification['type'],
           'message': notification['message'],
           'sender_id': notification['sender'],
           'sender_username': sender_username,
@@ -199,7 +200,8 @@ async def checkForNotifications(self):
           'receiver_id': notification['receiver'],
           'receiver_username': receiver_username,
           'receiver_avatar_url': receiver_avatar_url,
-          'status': notification['status']
+          'status': notification['status'],
+          'date': notification['date']
         })
   else:
     logger.debug(f'checkForNotifications > Error retrieving notifications from database')
