@@ -194,11 +194,70 @@ def api_updateTournament(request):
     logger.debug('api_updateTournament > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
+def api_getUserStats(request, user_id):
+    logger.debug("api_getUserStats")
+    if request.method != 'GET':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    try:
+        games = Game.objects.filter(p1_id=user_id) | Game.objects.filter(p2_id=user_id)
+        games_list = []
+        for game in games:
+            game_dict = (model_to_dict(game))
+            game_dict['date'] = game.date.strftime('%Y-%m-%d %H:%M:%S')
+            games_list.append(game_dict)
+    except (json.JSONDecodeError, DatabaseError) as e:
+        return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
+    if games_list is None:
+        logger.debug("get_match_history > No games_list found")
+        games_list = []
+    
+    total_games = 0
+    wins = 0
+    game_registry = []
+    for game in games_list:
+        total_games += 1
+        game_winner_id = int(game['game_winner_id'])
+        user_id_int = int(user_id)
+        if game_winner_id == user_id_int:
+            wins += 1
+        game_registry.append({
+            'game_type': game['game_type'],
+            'game_round': game['game_round'],
+            'p1_name': game['p1_name'],
+            'p2_name': game['p2_name'],
+            'p1_score': game['p1_score'],
+            'p2_score': game['p2_score'],
+            'game_winner_name': game['game_winner_name'],
+            'game_winner_id': game['game_winner_id'],
+            'date': game['date']
+        })
+
+    defeats = total_games - wins
+    total_score = wins * 50
+    winrate = round((wins / total_games) * 100, 2) if total_games > 0 else 0
+    games_data = {
+        'total_games': total_games,
+        'wins': wins,
+        'defeats': defeats,
+        'total_score': total_score,
+        'winrate': winrate,
+        'game_registry': game_registry
+    }
+    return JsonResponse({'status': 'success', 'games_data': games_data})
+
 def api_getUserGames(request, user_id):
     logger.debug("api_getUserGames")
     if request.method == 'GET':
+        response = api_getUserStats(request, user_id)
+        return response
+    logger.debug('api_getUserGames > Method not allowed')
+    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+def api_getMatchMaking(request, user_id):
+    logger.debug("api_getMatchMaking")
+    if request.method == 'GET':
         try:
-            games = Game.objects.filter(p1_id=user_id) | Game.objects.filter(p2_id=user_id)
+            games = Game.objects.filter(p1_id=user_id, game_winner_id=None) | Game.objects.filter(p2_id=user_id, game_winner_id=None)
             games_list = []
             for game in games:
                 game_dict = (model_to_dict(game))
@@ -207,5 +266,5 @@ def api_getUserGames(request, user_id):
             return JsonResponse({'status': 'success', 'games': games_list})
         except (json.JSONDecodeError, DatabaseError) as e:
             return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
-    logger.debug('api_getUserGames > Method not allowed')
+    logger.debug('api_getMatchMaking > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
