@@ -2,7 +2,7 @@ import os, json, logging, websockets, ssl, asyncio, requests, aiohttp
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
 from django.middleware.csrf import get_token
-from ppretty import ppretty
+#from ppretty import ppretty
 logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)

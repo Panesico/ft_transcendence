@@ -9,9 +9,6 @@ from django.urls import path, include
 handler405 = 'gateway.viewsErrors.get_405'
 
 urlpatterns = [
-    # django admin
-    path('admin/', admin.site.urls),
-
     # errors pages
     path('404/', viewsErrors.get_404, name='404'),
     path('405/', viewsErrors.get_405, name='405'),

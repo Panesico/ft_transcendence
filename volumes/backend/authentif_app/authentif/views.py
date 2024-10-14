@@ -9,7 +9,27 @@ from authentif.forms import SignUpForm, LogInForm, EditProfileForm
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext as _
 from authentif.models import User
+import jwt
+from datetime import datetime, timedelta, timezone
+from .authmiddleware import login_required, generate_guest_token, JWTAuthenticationMiddleware
 logger = logging.getLogger(__name__)
+
+def generate_jwt_token(user):
+    secret_key = os.environ.get('DJANGO_SECRET_KEY')  # Load the secret key from env variable
+    if not secret_key:
+        raise Exception("JWT_SECRET_KEY environment variable is missing")
+    
+    payload = {
+        'user_id': user.id,
+        'exp': datetime.now(timezone.utc) + timedelta(hours=1),  # Token expiration time
+        'iat': datetime.now(timezone.utc),  # Issued at time
+    }
+
+    # Ensure you're using a secure algorithm, like HS256
+    token = jwt.encode(payload, secret_key, algorithm='HS256')
+    
+    return token
+
 
 def api_get_user_info(request, user_id):
     logger.debug("api_get_user_info")
@@ -30,33 +50,76 @@ def api_get_user_info(request, user_id):
     except User.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
         
+@login_required
 def api_logout(request):
-    logger.debug("api_logout")
-    if request.method == 'GET':
-        logout(request)
-        return JsonResponse({'status': 'success', 'message': _('Logged out successfully')})
-    else:
-        return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
+    """Logs out the user by blacklisting their JWT token and sending a guest token."""
+    token = request.COOKIES.get('jwt_token')
 
+    if token:
+        # Blacklist the current JWT token
+        JWTAuthenticationMiddleware.blacklist_token(token)
+
+        # Generate a new guest token
+        guest_token = generate_guest_token()
+
+        # Create a response indicating logout success
+        response = JsonResponse({'status': 'success', 'message': _('Logged out successfully')})
+
+        # Set the new guest JWT token as a cookie in the response
+        response.set_cookie('jwt_token', guest_token, httponly=True, secure=True, samesite='Lax')
+
+        return response
+    else:
+        return JsonResponse({'error': 'No active session found.'}, status=400)
+    
 def api_login(request):
     logger.debug("api_login")
+
     if request.method == 'POST':
         try:
-          data = json.loads(request.body)
-          # logger.debug(f'Received data: {data}')
-          form = LogInForm(request, data=data)
-          if form.is_valid():
-              user = form.get_user()
-              login(request, user)
-              logger.debug(f'api_login > User.id: {user.id}')
-              logger.debug('api_login > User logged in')
-              return JsonResponse({'status': 'success', 'message': _('Login successful'), 'user_id': user.id})
-          else:
-              logger.debug('api_login > Invalid username or password')
-              return JsonResponse({'status': 'error', 'message': _('Invalid username or password')}, status=401)
+            data = json.loads(request.body)
+            form = LogInForm(request, data=data)
+
+            if form.is_valid():
+                user = form.get_user()
+                login(request, user)
+                logger.debug(f"api_login > User.id: {user.id}")
+
+                # Generate a JWT token for the authenticated user
+                jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
+                logger.debug(f"token >>>>>>>>>>>: {jwt_token}")
+				
+                # Create response object
+                response = JsonResponse({
+                    'status': 'success',
+                    'message': _('Login successful'),
+                    'token': jwt_token,
+                    'user_id': user.id
+                })
+
+                # Set the JWT token in the headers
+                response['Authorization'] = f'Bearer {jwt_token}'
+
+                # Set the JWT token in a cookie (with security options)
+                response.set_cookie(
+                    key='jwt_token',
+                    value=jwt_token,
+                    httponly=True,  # Prevent JavaScript access to the cookie (for security)
+                    secure=True,  # Only send the cookie over HTTPS (ensure your environment supports this)
+                    samesite='Lax',  # Control cross-site request behavior
+                    max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
+                )
+
+                return response
+
+            else:
+                logger.debug('api_login > Invalid username or password')
+                return JsonResponse({'status': 'error', 'message': _('Invalid username or password')}, status=401)
+
         except json.JSONDecodeError:
             logger.debug('api_login > Invalid JSON')
             return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
+
     logger.debug('api_login > Method not allowed')
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
