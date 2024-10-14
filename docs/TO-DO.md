@@ -20,12 +20,10 @@ Remote game:
   @BenjaminLarger
 - Redirection to edit_profile after update info
 - send friend request
-- windows.on_reload() => create websocket when a user is connected
-- Handle websocket if user not connected
-- Error handling of friend request -> send a request to himself + send more than a request to the same person
-- Add an href associated to the avatar displayed in notification
+- Add an href associated to the avatar displayed in notification to his profile
 - Ensure modal close after friend request
-- Notification does not get there when user is disconnected
-- Add the correct data to friend page ->
 - Block a user
+- Get user response to notification
+- Set read message to answered in notification and profileapi set as read
+- Check if player is already your friend before adding him
 

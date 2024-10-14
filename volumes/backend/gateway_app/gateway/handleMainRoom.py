@@ -19,12 +19,6 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url, s
   receiver_avatar_url = receiver_avatar_url
   response = content.get('response', '')
 
-  logger.debug(f'friendRequestResponse > sender_id: {sender_id}')
-  logger.debug(f'friendRequestResponse > sender_username: {sender_username}')
-  logger.debug(f'friendRequestResponse > receiver_username: {receiver_username}')
-  logger.debug(f'friendRequestResponse > receiver_id: {receiver_id}')
-  logger.debug(f'friendRequestResponse > receiver_avatar: {receiver_avatar_url}')
-
   # Send response to frontend sender
   if sender_id in users_connected:
     logger.debug(f'friendRequestResponse > sender_id: {sender_id} is in users_connected {response}')

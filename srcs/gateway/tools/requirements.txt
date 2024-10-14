@@ -16,3 +16,5 @@ channels_redis==4.2.0
 pillow==10.4.0
 # JWT
 pyjwt
+
+ppretty
