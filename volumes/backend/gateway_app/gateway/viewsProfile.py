@@ -73,39 +73,7 @@ def get_match_history(request):
     get_history_url = 'https://play:9003/api/getGames/' + str(user_id)
     response = requests.get(get_history_url, verify=os.getenv("CERTFILE"))
     if response.status_code == 200:
-        games = response.json().get('games')
-        if games is None:
-            logger.debug("get_match_history > No games found")
-            games = []
-        total_games = 0
-        wins = 0
-        game_registry = []
-        for game in games:
-            total_games += 1
-            if game.get('game_winner_id') == user_id:
-                wins += 1
-            game_registry.append({
-              'game_type': game.get('game_type'),
-              'game_round': game.get('game_round'),
-              'p1_name': game.get('p1_name'),
-              'p2_name': game.get('p2_name'),
-              'p1_score': game.get('p1_score'),
-              'p2_score': game.get('p2_score'),
-              'game_winner_name': game.get('game_winner_name'),
-              'game_winner_id': game.get('game_winner_id'),
-              'date': game.get('date')
-            })
-        defeats = total_games - wins
-        total_score = wins * 50
-        winrate = round((wins / total_games) * 100, 2) if total_games > 0 else 0
-        games_data = {
-            'total_games': total_games,
-            'wins': wins,
-            'defeats': defeats,
-            'total_score': total_score,
-            'winrate': winrate,
-            'game_registry': game_registry
-        }
+        games_data = response.json().get('games_data')
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
           html = render_to_string('fragments/match_history_fragment.html', {'games_data' : games_data, 'user_id' : user_id}, request=request)
           return JsonResponse({'html': html, 'status': 'success'})
