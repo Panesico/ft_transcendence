@@ -230,7 +230,10 @@ def set_notif_as_readen(request, sender_id, receiver_id, type, response):
         notifications = Notification.objects.filter(sender=sender_obj, receiver=receiver_obj, type=type)
         logger.debug('notifications recovered')
         for notification in notifications:
-            notification.status = response + 'ed'
+            if (response == 'accept'):
+              notification.status = 'accepted'
+            elif (response == 'decline'):
+              notification.status = 'declined'
             notification.save()
             logger.debug('notification marked as read')
 

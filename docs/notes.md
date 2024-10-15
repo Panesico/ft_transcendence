@@ -43,6 +43,8 @@ docker container exec -it postgres sh
 \dt
 SELECT * FROM authentif_user;
 SELECT * FROM profileapi_notification ORDER BY date DESC;
+---> Delete notifications
+DELETE FROM profileapi_notification;
 
 # Include every service when generating the certificate
 openssl req -x509 -nodes -newkey rsa:4096 -days 365 \
