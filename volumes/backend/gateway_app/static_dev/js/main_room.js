@@ -6,6 +6,7 @@ unreadNotifications = false;
 function sendMessagesBySocket(message, socket)
 {
   console.log('sendMessagesBySocket > message:', message);
+  console.log('sendMessagesBySocket > socket.readyState:', socket.readyState);
   if (socket.readyState === WebSocket.OPEN)
   {
     socket.send(JSON.stringify(message));
@@ -18,19 +19,22 @@ function sendMessagesBySocket(message, socket)
   }
 }
 
-// Add event listener to the notification
-document.addEventListener('DOMContentLoaded', function() {
-  const notificationDropdown = document.getElementById('navbarDropdownNotifications');
-  notificationDropdown.addEventListener('click', function() {
-    console.log('Notification dropdown clicked');
-    unreadNotifications = false;
-    const bellIcon = notificationDropdown.querySelector('img');
-    if (bellIcon.src.includes('bell_up')) {
-      bellIcon.src = '/media/utils_icons/bell_down.png';
-    }
-  }
-  );
-});
+// // Add event listener to the notification
+// document.addEventListener('DOMContentLoaded', function() {
+//   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
+//   notificationDropdown.addEventListener('click', function() {
+//     console.log('Notification dropdown clicked');
+//     unreadNotifications = false;
+//     const bellIcon = notificationDropdown.querySelector('img');
+//     if (bellIcon.src.includes('bell_up')) {
+//       bellIcon.src = '/media/utils_icons/bell_down.png';
+
+//       // Mark notification as read
+//       sendMessagesBySocket({'type': 'mark_notification_as_read', 'receiver_id': receiver_id}, mainRoomSocket);
+//     }
+//   }
+//   );
+// });
 
 // Routine when user reload the page
 window.onload = () => {
@@ -40,9 +44,8 @@ window.onload = () => {
   // Get the User ID
   const userID = document.getElementById('userID').value;
   console.log('userID:', userID);
-  //const userID = 1;
-  if (userID === '' || userID === undefined || userID === 'None') {
-    console.warn('User ID is not defined');
+  if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null) {
+    console.warn('Client is not logged in');
     return;
   }
 

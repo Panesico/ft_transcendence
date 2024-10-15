@@ -84,7 +84,7 @@ function appendElements(avatar, message, acceptButton, declineButton, newNotific
   newNotification.setAttribute('data-userid', sender_id);
 
   // Set buttons only if status is pending
-  if (status !== 'read')
+  if (status !== 'accepted' && status !== 'declined')
   {
     newNotification.appendChild(acceptButton);
     newNotification.appendChild(declineButton);
@@ -152,7 +152,7 @@ function appendAvatarAndMessage(avatar, message, newNotification)
     return acceptButton;
   }
 
-  function changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown)
+  function changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id)
 {
   if (notificationDropdownClass) {
     //notificationDropdown.insertBefore(newNotification, notificationDropdown.firstChild);
@@ -210,6 +210,22 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
     }
 //    mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id}));
   });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const notificationDropdown = document.getElementById('navbarDropdownNotifications');
+    notificationDropdown.addEventListener('click', function() {
+      console.log('Notification dropdown clicked');
+      unreadNotifications = false;
+      const bellIcon = notificationDropdown.querySelector('img');
+      if (bellIcon.src.includes('bell_up')) {
+        bellIcon.src = '/media/utils_icons/bell_down.png';
+        
+        // Mark notification as read
+        sendMessagesBySocket({'type': 'mark_notification_as_read', 'receiver_id': receiver_id, 'sender_id': sender_id}, mainRoomSocket);
+      }
+    }
+    );
+  });
 }
 
 function addFriendRequestNotification(data)
@@ -249,7 +265,7 @@ function addFriendRequestNotification(data)
   appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status);
 
   // Change default down icon notification to the new notification icon
-  changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown);
+  changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id);
 
   // Set last notification on top
   if (notificationDropdownClass.childElementCount === 0) {
@@ -299,7 +315,7 @@ function addFriendResponseNotification(data)
   }
 
   // Change default down icon notification to the new notification icon
-  changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown);
+  changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id);
 
   // Set last notification on top
   if (notificationDropdownClass.childElementCount === 0) {
