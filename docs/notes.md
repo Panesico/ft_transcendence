@@ -42,6 +42,7 @@ docker container exec -it postgres sh
 <!-- psql -U postgres_main_user -d transcendence_db -->
 \dt
 SELECT * FROM authentif_user;
+SELECT * FROM profileapi_notification ORDER BY date DESC;
 
 # Include every service when generating the certificate
 openssl req -x509 -nodes -newkey rsa:4096 -days 365 \

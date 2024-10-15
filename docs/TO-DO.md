@@ -19,11 +19,12 @@ Remote game:
 
   @BenjaminLarger
 - Redirection to edit_profile after update info
-- send friend request
 - Add an href associated to the avatar displayed in notification to his profile
 - Ensure modal close after friend request
-- Block a user
-- Get user response to notification
-- Set read message to answered in notification and profileapi set as read
+- Set read message to answer in notification and profileapi set as read
 - Check if player is already your friend before adding him
+- Check if invitation has already be sent before popping the notification
+- Block player
+- Order player suggestion by alphabetical order
+- Clean web socket unused (AsyncWebsocketConsumer)
 

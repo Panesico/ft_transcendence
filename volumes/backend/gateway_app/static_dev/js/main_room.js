@@ -51,6 +51,7 @@ window.onload = () => {
   console.log('main_room_socketPath:', main_room_socketPath);
   mainRoomSocket = new WebSocket(`wss://localhost:8443/wss/mainroom/${userID}/`);
   console.log('mainRoomSocket.readyState:', mainRoomSocket.readyState);
+  console.log('mainRoomSocket userID:', userID);
 
   // On websocket open
   mainRoomSocket.onopen = function(e) {

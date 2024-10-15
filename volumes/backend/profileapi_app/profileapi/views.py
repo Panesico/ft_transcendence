@@ -230,8 +230,9 @@ def set_notif_as_readen(request, sender_id, receiver_id, type, response):
         notifications = Notification.objects.filter(sender=sender_obj, receiver=receiver_obj, type=type)
         logger.debug('notifications recovered')
         for notification in notifications:
-            notification.status = 'read'
+            notification.status = response + 'ed'
             notification.save()
+            logger.debug('notification marked as read')
 
             # if friend request accepted, save friendship in database
             if response == 'accept' and type == 'friend_request':
@@ -265,4 +266,18 @@ def set_notif_as_readen(request, sender_id, receiver_id, type, response):
     return JsonResponse({'status': 'success', 'message': 'Notification marked as read'}, status=200)
 
 
-    
+def set_all_notifs_as_readen(request, receiver_id):
+    logger.debug("set_all_notifs_as_readen")
+    try:
+        receiver_obj = Profile.objects.get(user_id=receiver_id)
+        logger.debug('receiver_obj recovered')
+        notifications = Notification.objects.filter(receiver=receiver_obj, status='unread')
+        logger.debug('notifications recovered')
+        for notification in notifications:
+            notification.status = 'read'
+            notification.save()
+            logger.debug('notification marked as read')
+    except Profile.DoesNotExist:
+        logger.debug('set_all_notifs_as_readen > User not found')
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    return JsonResponse({'status': 'success', 'message': 'All notifications marked as read'}, status=200)

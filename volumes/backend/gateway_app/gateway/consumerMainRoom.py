@@ -1,6 +1,6 @@
 import json, asyncio, logging, requests, os
 from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
-from .handleMainRoom import readMessage, friendRequestResponse, friendRequest, handleNewConnection, checkForNotifications
+from .handleMainRoom import readMessage, friendRequestResponse, friendRequest, handleNewConnection, checkForNotifications, markNotificationAsRead
 from .handleInvite import get_authentif_variables
 logger = logging.getLogger(__name__)
 
@@ -56,6 +56,10 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     # Friend request response
     if typeMessage == 'friend_request_response':
       await friendRequestResponse(content, users_connected, self.avatar_url, self)
+    
+    # Mark notification as read
+    if typeMessage == 'mark_notification_as_read':
+      await markNotificationAsRead(self, content, self.user_id)
       
 
       
