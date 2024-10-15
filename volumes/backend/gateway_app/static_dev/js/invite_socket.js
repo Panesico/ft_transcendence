@@ -11,6 +11,12 @@ function listenSubmit(form) {
   console.log('form: ', form);
   form.addEventListener('submit', async (e) => {
 	e.preventDefault();
+
+  // Ensure modal is closed
+  const modal = document.getElementById('inviteFriendModal');
+  const modalInstance = bootstrap.Modal.getInstance(modal);
+  modalInstance.hide();
+
 	// console.log('Form submitted', e);
 	const formData = new FormData(form);
 	let url = form.action;

@@ -36,7 +36,7 @@ class FormConsumer(AsyncWebsocketConsumer):
         self.user_id = user_id
         logger.debug(f'FormConsumer > self.user_id: {self.user_id}')
         profile_data = get_authentif_variables(self.user_id)
-        self.usernames = profile_data.get('usernames')
+        self.usernames = sorted(profile_data.get('usernames', []))
         logger.debug(f'FormConsumer > usernames: {self.usernames}')
 
       logger.debug(f'FormConsumer > key_pressed: {key_pressed}')

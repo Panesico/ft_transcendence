@@ -239,27 +239,6 @@ def set_notif_as_readen(request, sender_id, receiver_id, type, response):
                 sender_obj.friends.add(receiver_obj)
                 sender_obj.save()
                 receiver_obj.save()
-
-                # Save response to database
-                new_notification = Notification(
-                    sender=receiver_obj,
-                    receiver=sender_obj,
-                    message=response,
-                    type=type,
-                    status='unread'
-                )
-                new_notification.save()
-            else:
-                logger.debug('Friendship not saved in database')
-                # Save response to database
-                new_notification = Notification(
-                    sender=receiver_obj,
-                    receiver=sender_obj,
-                    message=response,
-                    type=type,
-                    status='unread'
-                )
-                new_notification.save()
     except Profile.DoesNotExist:
         logger.debug('set_notif_as_readen > User not found')
         return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
@@ -281,3 +260,22 @@ def set_all_notifs_as_readen(request, receiver_id):
         logger.debug('set_all_notifs_as_readen > User not found')
         return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
     return JsonResponse({'status': 'success', 'message': 'All notifications marked as read'}, status=200)
+
+def check_friendship(request, sender_id, receiver_id):
+    logger.debug("check_friendship")
+    try:
+        sender_obj = Profile.objects.get(user_id=sender_id)
+        receiver_obj = Profile.objects.get(user_id=receiver_id)
+        logger.debug('sender_obj and receiver_obj recovered')
+        if receiver_obj in sender_obj.friends.all():
+            logger.debug('check_friendship > Friendship exists')
+            return JsonResponse({'status': 'success', 'message': 'Friendship exists'}, status=404)
+        else:
+            logger.debug('check_friendship > Friendship does not exist')
+            return JsonResponse({'status': 'error', 'message': 'Friendship does not exist'}, status=200)
+    except Profile.DoesNotExist:
+        logger.debug('check_friendship > User not found')
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    except Exception as e:
+        logger.debug(f'check_friendship > {str(e)}')
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
