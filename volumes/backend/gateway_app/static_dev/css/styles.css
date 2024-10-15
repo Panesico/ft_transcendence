@@ -24,6 +24,10 @@ body {
   background-color: #181a1b;
 }
 
+#mainHeader {
+  height: 80px;
+}
+
 /**************************/
 /*** Floating animation ***/
 /**************************/

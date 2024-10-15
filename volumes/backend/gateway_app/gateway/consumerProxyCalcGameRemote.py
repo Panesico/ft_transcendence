@@ -278,6 +278,12 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                     })
                     await calcgame_ws.send(text_data)
 
+                    # Send message received from calcgame to both players
+                    player1 = self.active_games[game_id]['player1']
+                    player2 = self.active_games[game_id]['player2']
+                    await player1['ws'].send(calcgame_response)
+                    await player2['ws'].send(calcgame_response)       
+
                 elif data['type'] == 'game_end':
                     # Game ended
                     await self.game_end(game_id, calcgame_response)

@@ -1,5 +1,5 @@
 
-async function saveGameResultInDatabase(
+async function saveGameResultToDatabase(
     game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id,
     game_result) {
   let path = window.location.pathname;
@@ -45,34 +45,4 @@ async function saveGameResultInDatabase(
   console.log('data.message: ', data.message);
 
   document.querySelector('main').innerHTML = data.html;
-}
-
-// Start button clicked from game or tournament page
-async function startGame(
-    game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id) {
-  console.log(
-      game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id);
-  // If normal game: startGame('pong', 0, 'single','Player1', 0, 'Player2', 0)
-  // Tournament: startGame('pong', '3', 'Semi-Final 1', 'django_superuser',1,
-  // 'Name2',0)
-
-  // Remove the start game button and previous winner name
-  document.getElementById('startGame-button')?.remove();
-  document.getElementById('playAgain-button')?.remove();
-  document.getElementById('nextRound-button')?.remove();
-  document.getElementById('startGame-winner')?.remove();
-
-  let game_result = {};
-  // Execute the game
-  if (game_type === 'pong') {
-    game_result = await executePongGame(p1_name, p2_name);
-  } else if (game_type === 'cows') {
-    game_result = await executeCowGame(p1_name, p2_name);
-  }
-  console.log('game_result: ', game_result);
-
-  // Save the game result in the database
-  saveGameResultInDatabase(
-      game_type, tournament_id, game_round, p1_name, p1_id, p2_name, p2_id,
-      game_result);
 }

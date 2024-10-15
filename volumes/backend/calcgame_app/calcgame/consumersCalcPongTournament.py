@@ -3,7 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .consumersCalcPongUtils import update_ball_pos, check_ball_border_collision, check_ball_paddle_collision, check_ball_outofbounds, reset_ball_position
 logger = logging.getLogger(__name__)
 
-class PongCalcLocal(AsyncWebsocketConsumer):
+class PongCalcTournament(AsyncWebsocketConsumer):
   # Game configuration constants
   cfg = {
     "canvas": {
@@ -41,39 +41,38 @@ class PongCalcLocal(AsyncWebsocketConsumer):
   async def connect(self):
     # Accept the WebSocket connection
     await self.accept()
-    logger.debug("PongCalcLocal > Client connected")
+    logger.debug("PongCalcTournament > Client connected")
     # Send an initial message to confirm the connection
     await self.send(text_data=json.dumps({
       'type': 'connection_established, calcgame says hello',
-      'message': 'You are connected!',
-      'initial_vars': self.cfg,
+      'message': 'You are connected!'
     }))
 
   async def disconnect(self, close_code):
     # Handle WebSocket disconnection
-    logger.debug("PongCalcLocal > Client disconnected")
+    logger.debug("PongCalcTournament > Client disconnected")
     pass
 
   async def receive(self, text_data):
     # Handle messages received from the client
     data = json.loads(text_data)
-    logger.debug(f"PongCalcLocal > received data: {data}")
+    logger.debug(f"PongCalcTournament > received data: {data}")
     
     if data['type'] == 'opening_connection, game details':
        self.p1_name = data['p1_name']
        self.p2_name = data['p2_name']
-       logger.debug(f"PongCalcLocal > opening_connection with players: {self.p1_name}, {self.p2_name}")
+       logger.debug(f"PongCalcTournament > opening_connection with players: {self.p1_name}, {self.p2_name}")
 
     if data['type'] == 'players_ready':
         await self.start_game()
 
     if data['type'] == 'key_press':
-      # logger.debug("PongCalcLocal > key press event")
+      # logger.debug("PongCalcTournament > key press event")
       self.update_pressed_keys(data['keys'])
 
   async def start_game(self):
     # Start the game and send initial game state to the client
-    logger.debug("PongCalcLocal > Game started")
+    logger.debug("PongCalcTournament > Game started")
     for i in range(3, 0, -1):
         await self.send(text_data=json.dumps({
           'type': 'game_countdown',
@@ -83,7 +82,7 @@ class PongCalcLocal(AsyncWebsocketConsumer):
         }))
         await asyncio.sleep(0.8)
 
-    logger.debug("PongCalcLocal > sending first game_update")
+    logger.debug("PongCalcTournament > sending first game_update")
     await self.send(text_data=json.dumps({
         'type': 'game_update',
         'game_state': self.gs
@@ -93,7 +92,7 @@ class PongCalcLocal(AsyncWebsocketConsumer):
     self.game_task = asyncio.create_task(self.game_loop())
 
   async def game_end(self):
-    logger.debug("PongCalcLocal > Game ended")
+    logger.debug("PongCalcTournament > Game ended")
     winner = self.p1_name if self.gs['scorePlayer1'] > self.gs['scorePlayer2'] else self.p2_name
 
     # End the game
@@ -113,7 +112,7 @@ class PongCalcLocal(AsyncWebsocketConsumer):
 
 
   async def game_loop(self):
-      logger.debug("PongCalcLocal > game_loop")
+      logger.debug("PongCalcTournament > game_loop")
       while True:
           # Wait before continuing the loop (in seconds)
           await asyncio.sleep(0.02)
@@ -128,7 +127,7 @@ class PongCalcLocal(AsyncWebsocketConsumer):
 
           # Break loop and end game if a player reaches the max score
           if self.gs['scorePlayer1'] >= self.cfg['maxScore'] or self.gs['scorePlayer2'] >= self.cfg['maxScore']:
-            logger.debug("PongCalcLocal > Ending game...")
+            logger.debug("PongCalcTournament > Ending game...")
             break
           
           # Send the updated game state to the client
@@ -146,7 +145,7 @@ class PongCalcLocal(AsyncWebsocketConsumer):
 
   def update_paddle_pos(self):
     if 'w' in self.pressed_keys and self.gs['leftPaddleY'] > self.cfg['borderWidth']:
-        logger.debug("PongCalcLocal > update_paddle_pos > w pressed")
+        logger.debug("PongCalcTournament > update_paddle_pos > w pressed")
       # if player == 'left':
         self.gs['leftPaddleY'] -= self.cfg['paddleSpeed']
       # elif player == 'right':
