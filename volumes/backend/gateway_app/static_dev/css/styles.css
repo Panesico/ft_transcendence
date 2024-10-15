@@ -205,23 +205,6 @@ width: 80px;
 border-radius: 50%;
 }
 
-#preferred_language .language-button-input:checked + label {
-  background-color: #ffffff;
-  color: #181a1b;
-  border-color: #198754;
-  border-width: 2px;
-}
-
-#preferred_language .language-button-input {
-  color: #ffffff;
-  border-color: #ffffff;
-}
-
-#preferred_language .language-button-input:hover {
-  background-color: #adadad;
-  color: white;
-}
-
 .hero h1 {
   font-size: 4rem;
   font-weight: bold;
