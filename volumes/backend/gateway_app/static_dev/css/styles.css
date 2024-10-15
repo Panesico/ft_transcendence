@@ -24,6 +24,10 @@ body {
   background-color: #181a1b;
 }
 
+#mainHeader {
+  height: 80px;
+}
+
 /**************************/
 /*** Floating animation ***/
 /**************************/
@@ -199,23 +203,6 @@ img.profile-photo-lg{
 height: 80px;
 width: 80px;
 border-radius: 50%;
-}
-
-#preferred_language .language-button-input:checked + label {
-  background-color: #ffffff;
-  color: #181a1b;
-  border-color: #198754;
-  border-width: 2px;
-}
-
-#preferred_language .language-button-input {
-  color: #ffffff;
-  border-color: #ffffff;
-}
-
-#preferred_language .language-button-input:hover {
-  background-color: #adadad;
-  color: white;
 }
 
 .hero h1 {

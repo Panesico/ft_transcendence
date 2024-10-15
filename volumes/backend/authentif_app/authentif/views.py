@@ -36,16 +36,12 @@ def api_get_user_info(request, user_id):
     try:
         users = User.objects.all()
         users_id = [user.id for user in users]
-        logger.debug(f'api_get_user_info > Users_id: {users_id}')
-        logger.debug(f'api_get_user_info > Users: {users}')
         user = User.objects.get(id=user_id)
         if user:
             username = user.username
             avatar_url = user.avatar.url if user.avatar else None
-            logger.debug(f'api_get_user_info > User found: {username}')
             return JsonResponse({'status': 'success', 'message': 'User found', 'username': username, 'usernames': [user.username for user in users], 'users_id': users_id, 'avatar_url': avatar_url})
         else:
-            logger.debug('api_get_user_info > User not found')
             return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
     except User.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)

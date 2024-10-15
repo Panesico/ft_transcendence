@@ -46,7 +46,8 @@ class PongCalcRemote(AsyncWebsocketConsumer):
     # Send an initial message to confirm the connection
     await self.send(text_data=json.dumps({
       'type': 'connection_established, calcgame says hello',
-      'message': 'You are connected!'
+      'message': 'You are connected!',
+      'initial_vars': self.cfg,
     }))
 
   async def disconnect(self, close_code):

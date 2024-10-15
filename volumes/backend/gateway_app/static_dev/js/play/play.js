@@ -3,7 +3,7 @@ function displayError(errorMessage) {
   document.querySelector('.errorlist').textContent = errorMessage;
 }
 
-function checkValidInput(gameMode, gameType, p1_name, p2_name) {
+function checkValidInputGame(gameMode, gameType, p1_name, p2_name) {
   let lang = getCookie('django_language');
 
   // Check if the gameMode and gameType are valid
@@ -21,11 +21,9 @@ function checkValidInput(gameMode, gameType, p1_name, p2_name) {
   }
 
   // Check if the names are empty or only whitespace
-  if ((gameMode === 'remote' &&
-       (p1_name.length === 0 || p1_name.trim().length === 0)) ||
+  if ((p1_name.length === 0 || p1_name.trim().length === 0) ||
       (gameMode === 'local' &&
-       (p1_name.length === 0 || p2_name.length === 0 ||
-        p1_name.trim().length === 0 || p2_name.trim().length === 0))) {
+       (p2_name.length === 0 || p2_name.trim().length === 0))) {
     let error = 'Name can\'t be empty';
     if (lang === 'fr')
       error = 'Le nom ne peut pas être vide';
@@ -43,6 +41,31 @@ function checkValidInput(gameMode, gameType, p1_name, p2_name) {
       error = 'Les noms doivent être différents';
     else if (lang === 'es')
       error = 'Los nombres deben ser diferentes';
+    displayError(error);
+
+    return false;
+  }
+
+  // Check name length <= 16
+  if (p1_name.length > 16 || (gameMode === 'local' && p2_name.length > 16)) {
+    let error = 'Name must be 16 characters or less';
+    if (lang === 'fr')
+      error = 'Le nom doit comporter 16 caractères ou moins';
+    else if (lang === 'es')
+      error = 'El nombre debe tener 16 caracteres o menos';
+    displayError(error);
+
+    return false;
+  }
+
+  // Check if names are alphanumerical
+  if (!/^[a-zA-Z0-9_]+$/i.test(p1_name) ||
+      (gameMode === 'local' && !/^[a-zA-Z0-9_]+$/i.test(p2_name))) {
+    let error = 'Names must be alphanumerical';
+    if (lang === 'fr')
+      error = 'Les noms doivent être alphanumériques';
+    else if (lang === 'es')
+      error = 'Los nombres deben ser alfanuméricos';
     displayError(error);
 
     return false;
@@ -90,7 +113,7 @@ async function playGame() {
   }
 
   // check input selection
-  if (!checkValidInput(gameMode, gameType, p1_name, p2_name)) return;
+  if (!checkValidInputGame(gameMode, gameType, p1_name, p2_name)) return;
 
   // gameRound: 'single', 'Semi-Final 1', 'Semi-Final 2', 'Final'
   let gameRound = 'single';

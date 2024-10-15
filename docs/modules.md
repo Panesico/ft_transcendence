@@ -16,11 +16,12 @@ menting an API.
 m Minor module: Expanding Browser Compatibility.
 m Minor module: Multiple language supports.
 
+M Major module: Implementing a remote authentication. (42 Auth)
+M Major module: Implement Two-Factor Authentication (2FA) and JWT.
+
 # To-do / considered:
 ◦ Major module: Store the score of a tournament in the Blockchain.
 ◦ Major module: Live chat.
-◦ Major module: Implementing a remote authentication. (42 Auth)
-◦ Major module: Implement Two-Factor Authentication (2FA) and JWT.
 ◦ Major module: Introduce an AI Opponent.
 
 
