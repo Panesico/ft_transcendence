@@ -254,17 +254,17 @@ def api_getUserGames(request, user_id):
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
 def api_getMatchMaking(request, user_id):
-    logger.debug("api_getMatchMaking")
-    if request.method == 'GET':
-        try:
-            games = Game.objects.filter(p1_id=user_id, game_winner_id=None) | Game.objects.filter(p2_id=user_id, game_winner_id=None)
-            games_list = []
-            for game in games:
-                game_dict = (model_to_dict(game))
-                game_dict['date'] = game.date.strftime('%Y-%m-%d %H:%M:%S')
-                games_list.append(game_dict)
-            return JsonResponse({'status': 'success', 'games': games_list})
-        except (json.JSONDecodeError, DatabaseError) as e:
-            return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
-    logger.debug('api_getMatchMaking > Method not allowed')
-    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    porfile_api_url = os.getenv('https://profileapi:9002/api/getUsersIds/')
+    response = requests.get(porfile_api_url)
+    data = response.json()
+    users_ids = data['users_ids']
+    users_ids.remove(user_id)
+    request_user_stats = api_getUserStats(request, user_id)
+    for id in users_ids:
+        request = requests.get()
+        user_stats = api_getUserStats(request, id)
+        if user_stats['games_data']['total_games'] > 0:
+            if user_stats['games_data']['winrate'] > request_user_stats['games_data']['winrate']:
+                return JsonResponse({'status': 'success', 'match': id})
+    
+   

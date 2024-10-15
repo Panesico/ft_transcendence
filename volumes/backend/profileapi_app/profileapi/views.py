@@ -142,6 +142,19 @@ def get_friends(request, user_id):
     except Exception as e:
         logger.debug(f'get_friends > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    
+def get_users_ids(request):
+    logger.debug("get_users_ids")
+    try:
+        users = Profile.objects.all()
+        logger.debug('users recovered')
+        data = []
+        for user in users:
+            data.append(user.user_id)
+        return JsonResponse(data, status=200, safe=False)
+    except Exception as e:
+        logger.debug(f'get_users_ids > {str(e)}')
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 def create_notifications(request):
     logger.debug("create_notifications")
