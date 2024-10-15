@@ -194,7 +194,7 @@ def api_updateTournament(request):
     logger.debug('api_updateTournament > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
-def api_getUserStats(request, user_id):
+def api_getUserStats(request, user_id, raw=False):
     logger.debug("api_getUserStats")
     if request.method != 'GET':
         return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
@@ -243,28 +243,39 @@ def api_getUserStats(request, user_id):
         'winrate': winrate,
         'game_registry': game_registry
     }
+    if raw:
+        return {'status': 'success', 'games_data': games_data}
     return JsonResponse({'status': 'success', 'games_data': games_data})
 
 def api_getUserGames(request, user_id):
     logger.debug("api_getUserGames")
     if request.method == 'GET':
         response = api_getUserStats(request, user_id)
+        logger.debug(f'api_getUserGames > response: {response}')
+        target_id = api_getMatchMaking(request, user_id)
+        logger.debug(f'api_getUserGames > target_id: {target_id}')
         return response
     logger.debug('api_getUserGames > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
 def api_getMatchMaking(request, user_id):
-    porfile_api_url = os.getenv('https://profileapi:9002/api/getUsersIds/')
-    response = requests.get(porfile_api_url)
-    data = response.json()
-    users_ids = data['users_ids']
+    logger.debug("api_getMatchMaking")
+    response = requests.get('https://profileapi:9002/api/getUsersIds/', verify=os.getenv("CERTFILE"))
+    users_ids = response.json()
+    user_id = int(user_id)
+    users_ids = [int(id) for id in users_ids]
     users_ids.remove(user_id)
-    request_user_stats = api_getUserStats(request, user_id)
+    logger.debug(f'api_getMatchMaking > data: {users_ids}')
+    request_user_stats = api_getUserStats(request, user_id, raw=True)
+    request_winrate = request_user_stats['games_data']['winrate']
+    target_winrate = 100
+    target_id = None
     for id in users_ids:
-        request = requests.get()
-        user_stats = api_getUserStats(request, id)
-        if user_stats['games_data']['total_games'] > 0:
-            if user_stats['games_data']['winrate'] > request_user_stats['games_data']['winrate']:
-                return JsonResponse({'status': 'success', 'match': id})
-    
-   
+        user_stats = api_getUserStats(request, id, raw=True)
+        if user_stats['status'] == 'success':
+            winrate_diff = abs(user_stats['games_data']['winrate'] - request_winrate)
+            if winrate_diff < target_winrate:
+                target_winrate = winrate_diff
+                target_id = id
+        logger.debug(f'api_getMatchMaking > target_id: {target_id} with winrate difference: {target_winrate}')
+    return JsonResponse({'status': 'success', 'target_id': target_id})
