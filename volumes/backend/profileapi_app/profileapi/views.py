@@ -24,11 +24,12 @@ def api_signup(request):
     }
     logger.debug("--> POST method")
     data = json.loads(request.body)
+    display_name = 'user' + str(data['user_id'])
     logger.debug(f"data : {data}")
     try:
       profile = Profile(
       user_id=data['user_id'],
-      display_name=data['user_id'],
+      display_name= display_name,
       )
       logger.debug("--> profile user_id created")
       profile.save()

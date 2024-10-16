@@ -18,9 +18,9 @@ Remote game:
 
 
   @BenjaminLarger
-- Redirection to edit_profile after update info
 - Add an href associated to the avatar displayed in notification to his profile
 - Block player
 - Clean web socket unused (AsyncWebsocketConsumer)
 - Display name only after click
+- Notification up to down
 
