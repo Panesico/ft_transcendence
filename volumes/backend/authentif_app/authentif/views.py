@@ -105,7 +105,7 @@ def api_login(request):
                     samesite='Lax',  # Control cross-site request behavior
                     max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
                 )
-
+                
                 return response
 
             else:

@@ -28,7 +28,7 @@ urlpatterns = [
     path('edit_profile_general/', viewsProfile.post_edit_profile_general, name='edit_profile_general'),
     path('edit_profile_security/', viewsProfile.post_edit_profile_security, name='edit_profile_security'),
     path('edit_profile_avatar/', viewsProfile.post_edit_profile_avatar, name='edit_profile_avatar'),
-	  path('profile/match_history/', viewsProfile.get_match_history, name='match_history'),
+    path('profile/match_history/', viewsProfile.get_match_history, name='match_history'),
 
     # invite friends
     path('invite_a_friend', viewsInvitation.post_invite, name='post_invite'),
@@ -44,7 +44,7 @@ urlpatterns = [
     # Languages API
     path('i18n/', include('django.conf.urls.i18n')),
 
-    
+
 
     # path('api/data/', views.get_files, name='files'),
     # re_path(r'^.*$', views.get_other),  # Catch-all route to serve the SPA

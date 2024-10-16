@@ -232,3 +232,9 @@ border-radius: 50%;
     width: 20%;
     white-space: nowrap;
 }
+
+#chatButton img {
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+}

@@ -57,7 +57,6 @@ def get_edit_profile(request):
 
     form = EditProfileFormFrontend()
     # logger.debug(f"get_edit_profile > form: {form}")
-    
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_edit_profile > XMLHttpRequest")
         html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
