@@ -8,8 +8,8 @@ function checkValidInputGame(gameMode, gameType, p1_name, p2_name) {
 
   // Check if the gameMode and gameType are valid
   if (!gameMode || !gameType ||
-      (gameMode !== 'local' && gameMode !== 'remote') ||
-      (gameType !== 'pong' && gameType !== 'cows')) {
+    (gameMode !== 'local' && gameMode !== 'remote') ||
+    (gameType !== 'pong' && gameType !== 'cows')) {
     let error = 'Invalid selection';
     if (lang === 'fr')
       error = 'Sélection invalide';
@@ -22,8 +22,8 @@ function checkValidInputGame(gameMode, gameType, p1_name, p2_name) {
 
   // Check if the names are empty or only whitespace
   if ((p1_name.length === 0 || p1_name.trim().length === 0) ||
-      (gameMode === 'local' &&
-       (p2_name.length === 0 || p2_name.trim().length === 0))) {
+    (gameMode === 'local' &&
+      (p2_name.length === 0 || p2_name.trim().length === 0))) {
     let error = 'Name can\'t be empty';
     if (lang === 'fr')
       error = 'Le nom ne peut pas être vide';
@@ -60,7 +60,7 @@ function checkValidInputGame(gameMode, gameType, p1_name, p2_name) {
 
   // Check if names are alphanumerical
   if (!/^[a-zA-Z0-9_]+$/i.test(p1_name) ||
-      (gameMode === 'local' && !/^[a-zA-Z0-9_]+$/i.test(p2_name))) {
+    (gameMode === 'local' && !/^[a-zA-Z0-9_]+$/i.test(p2_name))) {
     let error = 'Names must be alphanumerical';
     if (lang === 'fr')
       error = 'Les noms doivent être alphanumériques';
@@ -104,7 +104,7 @@ async function playGame() {
   if (gameMode === 'remoteMode') gameMode = 'remote';
 
   const gameType =
-      document.querySelector('input[name="chosenGame"]:checked').id;
+    document.querySelector('input[name="chosenGame"]:checked').id;
 
   const p1_name = document.getElementById('player1-input').value;
   let p2_name = '';
@@ -117,7 +117,6 @@ async function playGame() {
 
   // gameRound: 'single', 'Semi-Final 1', 'Semi-Final 2', 'Final'
   let gameRound = 'single';
-  let game_result =
-      await startNewGame(gameMode, gameType, gameRound, p1_name, p2_name);
-  console.log('playGame > game_result: ', game_result);
+
+  startNewGame(gameMode, gameType, gameRound, p1_name, p2_name);
 }
