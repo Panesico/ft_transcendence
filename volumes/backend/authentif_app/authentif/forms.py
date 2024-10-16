@@ -8,36 +8,35 @@ from django.utils.translation import gettext as _
 import logging
 logger = logging.getLogger(__name__)
 
-class SignUpForm(forms.ModelForm):
+from django import forms
+from .models import User
 
-    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'class': 'form-control', 'id': 'signupConfirmPassword'
-    }), label=_('Confirm Password'))
+class SignUpForm(forms.ModelForm):
+    confirm_password = forms.CharField(widget=forms.PasswordInput, required=False)
 
     class Meta:
         model = User
-        fields = ['username', 'password']
-        widgets = {
-            'username': forms.TextInput(attrs={
-                'class': 'form-control', 'id': 'signupUsername'
-            }),
-            'password': forms.PasswordInput(attrs={
-                'class': 'form-control', 'id': 'signupPassword'
-            }),
-        }
+        fields = ['username', 'password', 'id_42']
 
     def clean(self):
-        logger.debug("SignUpForm > clean")
         cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        confirm_password = cleaned_data.get('confirm_password')
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+        id_42 = cleaned_data.get("id_42")
 
-        if password and confirm_password:
-            logger.debug("SignUpForm > clean > if password and confirm_password")
+        # If id_42 is provided, no need for password
+        if not id_42:
+            if not password or not confirm_password:
+                raise forms.ValidationError("Password and confirmation are required.")
             if password != confirm_password:
-                logger.debug("SignUpForm > clean > if password != confirm_password")
-                raise ValidationError(_("Passwords do not match"))
+                raise forms.ValidationError("Passwords do not match.")
+
+        # If id_42 is set, we don't need a password, vice versa
+        if id_42 and password:
+            raise forms.ValidationError("Cannot set both password and id_42.")
+
         return cleaned_data
+
 
 
 class LogInForm(AuthenticationForm):
@@ -46,6 +45,11 @@ class LogInForm(AuthenticationForm):
     }))
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control', 'id': 'loginPassword'
+    }))
+
+class LogInForm42(AuthenticationForm):
+    id = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control', 'id': 'loginId'
     }))
 
 class EditProfileForm(UserChangeForm):

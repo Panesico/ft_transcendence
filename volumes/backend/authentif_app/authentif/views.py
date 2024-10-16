@@ -124,9 +124,11 @@ def api_login(request):
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
 # Create a profile linked to user through call to profileapi service
-def createProfile(username, user_id, csrf_token):
+def createProfile(username, user_id, csrf_token, is_42):
     profileapi_url = 'https://profileapi:9002/api/signup/'
     profile_data = { 'user_id': user_id, 'username': username }
+    
+    
     headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',
@@ -136,8 +138,12 @@ def createProfile(username, user_id, csrf_token):
     }
 
     try:
-        response = requests.post(
-            profileapi_url, json=profile_data, headers=headers, verify=os.getenv("CERTFILE"))
+        if not is_42:
+            response = requests.post(
+                profileapi_url, json=profile_data, headers=headers, verify=os.getenv("CERTFILE"))
+        else:
+            response = requests.post(
+                profileapi_url, json=profile_data, headers=headers, verify=False)
         logger.debug(f'api_signup > createProfile > Response: {response}')
         logger.debug(f'api_signup > createProfile > Response status code: {response.status_code}')
         
@@ -189,7 +195,7 @@ def api_signup(request):
               
               csrf_token = request.COOKIES.get('csrftoken')
               # Create a profile through call to profileapi service
-              if not createProfile(username, user.id, csrf_token):
+              if not createProfile(username, user.id, csrf_token, False):
                     user.delete()
                     return JsonResponse({
                         'status': 'error', 
@@ -282,3 +288,166 @@ def api_edit_profile(request):
   else:
     logger.debug('api_edit_profile > Method not allowed')
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
+
+import requests
+from django.shortcuts import redirect, render
+from django.conf import settings
+from django.contrib.auth import login
+
+import requests
+from django.conf import settings
+
+def exchange_code_for_token(auth_code):
+    data = {
+        'grant_type': 'authorization_code',
+        'client_id': settings.CLIENT_ID,
+        'client_secret': settings.CLIENT_SECRET,
+        'code': auth_code,
+        'redirect_uri': settings.REDIRECT_URI,
+    }
+    response = requests.post('https://api.intra.42.fr/oauth/token', data=data)
+    return response.json()
+
+def get_42_user_data(token):
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
+    return response.json()
+
+from django.http import JsonResponse, HttpResponseRedirect
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.uploadedfile import SimpleUploadedFile
+
+logger = logging.getLogger(__name__)
+
+import requests
+from django.utils.translation import gettext as _
+
+def create_or_get_user(request, user_data):
+    """
+    Creates a new user or retrieves an existing one based on the 42 API data.
+    Logs in the user after creation or retrieval, and calls the profile API to create the profile.
+    """
+    try:
+        # Try to find the user by their 42 login (username)
+        user = User.objects.get(username=user_data['login'])
+        logger.info(f"User found: {user.username}")
+    except User.DoesNotExist:
+        # Check if this is a "42 user" by seeing if `id` exists in user_data (or any other identifier for 42 user)
+        if 'id' in user_data:  # Assuming `id` from user_data corresponds to 42 ID
+            data = {"username": user_data['login'], "id_42": user_data['id']}  # No password needed for 42 users
+
+            # Bypass the password field if user is 42-based
+            form = SignUpForm(data=data)
+            if form.is_valid():
+                user = form.save()
+            else:
+                logger.error(f"SignUpForm error: {form.errors}")
+        else:
+            # Create a standard user with a password if not a 42 user
+            data = {"username": user_data['login'], "password": "1", "confirm_password": "1"}
+            form = SignUpForm(data=data)
+            if form.is_valid():
+                user = form.save()
+            else:
+                logger.error(f"SignUpForm error: {form.errors}")
+        
+        # Create the profile
+        createProfile(user_data['login'], user_data['id'], "", 'id' in user_data)  # True if 42 user
+        payload = json.dumps({'image_url': user_data['image']['link']})  # Convert the data to a JSON string
+        csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+        jwt_token = request.COOKIES.get('jwt_token')
+
+        headers = {
+            'X-CSRFToken': csrf_token,
+            'Cookie': f'csrftoken={csrf_token}',
+            'Content-Type': 'application/json',
+            'Referer': 'https://authentif:9001',
+            'Authorization': f'Bearer {jwt_token}',
+        }
+        
+        # Make the POST request to the external authentif service
+        response = requests.post("https://gateway:8443/download_42_avatar", data=payload, headers=headers, verify=False)
+        csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+        jwt_token = request.COOKIES.get('jwt_token')
+
+        headers = {
+            'X-CSRFToken': csrf_token,
+            'Cookie': f'csrftoken={csrf_token}',
+            'Content-Type': f"{response.json()['avatar']['content_type']}",
+            'Referer': 'https://authentif:9001',
+            'Authorization': f'Bearer {jwt_token}',
+        }
+
+        response = requests.post("https://gateway:8443/post_edit_profile_avatar", body=response.text, headers=headers, verify=False)
+        
+        
+
+        
+    if user == None:
+        login(request, user)
+
+    return user
+
+
+
+def oauth(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+
+    # Get the 'code' parameter from the parsed JSON data
+    auth_code = data.get('code')
+    state = data.get('state')
+    
+    if not auth_code:
+        return JsonResponse({'error': 'Authorization code is missing'}, status=400)
+
+    # Step 2: Exchange authorization code for access token
+    try:
+        token_data = exchange_code_for_token(auth_code)
+    except Exception as e:
+        logger.error(f"Error exchanging authorization code: {str(e)}")
+        return JsonResponse({'error': 'Failed to retrieve access token'}, status=500)
+
+    if 'access_token' not in token_data:
+        return JsonResponse({'error': 'Failed to retrieve access token'}, status=400)
+
+    # Step 3: Retrieve user data from 42 API
+    try:
+        user_data = get_42_user_data(token_data['access_token'])
+    except Exception as e:
+        logger.error(f"Error fetching user data: {str(e)}")
+        return JsonResponse({'error': 'Failed to retrieve user data'}, status=500)
+
+    # Step 4: Create or authenticate the user and generate a JWT
+    user = create_or_get_user(request, user_data)
+
+    jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
+    
+    # Create response object
+    response = JsonResponse({
+        'status': 'success',
+        'message': _('Login successful'),
+        'token': jwt_token,
+        'user_id': user.id
+    })
+
+    # Set the JWT token in the headers
+    response['Authorization'] = f'Bearer {jwt_token}'
+
+    # Set the JWT token in a cookie (with security options)
+    response.set_cookie(
+        key='jwt_token',
+        value=jwt_token,
+        httponly=True,  # Prevent JavaScript access to the cookie (for security)
+        secure=True,  # Only send the cookie over HTTPS (ensure your environment supports this)
+        samesite='Lax',  # Control cross-site request behavior
+        max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
+    )
+    return response

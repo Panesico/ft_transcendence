@@ -267,3 +267,47 @@ def post_edit_profile_avatar(request):
     html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
     return JsonResponse({'html': html, 'status': 'error'}, status=400)
 
+import requests
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.http import JsonResponse
+
+@login_required
+def download_42_avatar(request):
+    if request.method == 'POST':
+        # Get the image URL from the POST data
+        image_url = request.POST.get('image_url')
+        
+        if not image_url:
+            return JsonResponse({'error': 'No image URL provided'}, status=400)
+
+        try:
+            # Download the image
+            response = requests.get(image_url)
+            response.raise_for_status()  # Raise an error if the download fails
+
+            # Get the image content
+            image_content = response.content
+
+            # Extract the image name from the URL
+            image_name = image_url.split("/")[-1]
+
+            # Create a SimpleUploadedFile object (to simulate a file upload)
+            avatar_file = SimpleUploadedFile(
+                name=image_name,
+                content=image_content,
+                content_type=response.headers['Content-Type']
+            )
+
+            # Return the file in the request (simulating "avatar" in FILES)
+            return JsonResponse({
+                'avatar': {
+                    'filename': avatar_file.name,
+                    'size': avatar_file.size,
+                    'content_type': avatar_file.content_type
+                }
+            })
+
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
