@@ -17,11 +17,12 @@ def api_signup(request):
         return HttpResponse('Method not allowed', status=405)
     logger.debug("--> POST method")
     data = json.loads(request.body)
+    display_name = 'user' + str(data['user_id'])
     logger.debug(f"data : {data}")
     try:
       profile = Profile(
-          user_id=data['user_id'],
-          display_name=data['user_id'],
+      user_id=data['user_id'],
+      display_name= display_name,
       )
       logger.debug("--> profile user_id created")
       profile.save()
@@ -133,6 +134,19 @@ def get_friends(request, user_id):
     except Exception as e:
         logger.debug(f'get_friends > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    
+def get_users_ids(request):
+    logger.debug("get_users_ids")
+    try:
+        users = Profile.objects.all()
+        logger.debug('users recovered')
+        data = []
+        for user in users:
+            data.append(user.user_id)
+        return JsonResponse(data, status=200, safe=False)
+    except Exception as e:
+        logger.debug(f'get_users_ids > {str(e)}')
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 def create_notifications(request):
     logger.debug("create_notifications")
@@ -208,39 +222,55 @@ def set_notif_as_readen(request, sender_id, receiver_id, type, response):
         notifications = Notification.objects.filter(sender=sender_obj, receiver=receiver_obj, type=type)
         logger.debug('notifications recovered')
         for notification in notifications:
-            notification.status = 'read'
+            if (response == 'accept'):
+              notification.status = 'accepted'
+            elif (response == 'decline'):
+              notification.status = 'declined'
             notification.save()
+            logger.debug('notification marked as read')
 
             # if friend request accepted, save friendship in database
             if response == 'accept' and type == 'friend_request':
                 sender_obj.friends.add(receiver_obj)
                 sender_obj.save()
                 receiver_obj.save()
-
-                # Save response to database
-                new_notification = Notification(
-                    sender=receiver_obj,
-                    receiver=sender_obj,
-                    message=response,
-                    type=type,
-                    status='unread'
-                )
-                new_notification.save()
-            else:
-                logger.debug('Friendship not saved in database')
-                # Save response to database
-                new_notification = Notification(
-                    sender=receiver_obj,
-                    receiver=sender_obj,
-                    message=response,
-                    type=type,
-                    status='unread'
-                )
-                new_notification.save()
     except Profile.DoesNotExist:
         logger.debug('set_notif_as_readen > User not found')
         return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
     return JsonResponse({'status': 'success', 'message': 'Notification marked as read'}, status=200)
 
 
-    
+def set_all_notifs_as_readen(request, receiver_id):
+    logger.debug("set_all_notifs_as_readen")
+    try:
+        receiver_obj = Profile.objects.get(user_id=receiver_id)
+        logger.debug('receiver_obj recovered')
+        notifications = Notification.objects.filter(receiver=receiver_obj, status='unread')
+        logger.debug('notifications recovered')
+        for notification in notifications:
+            notification.status = 'read'
+            notification.save()
+            logger.debug('notification marked as read')
+    except Profile.DoesNotExist:
+        logger.debug('set_all_notifs_as_readen > User not found')
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    return JsonResponse({'status': 'success', 'message': 'All notifications marked as read'}, status=200)
+
+def check_friendship(request, sender_id, receiver_id):
+    logger.debug("check_friendship")
+    try:
+        sender_obj = Profile.objects.get(user_id=sender_id)
+        receiver_obj = Profile.objects.get(user_id=receiver_id)
+        logger.debug('sender_obj and receiver_obj recovered')
+        if receiver_obj in sender_obj.friends.all():
+            logger.debug('check_friendship > Friendship exists')
+            return JsonResponse({'status': 'success', 'message': 'Friendship exists'}, status=404)
+        else:
+            logger.debug('check_friendship > Friendship does not exist')
+            return JsonResponse({'status': 'error', 'message': 'Friendship does not exist'}, status=200)
+    except Profile.DoesNotExist:
+        logger.debug('check_friendship > User not found')
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    except Exception as e:
+        logger.debug(f'check_friendship > {str(e)}')
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

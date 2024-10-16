@@ -53,26 +53,68 @@ def api_saveGame(request):
     logger.debug('api_saveGame > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
     
-def api_newTournament(request):
-    logger.debug("api_newTournament")
+# def api_newTournament(request):
+#     logger.debug("api_newTournament")
+#     if request.method == 'POST':
+#         try:
+#           data = json.loads(request.body)
+#           logger.debug(f'api_newTournament > Received data: {data}')
+
+#           logger.debug('api_newTournament > Creating tournament...')
+#           tournament = Tournament.objects.create(
+#               game_type = data.get('game_type'),
+#               t_p1_name = data.get('player1'),
+#               t_p2_name = data.get('player2'),
+#               t_p3_name = data.get('player3'),
+#               t_p4_name = data.get('player4'),
+#               t_p1_id = data.get('p1_id'),
+#               t_p2_id = data.get('p2_id'),
+#               t_p3_id = data.get('p3_id'),
+#               t_p4_id = data.get('p4_id')
+#           )
+#           logger.debug(f'api_newTournament > Starting tournament: {tournament}')
+#           tournament.start_tournament()
+
+#           game_round = 'Semi-Final 1'
+#           info = {
+#               'tournament_id': tournament.id,
+#               'game_round': game_round,
+#               'p1_name': tournament.t_p1_name,
+#               'p2_name': tournament.t_p2_name,
+#               'p1_id': tournament.t_p1_id,
+#               'p2_id': tournament.t_p2_id,
+#           }
+
+#           message = ("starting Semi-Final 1")
+          
+#           return JsonResponse({'status': 'success', 'message': message, 'info': info})
+#         except (json.JSONDecodeError, DatabaseError) as e:
+#             logger.debug(f'api_newTournament > Error: {str(e)}')
+#             return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
+#     logger.debug('api_newTournament > Method not allowed')
+#     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+ 
+def api_createTournament(request):
+    logger.debug("api_createTournament")
     if request.method == 'POST':
         try:
           data = json.loads(request.body)
-          logger.debug(f'api_newTournament > Received data: {data}')
+          logger.debug(f'api_createTournament > Received data: {data}')
 
-          logger.debug('api_newTournament > Creating tournament...')
+          logger.debug('api_createTournament > Creating tournament...')
           tournament = Tournament.objects.create(
-              tournament_type = data.get('tournament_type'),
-              t_p1_name = data.get('player1'),
-              t_p2_name = data.get('player2'),
-              t_p3_name = data.get('player3'),
-              t_p4_name = data.get('player4'),
+              game_type = data.get('game_type'),
+              t_p1_name = data.get('p1_name'),
+              t_p2_name = data.get('p2_name'),
+              t_p3_name = data.get('p3_name'),
+              t_p4_name = data.get('p4_name'),
               t_p1_id = data.get('p1_id'),
               t_p2_id = data.get('p2_id'),
               t_p3_id = data.get('p3_id'),
               t_p4_id = data.get('p4_id')
           )
-          logger.debug(f'api_newTournament > Starting tournament: {tournament}')
+          logger.debug(f'api_createTournament > Starting tournament: {tournament}')
           tournament.start_tournament()
 
           game_round = 'Semi-Final 1'
@@ -89,9 +131,9 @@ def api_newTournament(request):
           
           return JsonResponse({'status': 'success', 'message': message, 'info': info})
         except (json.JSONDecodeError, DatabaseError) as e:
-            logger.debug(f'api_saveGame > Error: {str(e)}')
+            logger.debug(f'api_createTournament > Error: {str(e)}')
             return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
-    logger.debug('api_newTournament > Method not allowed')
+    logger.debug('api_createTournament > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
 def api_updateTournament(request):
@@ -194,7 +236,7 @@ def api_updateTournament(request):
     logger.debug('api_updateTournament > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
-def api_getUserStats(request, user_id):
+def api_getUserStats(request, user_id, raw=False):
     logger.debug("api_getUserStats")
     if request.method != 'GET':
         return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
@@ -243,28 +285,40 @@ def api_getUserStats(request, user_id):
         'winrate': winrate,
         'game_registry': game_registry
     }
+    if raw:
+        return {'status': 'success', 'games_data': games_data}
     return JsonResponse({'status': 'success', 'games_data': games_data})
 
 def api_getUserGames(request, user_id):
     logger.debug("api_getUserGames")
     if request.method == 'GET':
         response = api_getUserStats(request, user_id)
+        logger.debug(f'api_getUserGames > response: {response}')
+        target_id = api_getMatchMaking(request, user_id)
+        logger.debug(f'api_getUserGames > target_id: {target_id}')
         return response
     logger.debug('api_getUserGames > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
 def api_getMatchMaking(request, user_id):
     logger.debug("api_getMatchMaking")
-    if request.method == 'GET':
-        try:
-            games = Game.objects.filter(p1_id=user_id, game_winner_id=None) | Game.objects.filter(p2_id=user_id, game_winner_id=None)
-            games_list = []
-            for game in games:
-                game_dict = (model_to_dict(game))
-                game_dict['date'] = game.date.strftime('%Y-%m-%d %H:%M:%S')
-                games_list.append(game_dict)
-            return JsonResponse({'status': 'success', 'games': games_list})
-        except (json.JSONDecodeError, DatabaseError) as e:
-            return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
-    logger.debug('api_getMatchMaking > Method not allowed')
-    return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    response = requests.get('https://profileapi:9002/api/getUsersIds/', verify=os.getenv("CERTFILE"))
+    users_ids = response.json()
+    user_id = int(user_id)
+    logger.debug(f'api_getMatchMaking > user_id: {user_id}')
+    users_ids = [int(id) for id in users_ids]
+    users_ids.remove(user_id)
+    logger.debug(f'api_getMatchMaking > data: {users_ids}')
+    request_user_stats = api_getUserStats(request, user_id, raw=True)
+    request_winrate = request_user_stats['games_data']['winrate']
+    target_winrate = 100
+    target_id = None
+    for id in users_ids :
+        user_stats = api_getUserStats(request, id, raw=True)
+        if user_stats['status'] == 'success':
+            winrate_diff = abs(user_stats['games_data']['winrate'] - request_winrate)
+            if winrate_diff < target_winrate:
+                target_winrate = winrate_diff
+                target_id = id
+        logger.debug(f'api_getMatchMaking > target_id: {target_id} with winrate difference: {target_winrate}')
+    return JsonResponse({'status': 'success', 'target_id': target_id})

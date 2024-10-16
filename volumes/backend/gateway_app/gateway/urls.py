@@ -37,19 +37,19 @@ urlpatterns = [
     # invite friends
     path('invite_a_friend', viewsInvitation.post_invite, name='post_invite'),
     path('my_friends/', views.list_friends, name='list_friends'),
+	path('getFriends/', views.get_friends, name='get_friends'),
 
     # play api
     path('play/', viewsPlay.get_play, name='play'),
-    path('play/game/', viewsPlay.post_game, name='game'),
+    # path('play/game/', viewsPlay.post_game, name='game'),
     path('play/saveGame/', viewsPlay.save_game, name='saveGame'),
     path('tournament/', viewsPlay.view_tournament, name='tournament'),
-    path('tournament/update/', viewsPlay.view_tournament_update, name='tournamentUpdate'),
-    # path('remote/', viewsPlay.get_remote, name='remote'),
+    # path('tournament/update/', viewsPlay.view_tournament_update, name='tournamentUpdate'),
 
     # Languages API
     path('i18n/', include('django.conf.urls.i18n')),
 
-    
+
 
     # path('api/data/', views.get_files, name='files'),
     # re_path(r'^.*$', views.get_other),  # Catch-all route to serve the SPA

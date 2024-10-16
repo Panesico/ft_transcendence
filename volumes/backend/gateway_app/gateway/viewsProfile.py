@@ -57,7 +57,6 @@ def get_edit_profile(request):
 
     form = EditProfileFormFrontend()
     # logger.debug(f"get_edit_profile > form: {form}")
-    
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_edit_profile > XMLHttpRequest")
         html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
@@ -115,13 +114,13 @@ def post_edit_profile_security(request):
      # Redirection usage
     form = LogInFormFrontend()
     profile_data = get_profileapi_variables(request=request)
+    preferred_language = profile_data.get('preferred_language')
 
     if response.ok:
       logger.debug('post_edit_profile > Response OK')
-      html = render_to_string('fragments/login_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+#      html = render_to_string('fragments/login_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
       user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
-      for cookie in response.cookies:
-        user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
+      user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
       return user_response
 
     #handle wrong confirmation password
@@ -130,7 +129,7 @@ def post_edit_profile_security(request):
       data = json.loads(request.body)
       form = EditProfileFormFrontend(data)
       form.add_error(None, message)
-      logger.debug('post_edit_profile_general > Response KO')
+      logger.debug('post_edit_profile_security > Response KO')
 
       html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
@@ -176,10 +175,9 @@ def post_edit_profile_general(request):
             #construct html to return
         preferred_language = profile_data.get('preferred_language')
         logger.debug(f"post_edit_profile > preferred_language: {preferred_language}")
-        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'preferred_language': preferred_language}, request=request)
-        user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'preferred_language': preferred_language})
-        for cookie in response.cookies:
-            user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
+        #html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'preferred_language': preferred_language}, request=request)
+        #user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'preferred_language': preferred_language})
+        user_response =  JsonResponse({'status': status, 'message': message, 'preferred_language': preferred_language})
         user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
         return user_response
         
@@ -215,6 +213,7 @@ def post_edit_profile_avatar(request):
   # Redirection usage
   form = EditProfileFormFrontend()
   profile_data = get_profileapi_variables(request=request)
+  preferred_language = profile_data.get('preferred_language')
 
   # Recover data from the form
   data = request.POST.copy()
@@ -246,9 +245,8 @@ def post_edit_profile_avatar(request):
 
     if  response.ok:
         logger.debug('post_edit_profile_avatar > Response OK')
-        user_response =  JsonResponse({'html': html, 'status': 'success', 'message': 'Avatar updated successfully'})
-        for cookie in response.cookies:
-          user_response.set_cookie(cookie.key, cookie.value, domain='localhost', httponly=True, secure=True)
+        user_response =  JsonResponse({'message': message, 'status': 'success'})
+        user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
         return user_response
     else:
       form = EditProfileFormFrontend()

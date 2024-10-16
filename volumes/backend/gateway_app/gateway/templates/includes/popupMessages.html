@@ -1,5 +1,5 @@
 
-<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+<div class="modal hide fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content bg-dark text-light"  style="background-color: #333; color: #fff; border: 2px solid white;">
       <div class="modal-header">
@@ -20,5 +20,30 @@
       const messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
       messageModal.show();
     }
+
+    const messageModal = document.getElementById('messageModal');
+    if (messageModal) {
+      const modalInstance = bootstrap.Modal.getInstance(messageModal);
+      if (modalInstance) {
+        modalInstance.hide(); // Hide modal when navigating back
+        document.querySelector('.modal-backdrop')?.remove();
+        document.body.classList.remove('modal-open')
+      }
+    }
+
+  });
+
+  window.addEventListener('popstate', function () {
+    // Close the modal on back navigation
+    const messageModal = document.getElementById('messageModal');
+    if (messageModal) {
+      const modalInstance = bootstrap.Modal.getInstance(messageModal);
+      if (modalInstance) {
+        modalInstance.hide(); // Hide modal when navigating back
+        document.querySelector('.modal-backdrop')?.remove();
+        document.body.classList.remove('modal-open')
+      }
+    }
   });
 </script>
+

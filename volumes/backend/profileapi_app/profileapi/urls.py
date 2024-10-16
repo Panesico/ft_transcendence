@@ -17,9 +17,14 @@ urlpatterns = [
     # Getter
     path('api/profile/<str:user_id>/', views.get_profile_api, name='profile_api'),
     path('api/getfriends/<str:user_id>/', views.get_friends, name='get_friends'),
+	path('api/getUsersIds/', views.get_users_ids, name='get_users_ids'),
 
     # Notifications
     path('api/createnotif/', views.create_notifications, name='create_notifications'),
     path('api/getnotif/<str:user_id>/', views.get_notifications, name='get_notifications'),
     path('api/setnotifasread/<str:sender_id>/<str:receiver_id>/<str:type>/<str:response>/', views.set_notif_as_readen, name='set_notif_as_readen'),
+    path('api/setallnotifasread/<str:receiver_id>/', views.set_all_notifs_as_readen, name='set_all_notifs_as_readen'),
+
+    # Friends
+    path('api/checkfriendship/<int:sender_id>/<int:receiver_id>/', views.check_friendship, name='check_friendship'),
 ]

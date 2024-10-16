@@ -3,6 +3,18 @@ async function loadContent(path) {
   // console.log('loadContent');
   let url = (path === '/') ? path : `${path}/`;
 
+  //if url ends by //, remove the last /
+  console.log('url: ', url);
+  if (url.endsWith('//')) {
+    url = url.slice(0, -1);
+  }
+
+  // Check go back arrow has been clicked
+  if (url === '/back') {
+    console.log('Go back arrow clicked');
+  }
+
+
   // console.log('url: ', url);
   // Fetch content from Django and inject into main
   try {
@@ -105,6 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let message = 'Profile updated';
     displayMessageInModal(message);
     sessionStorage.removeItem('afterProfileUpdate');
+  }
+  else if (sessionStorage.getItem('afterAvatarUpdate') === 'true') {
+    let message = 'Avatar updated';
+    displayMessageInModal(message);
+    sessionStorage.removeItem('afterAvatarUpdate');
   }
 });
 

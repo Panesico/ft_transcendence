@@ -45,7 +45,7 @@ class Tournament(models.Model):
         ('pong', 'pong'),
         ('cows', 'cows'),
     ]
-    tournament_type = models.CharField(max_length=16, choices=GAME_TYPES)
+    game_type = models.CharField(max_length=16, choices=GAME_TYPES)
 
     # Player Information
     t_p1_id = models.IntegerField()
@@ -81,14 +81,14 @@ class Tournament(models.Model):
             logger.debug('class Tournament > start_tournament > Create semi-final games')
             ### NEED TO add randomizer to determine who plays who ###
             self.semifinal1 = Game.objects.create(
-                game_type=self.tournament_type,
+                game_type=self.game_type,
                 game_round='semifinal1',
                 p1_id=self.t_p1_id, p1_name=self.t_p1_name,
                 p2_id=self.t_p2_id, p2_name=self.t_p2_name,
                 p1_score=0, p2_score=0
             )
             self.semifinal2 = Game.objects.create(
-                game_type=self.tournament_type,
+                game_type=self.game_type,
                 game_round='semifinal2',
                 p1_id=self.t_p3_id, p1_name=self.t_p3_name,
                 p2_id=self.t_p4_id, p2_name=self.t_p4_name,
@@ -101,7 +101,7 @@ class Tournament(models.Model):
         logger.debug('class Tournament > create_final')
         if not self.final:
             self.final = Game.objects.create(
-                game_type=self.tournament_type,
+                game_type=self.game_type,
                 game_round='final',
                 p1_id=self.semifinal1.game_winner_id, p1_name=self.semifinal1.game_winner_name,
                 p2_id=self.semifinal2.game_winner_id, p2_name=self.semifinal2.game_winner_name,

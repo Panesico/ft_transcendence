@@ -23,6 +23,23 @@ def get_home(request):
         return JsonResponse({'html': html, 'status': status, 'message': message})
     return render(request, 'partials/home.html', {'status': status, 'message': message})
 
+def get_friends(request):
+  logger.debug("")
+  logger.debug(f"get_friends > request: {request}")
+  if not request.user.is_authenticated:
+    return redirect('login')
+  if request.method != 'GET':
+    return redirect('405')
+
+  # Get friends
+  profile_api_url = 'https://profileapi:9002/api/getfriends/' + str(request.user.id) + '/'
+  response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+  friends = response.json()
+  logger.debug(f"get_friends > friends: {friends}")
+  if response.status_code == 200:
+    return JsonResponse({'friends': friends}, status=200)
+
+
 def list_friends(request):
     logger.debug("")
     logger.debug(f"list_friends > request: {request}")

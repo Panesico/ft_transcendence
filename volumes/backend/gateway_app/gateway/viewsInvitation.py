@@ -21,6 +21,19 @@ def get_authentif_variables(user_id):
     logger.debug(f"-------> get_edit_profile > Response: {response}")
     return None
 
+# Check if two users are already friends
+def check_friendship(sender_id, receiver_id):
+  logger.debug(f"check_friendship > sender_id: {sender_id}")
+  logger.debug(f"check_friendship > receiver_id: {receiver_id}")
+  url = 'https://profileapi:9002/api/checkfriendship/' + str(sender_id) + '/' + str(receiver_id) + '/'
+  logger.debug(f"check_friendship > url: {url}")
+  response = requests.get(url, verify=os.getenv("CERTFILE"))
+  logger.debug(f"check_friendship > response: {response}")
+  if response.status_code == 200:
+    return response.json()
+  else:
+    return response.json()
+
 def post_invite(request):
   logger.debug("")
   logger.debug('post_invite')
@@ -35,9 +48,6 @@ def post_invite(request):
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
     }
-
-  # Get user data
-
 
   # Recover data from the form
 #  data = json.loads(request.body)
@@ -60,6 +70,8 @@ def post_invite(request):
   usernames = user_data.get('usernames')
   users_id = user_data.get('users_id')
 
+  # Check friendship
+  friendship = check_friendship(sender_id, users_id[usernames.index(data['username'])])
 
   # Check if username exists
   if data['username'] not in usernames:
@@ -68,6 +80,13 @@ def post_invite(request):
     form.add_error(None, 'Username does not exist')
     html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
     user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
+    return user_response
+  elif friendship['status'] == 'success':
+    status = 'error'
+    message = 'Friendship already exists'
+    form = InviteFriendFormFrontend()
+    html = render_to_string('fragments/profile_fragment.html', {'form': form, 'message': message}, request=request)
+    user_response = JsonResponse({'html': html, 'status': status, 'message': message})
     return user_response
   elif data['username'] == sender_username:
     status = 'error'
@@ -85,9 +104,6 @@ def post_invite(request):
     logger.debug(f"post_invite > receiver_id: {receiver_id}")
     user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'receiver_username': data['username'], 'receiver_id': receiver_id, 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url}) 
     return user_response
-
-
-
 
   form = InviteFriendFormFrontend(request.POST)
   html = render_to_string('fragments/profile_fragment.html', {}, request=request)
