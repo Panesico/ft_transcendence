@@ -33,6 +33,7 @@ urlpatterns = [
     # invite friends
     path('invite_a_friend', viewsInvitation.post_invite, name='post_invite'),
     path('my_friends/', views.list_friends, name='list_friends'),
+	path('getFriends/', views.get_friends, name='get_friends'),
 
     # play api
     path('play/', viewsPlay.get_play, name='play'),
