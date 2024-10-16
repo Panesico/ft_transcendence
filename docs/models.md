@@ -30,7 +30,7 @@ Game:
     date
 
 Tournament:
-    tournament_type
+    game_type
     t_p1_id
     t_p1_name    
     t_p2_id

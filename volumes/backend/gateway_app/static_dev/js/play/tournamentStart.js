@@ -16,9 +16,8 @@ async function startNewTournament(
   if (calcGameSocket === undefined) return;
 
 
-
   calcGameSocket.onopen = function (e) {
-    console.log('startNewGame > .onopen, connection opened.');
+    console.log('startNewTournament > .onopen, connection opened.');
 
     // Set up event listeners on navbar items to close connection on navigate
     setupNavbarEventListeners(calcGameSocket);
@@ -28,15 +27,18 @@ async function startNewTournament(
         type: 'opening_connection, game details',
         p1_name: p1_name,
         p2_name: p2_name,
-        game_type: gameType
+        p3_name: p3_name,
+        p4_name: p4_name,
+        game_type: gameType,
+        game_round: gameRound
       }));
 
-    else if (gameMode === 'remote')
-      calcGameSocket.send(JSON.stringify({
-        type: 'opening_connection, my name is',
-        p1_name: p1_name,
-        game_type: gameType
-      }));
+    // else if (gameMode === 'remote')
+    //   calcGameSocket.send(JSON.stringify({
+    //     type: 'opening_connection, my name is',
+    //     p1_name: p1_name,
+    //     game_type: gameType
+    //   }));
   };
 
   calcGameSocket.onmessage = function (e) {
@@ -44,18 +46,18 @@ async function startNewTournament(
 
     if (data.type === 'connection_established, calcgame says hello') {
       console.log(
-        'startNewGame > .onmessage connection_established:', data.message);
+        'startNewTournament > .onmessage connection_established:', data.message);
       cfg = getInitialVariables(gameType, data.initial_vars);
 
     } else if (data.type === 'waiting_room') {  // while finding an opponent
       // in remote
-      console.log('startNewGame > .onmessage waiting_room:', data.message);
+      console.log('startNewTournament > .onmessage waiting_room:', data.message);
       // Load html waiting room
       document.querySelector('main').innerHTML = data.html;
 
     }  // displays Start button in local and checkboxes in remote
     else if (data.type === 'game_start') {
-      console.log('startNewGame > .onmessage game_start:', data.message);
+      console.log('startNewTournament > .onmessage game_start:', data.message);
       // Load start game page
       document.querySelector('main').innerHTML = data.html;
       if (gameMode === 'local') {
@@ -70,23 +72,23 @@ async function startNewTournament(
 
     }  // updates oppenent's ready checkbox in remote
     else if (data.type === 'opponent_ready') {
-      console.log('startNewGame > .onmessage opponent_ready:', data.message);
+      console.log('startNewTournament > .onmessage opponent_ready:', data.message);
       updateOpponentReadyCheckBoxes(data.opponent)
 
     } else if (data.type === 'game_countdown') {
-      console.log('startNewGame > .onmessage game_countdown:', data.message);
+      console.log('startNewTournament > .onmessage game_countdown:', data.message);
       if (data.countdown === 3) displayCanvasElement(cfg);
       showCountdown(cfg, data.game_state, data.countdown);
 
     } else if (data.type === 'game_update') {
-      // console.log('startNewGame > .onmessage game_update:', data.message);
+      // console.log('startNewTournament > .onmessage game_update:', data.message);
       if (gameType === 'pong')
         renderPongGame(cfg, data.game_state);
       else if (gameType === 'cows')
         renderCowsGame(cfg, data.game_state);
 
     } else if (data.type === 'game_end') {
-      console.log('startNewGame > .onmessage game_end:', data.message);
+      console.log('startNewTournament > .onmessage game_end:', data.message);
       console.log('game_result:', data.game_result);
       document.querySelector('#game-container').innerHTML = data.html;
       document.querySelector('.scorePlayer1').textContent =
@@ -97,21 +99,23 @@ async function startNewTournament(
       if (gameRound != 'single')
         console.log('game_end gameRound:', gameRound);
 
+    } else if (data.type === 'tournament_end') {
+      console.log('startNewTournament > .onmessage tournament_end:', data.message);
       calcGameSocket.close();
 
     } else
-      console.log('startNewGame > .onmessage data:', data);
+      console.log('startNewTournament > .onmessage data:', data);
   };
 
   calcGameSocket.onclose = function (e) {
     if (!e.wasClean) {
       console.error('WebSocket closed unexpectedly:', e);
     } else
-      console.log('startNewGame > .onclose, connection closed');
+      console.log('startNewTournament > .onclose, connection closed');
   };
 
   calcGameSocket.onerror = function (e) {
-    console.error('startNewGame > .onerror, error occurred: ', e);
+    console.error('startNewTournament > .onerror, error occurred: ', e);
   };
 
   // Event listeners for controls
