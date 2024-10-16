@@ -44,7 +44,7 @@ window.onload = () => {
   // Get the User ID
   const userID = document.getElementById('userID').value;
   console.log('userID:', userID);
-  if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null) {
+  if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null || userID === 'None' || userID === '[object HTMLInputElement]') {
     console.warn('Client is not logged in');
     return;
   }
@@ -72,9 +72,8 @@ window.onload = () => {
 
   // On websocket close
   mainRoomSocket.onclose = function(e) {
-    console.warn('mainRoomSocket socket closed unexpectedly');
+    console.console('mainRoomSocket socket closed unexpectedly');
   };
-}
 
 // Close the main room socket when the window is closed
 window.onbeforeunload = () => {
@@ -115,4 +114,4 @@ function parseSocketMessage(data)
   {
     console.log('parseSocketMessage > data.type:', data.type);
   }
-}
+}}
