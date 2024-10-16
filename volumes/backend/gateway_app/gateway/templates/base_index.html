@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   {% comment %} <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon"> {% endcomment %}
   <link rel="icon" href="{% static 'images/animated_favicon.gif' %}" type="image/gif" >
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body class="d-flex flex-column">
@@ -35,28 +36,36 @@
     {% endblock %}
   </main>
 
-  <!-- Chat -->
-  <div id="chatButton" class="position-fixed bottom-0 end-0 p-3">
-    <button
-      type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#chatModal">
-      {% trans "Let's chat" %}
-    </button>
-  </div>
+<!-- Chat -->
+<div id="chatButton" class="position-fixed bottom-0 end-0 p-3">
+  <img src="{% static 'images/chat_icon.png' %}" alt="Chat" data-bs-toggle="modal" data-bs-target="#chatModal" style="width: 100px; height: 100px; cursor: pointer;">
+</div>
 
-  <section>
-    <div class="container py-5">
-      <!-- Modal -->
-      <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content" style="background: linear-gradient(to left, #747474, #333333);">
-            <div class="modal-header d-flex justify-content-center align-items-center">
-                          <h5 style="color: white; flex-grow: 1; text-align: center;" class="modal-title" id="chatModalLabel">{% trans "Chat messages" %}</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-            <div class="modal-body" style="height: 400px; overflow: auto;">
+<section>
+  <div class="container py-5">
+    <!-- Modal -->
+    <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" style="background: linear-gradient(to left, #747474, #333333);">
+          <div class="modal-header d-flex justify-content-center align-items-center">
+            <h5 style="color: white; flex-grow: 1; text-align: center;" class="modal-title" id="chatModalLabel">{% trans "Chat messages" %}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          
+          <!-- Contact Selection -->
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="contactSelect" class="form-label" style="color: white;">{% trans "Select Contact" %}</label>
+              <select class="form-select" id="contactSelect" aria-label="{% trans "Select a contact to chat with" %}">
+                <option selected>{% trans "Choose..." %}</option>
+              </select>
+            </div>
+
+            <!-- Chat Content -->
+            <div style="height: 300px; overflow: auto;">
               <div class="d-flex justify-content-between">
-                <p style="color: white" >Fanny Neguesha</p>
-                <p class="small mb-1 text-muted" >23 Jan 2:00 pm</p>
+                <p style="color: white">Fanny Neguesha</p>
+                <p class="small mb-1 text-muted">23 Jan 2:00 pm</p>
               </div>
               <div class="d-flex flex-row justify-content-start">
                 <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp" alt="{% trans "avatar 1" %}" style="width: 45px; height: 100%;">
@@ -65,17 +74,21 @@
                 </div>
               </div>
             </div>
-            <div class="modal-footer">
-              <div class="input-group mb-0">
-                <input type="text" class="form-control" placeholder="{% trans "Type message" %}" aria-label="{% trans "Recipient's username" %}" aria-describedby="button-addon2" />
-                <button class="btn btn-dark" type="button" id="button-addon2" style="padding-top: .55rem;">{% trans "Send" %}</button>
-              </div>
+          </div>
+          
+          <!-- Footer with message input -->
+          <div class="modal-footer">
+            <div id="chat-log" class="input-group mb-0">
+              <input id="chat-message-input" type="text" class="form-control" placeholder="{% trans "Type message" %}" aria-label="{% trans "Recipient's username" %}" aria-describedby="button-addon2" />
+              <button id="chat-message-submit" class="btn btn-dark" type="button" style="padding-top: .55rem;">{% trans "Send" %}</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
 
   <!-- Bootstrap JS and Popper.js -->
   <script
@@ -97,6 +110,7 @@
   <script src="{% static 'js/form_utils.js' %}"></script>
   <script src="{% static 'js/main_room.js' %}"></script>
   <script src="{% static 'js/notifications.js' %}"></script>
+  <script src="{% static 'js/chat.js' %}"></script>
 
   <!-- Play/Game JS -->
   <script src="{% static 'js/play/cows.js' %}"></script>

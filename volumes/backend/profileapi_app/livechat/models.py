@@ -2,7 +2,8 @@ from django.db import models
 from profileapi.models import Profile
 
 class Message(models.Model):
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    send_user = models.ForeignKey(Profile, related_name='sent_messages', on_delete=models.CASCADE, default=1)
+    dest_user = models.ForeignKey(Profile, related_name='received_messages', on_delete=models.CASCADE, default=1)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 

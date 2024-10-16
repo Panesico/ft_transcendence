@@ -90,16 +90,15 @@ window.onbeforeunload = () => {
   }
 }
 
-function sendFriendRequest(sender_username, sender_id, sender_avatar_url, receiver_username, receiver_id)
+function sendChatMessage(sender_id, receiver_id, message)
 {
-  console.log('sendFriendRequest > sender_username:', sender_username);
-  console.log('sendFriendRequest > sender_id:', sender_avatar_url);
-  console.log('sendFriendRequest > sender_avatar_url:', sender_avatar_url);
-  console.log('sendFriendRequest > receiver_username:', receiver_username);
-  console.log('sendFriendRequest > receiver_id:', receiver_id);
-  sendMessagesBySocket({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}, mainRoomSocket);
-//  mainRoomSocket.send(JSON.stringify({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}));
+  console.log('sendChatMessage > sender_id:', sender_id);
+  console.log('sendChatMessage > receiver_id:', receiver_id);
+  console.log('sendChatMessage > message:', message);
+  sendMessagesBySocket({'type': 'chat_message', 'sender_id': sender_id, 'receiver_id': receiver_id, 'message': message}, mainRoomSocket);
 }
+
+
 
 // Parse the socket message
 function parseSocketMessage(data)
@@ -109,6 +108,9 @@ function parseSocketMessage(data)
   }
   else if (data.type === 'friend_request_response') {
     addFriendResponseNotification(data);
+  }
+  else if (data.type === 'chat_message') {
+    addChatMessage(data);
   }
   else
   {
