@@ -21,6 +21,16 @@
       messageModal.show();
     }
 
+    const messageModal = document.getElementById('messageModal');
+    if (messageModal) {
+      const modalInstance = bootstrap.Modal.getInstance(messageModal);
+      if (modalInstance) {
+        modalInstance.hide(); // Hide modal when navigating back
+        document.querySelector('.modal-backdrop')?.remove();
+        document.body.classList.remove('modal-open')
+      }
+    }
+
   });
 
   window.addEventListener('popstate', function () {

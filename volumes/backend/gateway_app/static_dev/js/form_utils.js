@@ -1,7 +1,7 @@
 function listenForm(form) {
-	// console.log('form: ', form);
-	form.addEventListener('submit', async (e) => {
-	  e.preventDefault();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    console.warn('Form submitted', e);
   
 	  // console.log('Form submitted', e);
   
@@ -25,7 +25,7 @@ function listenForm(form) {
 		  credentials: 'include',
 		  body: JSON.stringify(jsonObject)
 		});
-		// console.log('handleFormSubmission > request: ', request);
+		console.log('handleFormSubmission > request: ', request);
 		const response = await fetch(request);
 		const data = await response.json();
   
@@ -39,18 +39,18 @@ function listenForm(form) {
 			'listenForm > data.preferred_language ', data.preferred_language);
 		console.log('listenForm > data.message: ', data.message);
 		console.log('listenForm > data.html: ', data.html);
-		if (data.status != 'error' && data.message && !data.html ||
-			data.message === 'Profile updated') {
+		if (data.status != 'error' && data.message && !data.html) {
 		  console.log('data.message: ', data.message);
 		  if (data.message === 'Login successful') {
-			// sendMessage('websocket: data received');
 			sessionStorage.setItem('afterLogin', 'true');
 		  } else if (data.message === 'Sign up successful') {
 			sessionStorage.setItem('afterSignup', 'true');
 		  } else if (data.message === 'Profile updated') {
 			sessionStorage.setItem('afterProfileUpdate', 'true');
 		  }
-		  window.location.replace('/');
+      if (data.message !== 'Profile updated') {
+        window.location.replace('/');
+      }
 		} else
 		  document.querySelector('main').innerHTML = data.html;
   
@@ -110,13 +110,13 @@ function listenFormUpload(form) {
 	  }
 
 	  // Handle the response data
-	  if (data.status != 'error' && data.message) {
-		console.log('data.message: ', data.message);
-		window.location.replace('/');
+	  if (data.status != 'error' && data.message)
+      {
+      console.log('data.message: ', data.message);
 	  } else
-		document.querySelector('main').innerHTML = data.html;
+  		document.querySelector('main').innerHTML = data.html;
 	  if (!data?.html?.includes('class="errorlist nonfield')) {
-		displayMessageInModal(data);
+		  displayMessageInModal(data.message);
 	  }
 	  handleFormSubmission();
 
@@ -138,23 +138,19 @@ async function handleFormSubmission() {
 	if (modalInviteFriend && formFriendInvite) {
     console.log('modalInviteFriend && formFriendInvite');
 	  listenFriendInvitation(modalInviteFriend, formFriendInvite);
-	  console.log('form: ', formFriendInvite);
 	}
 	else if (formUpload) {
 	  listenFormUpload(formUpload);
 	}
   else if (form) {
-	  console.log('form: ', form);
 	  listenForm(form);
 	}
   
 	if (formGeneral) {
-	  console.log('formGeneral: ', formGeneral);
 	  listenForm(formGeneral);
 	}
   
 	if (formSecurity) {
-	  console.log('formSecurity: ', formSecurity);
 	  listenForm(formSecurity);
 	}
   }
