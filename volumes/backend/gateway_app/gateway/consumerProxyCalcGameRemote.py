@@ -4,8 +4,6 @@ from django.template.loader import render_to_string
 from django.middleware.csrf import get_token
 #from ppretty import ppretty
 logger = logging.getLogger(__name__)
-
-logger = logging.getLogger(__name__)
 logging.getLogger('websockets').setLevel(logging.WARNING)
 
 # On connect, adds self to waiting
@@ -386,7 +384,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                     # Check if response status is 200 OK
                     if response.status == 200:
                         response_json = await response.json()
-                        logger.debug(f"ProxyCalcGameRemote > calcgame responds: {response_json.get('message')}")
+                        logger.debug(f"ProxyCalcGameRemote > play responds: {response_json.get('message')}")
                     else:
                         logger.error(f"ProxyCalcGameRemote > Failed to save game. Status code: {response.status}")
             except aiohttp.ClientError as e:

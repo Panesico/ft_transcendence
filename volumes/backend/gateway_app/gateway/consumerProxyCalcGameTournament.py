@@ -1,7 +1,8 @@
-import os, json, logging, websockets, ssl, asyncio, aiohttp
+import os, json, logging, websockets, ssl, asyncio, aiohttp, jwt
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.conf import settings
 from django.template.loader import render_to_string
-
+from ppretty import ppretty
 logger = logging.getLogger(__name__)
 logging.getLogger('websockets').setLevel(logging.WARNING)
 
@@ -19,7 +20,7 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
             game_type = None
         
         if game_type == None or game_type not in ['pong', 'cows']:
-            logger.error("ProxyCalcGameRemote > No game_type provided, connection closed")
+            logger.error("ProxyCalcGameTournament > No game_type provided, connection closed")
             await self.close()
             return
         
@@ -52,29 +53,53 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         # save the player names and context to build html later
         if data['type'] == 'opening_connection, game details':
-            self.p1_name = data['p1_name']
-            self.p2_name = data['p2_name']
-            self.game_type = data['game_type']
+            
+            decoded_data = jwt.decode(
+                self.scope['cookies']['jwt_token'],
+                settings.SECRET_KEY,
+                algorithms=["HS256"]
+            )
+
             self.context = {
-                'user': self.scope['user'],
+                'user_id': decoded_data.get('user_id'),
+                'username': decoded_data.get('username'),
                 'session': self.scope['session'],
                 'cookies': self.scope['cookies'],
             }
-            logger.debug(f"ProxyCalcGameTournament > opening_connection with players: {self.p1_name}, {self.p2_name}")
-            logger.debug(f"ProxyCalcGameTournament > self.context['user']: {self.context['user']}, ['user'].id: {self.context['user'].id}")
 
-            self.p1_id = self.context['user'].id if self.context['user'].id else 0
-            self.p2_id = 0
-            info = {
+            self.trmt_info = {
                 'tournament_id': 0,
-                'game_round': 'single',
-                'game_type': 'pong',
-                'p1_name': self.p1_name,
-                'p2_name': self.p2_name,
-                'p1_id': self.p1_id,
-                'p2_id': self.p2_id,
+                'game_type': data['game_type'],
+                'game_round': data['game_round'],
+                'p1_name': data['p1_name'],
+                'p2_name': data['p2_name'],
+                'p3_name': data['p3_name'],
+                'p4_name': data['p4_name'],
+                'p1_id': self.context['user_id'],
+                'p2_id': 0,
+                'p3_id': 0,
+                'p4_id': 0,
             }
-            html = render_to_string('fragments/game_fragment.html', {'context': self.context, 'info': info})
+
+            logger.debug(f"ProxyCalcGameTournament > opening_connection with players: {self.trmt_info['p1_name']}, {self.trmt_info['p2_name']}, {self.trmt_info['p3_name']}, {self.trmt_info['p4_name']}")
+
+            next_game_info = await self.createTournament()
+            logger.debug(f"ProxyCalcGameTournament > createTournament response: {next_game_info}")
+            logger.debug(ppretty(next_game_info))
+            
+            self.trmt_info['tournament_id'] = next_game_info.get('tournament_id')
+            logger.debug(f"ProxyCalcGameTournament > tournament_id: {self.trmt_info['tournament_id']}")
+            # info = {
+            #     'tournament_id': 0,
+            #     'game_round': 'single',
+            #     'game_type': 'pong',
+            #     'p1_name': self.p1_name,
+            #     'p2_name': self.p2_name,
+            #     'p1_id': self.p1_id,
+            #     'p2_id': self.p2_id,
+            # }
+
+            html = render_to_string('fragments/tournament_start_fragment.html', {'context': self.context, 'info': self.trmt_info})
             logger.debug(f"ProxyCalcGameTournament > sending game_start page to client")
             await self.send(json.dumps({
                 'type': 'game_start',
@@ -83,6 +108,34 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
             }))
         # Forward the message from the client to the calcgame WebSocket server
         await self.calcgame_ws.send(text_data)
+    
+    async def createTournament(self):
+        logger.debug("ProxyCalcGameTournament > createTournament")
+
+        # Make request to play container to create tournament
+        play_url = 'https://play:9003/api/createTournament/'
+
+        csrf_token = self.context['cookies'].get('csrftoken')
+        headers = {
+            'X-CSRFToken': csrf_token,
+            'Cookie': f'csrftoken={csrf_token}',
+            'Content-Type': 'application/json',
+            'Referer': 'https://gateway:8443',
+        }
+                
+        ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        ssl_context.load_verify_locations(os.getenv("CERTFILE"))
+
+        # async http request to create tournament in play container
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.post(play_url, json=self.trmt_info, headers=headers, ssl=ssl_context) as response:
+                    response_json = await response.json()
+                    logger.debug(f"ProxyCalcGameTournament > play responds: {response_json.get('message')}")
+            except aiohttp.ClientError as e:
+                logger.error(f"ProxyCalcGameTournament > Error during request: {e}")
+                return None
+        return response_json
 
     async def listen_to_calcgame(self):
         try:

@@ -156,11 +156,11 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
         # async http request to save game in play container
         async with aiohttp.ClientSession() as session:
             try:
-                async with session.post(play_url, json=data, headers=headers, ssl=False) as response:
+                async with session.post(play_url, json=data, headers=headers, ssl=ssl_context) as response:
                     # Check if response status is 200 OK
                     if response.status == 200:
                         response_json = await response.json()
-                        logger.debug(f"ProxyCalcGameLocal > calcgame responds: {response_json.get('message')}")
+                        logger.debug(f"ProxyCalcGameLocal > play responds: {response_json.get('message')}")
                     else:
                         logger.error(f"ProxyCalcGameLocal > Failed to save game. Status code: {response.status}")
             except aiohttp.ClientError as e:

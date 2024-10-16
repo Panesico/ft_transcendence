@@ -29,7 +29,7 @@ function getInitialVariables(gameType, initialVars) {
     canvas,
     ctx,
   } :
-                                  {};
+    {};
 
   return cfg;
 }
@@ -76,29 +76,29 @@ function renderPongGame(cfg, gameState) {
   let centerLineY = 0;
   while (centerLineY < cfg.canvas.height) {
     cfg.ctx.fillRect(
-        cfg.canvas.width / 2, centerLineY + 0.5 * cfg.borderWidth, 1,
-        cfg.borderWidth);
+      cfg.canvas.width / 2, centerLineY + 0.5 * cfg.borderWidth, 1,
+      cfg.borderWidth);
     centerLineY += 2 * cfg.borderWidth;
   }
 
   // Draw top and bottom borders
   cfg.ctx.fillRect(0, 0, cfg.canvas.width, cfg.borderWidth);
   cfg.ctx.fillRect(
-      0, cfg.canvas.height - cfg.borderWidth, cfg.canvas.width,
-      cfg.borderWidth);
+    0, cfg.canvas.height - cfg.borderWidth, cfg.canvas.width,
+    cfg.borderWidth);
 
   // Draw the left paddle
   cfg.ctx.fillRect(
-      2 * cfg.paddleWidth, gameState.leftPaddleY, cfg.paddleWidth,
-      cfg.paddleHeight);
+    2 * cfg.paddleWidth, gameState.leftPaddleY, cfg.paddleWidth,
+    cfg.paddleHeight);
   // Draw the right paddle
   cfg.ctx.fillRect(
-      cfg.canvas.width - 3 * cfg.paddleWidth, gameState.rightPaddleY,
-      cfg.paddleWidth, cfg.paddleHeight);
+    cfg.canvas.width - 3 * cfg.paddleWidth, gameState.rightPaddleY,
+    cfg.paddleWidth, cfg.paddleHeight);
 
   // Draw ball
   cfg.ctx.fillRect(
-      gameState.ballX, gameState.ballY, cfg.ballSize, cfg.ballSize);
+    gameState.ballX, gameState.ballY, cfg.ballSize, cfg.ballSize);
 }
 
 
@@ -109,11 +109,11 @@ function setPlayerReadyCheckBoxes(player_role, calcGameSocket, game_id) {
   if (player_role === '1') {
     player1Ready.disabled = false;
     player1Ready.addEventListener(
-        'click', () => togglePlayerReady(player_role, calcGameSocket, game_id));
+      'click', () => togglePlayerReady(player_role, calcGameSocket, game_id));
   } else if (player_role === '2') {
     player2Ready.disabled = false;
     player2Ready.addEventListener(
-        'click', () => togglePlayerReady(player_role, calcGameSocket, game_id));
+      'click', () => togglePlayerReady(player_role, calcGameSocket, game_id));
   }
 }
 
@@ -134,31 +134,31 @@ function togglePlayerReady(player_role, calcGameSocket, game_id) {
   const player2Ready = document.getElementById('player2-ready');
   if (player_role === '1' && player1Ready.checked) {
     calcGameSocket.send(
-        JSON.stringify({type: 'player_ready', player: 'player1', game_id}));
+      JSON.stringify({ type: 'player_ready', player: 'player1', game_id }));
     player1Ready.disabled = true;
   } else if (player_role === '2' && player2Ready.checked) {
     calcGameSocket.send(
-        JSON.stringify({type: 'player_ready', player: 'player2', game_id}));
+      JSON.stringify({ type: 'player_ready', player: 'player2', game_id }));
     player2Ready.disabled = true;
   }
 }
 
-// Gets WebSocket for the game mode and game type
+// Gets websocket for the game mode and game type
 function getCalcGameSocket(gameMode, gameType, gameRound) {
   let calcGameSocket;
 
   // if tournament game
   if (gameRound != 'single' && (gameType === 'pong' || gameType === 'cows')) {
     calcGameSocket =
-        new WebSocket(`/wss/calcgame/tournament/?gameType=${gameType}`);
+      new WebSocket(`/wss/calcgame/tournament/?gameType=${gameType}`);
 
   }  // if single game
   else if (
-      gameRound === 'single' &&
-      (gameMode === 'local' || gameMode === 'remote') &&
-      (gameType === 'pong' || gameType === 'cows')) {
+    gameRound === 'single' &&
+    (gameMode === 'local' || gameMode === 'remote') &&
+    (gameType === 'pong' || gameType === 'cows')) {
     calcGameSocket =
-        new WebSocket(`/wss/calcgame/${gameMode}/?gameType=${gameType}`);
+      new WebSocket(`/wss/calcgame/${gameMode}/?gameType=${gameType}`);
 
   } else {
     let lang = getCookie('django_language');
@@ -170,4 +170,33 @@ function getCalcGameSocket(gameMode, gameType, gameRound) {
     displayError(error);
   }
   return calcGameSocket;
+}
+
+// Attach and remove event listeners to navbar items on socket open/close
+function setupNavbarEventListeners(socket) {
+  const header = document.querySelector("#mainHeader");
+  const navLinks = header.querySelectorAll("a");
+
+  // Define the event listener for navigation
+  function closeSocketOnNavbarClick() {
+    if (socket) {
+      // console.log("Closing WebSocket due to navigation.");
+      socket.close();
+      socket = null;
+
+      removeNavbarListeners();
+    }
+  }
+
+  // Remove event listeners from the navbar links
+  function removeNavbarListeners(socket) {
+    navLinks.forEach(link => {
+      link.removeEventListener("click", closeSocketOnNavbarClick);
+    });
+  }
+
+  // Attach event listeners to all navbar links
+  navLinks.forEach(link => {
+    link.addEventListener("click", closeSocketOnNavbarClick);
+  });
 }

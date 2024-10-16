@@ -4,10 +4,10 @@ function checkValidInputTournament(p1_name, p2_name, p3_name, p4_name) {
 
   // Check if the names are different
   if (p1_name === p2_name || p1_name === p3_name || p1_name === p4_name ||
-      p2_name === p3_name || p2_name === p4_name || p3_name === p4_name) {
+    p2_name === p3_name || p2_name === p4_name || p3_name === p4_name) {
     console.log(
-        'p1_name: ', p1_name, 'p2_name: ', p2_name, 'p3_name: ', p3_name,
-        'p4_name: ', p4_name);
+      'p1_name: ', p1_name, 'p2_name: ', p2_name, 'p3_name: ', p3_name,
+      'p4_name: ', p4_name);
     let error = 'Names must be unique';
     console.log('error: ', error);
     if (lang === 'fr')
@@ -76,7 +76,7 @@ async function playTournament() {
   const p4_name = document.getElementById('player4-input').value;
 
   const gameType =
-      document.querySelector('input[name="chosenGame"]:checked').id;
+    document.querySelector('input[name="chosenGame"]:checked').id;
 
   console.log(gameType, p1_name, p2_name, p3_name, p4_name);
 
@@ -86,7 +86,6 @@ async function playTournament() {
   let gameMode = 'local';
   let gameRound = 'Semi-Final 1';
 
-  let game_result = await startNewTournament(
-      gameMode, gameType, gameRound, p1_name, p2_name, p3_name, p4_name);
-  console.log('playTournament > game_result: ', game_result);
+  startNewTournament(
+    gameMode, gameType, gameRound, p1_name, p2_name, p3_name, p4_name);
 }

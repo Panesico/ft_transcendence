@@ -16,8 +16,8 @@ def view_tournament(request):
     logger.debug('view_tournament')
     if request.method == 'GET': 
        return get_tournament(request)      
-    elif request.method == 'POST':
-       return post_tournament(request)
+    # elif request.method == 'POST':
+    #    return post_tournament(request)
     else:
       return redirect('405')
 
@@ -35,53 +35,53 @@ def get_tournament(request):
         return JsonResponse({'html': html})
     return render(request, 'partials/tournament.html', {'form': form})
 
-def post_tournament(request):
-    logger.debug('post_tournament')
-    play_url = 'https://play:9003/api/newTournament/'
-    if request.method != 'POST':
-      return redirect('405')
+# def post_tournament(request):
+#     logger.debug('post_tournament')
+#     play_url = 'https://play:9003/api/newTournament/'
+#     if request.method != 'POST':
+#       return redirect('405')
     
-    csrf_token = request.COOKIES.get('csrftoken')
-    headers = {
-        'X-CSRFToken': csrf_token,
-        'Cookie': f'csrftoken={csrf_token}',
-        'Content-Type': 'application/json',
-        'Referer': 'https://gateway:8443',
-    }
-    data = json.loads(request.body)
-    data['p1_id'] = request.user.id if request.user.is_authenticated else 0
-    data['p2_id'] = 0
-    data['p3_id'] = 0
-    data['p4_id'] = 0
-    data['tournament_type'] = 'pong'
-    logger.debug(f'post_tournament > extracted data from JSON: {data}')
+#     csrf_token = request.COOKIES.get('csrftoken')
+#     headers = {
+#         'X-CSRFToken': csrf_token,
+#         'Cookie': f'csrftoken={csrf_token}',
+#         'Content-Type': 'application/json',
+#         'Referer': 'https://gateway:8443',
+#     }
+#     data = json.loads(request.body)
+#     data['p1_id'] = request.user.id if request.user.is_authenticated else 0
+#     data['p2_id'] = 0
+#     data['p3_id'] = 0
+#     data['p4_id'] = 0
+#     data['game_type'] = 'pong'
+#     logger.debug(f'post_tournament > extracted data from JSON: {data}')
 
-    form = TournamentFormFrontend(data)
-    if not form.is_valid():
-        logger.debug(f"post_tournament > Form is NOT valid: {form.errors}")
-        html = render_to_string('fragments/tournament_form_fragment.html', {'form': form}, request=request)
-        return JsonResponse({'html': html, 'status': 'error', 'message': 'Form is not valid'})
+#     form = TournamentFormFrontend(data)
+#     if not form.is_valid():
+#         logger.debug(f"post_tournament > Form is NOT valid: {form.errors}")
+#         html = render_to_string('fragments/tournament_form_fragment.html', {'form': form}, request=request)
+#         return JsonResponse({'html': html, 'status': 'error', 'message': 'Form is not valid'})
     
-    # logger.debug(f'csrf_token: {csrf_token}')
-    # logger.debug(f'Extracted headers: {headers}')
+#     # logger.debug(f'csrf_token: {csrf_token}')
+#     # logger.debug(f'Extracted headers: {headers}')
     
-    response = requests.post(play_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
-    # logger.debug(f"post_tournament > Response cookies: {response.cookies}")
+#     response = requests.post(play_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
+#     # logger.debug(f"post_tournament > Response cookies: {response.cookies}")
 
-    status = response.json().get("status")
-    message = response.json().get("message")
-    logger.debug(f"post_tournament > Response {response.ok}, message: {message}")
-    if response.ok:
-        info = response.json().get("info")
-        logger.debug(f"post_tournament > Response info: {info}")
-        html = render_to_string('fragments/tournament_start_fragment.html', {'info': info}, request=request)
-    else:
-        logger.debug(f"post_tournament > Response NOT OK: {response.json()}")
-        data = json.loads(request.body)
-        form = TournamentFormFrontend(data)
-        form.add_error(None, message)
-        html = render_to_string('fragments/tournament_form_fragment.html', {'form': form}, request=request)
-    return JsonResponse({'html': html, 'status': status, 'message': message})
+#     status = response.json().get("status")
+#     message = response.json().get("message")
+#     logger.debug(f"post_tournament > Response {response.ok}, message: {message}")
+#     if response.ok:
+#         info = response.json().get("info")
+#         logger.debug(f"post_tournament > Response info: {info}")
+#         html = render_to_string('fragments/tournament_start_fragment.html', {'info': info}, request=request)
+#     else:
+#         logger.debug(f"post_tournament > Response NOT OK: {response.json()}")
+#         data = json.loads(request.body)
+#         form = TournamentFormFrontend(data)
+#         form.add_error(None, message)
+#         html = render_to_string('fragments/tournament_form_fragment.html', {'form': form}, request=request)
+#     return JsonResponse({'html': html, 'status': status, 'message': message})
 
 def view_tournament_update(request):
     logger.debug('view_tournament_update')
@@ -123,16 +123,6 @@ def view_tournament_update(request):
 
 
 
-# def view_game(request):
-#     logger.debug('view_game')
-#     if request.method == 'GET': 
-#        return get_game(request)      
-#     elif request.method == 'POST':
-#        return post_game(request)
-#     else:
-#       return redirect('405')
-
-
 def get_play(request):
     logger.debug("")
     logger.debug("get_play")
@@ -144,35 +134,35 @@ def get_play(request):
         return JsonResponse({'html': html})
     return render(request, 'partials/play.html')
 
-def post_game(request):
-    logger.debug("")
-    logger.debug("post_game")
-    if request.method != 'POST': 
-      return redirect('405')
+# def post_game(request):
+#     logger.debug("")
+#     logger.debug("post_game")
+#     if request.method != 'POST': 
+#       return redirect('405')
     
-    # csrf_token = request.COOKIES.get('csrftoken')
-    # headers = {
-    #     'X-CSRFToken': csrf_token,
-    #     'Cookie': f'csrftoken={csrf_token}',
-    #     'Content-Type': 'application/json',
-    #     'Referer': 'https://gateway:8443',
-    # }
-    data = json.loads(request.body)
-    # logger.debug(f'post_game > JSON data: {data}')
+#     # csrf_token = request.COOKIES.get('csrftoken')
+#     # headers = {
+#     #     'X-CSRFToken': csrf_token,
+#     #     'Cookie': f'csrftoken={csrf_token}',
+#     #     'Content-Type': 'application/json',
+#     #     'Referer': 'https://gateway:8443',
+#     # }
+#     data = json.loads(request.body)
+#     # logger.debug(f'post_game > JSON data: {data}')
     
-    p1_id = request.user.id if request.user.is_authenticated else 0
-    info = {
-        'tournament_id': 0,
-        'game_round': 'single',
-        'game_type': data['game_type'],
-        'p1_name': data['p1_name'],
-        'p2_name': data['p2_name'],
-        'p1_id': p1_id,
-        'p2_id': 0,
-    }
+#     p1_id = request.user.id if request.user.is_authenticated else 0
+#     info = {
+#         'tournament_id': 0,
+#         'game_round': 'single',
+#         'game_type': data['game_type'],
+#         'p1_name': data['p1_name'],
+#         'p2_name': data['p2_name'],
+#         'p1_id': p1_id,
+#         'p2_id': 0,
+#     }
 
-    html = render_to_string('fragments/game_fragment.html', {'info': info}, request=request)
-    return JsonResponse({'html': html})
+#     html = render_to_string('fragments/game_fragment.html', {'info': info}, request=request)
+#     return JsonResponse({'html': html})
 
 def save_game(request):
     if request.method != 'POST': 
@@ -211,16 +201,3 @@ def save_game(request):
         form.add_error(None, message)
         html = render_to_string('fragments/game_fragment.html', {'form': form}, request=request)
         return JsonResponse({'html': html, 'status': status, 'message': message})
-    
-
-
-# def get_remote(request):
-#     logger.debug("")
-#     logger.debug("get_remote")
-#     if request.method != 'GET': 
-#       return redirect('405')
-#     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-#         logger.debug("get_remote XMLHttpRequest")
-#         html = render_to_string('fragments/remote_fragment.html', context={}, request=request)
-#         return JsonResponse({'html': html})
-#     return render(request, 'partials/remote.html')
