@@ -98,16 +98,7 @@ function sendChatMessage(sender_id, receiver_id, message)
   sendMessagesBySocket({'type': 'chat_message', 'sender_id': sender_id, 'receiver_id': receiver_id, 'message': message}, mainRoomSocket);
 }
 
-function sendFriendRequest(sender_username, sender_id, sender_avatar_url, receiver_username, receiver_id)
-{
-  console.log('sendFriendRequest > sender_username:', sender_username);
-  console.log('sendFriendRequest > sender_id:', sender_avatar_url);
-  console.log('sendFriendRequest > sender_avatar_url:', sender_avatar_url);
-  console.log('sendFriendRequest > receiver_username:', receiver_username);
-  console.log('sendFriendRequest > receiver_id:', receiver_id);
-  sendMessagesBySocket({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}, mainRoomSocket);
-//  mainRoomSocket.send(JSON.stringify({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}));
-}
+
 
 // Parse the socket message
 function parseSocketMessage(data)
