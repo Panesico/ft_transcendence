@@ -440,8 +440,6 @@ def oauth(request):
     # Step 3: Retrieve user data from 42 API
     try:
         user_data = get_42_user_data(token_data['access_token'])
-        with open("user_data.json", 'w') as json_file:
-            json.dump(user_data, json_file, indent=4)
     except Exception as e:
         logger.error(f"Error fetching user data: {str(e)}")
         return JsonResponse({'error': 'Failed to retrieve user data'}, status=500)
