@@ -120,9 +120,12 @@ def api_login(request):
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
 # Create a profile linked to user through call to profileapi service
-def createProfile(username, user_id, csrf_token, is_42):
+def createProfile(username, user_id, csrf_token, id_42):
     profileapi_url = 'https://profileapi:9002/api/signup/'
-    profile_data = { 'user_id': user_id, 'username': username }
+    if id_42:
+        profile_data = { 'user_id': user_id, 'username': username, 'id_42': id_42 }
+    else:
+        profile_data = { 'user_id': user_id, 'username': username }
     
     
     headers = {
@@ -133,13 +136,12 @@ def createProfile(username, user_id, csrf_token, is_42):
         'Referer': 'https://authentif:9001',
     }
 
+    cookies = {
+    'csrftoken': f'{csrf_token}',
+    }
+
     try:
-        if not is_42:
-            response = requests.post(
-                profileapi_url, json=profile_data, headers=headers, verify=os.getenv("CERTFILE"))
-        else:
-            response = requests.post(
-                profileapi_url, json=profile_data, headers=headers, verify=False)
+        response = requests.post(profileapi_url, json=profile_data, headers=headers, cookies=cookies, verify=os.getenv("CERTFILE"))
         logger.debug(f'api_signup > createProfile > Response: {response}')
         logger.debug(f'api_signup > createProfile > Response status code: {response.status_code}')
         
@@ -364,7 +366,7 @@ def create_or_get_user(request, user_data):
         }
         
         # Make the POST request to the external authentif service
-        response = requests.post("https://gateway:8443/download_42_avatar", data=payload, headers=headers, verify=False)
+        response = requests.post("https://gateway:8443/download_42_avatar", data=payload, headers=headers, verify=os.getenv("CERTFILE"))
         csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
         jwt_token = request.COOKIES.get('jwt_token')
 
@@ -376,7 +378,7 @@ def create_or_get_user(request, user_data):
             'Authorization': f'Bearer {jwt_token}',
         }
 
-        response = requests.post("https://gateway:8443/post_edit_profile_avatar", body=response.text, headers=headers, verify=False)
+        response = requests.post("https://gateway:8443/post_edit_profile_avatar", body=response.text, headers=headers, verify=os.getenv("CERTFILE"))
         
         
 
@@ -387,7 +389,7 @@ def create_or_get_user(request, user_data):
     return user
 
 
-
+@csrf_exempt
 def oauth(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
@@ -417,15 +419,113 @@ def oauth(request):
     # Step 3: Retrieve user data from 42 API
     try:
         user_data = get_42_user_data(token_data['access_token'])
+        with open("user_data.json", 'w') as json_file:
+            json.dump(user_data, json_file, indent=4)
     except Exception as e:
         logger.error(f"Error fetching user data: {str(e)}")
         return JsonResponse({'error': 'Failed to retrieve user data'}, status=500)
 
     # Step 4: Create or authenticate the user and generate a JWT
-    user = create_or_get_user(request, user_data)
+    try:
+        # Try to find the user by their 42 login (username)
+        user = User.objects.get(username=user_data['login'])
+        logger.info(f"User found: {user.username}")
+    except User.DoesNotExist:
+        # Check if this is a "42 user" by seeing if `id` exists in user_data (or any other identifier for 42 user)
+        if 'id' in user_data:  # Assuming `id` from user_data corresponds to 42 ID
+            data = {"username": user_data['login'], "id_42": user_data['id']}  # No password needed for 42 users
 
-    jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
+            # Bypass the password field if user is 42-based
+            form = SignUpForm(data=data)
+            if form.is_valid():
+                user = form.save()
+            else:
+                logger.error(f"SignUpForm error: {form.errors}")
+        
+        csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+
+        # Create the profile
+        createProfile(user_data['login'], user.id, csrf_token, 'id' in user_data)  # True if 42 user
+        if user == None:
+            login(request, user)
+
+        jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
+        payload = json.dumps({'image_url': user_data['image']['link']})  # Convert the data to a JSON string
+        
+
+        headers = {
+            'X-CSRFToken': csrf_token,
+            'Cookie': f'csrftoken={csrf_token}',
+            'Content-Type': 'application/json',
+            'Referer': 'https://authentif:9001',
+            'Authorization': f'Bearer {jwt_token}',
+        }
+        
+        # Make the POST request to the external authentif service
+        response = requests.post("https://gateway:8443/download_42_avatar",cookies=request.COOKIES,data=payload,headers=headers,verify=os.getenv("CERTFILE"))
+
+    # If the response is a file (an image), we need to handle it differently.
+    if response.status_code == 200:
+        # Get the content type from the response
+        content_type = response.headers['Content-Type']
+        image_name = response.headers.get('Content-Disposition').split('filename=')[1].strip('"')
+
+        # Prepare the multipart form data for editing the profile avatar
+        files = {
+            'avatar': (image_name, response.content, content_type)  # Sending the image as a file
+        }
+
+        csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+
+        headers = {
+            'X-CSRFToken': csrf_token,
+            'Authorization': f'Bearer {jwt_token}',
+            'Referer': 'https://authentif:9001',
+        }
+
+        # Send the image to edit_profile_avatar
+        edit_response = requests.post(
+            "https://gateway:8443/edit_profile_avatar/",
+            cookies=request.COOKIES,
+            files=files,  # Sending the files parameter for multipart
+            headers=headers,
+            verify=os.getenv("CERTFILE")
+        )
+
+        if edit_response.status_code == 200:
+            print("Avatar updated successfully.")
+        else:
+            print(f"Failed to update avatar: {edit_response.content}")
+
+    else:
+        print(f"Failed to download avatar: {response.content}")
+
     
+    headers = {
+            'X-CSRFToken': csrf_token,
+            'Cookie': f'csrftoken={csrf_token}',
+            'Content-Type': 'application/json',
+            'Referer': 'https://authentif:9001',
+            'Authorization': f'Bearer {jwt_token}',
+    }
+    
+    if user_data['languages_users'][0]['language_id'] == 11:
+        language = 'es'
+    elif user_data['languages_users'][0]['language_id'] == 1:
+        language = 'fr'
+    else:
+        language = 'en'
+    
+    payload = json.dumps({
+        "csrfmiddlewaretoken": f"{csrf_token}",
+        "display_name": f"{user_data['login']}",
+        "country": f"{user_data['campus'][0]['country']}",
+        "city": f"{user_data['campus'][0]['city']}",
+        "preferred_language": f"{language}"
+    })
+
+    response = requests.post("https://gateway:8443/edit_profile_general/",data=payload,headers=headers,verify=os.getenv("CERTFILE"))
+
     # Create response object
     response = JsonResponse({
         'status': 'success',

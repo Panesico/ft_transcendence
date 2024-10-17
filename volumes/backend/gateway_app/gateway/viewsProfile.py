@@ -269,12 +269,26 @@ import requests
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import JsonResponse
 
+import requests
+from django.http import HttpResponse, JsonResponse
+from django.core.files.uploadedfile import SimpleUploadedFile
+import json
+import mimetypes
+import logging
+
+logger = logging.getLogger(__name__)
+
 @login_required
 def download_42_avatar(request):
     if request.method == 'POST':
         # Get the image URL from the POST data
-        image_url = request.POST.get('image_url')
+        body_unicode = request.body.decode('utf-8')  # Decode the raw request body
+        body_data = json.loads(body_unicode)         # Parse the JSON data
+            
+        # Get the image URL from the parsed JSON
+        image_url = body_data.get('image_url')
         
+        logger.info(f"HEL MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE -------------------------> {image_url}")
         if not image_url:
             return JsonResponse({'error': 'No image URL provided'}, status=400)
 
@@ -289,21 +303,14 @@ def download_42_avatar(request):
             # Extract the image name from the URL
             image_name = image_url.split("/")[-1]
 
-            # Create a SimpleUploadedFile object (to simulate a file upload)
-            avatar_file = SimpleUploadedFile(
-                name=image_name,
-                content=image_content,
-                content_type=response.headers['Content-Type']
-            )
+            # Determine the MIME type of the file
+            mime_type, _ = mimetypes.guess_type(image_name)
 
-            # Return the file in the request (simulating "avatar" in FILES)
-            return JsonResponse({
-                'avatar': {
-                    'filename': avatar_file.name,
-                    'size': avatar_file.size,
-                    'content_type': avatar_file.content_type
-                }
-            })
+            # Create a response object with the image content
+            multipart_response = HttpResponse(image_content, content_type=mime_type)
+            multipart_response['Content-Disposition'] = f'attachment; filename={image_name}'
+
+            return multipart_response
 
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': str(e)}, status=400)

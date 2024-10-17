@@ -205,7 +205,9 @@ import os
 import requests
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def oauth(request):
     authentif_url = 'https://authentif:9001/api/oauth/'  # External auth service endpoint
     
@@ -232,15 +234,14 @@ def oauth(request):
         jwt_token = request.COOKIES.get('jwt_token')
 
         headers = {
-            'X-CSRFToken': csrf_token,
-            'Cookie': f'csrftoken={csrf_token}',
-            'Content-Type': 'application/json',
-            'Referer': 'https://gateway:8443',
-            'Authorization': f'Bearer {jwt_token}',
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+        'Authorization': f'Bearer {jwt_token}',
         }
-        
         # Make the POST request to the external authentif service
-        response = requests.post(authentif_url, data=payload, headers=headers, verify=os.getenv("CERTFILE"))
+        response = requests.post(authentif_url, cookies=request.COOKIES,data=payload, headers=headers, verify=os.getenv("CERTFILE"))
         
         response_data = response.json()
         jwt_token = response_data.get("token")

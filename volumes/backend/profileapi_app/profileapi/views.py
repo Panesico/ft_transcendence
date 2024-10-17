@@ -7,9 +7,11 @@ import json
 import os
 import requests
 import logging
+from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger(__name__)
 
+@csrf_exempt
 def api_signup(request):
     logger.debug("--> hello from api_signup")
     if (request.method != 'POST'):
@@ -17,7 +19,10 @@ def api_signup(request):
         return HttpResponse('Method not allowed', status=405)
     logger.debug("--> POST method")
     data = json.loads(request.body)
-    display_name = 'user' + str(data['user_id'])
+    if data['id_42']:
+        display_name = data['username']
+    else:
+        display_name = 'user' + str(data['user_id'])
     logger.debug(f"data : {data}")
     try:
       profile = Profile(
