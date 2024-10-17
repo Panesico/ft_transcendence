@@ -24,7 +24,7 @@ def api_signup(request):
         if data['id_42']:
             display_name = data['username']
     except:
-        display_name = 'user' + str(data['user_id'])
+        display_name = data['username']
     logger.debug(f"data : {data}")
     try:
       profile = Profile(
