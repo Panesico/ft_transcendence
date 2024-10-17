@@ -255,7 +255,7 @@ def api_signup(request):
     logger.debug('api_signup > Method not allowed')
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
-def api_check_exists(request):
+def api_check_username_exists(request):
     logger.debug("api_check_exists")
     if request.method == 'POST':
         try:

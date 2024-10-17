@@ -3,6 +3,7 @@ from profileapi.forms import InviteFriendForm
 from profileapi.models import Profile, Notification
 from profileapi.forms import EditProfileForm
 from django.db import DatabaseError
+from django.utils.translation import gettext as _
 import json
 import os
 import requests
@@ -284,3 +285,21 @@ def check_friendship(request, sender_id, receiver_id):
     except Exception as e:
         logger.debug(f'check_friendship > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+def check_displayname_exists(request):
+    logger.debug("check_displayname_exists")
+    if request.method == 'POST':
+        try:
+          data = json.loads(request.body)
+          name_to_test = data.get('name')
+          if Profile.objects.filter(display_name=name_to_test).exists():
+              logger.debug('check_displayname_exists > User exists')
+              return JsonResponse({'status': 'success', 'message': _('User exists')})
+          else:
+              logger.debug('check_displayname_exists > User does not exist')
+              return JsonResponse({'status': 'failure', 'message': _('User does not exist')}, status=404)
+        except json.JSONDecodeError:
+            logger.debug('check_displayname_exists > Invalid JSON')
+            return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
+    logger.debug('check_displayname_exists > Method not allowed')
+    return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)

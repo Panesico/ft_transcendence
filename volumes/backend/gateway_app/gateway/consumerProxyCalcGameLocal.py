@@ -3,6 +3,10 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
 from .utils import getUserId, getUserData, asyncRequest
 
+import prettyprinter
+from prettyprinter import pformat
+prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
+
 logger = logging.getLogger(__name__)
 logging.getLogger('websockets').setLevel(logging.WARNING)
 
@@ -79,6 +83,9 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
                 'p1_id': self.p1_id,
                 'p2_id': self.p2_id,
             }
+            
+            logger.debug(f"ProxyCalcGameLocal > user: {pformat(user)}")
+
             html = render_to_string('fragments/game_fragment.html', {'context': self.context, 'info': info})
             logger.debug(f"ProxyCalcGameLocal > sending game_start page to client")
             await self.send(json.dumps({

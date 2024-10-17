@@ -68,8 +68,8 @@
 
       <div class="mb-3 d-flex">
         <div class="me-3">
-          <label for="player1-input" class="form-label">{% if user.is_authenticated %}{{ user.username }}{% else %}{% trans 'Name Player' %} 1{% endif %}</label>
-          <input type="text" class="form-control" id="player1-input" name="p1_name" value="{% if user.is_authenticated %}{{ user.username }}{% else %}{% trans 'Name1' %}{% endif %}" required>
+          <label for="player1-input" class="form-label">{% if user.user_id != 0 %}{{ user.username }}{% else %}{% trans 'Name Player' %} 1{% endif %}</label>
+          <input type="text" class="form-control" id="player1-input" name="p1_name" value="{% if user.user_id != 0 %}{{ user.profile.display_name }}{% else %}{% trans 'Name1' %}{% endif %}" required>
         </div>
         <div id="form-player2">
           <label for="player2-input" class="form-label">{% trans 'Name Player' %} 2</label>
@@ -80,6 +80,5 @@
       <button id="play-game-button" type="button" class="btn btn-secondary" onclick="playGame()">{% trans "Play game" %}</button>
 
     </form>
-
   </div>
 </div>

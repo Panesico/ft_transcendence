@@ -74,6 +74,59 @@ function checkValidInputGame(gameMode, gameType, p1_name, p2_name) {
   return true;
 }
 
+async function checkNameAlreadyExists(name) {
+  jsonObject = { 'name': name };
+
+  let path = window.location.pathname;
+  let url = '';
+  // console.log('path: ', path);
+  if (path === '/play/') {
+    url = 'checkNameExists/';
+  } else if (path === '/play') {
+    url = path + '/checkNameExists/';
+  }
+
+  try {
+    let request = new Request(url, {
+      method: 'POST',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      credentials: 'include',
+      body: JSON.stringify(jsonObject)
+    });
+
+    const response = await fetch(request);
+    // console.log(response);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error - status: ${response.status}`);
+    }
+    const data = await response.json();
+    // console.log(data);
+
+    if (data.status === 'failure') {
+      let lang = getCookie('django_language');
+      let error = 'Name not available';
+      if (lang === 'fr')
+        error = 'Ce nom n\'est pas disponible';
+      else if (lang === 'es')
+        error = 'Este nombre no está disponible';
+      displayError(error);
+      return true;
+    }
+
+  } catch (error) {
+    console.error('Error loading content:', error);
+    document.querySelector('main').innerHTML = '<h1>Error loading content</h1>';
+    return true;
+  }
+
+  return false;
+}
+
 // Toggles what's displayed depending on the game mode
 function toggleGameMode() {
   const remoteMode = document.getElementById('remoteMode').checked;
@@ -94,6 +147,7 @@ function toggleGameMode() {
   }
 }
 
+
 // Called from button on Play page, starts a new game
 async function playGame() {
   // gameMode: 'local' or 'remote' (or 'ai)
@@ -113,7 +167,13 @@ async function playGame() {
   }
 
   // check input selection
-  if (!checkValidInputGame(gameMode, gameType, p1_name, p2_name)) return;
+  if (checkValidInputGame(gameMode, gameType, p1_name, p2_name) == false) return;
+
+  if (gameMode === 'remote') {
+    let nameExists = await checkNameAlreadyExists(p1_name);
+    if (nameExists)
+      return
+  }
 
   // gameRound: 'single', 'Semi-Final 1', 'Semi-Final 2', 'Final'
   let gameRound = 'single';

@@ -316,3 +316,53 @@ def download_42_avatar(request):
             return JsonResponse({'error': str(e)}, status=400)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+async def checkNameExists(request):
+    logger.debug("")
+    logger.debug("checkNameExists")
+    if request.method != 'POST':
+      return redirect('405')
+    data = json.loads(request.body)
+
+    csrf_token = request.COOKIES.get('csrftoken')
+    headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+    }
+
+    # Check if the display name already exists
+    profile_api_url = 'https://profileapi:9002/api/checkDisplaynameExists/'
+    response = requests.post(profile_api_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
+    logger.debug(f"checkNameExists > profileapi response: {response.json()}")
+
+    status = response.json().get("status")
+    message = response.json().get("message")
+
+    if response.ok:
+        # if display name doesn't exists, check username
+        if status == 'failure': 
+          # Check if the username already exists
+          authentif_url = 'https://authentif:9001/api/checkUsernameExists/'
+          response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
+          logger.debug(f"checkNameExists > authentif response: {response.json()}")
+
+          status = response.json().get("status")
+          message = response.json().get("message")
+
+          if response.ok:
+              # if display name doesn't exists, check username
+              if status == 'failure': 
+                return JsonResponse({'status': 'success', 'message': 'display name and username are available'})
+              else:
+                return JsonResponse({'status': 'failure', 'message': 'Name not available'}) 
+        else:
+          return JsonResponse({'status': 'failure', 'message': 'Name not available'})    
+    
+    return JsonResponse({'status': 'error', 'message': message})
+
+
+
+
+   

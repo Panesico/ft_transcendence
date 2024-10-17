@@ -1,14 +1,10 @@
-import os
+import os, json, requests, logging
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
-from django.contrib import messages
-from django.urls import reverse
 from .forms import TournamentFormFrontend
-import json
-import requests
-import logging
+from .utils import getUserId, getUserData
 logger = logging.getLogger(__name__)
 
 
@@ -123,16 +119,23 @@ def view_tournament_update(request):
 
 
 
-def get_play(request):
+async def get_play(request):
     logger.debug("")
     logger.debug("get_play")
     if request.method != 'GET': 
       return redirect('405')
+    
+    jwt_token = request.COOKIES.get('jwt_token')
+    user_id = await getUserId(jwt_token)
+    user = await getUserData(user_id)
+    logger.debug(f"get_play > user['profile']: {user['profile']}")
+        
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_play XMLHttpRequest")
-        html = render_to_string('fragments/play_fragment.html', context={}, request=request)
+        html = render_to_string('fragments/play_fragment.html', context={'user': user}, request=request)
         return JsonResponse({'html': html})
-    return render(request, 'partials/play.html')
+    return render(request, 'partials/play.html', {'user': user})
+
 
 # def post_game(request):
 #     logger.debug("")

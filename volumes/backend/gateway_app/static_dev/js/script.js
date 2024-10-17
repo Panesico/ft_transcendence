@@ -14,12 +14,11 @@ async function loadContent(path) {
     console.log('Go back arrow clicked');
   }
 
-
   // console.log('url: ', url);
   // Fetch content from Django and inject into main
   try {
     let request = new Request(url, {
-      headers: {'X-Requested-With': 'XMLHttpRequest'},
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
       credentials: 'include',
     });
     // console.log('loadContent > request: ', request);
@@ -38,7 +37,6 @@ async function loadContent(path) {
       document.querySelector('main').innerHTML = data.html;
 
     displayMessageInModal(data.message);
-    displayMessageInModal(data.message);
     handleFormSubmission();
   } catch (error) {
     console.error('Error loading content:', error);
@@ -48,8 +46,8 @@ async function loadContent(path) {
 
 function isUserLoggedIn() {
   console.log(
-      'isUserLoggedIn > sessionStorage.getItem(afterLogin): ',
-      sessionStorage.getItem('afterLogin'));
+    'isUserLoggedIn > sessionStorage.getItem(afterLogin): ',
+    sessionStorage.getItem('afterLogin'));
   return sessionStorage.getItem('afterLogin') === 'true';
 }
 
@@ -105,20 +103,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let message = 'Login successful';
     displayMessageInModal(message);
     sessionStorage.removeItem('afterLogin');
+
   } else if (sessionStorage.getItem('afterLogout') === 'true') {
     let message = 'Logged out successfully';
     displayMessageInModal(message);
     sessionStorage.removeItem('afterLogout');
+
   } else if (sessionStorage.getItem('afterSignup') === 'true') {
     let message = 'Signup successful';
     displayMessageInModal(message);
     sessionStorage.removeItem('afterSignup');
+
   } else if (sessionStorage.getItem('afterProfileUpdate') === 'true') {
     let message = 'Profile updated';
     displayMessageInModal(message);
     sessionStorage.removeItem('afterProfileUpdate');
-  }
-  else if (sessionStorage.getItem('afterAvatarUpdate') === 'true') {
+
+  } else if (sessionStorage.getItem('afterAvatarUpdate') === 'true') {
     let message = 'Avatar updated';
     displayMessageInModal(message);
     sessionStorage.removeItem('afterAvatarUpdate');
@@ -145,12 +146,12 @@ function changeLanguage(lang) {
     credentials: 'include',
     body: formData,
   })
-      .then(response => {
-        if (response.ok) {
-          window.location.reload();
-        } else {
-          console.error('Error changing language:', response.statusText);
-        }
-      })
-      .catch(error => console.error('Fetch error:', error));
+    .then(response => {
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        console.error('Error changing language:', response.statusText);
+      }
+    })
+    .catch(error => console.error('Fetch error:', error));
 }

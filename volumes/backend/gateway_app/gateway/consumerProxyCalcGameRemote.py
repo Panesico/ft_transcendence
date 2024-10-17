@@ -120,11 +120,14 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
         game = self.active_games[game_id]
         player1 = game['player1']
         player2 = game['player2']
-        logger.debug(f"ProxyCalcGameRemote > start_game player1: {player1}")
-        logger.debug(f"ProxyCalcGameRemote > start_game player2: {player2}")
+        logger.debug(f"ProxyCalcGameRemote > start_game player1: {pformat(game)}")
+        logger.debug(f"ProxyCalcGameRemote > start_game player1: {pformat(player1)}")
+        logger.debug(f"ProxyCalcGameRemote > start_game player2: {pformat(player2)}")
 
-        # logger.debug(f"ProxyCalcGameRemote > start_game p1 context: {player1['context']}")
-        # logger.debug(f"ProxyCalcGameRemote > start_game p2 context: {player2['context']}")
+        if player1['player_name'] == player2['player_name']:
+            player1['player_name'] += "#1"
+            player2['player_name'] += "#2"
+
         info = {
             'tournament_id': 0,
             'game_round': 'single',
@@ -133,10 +136,11 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             'p2_name': player2['player_name'],
             'p1_id': player1['player_id'],
             'p2_id': player2['player_id'],
+            'p1_avatar_url': player1['context']['user']['avatar_url'],
+            'p2_avatar_url': player2['context']['user']['avatar_url'],
         }
         html1 = render_to_string('fragments/game_remote_fragment.html', {'context': player1['context'], 'info': info})
-        # logger.debug(f"ProxyCalcGameRemote > start_game html1: {html1}")
-        html2 = render_to_string('fragments/game_remote_fragment.html', {'context': player1['context'], 'info': info})
+        html2 = render_to_string('fragments/game_remote_fragment.html', {'context': player2['context'], 'info': info})
 
         try: # Notify players that the game is starting            
             await player1['ws'].send(json.dumps({
@@ -214,8 +218,10 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                 player['player_name'] = data['p1_name']
                 player['ready'] = False
                 player['game_type'] = game_type
-                if self.scope['user'].is_authenticated:
-                  player['player_id'] = self.scope['user'].id
+
+                # logger.debug(f"ProxyCalcGameRemote > opening_connection player: {pformat(player)}")
+                player['player_id'] = player['context']['user']['user_id']
+                # logger.debug(f"ProxyCalcGameRemote > opening_connection player_id: {player['player_id']}")
 
                 logger.debug(f"Updated waiting[{game_type}][{connect_id}] with player_name: {data['p1_name']}, player_id: {self.waiting[game_type][connect_id]['player_id']}")
             else:
@@ -273,17 +279,19 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                     
                 if data['type'] == 'connection_established, calcgame says hello':
                     # Connection established with calcgame, send back game info
+                    player1 = self.active_games[game_id]['player1']
+                    player2 = self.active_games[game_id]['player2']
+
                     text_data = json.dumps({
                         'type': 'opening_connection, game details',
                         'game_id': game_id,
-                        'p1_name': self.active_games[game_id]['player1']['player_name'],
-                        'p2_name': self.active_games[game_id]['player2']['player_name'],
+                        'p1_name': player1['player_name'],
+                        'p2_name': player2['player_name'],
                     })
+                    logger.debug(f"ProxyCalcGameRemote > listen_to_calcgame:  p1_name: {player1['player_name']}, p2_name: {player2['player_name']}")
                     await calcgame_ws.send(text_data)
 
                     # Send message received from calcgame to both players
-                    player1 = self.active_games[game_id]['player1']
-                    player2 = self.active_games[game_id]['player2']
                     await player1['ws'].send(calcgame_response)
                     await player2['ws'].send(calcgame_response)       
 
@@ -354,6 +362,11 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
         play_url = 'https://play:9003/api/saveGame/'
         csrf_token = player1['context']['cookies'].get('csrftoken')
         
+        if player1['player_name'].endswith("#1"):
+            player1['player_name'] = player1['player_name'][:-2]
+        if player2['player_name'].endswith("#2"):
+            player2['player_name'] = player2['player_name'][:-2]
+
         data = {
             'game_type': 'pong',
             'game_round': 'single',

@@ -18,7 +18,7 @@ urlpatterns = [
     # Getter
     path('api/profile/<str:user_id>/', views.get_profile_api, name='profile_api'),
     path('api/getfriends/<str:user_id>/', views.get_friends, name='get_friends'),
-	path('api/getUsersIds/', views.get_users_ids, name='get_users_ids'),
+	  path('api/getUsersIds/', views.get_users_ids, name='get_users_ids'),
 
     # Notifications
     path('api/createnotif/', views.create_notifications, name='create_notifications'),
@@ -30,4 +30,7 @@ urlpatterns = [
     path('api/checkfriendship/<int:sender_id>/<int:receiver_id>/', views.check_friendship, name='check_friendship'),
 	
     path('livechat/', include('livechat.urls')),
+
+    # Check display names
+    path('api/checkDisplaynameExists/', views.check_displayname_exists, name='check_displayname_exists'),
 ]

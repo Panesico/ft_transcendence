@@ -15,15 +15,14 @@ urlpatterns = [
 
     # home page
     path('', views.get_home, name='home'),
-    path('home/', views.get_home, name='home'),
+    path('home/', views.get_home),
 
     # authentif api
     path('signup/', viewsAuth.view_signup, name='signup'),
     path('login/', viewsAuth.view_login, name='login'),
     path('logout/', viewsAuth.get_logout, name='logout'),
-	path('oauth', viewsAuth.oauth, name='oauth'),
-	path('oauth_callback', viewsAuth.oauth_callback, name='oauth_callback'),
-
+    path('oauth', viewsAuth.oauth, name='oauth'),
+    path('oauth_callback', viewsAuth.oauth_callback, name='oauth_callback'),
 
     # profile api
     path('profile/', viewsProfile.get_profile, name='profile'),
@@ -31,18 +30,18 @@ urlpatterns = [
     path('edit_profile_general/', viewsProfile.post_edit_profile_general, name='edit_profile_general'),
     path('edit_profile_security/', viewsProfile.post_edit_profile_security, name='edit_profile_security'),
     path('edit_profile_avatar/', viewsProfile.post_edit_profile_avatar, name='edit_profile_avatar'),
-	path('profile/match_history/', viewsProfile.get_match_history, name='match_history'),
-	path('download_42_avatar', viewsProfile.download_42_avatar, name='download_42_avatar'),
+    path('profile/match_history/', viewsProfile.get_match_history, name='match_history'),
+    path('download_42_avatar', viewsProfile.download_42_avatar, name='download_42_avatar'),
+    path('play/checkNameExists/', viewsProfile.checkNameExists, name='checkNameExists'),
 
     # invite friends
     path('invite_a_friend', viewsInvitation.post_invite, name='post_invite'),
     path('invite_to_play/<int:receiver_id>/', viewsInvitation.invite_to_play, name='invite_to_play'),
     path('my_friends/', views.list_friends, name='list_friends'),
-	path('getFriends/', views.get_friends, name='get_friends'),
+	  path('getFriends/', views.get_friends, name='get_friends'),
 
     # play api
     path('play/', viewsPlay.get_play, name='play'),
-    # path('play/game/', viewsPlay.post_game, name='game'),
     path('play/saveGame/', viewsPlay.save_game, name='saveGame'),
     path('tournament/', viewsPlay.view_tournament, name='tournament'),
     # path('tournament/update/', viewsPlay.view_tournament_update, name='tournamentUpdate'),
@@ -50,10 +49,6 @@ urlpatterns = [
     # Languages API
     path('i18n/', include('django.conf.urls.i18n')),
 
-
-
-    # path('api/data/', views.get_files, name='files'),
-    # re_path(r'^.*$', views.get_other),  # Catch-all route to serve the SPA
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
