@@ -66,6 +66,7 @@ def getReceivedChatMessages(request, user_id):
 					'timestamp': message.timestamp,
 					'read': message.read
 				})
+			logger.debug(f'getReceivedChatMessages > data: {data}')
 			return JsonResponse(data, safe=False)
 		except DatabaseError as e:
 			return JsonResponse({'message': 'Error getting messages'}, status=400)

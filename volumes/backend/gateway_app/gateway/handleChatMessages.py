@@ -19,7 +19,8 @@ async def sendChatMessage(content, users_connected, self):
     logger.debug(f'senChatMessage > receiver_id: {receiver_id} is in users_connected')
     # Get current date and time
     await users_connected[receiver_id].send_json({
-      'type': 'chat_message',
+      'type': 'chat',
+      'subtype' : 'chat_message',
       'message': message,
       'sender_id': sender_id,
       'receiver_id': receiver_id,
@@ -72,17 +73,24 @@ async def checkForChatMessages(self):
   response.raise_for_status()
   if response.status_code == 200:
     chat_messages = sorted(response.json(), key=lambda x: x['timestamp'])
-    logger.debug(f'checkForChatMessages > chat_messages: {chat_messages}')
-    logger.debug(f'checkForChatMessages > info user connected: {self.user_id}')
     
-  unread_messages = 0
+  unread_messages_count = 0
   for chat_message in chat_messages:
-    logger.debug(f'checkForChatMessages > chat_message: {chat_message}')
     if chat_message['read'] == False:
-      unread_messages += 1
+      unread_messages_count += 1
+  await self.send_json({
+    'type': 'chat',
+    'subtype': 'unread_messages',
+    'chat_messages': chat_messages,
+    'unread_messages_count': unread_messages_count
+  })
 
-      
+async def innitListening(self):
+  await self.send_json({
+      'type': 'chat',
+      'subtype': 'innit_listening',
+    })
 
-     
-
-  
+async def innitChat(self):
+  await innitListening(self)
+  await checkForChatMessages(self)

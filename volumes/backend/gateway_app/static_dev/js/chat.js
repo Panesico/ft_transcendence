@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+function innit_listening() {
     let friendsData = [];
     const userID = document.getElementById('userID').value;
     console.log('chat.js userID:', userID);
@@ -51,13 +51,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Update the avatar and display name
                         contactAvatar.src = friend.avatar;
                         contactDisplayName.textContent = friend.display_name;
+                        
+                        // Get all the messages between the user and the selected friend
+                        const request = new Request(`/getMessages/${friend.user_id}/`, {
+                            method: 'GET',
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            credentials: 'include'
+                        });
                     });
                 });
 
                 // Update unread messages count
-                const unreadMessages = friendsData.reduce((count, friend) => count + friend.unread_messages, 0);
-                unreadCount.textContent = unreadMessages;
-                unreadCount.style.display = unreadMessages > 0 ? 'block' : 'none';
             })
             .catch(error => console.error('Error fetching friends:', error));
     });
@@ -76,7 +82,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const receiverDisplayName = selectedFriend.display_name;
         const receiverAvatar = selectedFriend.avatar;
         const data = {
-            'type': 'chat_message',
+            'type': 'chat',
+            'subtype': 'chat_message',
             'sender_id': userID,
             'receiver_id': receiverId,
             'receiver_display_name': receiverDisplayName,
@@ -88,7 +95,21 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('data:', data);
         messageInput.value = '';
     });
-});
+}
+
+function handleChatMessages(data)
+{
+    if (data.subtype === 'innit_listening') {
+        innit_listening();
+        console.log('chat listen init');
+    }
+    else if (data.subtype === 'chat_message')
+        addRecvChatMessage(data);
+    else if (data.subtype === 'unread_messages') {
+        console.log('parseSocketMessage > data.subtype:', data.subtype);
+        addUnreadMessages(data);
+    }
+}
 
 function addSentChatMessage(message)
 {
@@ -112,4 +133,10 @@ function addRecvChatMessage(data)
 		 </p>
 	`;
 	chatMessages.appendChild(message);
+}
+
+function addUnreadMessages(data)
+{
+	const unreadChatsCount = document.getElementById('unreadChatscount');
+	unreadChatsCount.textContent = data.unread_messages_count;
 }

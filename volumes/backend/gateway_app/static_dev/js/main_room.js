@@ -100,8 +100,14 @@ function parseSocketMessage(data)
   else if (data.type === 'friend_request_response') {
     addFriendResponseNotification(data);
   }
-  else if (data.type === 'chat_message') {
-    addRecvChatMessage(data);
+  else if (data.type === 'chat') {
+    handleChatMessages(data);
+  }
+  else if (data.type === 'game_request') {
+    addFriendRequestNotification(data);
+  }
+  else if (data.type === 'game_request_response') {
+    addFriendResponseNotification(data);
   }
   else if (data.type === 'game_request') {
     addFriendRequestNotification(data);
