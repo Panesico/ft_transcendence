@@ -162,13 +162,15 @@ def post_signup(request):
     message = response.json().get("message")
     logger.debug(f"status: {status}, message: {message}")
     logger.debug(f"post_signup > Response: {response.json()}")
-    if response.ok:
-        logger.debug('post_signup > Response OK')
-        user_response =  JsonResponse({'status': status, 'message': message})
+    response_data = response.json()
+    jwt_token = response_data.get("token")
+    user_id = response_data.get("user_id")
+    message = response_data.get("message")
 
-        for cookie in response.cookies:
-            user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True, secure=True)
-
+    if jwt_token:
+        user_response = JsonResponse({'status': 'success', 'message': message, 'user_id': user_id})
+        # Set the JWT token in a secure, HTTP-only cookie
+        user_response.set_cookie('jwt_token', jwt_token, httponly=True, secure=True, samesite='Lax')
         return user_response
     else:
         # logger.debug('post_signup > Response NOT OK')

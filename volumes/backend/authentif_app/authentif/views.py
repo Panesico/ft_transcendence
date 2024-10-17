@@ -199,19 +199,33 @@ def api_signup(request):
                         'status': 'error', 
                         'message': _('Failed to create profile')
                     }, status=500)
+              jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
+              logger.debug(f"token >>>>>>>>>>>: {jwt_token}")
+      
+              # Create response object
+              response = JsonResponse({
+                  'status': 'success',
+                  'message': _('Login successful'),
+                  'token': jwt_token,
+                  'user_id': user.id
+              })
 
-              user = authenticate(username=username, password=password)
-              if user is not None:
-                  logger.debug('api_signup > Sign up successful')
-                  login(request, user)
-                  return JsonResponse({
-                      'status': 'success',
-                      'message': _('Sign up successful'),
-                  })
-              else:
-                  user.delete()
-                  logger.debug('api_signup > Authentication failed')
-                  return JsonResponse({'status': 'error', 'message': _('Authentication failed')}, status=401)
+              # Set the JWT token in the headers
+              response['Authorization'] = f'Bearer {jwt_token}'
+
+              # Set the JWT token in a cookie (with security options)
+              response.set_cookie(
+                  key='jwt_token',
+                  value=jwt_token,
+                  httponly=True,  # Prevent JavaScript access to the cookie (for security)
+                  secure=True,  # Only send the cookie over HTTPS (ensure your environment supports this)
+                  samesite='Lax',  # Control cross-site request behavior
+                  max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
+              )
+              
+              return response
+
+              
           else:
               logger.debug('api_signup > Invalid form')
               errors = json.loads(form.errors.as_json())

@@ -19,9 +19,10 @@ def api_signup(request):
         return HttpResponse('Method not allowed', status=405)
     logger.debug("--> POST method")
     data = json.loads(request.body)
-    if data['id_42']:
-        display_name = data['username']
-    else:
+    try:
+        if data['id_42']:
+            display_name = data['username']
+    except:
         display_name = 'user' + str(data['user_id'])
     logger.debug(f"data : {data}")
     try:
