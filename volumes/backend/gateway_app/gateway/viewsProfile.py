@@ -265,3 +265,54 @@ def post_edit_profile_avatar(request):
     html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
     return JsonResponse({'html': html, 'status': 'error'}, status=400)
 
+import requests
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.http import JsonResponse
+
+import requests
+from django.http import HttpResponse, JsonResponse
+from django.core.files.uploadedfile import SimpleUploadedFile
+import json
+import mimetypes
+import logging
+
+logger = logging.getLogger(__name__)
+
+@login_required
+def download_42_avatar(request):
+    if request.method == 'POST':
+        # Get the image URL from the POST data
+        body_unicode = request.body.decode('utf-8')  # Decode the raw request body
+        body_data = json.loads(body_unicode)         # Parse the JSON data
+            
+        # Get the image URL from the parsed JSON
+        image_url = body_data.get('image_url')
+        
+        logger.info(f"HEL MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE -------------------------> {image_url}")
+        if not image_url:
+            return JsonResponse({'error': 'No image URL provided'}, status=400)
+
+        try:
+            # Download the image
+            response = requests.get(image_url)
+            response.raise_for_status()  # Raise an error if the download fails
+
+            # Get the image content
+            image_content = response.content
+
+            # Extract the image name from the URL
+            image_name = image_url.split("/")[-1]
+
+            # Determine the MIME type of the file
+            mime_type, _ = mimetypes.guess_type(image_name)
+
+            # Create a response object with the image content
+            multipart_response = HttpResponse(image_content, content_type=mime_type)
+            multipart_response['Content-Disposition'] = f'attachment; filename={image_name}'
+
+            return multipart_response
+
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)

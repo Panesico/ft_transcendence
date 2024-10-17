@@ -1,14 +1,11 @@
 {% load i18n %}
 <div id="login" class="page p-4">
-  <div
-    class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto"
-    style="width: 256px;">
-
+  <div class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto" style="width: 256px;">
     <h1 class="mb-3 align-self-start">{% trans "Log In" %}</h1>
 
-    <form method="post" action="{% url 'login' %}">
+    <!-- Normal login form -->
+    <form method="post" action="{% url 'login' %}" class="w-100">
       {% csrf_token %}
-
       {% if form.non_field_errors %}
         <div class="alert alert-danger fs-6 p-3">
           <div class="errorlist nonfield m-0 p-0">
@@ -22,16 +19,107 @@
         {{ form.username }}
         <div class="text-danger fs-6">{{ form.username.errors }}</div>
       </div>
+
       <div class="mb-3">
         <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
         {{ form.password }}
         <div class="text-danger fs-6">{{ form.password.errors }}</div>
       </div>
 
-      <button type="submit" class="btn btn-secondary">{% trans "Log In" %}</button>
+      <button type="submit" class="btn btn-secondary w-100 mb-3">{% trans "Log In" %}</button>
     </form>
-    
-    <p class="mt-4"><a href="{% url 'signup' %}" onclick="navigate(event, '/signup')" class="link-secondary">{% trans "Don't have an account?" %}</a></p>
+
+    <!-- Login with 42 button -->
+    <button id="login-42-btn" class="btn btn-primary w-100 mb-3">{% trans "Login with 42" %}</button>
+
+    <!-- Link to Sign Up -->
+    <p class="mt-4"><a href="{% url 'signup' %}" class="link-secondary">{% trans "Don't have an account?" %}</a></p>
 
   </div>
 </div>
+
+<script>
+// Helper function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Function to retrieve OAuth code from cookies
+function getOAuthCode() {
+    return getCookie('oauth_code');
+}
+
+// Function to delete a cookie by name
+function deleteCookie(name) {
+    document.cookie = name + '=; Max-Age=-99999999; path=/;';
+}
+
+// Your 42 OAuth settings from Django variables
+const CLIENT_ID = "{{ CLIENT_ID }}";  // From Django settings
+const REDIRECT_URI = "{{ REDIRECT_URI }}";  // From Django settings
+const STATE = Math.random().toString(36).substring(7); // Generate random state to prevent CSRF attacks
+
+// Function to handle OAuth code once available
+function handleOAuthCode() {
+    const oauthCode = getOAuthCode();
+    if (oauthCode) {
+        console.log("OAuth code found in cookie:", oauthCode);
+        // Delete the OAuth code cookie after retrieving it
+        deleteCookie('oauth_code');
+
+        // Send the code to the server to exchange for an access token
+        fetch("{% url 'oauth' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie('csrftoken')
+				
+            },
+            body: JSON.stringify({ code: oauthCode })
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = "/";
+            } else {
+                console.error("OAuth authentication failed");
+            }
+        }).catch(error => {
+            console.error("Error during OAuth authentication:", error);
+        });
+    }
+}
+
+// When the user clicks the "Login with 42" button
+document.getElementById("login-42-btn").addEventListener("click", function() {
+    const authUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=public&state=${STATE}`;
+    const width = 600;
+    const height = 600;
+    const left = (window.innerWidth / 2) - (width / 2);
+    const top = (window.innerHeight / 2) - (height / 2);
+    const authWindow = window.open(authUrl, "42OAuthLogin", `width=${width},height=${height},top=${top},left=${left},menubar=no,toolbar=no,location=no,status=no,scrollbars=no,resizable=no`);
+
+    // Polling for OAuth code every second after the popup is opened
+    const intervalId = setInterval(function() {
+        // Check for the OAuth code in cookies
+        const oauthCode = getOAuthCode();
+        if (oauthCode) {
+            clearInterval(intervalId); // Stop polling once we get the OAuth code
+            authWindow.close(); // Close the popup
+
+            // Handle the OAuth code (send to server, etc.)
+            handleOAuthCode();
+        }
+    }, 1000); // Check every 1 second
+});
+
+</script>

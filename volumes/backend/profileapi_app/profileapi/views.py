@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from profileapi.forms import InviteFriendForm
 from profileapi.models import Profile, Notification
 from profileapi.forms import EditProfileForm
@@ -7,24 +7,23 @@ import json
 import os
 import requests
 import logging
+from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger(__name__)
 
+@csrf_exempt
 def api_signup(request):
     logger.debug("--> hello from api_signup")
     if (request.method != 'POST'):
         logger.debug("Method not allowed")
         return HttpResponse('Method not allowed', status=405)
-    csrf_token = request.COOKIES.get('csrftoken')
-    headers = {
-        'X-CSRFToken': csrf_token,
-        'Cookie': f'csrftoken={csrf_token}',
-        'Content-Type': 'application/json',
-        'HTTP_HOST': 'profileapi',
-    }
     logger.debug("--> POST method")
     data = json.loads(request.body)
-    display_name = 'user' + str(data['user_id'])
+    try:
+        if data['id_42']:
+            display_name = data['username']
+    except:
+        display_name = 'user' + str(data['user_id'])
     logger.debug(f"data : {data}")
     try:
       profile = Profile(
@@ -37,8 +36,6 @@ def api_signup(request):
       return JsonResponse({'message': 'Signup successful'}, status=201)
     except Exception as e:
       return JsonResponse({'error': str(e)}, status=400)
-    else:
-      return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
 def api_edit_profile(request):

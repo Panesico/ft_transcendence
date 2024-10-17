@@ -22,6 +22,8 @@ M Major module: Implement Two-Factor Authentication (2FA) and JWT.
 # To-do / considered:
 ◦ Major module: Store the score of a tournament in the Blockchain.
 ◦ Major module: Live chat.
+◦ Major module: Infrastructure Setup for Log Management.
+
 ◦ Major module: Introduce an AI Opponent.
 
 
@@ -44,7 +46,6 @@ and HashiCorp Vault for Secrets Management.
 Data Management, and Account Deletion.
 
 # Devops
-◦ Major module: Infrastructure Setup for Log Management.
 ◦ Minor module: Monitoring system.
 
 # Graphics

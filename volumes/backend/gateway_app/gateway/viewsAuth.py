@@ -58,9 +58,9 @@ def get_login(request):
     logger.debug('get_login')
     form = LogInFormFrontend()
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        html = render_to_string('fragments/login_fragment.html', {'form': form}, request=request)
+        html = render_to_string('fragments/login_fragment.html', {'form': form, 'CLIENT_ID': settings.CLIENT_ID, 'REDIRECT_URI': settings.REDIRECT_URI}, request=request)
         return JsonResponse({'html': html})
-    return render(request, 'partials/login.html', {'form': form})
+    return render(request, 'partials/login.html', {'form': form, 'CLIENT_ID': settings.CLIENT_ID, 'REDIRECT_URI': settings.REDIRECT_URI})
    
 User = get_user_model()
 
@@ -162,13 +162,15 @@ def post_signup(request):
     message = response.json().get("message")
     logger.debug(f"status: {status}, message: {message}")
     logger.debug(f"post_signup > Response: {response.json()}")
-    if response.ok:
-        logger.debug('post_signup > Response OK')
-        user_response =  JsonResponse({'status': status, 'message': message})
+    response_data = response.json()
+    jwt_token = response_data.get("token")
+    user_id = response_data.get("user_id")
+    message = response_data.get("message")
 
-        for cookie in response.cookies:
-            user_response.set_cookie(cookie.name, cookie.value, domain='localhost', httponly=True, secure=True)
-
+    if jwt_token:
+        user_response = JsonResponse({'status': 'success', 'message': message, 'user_id': user_id})
+        # Set the JWT token in a secure, HTTP-only cookie
+        user_response.set_cookie('jwt_token', jwt_token, httponly=True, secure=True, samesite='Lax')
         return user_response
     else:
         # logger.debug('post_signup > Response NOT OK')
@@ -182,3 +184,87 @@ def post_signup(request):
         # logger.debug(f"existing_errors: {existing_errors}")
         html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
         return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
+
+import requests
+import os
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect
+
+import json
+import os
+import requests
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect
+
+import json
+import os
+import requests
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect
+
+import json
+import os
+import requests
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def oauth(request):
+    authentif_url = 'https://authentif:9001/api/oauth/'  # External auth service endpoint
+    
+    # Only allow POST requests
+    if request.method != 'POST':
+        return redirect('405')  # Redirect to a 405 page for incorrect methods
+
+    # Parse JSON data from the request body
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return HttpResponse("Invalid JSON data", status=400)
+
+    # Get the 'code' and 'state' parameters from the parsed JSON data
+    auth_code = data.get('code')
+    state = data.get('state')
+    if not auth_code:
+        return HttpResponse("Authorization code is missing", status=400)
+
+    try:
+        # Set up the JSON data to send in the POST request to the external service
+        payload = json.dumps({'code': auth_code})  # Convert the data to a JSON string
+        csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+        jwt_token = request.COOKIES.get('jwt_token')
+
+        headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+        'Authorization': f'Bearer {jwt_token}',
+        }
+        # Make the POST request to the external authentif service
+        response = requests.post(authentif_url, cookies=request.COOKIES,data=payload, headers=headers, verify=os.getenv("CERTFILE"))
+        
+        response_data = response.json()
+        jwt_token = response_data.get("token")
+        user_id = response_data.get("user_id")
+        message = response_data.get("message")
+
+        if jwt_token:
+            django_response = JsonResponse({'status': 'success', 'message': message, 'user_id': user_id})
+            # Set the JWT token in a secure, HTTP-only cookie
+            django_response.set_cookie('jwt_token', jwt_token, httponly=True, secure=True, samesite='Lax')
+
+        return django_response
+
+    except requests.exceptions.RequestException as e:
+        # Handle external request failure gracefully
+        return HttpResponse(f"Failed to authenticate: {e}", status=500)
+
+
+def oauth_callback(request):
+    """
+    Renders the OAuth callback page where the popup window will extract the 'code'
+    and 'state' from the URL, then send it back to the parent window using postMessage.
+    """
+    return render(request, 'fragments/oauth_callback.html')

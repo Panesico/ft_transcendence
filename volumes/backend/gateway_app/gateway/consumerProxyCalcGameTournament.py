@@ -1,11 +1,14 @@
-import os, json, logging, websockets, ssl, asyncio, aiohttp, jwt
+import os, json, logging, websockets, ssl, asyncio, aiohttp
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django.conf import settings
 from django.template.loader import render_to_string
-from ppretty import ppretty
+from .utils import getUserId, getUserData, asyncRequest
+
+import prettyprinter
+from prettyprinter import pformat
+prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
+
 logger = logging.getLogger(__name__)
 logging.getLogger('websockets').setLevel(logging.WARNING)
-
 
 class ProxyCalcGameTournament(AsyncWebsocketConsumer):
     async def connect(self):
@@ -54,15 +57,14 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
         # save the player names and context to build html later
         if data['type'] == 'opening_connection, game details':
             
-            decoded_data = jwt.decode(
-                self.scope['cookies']['jwt_token'],
-                settings.SECRET_KEY,
-                algorithms=["HS256"]
-            )
+            jwt_token = self.scope['cookies']['jwt_token']
+            user_id = await getUserId(jwt_token)
+            user = await getUserData(user_id)
+
+            logger.debug(f"ProxyCalcGameTournament > getUserData: {pformat(user)}")
 
             self.context = {
-                'user_id': decoded_data.get('user_id'),
-                'username': decoded_data.get('username'),
+                'user': user,
                 'session': self.scope['session'],
                 'cookies': self.scope['cookies'],
             }
@@ -75,7 +77,7 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
                 'p2_name': data['p2_name'],
                 'p3_name': data['p3_name'],
                 'p4_name': data['p4_name'],
-                'p1_id': self.context['user_id'],
+                'p1_id': self.context['user']['user_id'],
                 'p2_id': 0,
                 'p3_id': 0,
                 'p4_id': 0,
@@ -85,7 +87,7 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
 
             next_game_info = await self.createTournament()
             logger.debug(f"ProxyCalcGameTournament > createTournament response: {next_game_info}")
-            logger.debug(ppretty(next_game_info))
+            logger.debug(pformat(next_game_info))
             
             self.trmt_info['tournament_id'] = next_game_info.get('tournament_id')
             logger.debug(f"ProxyCalcGameTournament > tournament_id: {self.trmt_info['tournament_id']}")
@@ -111,30 +113,12 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
     
     async def createTournament(self):
         logger.debug("ProxyCalcGameTournament > createTournament")
+        play_url = 'https://play:9003/api/createTournament/'
+        csrf_token = self.context['cookies'].get('csrftoken')
+        data = self.trmt_info
 
         # Make request to play container to create tournament
-        play_url = 'https://play:9003/api/createTournament/'
-
-        csrf_token = self.context['cookies'].get('csrftoken')
-        headers = {
-            'X-CSRFToken': csrf_token,
-            'Cookie': f'csrftoken={csrf_token}',
-            'Content-Type': 'application/json',
-            'Referer': 'https://gateway:8443',
-        }
-                
-        ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-        ssl_context.load_verify_locations(os.getenv("CERTFILE"))
-
-        # async http request to create tournament in play container
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.post(play_url, json=self.trmt_info, headers=headers, ssl=ssl_context) as response:
-                    response_json = await response.json()
-                    logger.debug(f"ProxyCalcGameTournament > play responds: {response_json.get('message')}")
-            except aiohttp.ClientError as e:
-                logger.error(f"ProxyCalcGameTournament > Error during request: {e}")
-                return None
+        response_json = await asyncRequest("POST", csrf_token, play_url, data)
         return response_json
 
     async def listen_to_calcgame(self):
@@ -182,13 +166,7 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
         # Save game to database
         play_url = 'https://play:9003/api/saveGame/'
 
-        csrf_token = self.context['cookies'].get('csrftoken')        
-        headers = {
-            'X-CSRFToken': csrf_token,
-            'Cookie': f'csrftoken={csrf_token}',
-            'Content-Type': 'application/json',
-            'Referer': 'https://gateway:8443',
-        }
+        csrf_token = self.context['cookies'].get('csrftoken') 
         
         data = {
             'game_type': 'pong',
@@ -203,18 +181,5 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
             'game_winner_id': self.p1_id if game_result.get('game_winner_name') == 'p1_name' else self.p2_id,
         }
         
-        ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-        ssl_context.load_verify_locations(os.getenv("CERTFILE"))
-
-        # async http request to save game in play container
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.post(play_url, json=data, headers=headers, ssl=False) as response:
-                    # Check if response status is 200 OK
-                    if response.status == 200:
-                        response_json = await response.json()
-                        logger.debug(f"ProxyCalcGameTournament > calcgame responds: {response_json.get('message')}")
-                    else:
-                        logger.error(f"ProxyCalcGameTournament > Failed to save game. Status code: {response.status}")
-            except aiohttp.ClientError as e:
-                logger.error(f"ProxyCalcGameTournament > Error during request: {e}")
+        response_json = await asyncRequest("POST", csrf_token, play_url, data)
+        logger.debug(f"ProxyCalcGameTournament > save_game_to_database response: {response_json}")

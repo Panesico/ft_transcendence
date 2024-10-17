@@ -1,6 +1,7 @@
-import os, json, logging, websockets, ssl, asyncio, aiohttp
+import os, json, logging, websockets, ssl, asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
+from .utils import getUserId, getUserData, asyncRequest
 
 logger = logging.getLogger(__name__)
 logging.getLogger('websockets').setLevel(logging.WARNING)
@@ -55,15 +56,19 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
             self.p1_name = data['p1_name']
             self.p2_name = data['p2_name']
             self.game_type = data['game_type']
+            jwt_token = self.scope['cookies']['jwt_token']
+            user_id = await getUserId(jwt_token)
+            user = await getUserData(user_id)
             self.context = {
-                'user': self.scope['user'],
+                'user': user,
                 'session': self.scope['session'],
                 'cookies': self.scope['cookies'],
             }
             logger.debug(f"ProxyCalcGameLocal > opening_connection with players: {self.p1_name}, {self.p2_name}")
-            logger.debug(f"ProxyCalcGameLocal > self.context['user']: {self.context['user']}, ['user'].id: {self.context['user'].id}")
 
-            self.p1_id = self.context['user'].id if self.context['user'].id else 0
+            logger.debug(f"ProxyCalcGameLocal > self.context['user']: {self.context['user']}, ['user']['user_id']: {self.context['user']['user_id']}")
+
+            self.p1_id = self.context['user']['user_id'] if self.context['user']['user_id'] else 0
             self.p2_id = 0
             info = {
                 'tournament_id': 0,
@@ -128,15 +133,8 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
         logger.debug("ProxyCalcGameLocal > save_game_to_database")
         # Save game to database
         play_url = 'https://play:9003/api/saveGame/'
+        csrf_token = self.context['cookies'].get('csrftoken')  
 
-        csrf_token = self.context['cookies'].get('csrftoken')        
-        headers = {
-            'X-CSRFToken': csrf_token,
-            'Cookie': f'csrftoken={csrf_token}',
-            'Content-Type': 'application/json',
-            'Referer': 'https://gateway:8443',
-        }
-        
         data = {
             'game_type': 'pong',
             'game_round': 'single',
@@ -150,18 +148,4 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
             'game_winner_id': self.p1_id if game_result.get('game_winner_name') == 'p1_name' else self.p2_id,
         }
         
-        ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-        ssl_context.load_verify_locations(os.getenv("CERTFILE"))
-
-        # async http request to save game in play container
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.post(play_url, json=data, headers=headers, ssl=ssl_context) as response:
-                    # Check if response status is 200 OK
-                    if response.status == 200:
-                        response_json = await response.json()
-                        logger.debug(f"ProxyCalcGameLocal > play responds: {response_json.get('message')}")
-                    else:
-                        logger.error(f"ProxyCalcGameLocal > Failed to save game. Status code: {response.status}")
-            except aiohttp.ClientError as e:
-                logger.error(f"ProxyCalcGameLocal > Error during request: {e}")
+        await asyncRequest("POST", csrf_token, play_url, data)
