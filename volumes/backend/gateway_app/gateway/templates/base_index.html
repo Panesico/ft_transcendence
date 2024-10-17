@@ -31,70 +31,12 @@
   </header>
   {% include 'includes/popupMessages.html' %}
   
+  {% include 'includes/chat_modal.html' %}
+  
   <main class="container text-light">
     {% block content %}
     {% endblock %}
   </main>
-
-<!-- Chat -->
-<div id="chatButton" class="position-fixed bottom-0 end-0 p-3">
-  <img src="{% static 'images/chat_icon.png' %}" alt="Chat" data-bs-toggle="modal" data-bs-target="#chatModal" style="width: 100px; height: 100px; cursor: pointer;">
-</div>
-
-<section>
-  <div class="container py-5">
-    <!-- Modal -->
-    <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content" style="background: linear-gradient(to left, #747474, #333333);">
-          <div class="modal-header d-flex justify-content-center align-items-center">
-            <h5 style="color: white; flex-grow: 1; text-align: center;" class="modal-title" id="chatModalLabel">{% trans "Chat messages" %}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          
-          <!-- Contact Selection -->
-          <div class="modal-body">
-            <div class="mb-3">
-              <label for="contactSelect" class="form-label" style="color: white;">{% trans "Select Contact" %}</label>
-              <select class="form-select" id="contactSelect" aria-label="{% trans "Select a contact to chat with" %}">
-                <option selected>{% trans "Choose..." %}</option>
-              </select>
-            </div>
-
-            <!-- Chat Content -->
-            <div style="height: 300px; overflow: auto;">
-              <!-- Destination -->
-              <div class="d-flex justify-content-between">
-                <p id="contactDisplayName" style="color: white">Fanny Neguesha</p>
-                <p id="date" class="small mb-1 text-muted">23 Jan 2:00 pm</p>
-              </div>
-              <div class="d-flex flex-row justify-content-start">
-                <img id="contactAvatar" src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp" style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;" alt="{% trans "avatar 1" %}">
-                <div id="recvChatMessages">
-                  <p class="small p-2 ms-3 mb-1 rounded-3 bg-body-tertiary" style="color: black">{% trans "What's up crackos ?" %}</p>
-                </div>
-              </div>
-              <!-- Sender -->
-              <div class="d-flex flex-row justify-content-end">
-                <div id="sendChatMessages">
-                  <p class="small p-2 ms-3 mb-1 rounded-3 bg-dark text-white">Nothing</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Footer with message input -->
-          <div class="modal-footer">
-            <div id="chat-log" class="input-group mb-0">
-              <input id="messageInput" type="text" class="form-control" placeholder="{% trans "Type message" %}" aria-label="{% trans "Recipient's username" %}" aria-describedby="button-addon2" />
-              <button id="sendButton" class="btn btn-dark" type="button" style="padding-top: .55rem;">{% trans "Send" %}</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 
   <!-- Bootstrap JS and Popper.js -->

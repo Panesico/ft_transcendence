@@ -1,6 +1,7 @@
 import json, asyncio, logging, requests, os
 from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
-from .handleMainRoom import readMessage, friendRequestResponse, friendRequest, handleNewConnection, checkForNotifications, markNotificationAsRead, sendChatMessage
+from .handleMainRoom import readMessage, friendRequestResponse, friendRequest, handleNewConnection, checkForNotifications, markNotificationAsRead
+from .handleChatMessages import sendChatMessage, checkForChatMessages
 from .handleInvite import get_authentif_variables
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ class mainRoom(AsyncJsonWebsocketConsumer):
         await self.accept()
         await handleNewConnection(self, users_connected)
         await checkForNotifications(self)
-        #await checkForChatMessages(self)
+        await checkForChatMessages(self)
         
 
   async def disconnect(self, close_code):

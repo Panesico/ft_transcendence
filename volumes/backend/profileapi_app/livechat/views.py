@@ -29,3 +29,59 @@ def saveChatMessage(request):
 			return JsonResponse({'message': 'Error saving message'}, status=400)
 	else:
 		return JsonResponse({'message': 'Method not allowed'}, status=405)
+	
+def getSentChatMessages(request, user_id):
+	id = int(user_id)
+	if request.method == 'GET':
+		try:
+			user = Profile.objects.get(user_id=id)
+			messages = Message.objects.filter(send_user=user)
+			data = []
+			for message in messages:
+				data.append({
+					'send_user': message.send_user.user_id,
+					'dest_user': message.dest_user.user_id,
+					'message': message.message,
+					'timestamp': message.timestamp,
+					'read': message.read
+				})
+			return JsonResponse(data, safe=False)
+		except DatabaseError as e:
+			return JsonResponse({'message': 'Error getting messages'}, status=400)
+	else:
+		return JsonResponse({'message': 'Method not allowed'}, status=405)
+	
+def getReceivedChatMessages(request, user_id):
+	id = int(user_id)
+	if request.method == 'GET':
+		try:
+			user = Profile.objects.get(user_id=id)
+			messages = Message.objects.filter(dest_user=user)
+			data = []
+			for message in messages:
+				data.append({
+					'send_user': message.send_user.user_id,
+					'dest_user': message.dest_user.user_id,
+					'message': message.message,
+					'timestamp': message.timestamp,
+					'read': message.read
+				})
+			return JsonResponse(data, safe=False)
+		except DatabaseError as e:
+			return JsonResponse({'message': 'Error getting messages'}, status=400)
+	else:
+		return JsonResponse({'message': 'Method not allowed'}, status=405)
+	
+def markChatAsRead(request):
+	if request.method == 'POST':
+		data = json.loads(request.body)
+		logger.debug(f'data: {data}')
+		try:
+			message = Message.objects.get(id=data['message_id'])
+			message.read = True
+			message.save()
+			return JsonResponse({'message': 'Message marked as read'}, status=201)
+		except DatabaseError as e:
+			return JsonResponse({'message': 'Error marking message as read'}, status=400)
+	else:
+		return JsonResponse({'message': 'Method not allowed'}, status=405)
