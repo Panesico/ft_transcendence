@@ -1,8 +1,12 @@
-import os, json, logging, websockets, ssl, asyncio, requests, aiohttp
+import os, json, logging, websockets, ssl, asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from django.middleware.csrf import get_token
-#from ppretty import ppretty
+from .utils import getUserId, getUserData, asyncRequest
+
+import prettyprinter
+from prettyprinter import pformat
+prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
+
 logger = logging.getLogger(__name__)
 logging.getLogger('websockets').setLevel(logging.WARNING)
 
@@ -49,8 +53,11 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
         
         # Generate a unique player ID for this connection
         connect_id = self.channel_name
+        jwt_token = self.scope['cookies']['jwt_token']
+        user_id = await getUserId(jwt_token)
+        user = await getUserData(user_id)
         context = {
-            'user': self.scope['user'],
+            'user': user,
             'session': self.scope['session'],
             'cookies': self.scope['cookies'],
         }
@@ -68,7 +75,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
         
         logger.debug(f"Player connected and added to waiting: {connect_id}")
 
-        await self.waiting_room()
+        await self.waiting_room(context)
         
         self.check_waiting_task = asyncio.create_task(self.check_waiting(game_type))
 
@@ -77,8 +84,6 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             if game_type in self.waiting:
                 # Filter players with player_name not None
                 filtered_players = {k: v for k, v in self.waiting[game_type].items() if v['player_name'] is not None}
-
-                # logger.debug(ppretty(filtered_players, indent='  ', width=80))
 
                 if len(filtered_players) >= 2:
                     # Pop two players from filtered_players
@@ -298,14 +303,9 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             logger.debug("ProxyCalcGameRemote > calcgame connection closed")
             pass
 
-    async def waiting_room(self):
+    async def waiting_room(self, context):
         logger.debug("ProxyCalcGameRemote > player in waiting_room")
 
-        context = {
-            'user': self.scope['user'],
-            'session': self.scope['session'],
-            'cookies': self.scope['cookies'],
-        }
         html = render_to_string('fragments/waiting_room.html', context=context)
 
         await self.send(json.dumps({
@@ -352,14 +352,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
         logger.debug(f"ProxyCalcGameRemote > save_game_to_database game_id: {game_id}")
         # Save game to database
         play_url = 'https://play:9003/api/saveGame/'
-
-        csrf_token = player1['context']['cookies'].get('csrftoken')        
-        headers = {
-            'X-CSRFToken': csrf_token,
-            'Cookie': f'csrftoken={csrf_token}',
-            'Content-Type': 'application/json',
-            'Referer': 'https://gateway:8443',
-        }
+        csrf_token = player1['context']['cookies'].get('csrftoken')
         
         data = {
             'game_type': 'pong',
@@ -374,21 +367,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             'game_winner_id': player1['player_id'] if game_result.get('game_winner_name') == 'p1_name' else player2['player_id'],
         }
         
-        ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-        ssl_context.load_verify_locations(os.getenv("CERTFILE"))
-
-        # async http request to save game in play container
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.post(play_url, json=data, headers=headers, ssl=ssl_context) as response:
-                    # Check if response status is 200 OK
-                    if response.status == 200:
-                        response_json = await response.json()
-                        logger.debug(f"ProxyCalcGameRemote > play responds: {response_json.get('message')}")
-                    else:
-                        logger.error(f"ProxyCalcGameRemote > Failed to save game. Status code: {response.status}")
-            except aiohttp.ClientError as e:
-                logger.error(f"ProxyCalcGameRemote > Error during request: {e}")
+        await asyncRequest("POST", csrf_token, play_url, data)
 
         # Close the websocket connection to the calcgame service
         await game['calcgame_ws'].close()

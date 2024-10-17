@@ -40,7 +40,14 @@ def api_get_user_info(request, user_id):
         if user:
             username = user.username
             avatar_url = user.avatar.url if user.avatar else None
-            return JsonResponse({'status': 'success', 'message': 'User found', 'username': username, 'usernames': [user.username for user in users], 'users_id': users_id, 'avatar_url': avatar_url})
+            return JsonResponse({
+                  'status': 'success',
+                  'message': 'User found',
+                  'username': username,
+                  'usernames': [user.username for user in users],
+                  'users_id': users_id,
+                  'avatar_url': avatar_url
+                })
         else:
             return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
     except User.DoesNotExist:
