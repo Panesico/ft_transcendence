@@ -18,14 +18,21 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url, s
   sender_avatar_url = content.get('sender_avatar_url', '')
   receiver_avatar_url = receiver_avatar_url
   response = content.get('response', '')
+  type = content.get('type', '')
+  logger.debug(f'friendRequestResponse > type: {type}')
+  message = f'{sender_username} has accepted your friend request.'
+  if type == 'game_request_response':
+    message = f'{sender_username} has accepted your game request.'
+  logger.debug(f'friendRequestResponse > message: {message}')
+
 
   # Send response to frontend sender
   if sender_id in users_connected:
     logger.debug(f'friendRequestResponse > sender_id: {sender_id} is in users_connected {response}')
     await users_connected[sender_id].send_json({
-      'type': 'friend_request_response',
+      'type': type,
       'response': response,
-      'message': f'{receiver_username} has accepted your friend request',
+      'message': message,
       'sender_username': sender_username,
       'sender_id': sender_id,
       'sender_avatar_url': sender_avatar_url,
@@ -36,7 +43,7 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url, s
     })
   
   # Set the notification as read
-  profileapi_url = 'https://profileapi:9002/api/setnotifasread/' + str(sender_id) + '/' + str(receiver_id) + '/friend_request/' + str(response) + '/'
+  profileapi_url = 'https://profileapi:9002/api/setnotifasread/' + str(sender_id) + '/' + str(receiver_id) + '/' + str(type) + '/' + str(response) + '/'
   csrf_token = self.scope['cookies']['csrftoken']
   headers = {
           'X-CSRFToken': csrf_token,
@@ -63,10 +70,19 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url, s
 async def friendRequest(content, users_connected, self):
   sender_id = content.get('sender_id', '')
   sender_username = content.get('sender_username', '')
-  receiver_username = content.get('receiver_username', '')
   receiver_id = content.get('receiver_id', '')
   sender_avatar_url = content.get('sender_avatar_url', '')
   message = f'{sender_username} sent you a friend request.'
+
+  # Get username of receiver
+  user_data = get_authentif_variables(self.user_id)
+  receiver_username = user_data.get('username', '')
+  logger.debug(f'friendRequest > receiver_username: {receiver_username}')
+  if user_data is None:
+    logger.debug(f'friendRequest > Error getting receiver_username')
+    return
+
+
 
   logger.debug(f'friendRequest > sender_id: {sender_id}')
   logger.debug(f'friendRequest > Friend request: {content}')
@@ -212,7 +228,7 @@ async def checkForNotifications(self):
     return
 
 async def markNotificationAsRead(self, content, user_id):
-  profileapi_url = 'https://profileapi:9002/api/setallnotifasread/' + str(content['sender_id']) + '/' + str(user_id) + '/'
+  profileapi_url = 'https://profileapi:9002/api/setallnotifasread/' + str(user_id) + '/'
   csrf_token = self.scope['cookies']['csrftoken']
   headers = {
       'X-CSRFToken': csrf_token,

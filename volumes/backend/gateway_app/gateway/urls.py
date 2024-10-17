@@ -32,6 +32,7 @@ urlpatterns = [
 
     # invite friends
     path('invite_a_friend', viewsInvitation.post_invite, name='post_invite'),
+    path('invite_to_play/<int:receiver_id>/', viewsInvitation.invite_to_play, name='invite_to_play'),
     path('my_friends/', views.list_friends, name='list_friends'),
 
     # play api

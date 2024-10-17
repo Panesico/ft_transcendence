@@ -227,8 +227,12 @@ def set_notif_as_readen(request, sender_id, receiver_id, type, response):
     try:
         sender_obj = Profile.objects.get(user_id=sender_id)
         receiver_obj = Profile.objects.get(user_id=receiver_id)
+        if (type == 'friend_request_response'):
+          request_type = 'friend_request'
+        else:
+          request_type = 'game_request'
         logger.debug('sender_obj and receiver_obj recovered')
-        notifications = Notification.objects.filter(sender=sender_obj, receiver=receiver_obj, type=type)
+        notifications = Notification.objects.filter(sender=sender_obj, receiver=receiver_obj, type=request_type)
         logger.debug('notifications recovered')
         for notification in notifications:
             if (response == 'accept'):
@@ -239,7 +243,7 @@ def set_notif_as_readen(request, sender_id, receiver_id, type, response):
             logger.debug('notification marked as read')
 
             # if friend request accepted, save friendship in database
-            if response == 'accept' and type == 'friend_request':
+            if response == 'accept' and type == 'friend_request_response':
                 sender_obj.friends.add(receiver_obj)
                 sender_obj.save()
                 receiver_obj.save()

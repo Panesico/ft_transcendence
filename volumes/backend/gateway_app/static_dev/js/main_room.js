@@ -19,22 +19,22 @@ function sendMessagesBySocket(message, socket)
   }
 }
 
-// // Add event listener to the notification
-// document.addEventListener('DOMContentLoaded', function() {
-//   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
-//   notificationDropdown.addEventListener('click', function() {
-//     console.log('Notification dropdown clicked');
-//     unreadNotifications = false;
-//     const bellIcon = notificationDropdown.querySelector('img');
-//     if (bellIcon.src.includes('bell_up')) {
-//       bellIcon.src = '/media/utils_icons/bell_down.png';
+// Add event listener to the notification
+document.addEventListener('DOMContentLoaded', function() {
+  const notificationDropdown = document.getElementById('navbarDropdownNotifications');
+  notificationDropdown.addEventListener('click', function() {
+    console.log('Notification dropdown clicked');
+    unreadNotifications = false;
+    const bellIcon = notificationDropdown.querySelector('img');
+    if (bellIcon.src.includes('bell_up')) {
+      bellIcon.src = '/media/utils_icons/bell_down.png';
 
-//       // Mark notification as read
-//       sendMessagesBySocket({'type': 'mark_notification_as_read', 'receiver_id': receiver_id}, mainRoomSocket);
-//     }
-//   }
-//   );
-// });
+      // Mark notification as read
+      sendMessagesBySocket({'type': 'mark_notification_as_read', 'receiver_id': receiver_id}, mainRoomSocket);
+    }
+  }
+  );
+});
 
 // Routine when user reload the page
 window.onload = () => {
@@ -72,7 +72,7 @@ window.onload = () => {
 
   // On websocket close
   mainRoomSocket.onclose = function(e) {
-    console.console('mainRoomSocket socket closed unexpectedly');
+    console.error('mainRoomSocket socket closed unexpectedly');
   };
 
 // Close the main room socket when the window is closed
@@ -111,6 +111,12 @@ function parseSocketMessage(data)
   }
   else if (data.type === 'chat_message') {
     addChatMessage(data);
+  }
+  else if (data.type === 'game_request') {
+    addFriendRequestNotification(data);
+  }
+  else if (data.type === 'game_request_response') {
+    addFriendResponseNotification(data);
   }
   else
   {

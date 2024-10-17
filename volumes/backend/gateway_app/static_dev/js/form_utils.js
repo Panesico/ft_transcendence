@@ -54,6 +54,10 @@ function listenForm(form) {
 		} else
 		  document.querySelector('main').innerHTML = data.html;
   
+      if (data.message === 'Invitation to play sent!') {
+        inviteFriendToPlay(data.sender_username, data.sender_id, data.sender_avatar_url, data.receiver_id)
+      }
+    
 		if (!data?.html?.includes('class="errorlist nonfield')) {
 		  if (data.message != 'starting Semi-Final 1')
 			displayMessageInModal(data.message);
@@ -134,7 +138,16 @@ async function handleFormSubmission() {
 	const formSecurity = document.getElementById('type-security')
 	const modalInviteFriend = document.getElementById('inviteFriendModal')
   const formFriendInvite = document.getElementById('type-invite-friend')
+  // Select all forms by their class name
+  var forms = document.querySelectorAll('form[id^="invite-play-"]'); // Select forms by unique ID pattern
+
+  // Iterate over each form and add an event listener
+  forms.forEach(function(form) {
+    listenForm(form)
+  });
+
   
+
 	if (modalInviteFriend && formFriendInvite) {
     console.log('modalInviteFriend && formFriendInvite');
 	  listenFriendInvitation(modalInviteFriend, formFriendInvite);

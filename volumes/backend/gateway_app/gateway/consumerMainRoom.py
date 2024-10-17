@@ -1,7 +1,7 @@
 import json, asyncio, logging, requests, os
 from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
 from .handleMainRoom import readMessage, friendRequestResponse, friendRequest, handleNewConnection, checkForNotifications, markNotificationAsRead, sendChatMessage
-from .handleInvite import get_authentif_variables
+from .handleInvite import get_authentif_variables, invite_to_game
 logger = logging.getLogger(__name__)
 
 #----------------- MAIN ROOM -----------------#
@@ -64,4 +64,10 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     
     if typeMessage == 'chat_message':
       await sendChatMessage(content, users_connected, self)
+
+    if typeMessage == 'invite_game':
+      await invite_to_game(self, content, users_connected)
+    
+    if typeMessage == 'game_request_response':
+      await friendRequestResponse(content, users_connected, self.avatar_url, self)
       

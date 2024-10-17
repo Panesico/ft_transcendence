@@ -35,8 +35,11 @@
                                   </div>
                                   <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
                                       <div class="btn-group" role="group">
-                                          <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#chatModal">{% trans "Let's chat" %}</button>
-                                          <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#gameInvitationModal">{% trans "Let's play" %}</button>
+                                          <button class="btn btn-light" >{% trans "Let's chat" %}</button>
+                                          <form method="post" id="invite-play-{{ friend.user_id }}" action="{% url 'invite_to_play' friend.user_id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-outline-light">{% trans "Let's play" %}</button>
+                                        </form>                                     
                                       </div>
                                   </div>
                                 </div>

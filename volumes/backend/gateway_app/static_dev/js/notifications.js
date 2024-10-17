@@ -49,23 +49,22 @@ function createDateElement(dateString, newNotification) {
   const formattedDate = date.toLocaleDateString();
   const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const formattedDateTime = `${formattedDate} ${formattedTime}`;
-
+  
   const container = document.createElement('div');
   container.style.display = 'flex';
   container.style.flexDirection = 'column';
   container.style.alignItems = 'center'; 
-
+  
   const dateElement = document.createElement('span');
   dateElement.textContent = formattedDateTime;
   dateElement.style.marginRight = '10px';
   dateElement.style.fontSize = '0.8rem';
   dateElement.style.color = 'grey';
   container.appendChild(dateElement);
-
+  
   const endiv = document.createElement('div');
 
   endiv.appendChild(container);
-
   newNotification.appendChild(endiv);
 
   return dateElement;
@@ -190,11 +189,13 @@ function createDeclineButton(sender_id, receiver_id, newNotification)
   return declineButton;
 }
 
-function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username)
+function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, type)
 {
+  response_type = type + '_response';
+  console.warn('listenUserResponse > response_type:', response_type);
   acceptButton.addEventListener('click', function() {
     console.log('Accept button clicked');
-    if (sendMessagesBySocket({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username}, mainRoomSocket) == true)
+    if (sendMessagesBySocket({'type': response_type, 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username}, mainRoomSocket) == true)
     {
       acceptButton.remove();
       declineButton.remove();
@@ -204,7 +205,7 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
 
   declineButton.addEventListener('click', function() {
     console.log('Decline button clicked');
-    if (sendMessagesBySocket({'type': 'friend_request_response', 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username}, mainRoomSocket) == true)
+    if (sendMessagesBySocket({'type': response_type, 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username}, mainRoomSocket) == true)
     {
       acceptButton.remove();
       declineButton.remove();   
@@ -248,6 +249,9 @@ function addFriendRequestNotification(data)
 
   // Create a span element for the message
   const message = createMessageElement(sender_username, ' sent you a friend request.');
+  if (data.type === 'game_request') {
+    message.textContent = `${sender_username} invited you to play a game.`;
+  }
   
   // Add button to accept the friend request represented by accept png
   const acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
@@ -273,7 +277,7 @@ function addFriendRequestNotification(data)
   unreadNotifications = true;
 
   // Add event listener to the buttons accept and decline
-  listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username);
+  listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, data.type);
 }
 
 /* -------------------Friend Response notification------------------- */
@@ -295,18 +299,26 @@ function addFriendResponseNotification(data)
   const newNotification = document.createElement('li');
   newNotification.classList.add('dropdown-item');
 
+  // Create an element for the date
+  const date = createDateElement(data.date, newNotification);
+
   // Create an img element for the avatar
   const avatar = createAvatarElement(receiver_avatar_url);
 
   // Create a span element for the message
-  if (data.response === 'accept') {
-    const message = createMessageElement(receiver_username, ' accepted your friend request.');
-    appendAvatarAndMessage(avatar, message, newNotification);
+  inputMessage = ' declined your game request.'
+  if (data.response === 'accept' && data.type === 'friend_request_response') {
+    inputMessage = ' accepted your friend request.';
   }
-  else {
-    const message = createMessageElement(receiver_username, ' declined your friend request.');
-    appendAvatarAndMessage(avatar, message, newNotification);
+  else if (data.response === 'decline' && data.type === 'friend_request_response') {
+    inputMessage = ' declined your friend request.';
   }
+  else if (data.response === 'accept' && data.type === 'game_request_response') {
+    inputMessage = ' accepted your game request.';
+  }
+
+  const message = createMessageElement(receiver_username, inputMessage);
+  appendAvatarAndMessage(avatar, message, newNotification);
 
   // Change default down icon notification to the new notification icon
   changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id, data.status);

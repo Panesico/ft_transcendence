@@ -22,5 +22,3 @@ Remote game:
 - Block player
 - Clean web socket unused (AsyncWebsocketConsumer)
 - Display name only after click
-- Notification up to down
-

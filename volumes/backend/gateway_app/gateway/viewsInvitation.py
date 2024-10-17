@@ -108,13 +108,48 @@ def post_invite(request):
   form = InviteFriendFormFrontend(request.POST)
   html = render_to_string('fragments/profile_fragment.html', {}, request=request)
   return render(request, 'partials//profile.html', {'status': 'success', 'form': form})
-  # if response.ok:
-  #   user_response =  JsonResponse({'status': status, 'message': message})
-  #   for cookie in response.cookies:
-  #     user_response.set_cookie(cookie.key, cookie.value)
-  #   return user_response
-  # else:
-  #   logger.debug('post_invite > Response NOT OK')
-  #   logger.debug(message)
-  #   html = render_to_string('fragments/profile_fragment.html', {}, request=request)
-  #   return JsonResponse({'html': html, 'status': status, 'message': message})
+
+def invite_to_play(request, receiver_id):
+  logger.debug("")
+  logger.debug('post_invite_to_play')
+  if request.method != 'POST':
+    return redirect('405')
+  csrf_token = request.COOKIES.get('csrftoken')
+  headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+    }
+  
+  # Check friendship
+  friendship = check_friendship(int(receiver_id), int(request.user.id))
+  if friendship['status'] == 'failure':
+    status = 'error'
+    message = 'Add this player as a friend before inviting them to play'
+    form = InviteFriendFormFrontend()
+    html = render_to_string('fragments/profile_fragment.html', {'form': form, 'message': message}, request=request)
+    user_response = JsonResponse({'html': html, 'status': status, 'message': message})
+    return user_response
+  elif request.user.id == receiver_id:
+    status = 'error'
+    message = 'You cannot invite yourself'
+    form.add_error(None, 'You cannot invite yourself')
+    html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
+    user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
+    return
+  else:
+    status = 'success'
+    message = 'Invitation to play sent!'
+    html = render_to_string('fragments/play_fragment.html', request=request)
+    logger.debug(f"invite_to_play > receiver_id: {receiver_id}")
+    logger.debug(f"invite_to_play > sender_id: {request.user.id}")
+    user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'sender_username': request.user.username, 'sender_id': request.user.id, 'receiver_id': receiver_id, 'sender_avatar_url': request.user.avatar.url}) 
+    return user_response
+
+
+    
+
+  
+  
+
