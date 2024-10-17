@@ -63,14 +63,21 @@
 
             <!-- Chat Content -->
             <div style="height: 300px; overflow: auto;">
+              <!-- Destination -->
               <div class="d-flex justify-content-between">
                 <p id="contactDisplayName" style="color: white">Fanny Neguesha</p>
                 <p id="date" class="small mb-1 text-muted">23 Jan 2:00 pm</p>
               </div>
               <div class="d-flex flex-row justify-content-start">
-                <img id="contactAvatar" src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp" alt="{% trans "avatar 1" %}" style="width: 45px; height: 100%;">
-                <div>
-                  <p class="small p-2 ms-3 mb-3 rounded-3 bg-body-tertiary" style="color: black">{% trans "What's up crackos ?" %}</p>
+                <img id="contactAvatar" src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp" style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;" alt="{% trans "avatar 1" %}">
+                <div id="recvChatMessages">
+                  <p class="small p-2 ms-3 mb-1 rounded-3 bg-body-tertiary" style="color: black">{% trans "What's up crackos ?" %}</p>
+                </div>
+              </div>
+              <!-- Sender -->
+              <div class="d-flex flex-row justify-content-end">
+                <div id="sendChatMessages">
+                  <p class="small p-2 ms-3 mb-1 rounded-3 bg-dark text-white">Nothing</p>
                 </div>
               </div>
             </div>
@@ -79,8 +86,8 @@
           <!-- Footer with message input -->
           <div class="modal-footer">
             <div id="chat-log" class="input-group mb-0">
-              <input id="chat-message-input" type="text" class="form-control" placeholder="{% trans "Type message" %}" aria-label="{% trans "Recipient's username" %}" aria-describedby="button-addon2" />
-              <button id="chat-message-submit" class="btn btn-dark" type="button" style="padding-top: .55rem;">{% trans "Send" %}</button>
+              <input id="messageInput" type="text" class="form-control" placeholder="{% trans "Type message" %}" aria-label="{% trans "Recipient's username" %}" aria-describedby="button-addon2" />
+              <button id="sendButton" class="btn btn-dark" type="button" style="padding-top: .55rem;">{% trans "Send" %}</button>
             </div>
           </div>
         </div>
@@ -120,7 +127,16 @@
   <script src="{% static 'js/play/tournament.js' %}"></script>
   <script src="{% static 'js/play/tournamentNextRound.js' %}"></script>
   <script src="{% static 'js/play/tournamentStart.js' %}"></script>
-  
+
+  <script type="text/javascript">
+    function gettext(msgid) {
+        var translations = {
+            "Choose...": "{% trans 'Choose...' %}"
+        };
+        return translations[msgid] || msgid;
+    }
+  </script>
+
 </body>
 
 </html>

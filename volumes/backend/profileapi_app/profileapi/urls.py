@@ -6,6 +6,7 @@ import json
 from .models import Profile
 from profileapi import views
 logger = logging.getLogger(__name__)
+from django.urls import include, path
 
 urlpatterns = [
     # Signup
@@ -27,4 +28,6 @@ urlpatterns = [
 
     # Friends
     path('api/checkfriendship/<int:sender_id>/<int:receiver_id>/', views.check_friendship, name='check_friendship'),
+	
+    path('livechat/', include('livechat.urls')),
 ]

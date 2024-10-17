@@ -2,22 +2,26 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from livechat.models import Message
 from django.db import DatabaseError
+from profileapi.models import Profile
 import json
 import os
 import requests
 import logging
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 def saveChatMessage(request):
 	if request.method == 'POST':
 		data = json.loads(request.body)
 		logger.debug(f'data: {data}')
+		sender = Profile.objects.get(user_id=data['sender_id'])
+		receiver = Profile.objects.get(user_id=data['receiver_id'])
 		try:
 			message = Message(
-				sender_id=data['sender_id'],
-				receiver_id=data['receiver_id'],
+				send_user=sender,
+				dest_user=receiver,
 				message=data['message'],
-				date=data['date']
+				timestamp=data['date']
 			)
 			message.save()
 			return JsonResponse({'message': 'Message saved'}, status=201)

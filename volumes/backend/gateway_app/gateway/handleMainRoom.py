@@ -235,6 +235,7 @@ async def sendChatMessage(content, users_connected, self):
   sender_id = content.get('sender_id', '')
   receiver_id = content.get('receiver_id', '')
   message = content.get('message', '')
+  date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
   logger.debug(f'senChatMessage > sender_id: {sender_id}')
   logger.debug(f'senChatMessage > receiver_id: {receiver_id}')
@@ -244,7 +245,6 @@ async def sendChatMessage(content, users_connected, self):
   if receiver_id in users_connected:
     logger.debug(f'senChatMessage > receiver_id: {receiver_id} is in users_connected')
     # Get current date and time
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     await users_connected[receiver_id].send_json({
       'type': 'chat_message',
       'message': message,
@@ -256,7 +256,7 @@ async def sendChatMessage(content, users_connected, self):
   # Save chat message request in database
   logger.debug(f'senChatMessage > Save chat message in database')
   profileapi_url = 'https://profileapi:9002/livechat/api/saveChatMessage/'
-  message_data = { 'sender_id': sender_id, 'receiver_id': receiver_id, 'message': message, 'type': 'chat_message' }
+  message_data = { 'sender_id': sender_id, 'receiver_id': receiver_id, 'message': message, 'type': 'chat_message', 'date': date }
   csrf_token = self.scope['cookies']['csrftoken']
   headers = {
       'X-CSRFToken': csrf_token,

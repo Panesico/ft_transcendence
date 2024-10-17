@@ -90,19 +90,10 @@ window.onbeforeunload = () => {
   }
 }
 
-function sendChatMessage(sender_id, receiver_id, message)
-{
-  console.log('sendChatMessage > sender_id:', sender_id);
-  console.log('sendChatMessage > receiver_id:', receiver_id);
-  console.log('sendChatMessage > message:', message);
-  sendMessagesBySocket({'type': 'chat_message', 'sender_id': sender_id, 'receiver_id': receiver_id, 'message': message}, mainRoomSocket);
-}
-
-
-
 // Parse the socket message
 function parseSocketMessage(data)
 {
+  console.log('parseSocketMessage > data:', data);
   if (data.type === 'friend_request') {
     addFriendRequestNotification(data);
   }
@@ -110,7 +101,7 @@ function parseSocketMessage(data)
     addFriendResponseNotification(data);
   }
   else if (data.type === 'chat_message') {
-    addChatMessage(data);
+    addRecvChatMessage(data);
   }
   else
   {
