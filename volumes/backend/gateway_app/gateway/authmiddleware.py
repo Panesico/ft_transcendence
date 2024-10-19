@@ -79,28 +79,60 @@ class JWTAuthenticationMiddleware:
                 request.user = self.create_guest_user()
 
         except (ExpiredSignatureError, InvalidTokenError, User.DoesNotExist) as e:
-            # logger.error(f"JWT Error: {str(e)} - Treating as guest user.")
+            logger.error(f"JWT Error: {str(e)} - Treating as guest user.")
             request.user = self.create_guest_user()
 
     def process_response(self, request, response):
         """Modify the response, setting a token for guest users if needed."""
-        jwt_token = request.COOKIES.get('jwt_token')
         
+        # 1. Check if the response already has an authenticated JWT in the 'Authorization' header
+        if 'Authorization' in response and response['Authorization'].startswith('Bearer '):
+            return response
+
+        # 2. Check if the response has a jwt_token cookie
+        response_jwt_token = response.cookies.get('jwt_token')
+        if response_jwt_token:
+            try:
+                # Decode the JWT token from the response cookie to verify it's valid
+                jwt.decode(response_jwt_token.value, settings.SECRET_KEY, algorithms=['HS256'])
+                # If the token is valid, do not modify the response
+                return response
+            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
+                # Log the issue but continue processing since the token in the response might be bad
+                logger.debug(f'Response JWT token error: {str(e)}')
+            except Exception as e:
+                logger.error(f'Unknown error when decoding response JWT token: {str(e)}')
+
+        # 3. If the request contains a JWT token, validate it
+        jwt_token = request.COOKIES.get('jwt_token')
         if jwt_token:
             try:
                 jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=['HS256'])
-                return response
+
+                # If JWT is valid and the user is authenticated, return the response as is
+                if request.user.is_authenticated:
+                    return response
             except jwt.ExpiredSignatureError:
                 logger.debug('JWT token has expired.')
+                # Clear expired token and treat as guest
+                response.delete_cookie('jwt_token')
             except jwt.InvalidTokenError:
                 logger.debug('Invalid JWT token.')
+                # Clear invalid token and treat as guest
+                response.delete_cookie('jwt_token')
+            except Exception as e:
+                logger.error(f'Unknown JWT middleware error: {str(e)}')
+                response.delete_cookie('jwt_token')  # Clear token on unknown error
 
-        if isinstance(request.user, GuestUser) or not jwt_token:
+        # 4. If the user is not authenticated (guest user), generate and set guest token
+        if isinstance(request.user, GuestUser) or not request.user.is_authenticated:
             guest_token = generate_guest_token()
             response['Authorization'] = f'Bearer {guest_token}'
             response.set_cookie('jwt_token', guest_token, httponly=True, secure=True, samesite='Lax')
 
         return response
+
+
 
     def create_guest_user(self):
         """Create a guest user (user_id=0)."""

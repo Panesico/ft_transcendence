@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import SignUpFormFrontend, LogInFormFrontend
 from .viewsProfile import get_profileapi_variables
 import jwt
+from django.utils.translation import gettext as _
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 logger = logging.getLogger(__name__)
@@ -25,24 +26,26 @@ def get_logout(request):
         # Make the external request to the authentif service
         response = requests.get(authentif_url, cookies=request.COOKIES, verify=os.getenv("CERTFILE"))
         
-        # Create a Django HttpResponse from the requests response
-        django_response = HttpResponse(
-            response.content,  # Content from the external request
-            status=response.status_code  # Status code from the external request
-        )
-        
-        # Set any headers from the external response if needed
-        for key, value in response.headers.items():
-            django_response[key] = value
-        
-        return django_response
+        json_response = JsonResponse({'status': 'success', 'message': _('Logged out successfully')})
 
+        # Set cookies from the response into the JsonResponse
+        for cookie_name, cookie_value in response.cookies.items():
+            json_response.set_cookie(cookie_name, cookie_value)
+        
+        # Set headers from response
+        for header_name, header_value in response.headers.items():
+            # Avoid overwriting 'Content-Type' or 'Content-Length' as they are set by JsonResponse
+            if header_name.lower() not in ['content-type', 'content-length']:
+                json_response[header_name] = header_value
+        
+        # Return the response
+        return json_response
+        
     except requests.exceptions.RequestException as e:
         # If the external request fails, handle the error gracefully
-        return HttpResponse(f"Failed to log out: {e}", status=500)
+        return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
 # Login
-
 def view_login(request):
     logger.debug('view_login')
     if request.user.is_authenticated:
@@ -100,6 +103,12 @@ def post_login(request):
 
         if jwt_token:
             user_response = JsonResponse({'status': 'success', 'message': message, 'user_id': user_id})
+            profile_data = get_profileapi_variables(request=request)
+            logger.debug(f"post_login > profile_data: {profile_data}")
+            preferred_language = profile_data.get('preferred_language')
+            logger.debug(f"post_login > preferred_language: {preferred_language}")
+            # Set the preferred language of the user, HTTP-only cookie
+            user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
             # Set the JWT token in a secure, HTTP-only cookie
             user_response.set_cookie('jwt_token', jwt_token, httponly=True, secure=True, samesite='Lax')
             return user_response
@@ -225,6 +234,8 @@ def oauth(request):
 
     # Get the 'code' and 'state' parameters from the parsed JSON data
     auth_code = data.get('code')
+
+    # TODO - compare the states for preventing cross-site attacks
     state = data.get('state')
     if not auth_code:
         return HttpResponse("Authorization code is missing", status=400)
@@ -245,21 +256,40 @@ def oauth(request):
         # Make the POST request to the external authentif service
         response = requests.post(authentif_url, cookies=request.COOKIES,data=payload, headers=headers, verify=os.getenv("CERTFILE"))
         
-        response_data = response.json()
-        jwt_token = response_data.get("token")
-        user_id = response_data.get("user_id")
-        message = response_data.get("message")
+        response_data = response.json() if response.status_code == 200 else {}
+        
+        # Create a base JsonResponse with status and message
+        json_response_data = {
+            'status': 'success',
+            'message': response_data.get("message", "No message provided")
+        }
 
-        if jwt_token:
-            django_response = JsonResponse({'status': 'success', 'message': message, 'user_id': user_id})
-            # Set the JWT token in a secure, HTTP-only cookie
-            django_response.set_cookie('jwt_token', jwt_token, httponly=True, secure=True, samesite='Lax')
+        # Merge response_data into the JsonResponse data
+        json_response_data.update(response_data)
 
-        return django_response
+        # Create JsonResponse
+        json_response = JsonResponse(json_response_data)
+
+        # Set cookies from the response into the JsonResponse
+        for cookie_name, cookie_value in response.cookies.items():
+            json_response.set_cookie(cookie_name, cookie_value)
+        
+        # Set headers from response
+        for header_name, header_value in response.headers.items():
+            # Avoid overwriting 'Content-Type' or 'Content-Length' as they are set by JsonResponse
+            if header_name.lower() not in ['content-type', 'content-length']:
+                json_response[header_name] = header_value
+        
+        if response.cookies.get('django_language') == None:
+            profile_data = get_profileapi_variables(request=request)
+            logger.debug(f"post_login > profile_data: {profile_data}")
+            preferred_language = profile_data.get('preferred_language')
+            json_response.set_cookie('django_language', preferred_language, samesite='Lax', httponly=True, secure=True)
+        return json_response
 
     except requests.exceptions.RequestException as e:
         # Handle external request failure gracefully
-        return HttpResponse(f"Failed to authenticate: {e}", status=500)
+        return JsonResponse({'status': 'error', 'message': _('Failed to login with 42')})
 
 
 def oauth_callback(request):

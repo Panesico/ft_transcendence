@@ -12,17 +12,17 @@
                               <div class="row g-0">
                                   <div class="col-md-2 col-sm-2 d-flex align-items-center justify-content-center">
                                       {% if friend.avatar %}
-                                          <img src="{{ friend.avatar }}" alt="{{ friend.username }}"
+                                          <img src="{{ friend.avatar }}" alt="{{ friend.username }}" href="/profile/match_history/{{ friend.username }}" onclick="navigate(event, '/profile/match_history/{{ friend.username }}')"
                                               style="height: 7rem; width: 7rem; object-fit: center; height: 7rem; width: 7rem; object-fit: center; border-radius: 50%; border: 2px solid #fff;">
                                       {% else %}
-                                          <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="{% trans "default icon" %}"
+                                          <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Jack" alt="{% trans 'default icon' %}" href="/profile/match_history/{{ friend.username }}" onclick="navigate(event, '/profile/match_history/{{ friend.username }}')"
                                               style="height: 7rem; width: 7rem; object-fit: center; height: 7rem; width: 7rem; object-fit: center; border-radius: 50%; border: 2px solid #fff;">
                                       {% endif %}
                                   </div>
                                   <div class="col-md-7 col-sm-7">
                                       <div class="card-body">
                                           <h4 class="card-title">
-                                              <a href="#" class="text-decoration-none" style="color: white">{{ friend.username }}</a>
+                                              <a href="#" class="text-decoration-none" style="color: white" href="/profile/match_history/{{ friend.username }}" onclick="navigate(event, '/profile/match_history/{{ friend.username }}')">{{ friend.username }}</a>
                                           </h4>
                                           <p class="card-text">
                                               <svg width="18" height="18" viewBox="0 0 24 24">
