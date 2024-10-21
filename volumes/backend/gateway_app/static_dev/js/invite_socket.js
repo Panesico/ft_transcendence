@@ -204,7 +204,7 @@ function listenFriendInvitation(modal, form) {
   let inputField = document.getElementById('username_input');
   let userID = document.getElementById('userID').value;
 
-  console.warn('User ID:', userID);
+  console.log('User ID:', userID);
   if (userID === '' || userID === undefined) {
     console.error('User ID is not defined');
     // exit ===> handle error

@@ -73,6 +73,29 @@ def getReceivedChatMessages(request, user_id):
 	else:
 		return JsonResponse({'message': 'Method not allowed'}, status=405)
 	
+def getConversation(request, user_1_id, user_2_id):
+	user_1_id = int(user_1_id)
+	user_2_id = int(user_2_id)
+	if request.method == 'GET':
+		try:
+			user_1 = Profile.objects.get(user_id=user_1_id)
+			user_2 = Profile.objects.get(user_id=user_2_id)
+			messages = Message.objects.filter(send_user=user_1, dest_user=user_2) | Message.objects.filter(send_user=user_2, dest_user=user_1)
+			data = []
+			for message in messages:
+				data.append({
+					'sender_id': message.send_user.user_id,
+					'receiver_id': message.dest_user.user_id,
+					'message': message.message,
+					'timestamp': message.timestamp,
+					'read': message.read
+				})
+			return JsonResponse(data, safe=False)
+		except DatabaseError as e:
+			return JsonResponse({'message': 'Error getting messages'}, status=400)
+	else:
+		return JsonResponse({'message': 'Method not allowed'}, status=405)
+	
 def markChatAsRead(request):
 	if request.method == 'POST':
 		data = json.loads(request.body)

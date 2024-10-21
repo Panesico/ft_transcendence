@@ -12,5 +12,6 @@ urlpatterns = [
     path('api/saveChatMessage/', views.saveChatMessage, name='save_chat_message'),
 	path('api/getSentChatMessages/<int:user_id>/', views.getSentChatMessages, name='get_sent_chat_messages'),
 	path('api/getReceivedChatMessages/<int:user_id>/', views.getReceivedChatMessages, name='get_received_chat_messages'),
+	path('api/getConversation/<int:user_1_id>/<int:user_2_id>/', views.getConversation, name='get_conversation'),
 	path('api/markChatAsRead/', views.markChatAsRead, name='mark_chat_as_read'),
 ]

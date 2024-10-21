@@ -192,7 +192,7 @@ function createDeclineButton(sender_id, receiver_id, newNotification)
 function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, type)
 {
   response_type = type + '_response';
-  console.warn('listenUserResponse > response_type:', response_type);
+  console.log('listenUserResponse > response_type:', response_type);
   acceptButton.addEventListener('click', function() {
     console.log('Accept button clicked');
     if (sendMessagesBySocket({'type': response_type, 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username}, mainRoomSocket) == true)
