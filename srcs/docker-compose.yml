@@ -146,6 +146,29 @@ services:
       - authentif
     command: uvicorn calcgame.asgi:application --host 0.0.0.0 --port 9004 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
+  blockchain:
+    build:
+      context: ./blockchain
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: blockchain
+    image: blockchain
+    container_name: blockchain
+    env_file:
+      - .env
+    expose:
+      - 9005
+    networks:
+      - transcendence
+    volumes:
+      - backend:/usr/src/app
+      - frontend:/usr/src/frontend
+      - certs:/certs
+    depends_on:
+      - postgres
+      - authentif
+    command: uvicorn blockchain.asgi:application --host 0.0.0.0 --port 9005 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
+
   postgres:
     image: postgres:16.4-alpine3.20
     container_name: postgres

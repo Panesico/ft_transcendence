@@ -59,3 +59,9 @@ openssl req -x509 -nodes -newkey rsa:4096 -days 365 \
 
 # To monitor redis
 docker exec -it redis redis-cli monitor
+
+# Blockchain
+
+## Remove current project
+cd /usr/src/app/blockchain_app
+rm -fr contracts ignition test artifacts cache package.json hardhat.config.js node_modules package-lock.json
