@@ -387,7 +387,7 @@ def create_or_get_user(request, user_data):
         }
         
         # Make the POST request to the external authentif service
-        response = requests.post("https://gateway:8443/download_42_avatar", data=payload, headers=headers, verify=os.getenv("CERTFILE"))
+        response = requests.post("https://gateway:8443/download_42_avatar/", data=payload, headers=headers, verify=os.getenv("CERTFILE"))
         csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
         jwt_token = request.COOKIES.get('jwt_token')
 
@@ -449,6 +449,23 @@ def oauth(request):
         # Try to find the user by their 42 login (username)
         user = User.objects.get(username=user_data['login'])
         logger.info(f"User found: {user.username}")
+        jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
+        response = JsonResponse({
+        'status': 'success',
+        'message': _('Login successful'),
+        'token': jwt_token,
+        'user_id': user.id
+	    })
+        response['Authorization'] = f'Bearer {jwt_token}'
+        response.set_cookie(
+        key='jwt_token',
+        value=jwt_token,
+        httponly=True,  # Prevent JavaScript access to the cookie (for security)
+        secure=True,  # Only send the cookie over HTTPS (ensure your environment supports this)
+        samesite='Lax',  # Control cross-site request behavior
+        max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
+        )
+        return response
     except User.DoesNotExist:
         # Check if this is a "42 user" by seeing if `id` exists in user_data (or any other identifier for 42 user)
         if 'id' in user_data:  # Assuming `id` from user_data corresponds to 42 ID
@@ -461,27 +478,27 @@ def oauth(request):
             else:
                 logger.error(f"SignUpForm error: {form.errors}")
         
-        csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+    csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
 
-        # Create the profile
-        createProfile(user_data['login'], user.id, csrf_token, 'id' in user_data)  # True if 42 user
-        if user == None:
-            login(request, user)
+    # Create the profile
+    createProfile(user_data['login'], user.id, csrf_token, 'id' in user_data)  # True if 42 user
+    if user == None:
+        login(request, user)
 
-        jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
-        payload = json.dumps({'image_url': user_data['image']['link']})  # Convert the data to a JSON string
-        
+    jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
+    payload = json.dumps({'image_url': user_data['image']['link']})  # Convert the data to a JSON string
+    
 
-        headers = {
-            'X-CSRFToken': csrf_token,
-            'Cookie': f'csrftoken={csrf_token}',
-            'Content-Type': 'application/json',
-            'Referer': 'https://authentif:9001',
-            'Authorization': f'Bearer {jwt_token}',
-        }
-        
-        # Make the POST request to the external authentif service
-        response = requests.post("https://gateway:8443/download_42_avatar",cookies=request.COOKIES,data=payload,headers=headers,verify=os.getenv("CERTFILE"))
+    headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://authentif:9001',
+        'Authorization': f'Bearer {jwt_token}',
+    }
+    
+    # Make the POST request to the external authentif service
+    response = requests.post("https://gateway:8443/download_42_avatar/",cookies=request.COOKIES,data=payload,headers=headers,verify=os.getenv("CERTFILE"))
 
     # If the response is a file (an image), we need to handle it differently.
     if response.status_code == 200:
@@ -534,7 +551,7 @@ def oauth(request):
         language = 'fr'
     else:
         language = 'en'
-    
+
     payload = json.dumps({
         "csrfmiddlewaretoken": f"{csrf_token}",
         "display_name": f"{user_data['login']}",
@@ -565,4 +582,6 @@ def oauth(request):
         samesite='Lax',  # Control cross-site request behavior
         max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
     )
+    response.set_cookie('django_language', language, samesite='Lax', httponly=True, secure=True)
+    
     return response

@@ -8,6 +8,10 @@ from django.contrib import messages
 from datetime import datetime
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 logger = logging.getLogger(__name__)
 
 def get_profileapi_variables(request):
@@ -64,19 +68,22 @@ def get_edit_profile(request):
     return render(request, 'partials/edit_profile.html', {'form': form, 'profile_data': profile_data})
 
 @login_required
-def get_match_history(request):
+def get_match_history(request, username):
     if request.method != 'GET':
         return redirect('405')
     logger.debug("get_match_history")
-    user_id = request.user.id
+    try:
+       user_id = User.objects.get(username=username).id
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Error retrieving match history of a non-existing user'})
     get_history_url = 'https://play:9003/api/getGames/' + str(user_id)
     response = requests.get(get_history_url, verify=os.getenv("CERTFILE"))
     if response.status_code == 200:
         games_data = response.json().get('games_data')
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-          html = render_to_string('fragments/match_history_fragment.html', {'games_data' : games_data, 'user_id' : user_id}, request=request)
+          html = render_to_string('fragments/match_history_fragment.html', {'games_data': games_data, 'user_id': user_id, 'username': username}, request=request)
           return JsonResponse({'html': html, 'status': 'success'})
-        return render(request, 'partials/match_history.html', {'games_data': games_data, 'user_id' : user_id})
+        return render(request, 'partials/match_history.html', {'games_data': games_data, 'user_id': user_id, 'username': username})
     else:
         logger.debug(f"-------> get_match_history > Response: {response.status_code}")
         return JsonResponse({'status': 'error', 'message': 'Error retrieving match history'})
