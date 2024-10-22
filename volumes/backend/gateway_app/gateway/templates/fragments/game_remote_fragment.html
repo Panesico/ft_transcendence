@@ -11,11 +11,11 @@
       <div id="player1-container" class="col-4 mb-3">
         <div class="d-flex align-items-center justify-content-center">
           {% if info.p1_id != 0 %}
-            <img src="{{ "/media"|add:info.p1_avatar_url }}" alt="{% trans "user profile picture" %}" height="32" class="photoPlayer1 pe-2">
+            <img src="{{ "/media"|add:info.p1_avatar_url }}" alt="{% trans "user profile picture" %}" height="32" class="photoPlayer1">
           {% else %}
-            <img src="{% static 'images/face_48.svg' %}" alt="{% trans "user profile picture" %}" height="32" class="photoPlayer1 pe-2">
+            <img src="{% static 'images/face_48.svg' %}" alt="{% trans "user profile picture" %}" height="32" class="photoPlayer1">
           {% endif %}
-          <p id="namePlayer1" class="m-0 fs-4">{{ info.p1_name }}</p>
+          <p id="namePlayer1" class="ps-2 m-0 fs-4">{{ info.p1_name }}</p>
         </div>
         <p class="scorePlayer1 fs-1 mb-0">0</p>
       </div>
@@ -24,9 +24,9 @@
         <div class="d-flex align-items-center justify-content-center">
           <p id="namePlayer2" class="pe-2 m-0 fs-4">{{ info.p2_name }}</p>
           {% if info.p2_id != 0 %}
-            <img src="{{ "/media"|add:info.p2_avatar_url }}" alt="{% trans "user profile picture" %}" height="32" class="photoPlayer1 pe-2">
+            <img src="{{ "/media"|add:info.p2_avatar_url }}" alt="{% trans "user profile picture" %}" height="32" class="photoPlayer1">
           {% else %}
-            <img src="{% static 'images/face_48.svg' %}" alt="{% trans "user profile picture" %}" height="32" class="photoPlayer1 pe-2">
+            <img src="{% static 'images/face_48.svg' %}" alt="{% trans "user profile picture" %}" height="32" class="photoPlayer1">
           {% endif %}
         </div>
         <p class="scorePlayer2 fs-1 mb-0">0</p>

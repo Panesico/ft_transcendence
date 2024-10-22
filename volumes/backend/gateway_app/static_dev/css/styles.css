@@ -75,6 +75,10 @@ body {
   min-width: 296px;
 }
 
+.photoPlayer1, .photoPlayer2 {
+  border-radius: 50%;
+}
+
 
 /**************************/
 /***      KOW-PONG      ***/
