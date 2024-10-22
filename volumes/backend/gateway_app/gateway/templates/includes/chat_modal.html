@@ -2,9 +2,9 @@
 {% load i18n %}
 
 <!-- Chat -->
-<div id="chatButton" class="position-fixed bottom-0 end-0 p-3">
+<div id="chatButton" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050">
 	<img src="{% static 'images/chat_icon.png' %}" alt="Chat" data-bs-toggle="modal" data-bs-target="#chatModal" style="width: 100px; height: 100px; cursor: pointer;">
-	<span id="unreadChatscount" class="badge rounded-pill bg-danger position-absolute top-70 translate-middle" style="top: 30px; left: 90px; font-size: 1rem; padding: 0.5rem 0.7rem;">0</span>
+	<span id="unreadChatscount" class="badge rounded-pill bg-danger position-absolute translate-middle" style="top: 30px; left: 90px; font-size: 1rem; padding: 0.5rem 0.7rem;">0</span>
 </div>
 
 <section>
@@ -22,17 +22,23 @@
 					<div class="modal-body">
 						<div class="row">
 							<!-- Contacts List (Left Column) -->
-							<div class="col-4" style="border-right: 1px solid white;">
+							<div class="col-4" >
 								<input type="hidden" id="currentChatId" value="">
 								<div class="mb-3">
 									<h6 style="color: white;">{% trans "Contacts" %}</h6>
 									<div class="list-group" id="contactList" style="height: 300px; overflow-y: auto;">
-										<!-- Example contacts -->
-										<a href="#" class="list-group-item list-group-item-action bg-dark text-white" aria-current="true">
+										<a href="#" class="list-group-item custom-contact bg-transparent text-white d-flex align-items-center" aria-current="true">
+											<img src="{% static 'images/default_avatar.png' %}" class="rounded-circle me-2" style="height: 2rem; width: 2rem;" alt="{% trans "avatar" %}">
 											{% trans "Select a contact" %}
 										</a>
-										<a href="#" class="list-group-item list-group-item-action bg-dark text-white">Contact 2</a>
-										<a href="#" class="list-group-item list-group-item-action bg-dark text-white">Contact 3</a>
+										<a href="#" class="list-group-item custom-contact bg-transparent text-white d-flex align-items-center">
+											<img src="{% static 'images/default_avatar.png' %}" class="rounded-circle me-2" style="height: 2rem; width: 2rem;" alt="{% trans "avatar" %}">
+											{% trans "Contact 1" %}
+										</a>
+										<a href="#" class="list-group-item custom-contact bg-transparent text-white d-flex align-items-center">
+											<img src="{% static 'images/default_avatar.png' %}" class="rounded-circle me-2" style="height: 2rem; width: 2rem;" alt="{% trans "avatar" %}">
+											{% trans "Contact 2" %}
+										</a>
 									</div>
 								</div>
 							</div>
@@ -42,7 +48,7 @@
 								<!-- Sticky header with contact name and avatar -->
 								<div class="sticky-top bg-dark d-flex justify-content-between align-items-center p-2 rounded-3 " style="z-index: 1; top: 0; background-color: #333;">
 									<div class="d-flex align-items-center">
-										<img id="contactAvatar" src="{% static 'images/cow400.png' %}" style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff; margin-right: 1rem;" alt="{% trans "avatar 1" %}">
+										<img id="contactAvatar" src="{% static 'images/default_avatar.png' %}" style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff; margin-right: 1rem;" alt="{% trans "avatar 1" %}">
 										<p id="contactDisplayName" style="color: white; margin: 0;">{% trans "Select a contact" %}</p>
 									</div>
 									<p id="date" class="small mb-0" style="color: white;">23 Jan 2:00 pm</p>

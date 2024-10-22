@@ -1,7 +1,7 @@
 import json, asyncio, logging, requests, os
 from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
 from .handleMainRoom import readMessage, friendRequestResponse, friendRequest, handleNewConnection, checkForNotifications, markNotificationAsRead
-from .handleChatMessages import sendChatMessage, innitChat, getConversation
+from .handleChatMessages import sendChatMessage, innitChat, getConversation, checkForChatMessages
 from .handleInvite import get_authentif_variables, invite_to_game
 logger = logging.getLogger(__name__)
 
@@ -51,27 +51,22 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     # Message / Logs
     if typeMessage == 'message':
       readMessage(content.get('message', ''))
-    
-    # Friend request
-    if typeMessage == 'friend_request':
+    elif typeMessage == 'friend_request':
       await friendRequest(content, users_connected, self)
-
-    # Friend request response
-    if typeMessage == 'friend_request_response':
+    elif typeMessage == 'friend_request_response':
       await friendRequestResponse(content, users_connected, self.avatar_url, self)
-    
-    # Mark notification as read
-    if typeMessage == 'mark_notification_as_read':
+    elif typeMessage == 'mark_notification_as_read':
       await markNotificationAsRead(self, content, self.user_id)
-    
-    if typeMessage == 'chat':
+    elif typeMessage == 'chat':
       if subTypeMessage == 'chat_message':
         await sendChatMessage(content, users_connected, self)
       elif subTypeMessage == 'get_conversation':
         await getConversation(content, self)
-      
-    if typeMessage == 'invite_game':
+      elif subTypeMessage == 'check_unread_messages':
+        logger.debug(f'mainRoom > check_unread_messages')
+        await checkForChatMessages(self)
+    elif typeMessage == 'invite_game':
       await invite_to_game(self, content, users_connected)
     
-    if typeMessage == 'game_request_response':
+    elif typeMessage == 'game_request_response':
       await friendRequestResponse(content, users_connected, self.avatar_url, self)

@@ -35,7 +35,7 @@
                                   </div>
                                   <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
                                       <div class="btn-group" role="group">
-                                          <button class="btn btn-light" >{% trans "Let's chat" %}</button>
+                                          <button id="block_button" class="btn btn-outline-light" >{% trans "Block" %}</button>
                                           <form method="post" id="invite-play-{{ friend.user_id }}" action="{% url 'invite_to_play' friend.user_id %}">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-outline-light">{% trans "Let's play" %}</button>

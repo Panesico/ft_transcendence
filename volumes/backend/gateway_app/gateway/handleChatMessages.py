@@ -51,7 +51,6 @@ async def sendChatMessage(content, users_connected, self):
     logger.debug(f'senChatMessage > Error saving chat message in database: {e}')
     return
 
-
 async def getConversation(content, self):
   # Get the database chat messages
   receiver_id = content.get('receiver_id', '')
@@ -80,6 +79,7 @@ async def getConversation(content, self):
 
 async def checkForChatMessages(self):
   # Get the database chat messages
+  logger.debug(f'checkForChatMessages > self.user_id: {self.user_id}')
   profileapi_url = 'https://profileapi:9002/livechat/api/getReceivedChatMessages/' + str(self.user_id) + '/'
   csrf_token = self.scope['cookies']['csrftoken']
   headers = {
@@ -90,7 +90,6 @@ async def checkForChatMessages(self):
       'Referer': 'https://gateway:8443',
   }
   response = requests.get(profileapi_url, headers=headers, verify=os.getenv("CERTFILE"))
-  logger.debug(f'checkForChatMessages > response.json(): {response.json()}')
 
   response.raise_for_status()
   if response.status_code == 200:
@@ -106,6 +105,26 @@ async def checkForChatMessages(self):
     'chat_messages': chat_messages,
     'unread_messages_count': unread_messages_count
   })
+
+async def setReadMessages(self):
+  # Get the database chat messages
+  profileapi_url = 'https://profileapi:9002/livechat/api/setReadMessages/' + str(self.user_id) + '/'
+  csrf_token = self.scope['cookies']['csrftoken']
+  headers = {
+      'X-CSRFToken': csrf_token,
+      'Cookie': f'csrftoken={csrf_token}',
+      'Content-Type': 'application/json',
+      'HTTP_HOST': 'profileapi',
+      'Referer': 'https://gateway:8443',
+  }
+  response = requests.get(profileapi_url, headers=headers, verify=os.getenv("CERTFILE"))
+  logger.debug(f'setReadMessages > response.json(): {response.json()}')
+
+  response.raise_for_status()
+  if response.status_code == 200:
+    logger.debug(f'setReadMessages > Chat messages marked as read')
+  else:
+    logger.debug(f'setReadMessages > Error marking chat messages as read')
 
 async def innitListening(self):
   await self.send_json({

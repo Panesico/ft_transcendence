@@ -41,9 +41,26 @@ function innit_listening() {
 				friendsData.forEach(friend => {
 					const contactItem = document.createElement('a');
 					contactItem.href = '#';
-					contactItem.classList.add('list-group-item', 'list-group-item-action', 'bg-dark', 'text-white');
+					contactItem.classList.add('list-group-item', 'bg-transparent', 'text-white', 'custom-contact', 'd-flex', 'align-items-center');
 					contactItem.dataset.contactId = friend.user_id;
-					contactItem.textContent = friend.display_name;
+				
+					// Create avatar element
+					const avatar = document.createElement('img');
+					avatar.src = friend.avatar || "{% static 'images/default_avatar.png' %}";
+					avatar.classList.add('rounded-circle', 'me-2');
+					avatar.style.height = '2rem';
+					avatar.style.width = '2rem';
+					avatar.alt = 'avatar';
+				
+					// Create display name element
+					const displayName = document.createElement('span');
+					displayName.textContent = friend.display_name;
+				
+					// Add the avatar and display name to the contact item
+					contactItem.appendChild(avatar);
+					contactItem.appendChild(displayName);
+				
+					// Add the contact item to the contact list
 					contactList.appendChild(contactItem);
 
 					// Listen to the click event on the contact item
@@ -69,9 +86,20 @@ function innit_listening() {
 							'receiver_id': friend.user_id,
 						};
 						sendMessagesBySocket(data, mainRoomSocket);
+						// Do scroll to the bottom of the chat
+						const chatMessages = document.getElementById('conversation');
+						chatMessages.scrollTop = chatMessages.scrollHeight;
+						console.log('chatMessages.scrollHeight:', chatMessages.scrollHeight);
+						console.log('chatMessages.scrollTop:', chatMessages.scrollTop);
 					});
 				});
 				// Update unread messages count
+				data = {
+					'type': 'chat',
+					'subtype': 'delete_unread_messages',
+					'user_id': userID,
+				};
+				sendMessagesBySocket(data, mainRoomSocket);
 			})
 			.catch(error => console.error('Error fetching friends:', error));
 	});
@@ -108,6 +136,16 @@ function innit_listening() {
 	});
 }
 
+function checkUnreadMessages()
+{
+	const data = {
+		'type': 'chat',
+		'subtype': 'check_unread_messages',
+		'user_id': userID,
+	};
+	sendMessagesBySocket(data, mainRoomSocket);
+}
+
 function handleChatMessages(data)
 {
 	if (data.subtype === 'innit_listening') {
@@ -119,13 +157,16 @@ function handleChatMessages(data)
 		const currentChatId = document.getElementById('currentChatId');
 		if (currentChatId.value == data.sender_id)
 			addRecvChatMessage(data);
+		checkUnreadMessages();
 	}
 	else if (data.subtype === 'unread_messages') {
 		console.log('parseSocketMessage > data.subtype:', data.subtype);
 		addUnreadMessages(data);
 	} else if (data.subtype === 'load_conversation') {
 		loadConversation(data);
+		checkUnreadMessages();
 	}
+
 }
 
 function loadConversation(data)

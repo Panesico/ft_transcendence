@@ -50,6 +50,8 @@ function listenForm(form) {
         }
         if (data.message !== 'Profile updated') {
           window.location.replace('/');
+        } else if (data.message === 'Profile updated') {
+          location.reload();
         }
       } else
         document.querySelector('main').innerHTML = data.html;
@@ -140,13 +142,15 @@ async function handleFormSubmission() {
   var forms = document.querySelectorAll('form[id^="invite-play-"]'); // Select forms by unique ID pattern
 
   // Iterate over each form and add an event listener
-  forms.forEach(function (form) {
-    listenForm(form)
-  });
-
-
-
-  if (modalInviteFriend && formFriendInvite) {
+  
+  
+  if (forms.length > 0) {
+    console.log('forms.length > 0');
+    forms.forEach(function (form) {
+      listenForm(form)
+    });
+  }
+  else if (modalInviteFriend && formFriendInvite) {
     console.log('modalInviteFriend && formFriendInvite');
     listenFriendInvitation(modalInviteFriend, formFriendInvite);
   }

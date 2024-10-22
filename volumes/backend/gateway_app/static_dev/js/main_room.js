@@ -50,9 +50,10 @@ window.onload = () => {
   }
 
   // Establish connection to the main room
-  main_room_socketPath = 'wss://localhost:8443/wss/mainroom/' + userID;
-  console.log('main_room_socketPath:', main_room_socketPath);
-  mainRoomSocket = new WebSocket(`wss://localhost:8443/wss/mainroom/${userID}/`);
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const hostname = window.location.hostname;
+  const port = window.location.port ? `:${window.location.port}` : '';
+  mainRoomSocket = new WebSocket(`${protocol}//${hostname}${port}/wss/mainroom/${userID}/`);
   console.log('mainRoomSocket.readyState:', mainRoomSocket.readyState);
   console.log('mainRoomSocket userID:', userID);
 
