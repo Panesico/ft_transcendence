@@ -157,7 +157,7 @@ services:
     env_file:
       - .env
     expose:
-      - 9005
+      - 8545
     networks:
       - transcendence
     volumes:
@@ -167,7 +167,7 @@ services:
     depends_on:
       - postgres
       - authentif
-    command: uvicorn blockchain.asgi:application --host 0.0.0.0 --port 9005 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
+    command: uvicorn blockchain.asgi:application --host 0.0.0.0 --port 8545 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
   postgres:
     image: postgres:16.4-alpine3.20

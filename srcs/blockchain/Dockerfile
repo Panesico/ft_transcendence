@@ -1,27 +1,15 @@
-FROM  python:3.9.20-alpine3.20
+FROM node:18
 
-RUN   apk update && \
-  apk add postgresql-client nodejs npm git expect && \
-  rm -rf /var/cache/apk/*
+WORKDIR /usr/app
 
-RUN   pip install --upgrade pip
+COPY ./tools/package-lock.json ./package-lock.json
+COPY ./tools/package.json ./package.json 
+COPY ./tools/hardhat.config.js ./hardhat.config.js
+COPY ./tools/entrypoint.sh ./entrypoint.sh
 
-ARG   SERVICE_NAME
-ENV   SERVICE_NAME=${SERVICE_NAME}
-WORKDIR /usr/src/app/${SERVICE_NAME}_app
+RUN chmod +x ./entrypoint.sh
 
-COPY  ./tools/ /tmp/
+RUN npm install --save-dev hardhat
+EXPOSE 8545
 
-
-# Install Python dependencies specified in requirements.txt
-RUN   pip install -r /tmp/requirements.txt
-
-RUN   chmod +x /tmp/init_django.sh
-RUN  chmod +x /tmp/init_hardat.sh
-
-# hardat config js file
-COPY ./tools/hardat_config.js /tmp/hardat_config.js
-
-#ENTRYPOINT [ "/bin/sh", "/tmp/init_django.sh" ]
-ENTRYPOINT [ "/bin/sh", "/tmp/init_hardat.sh" ]
-
+ENTRYPOINT [ "./entrypoint.sh" ]

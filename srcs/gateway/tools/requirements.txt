@@ -18,3 +18,5 @@ pillow==10.4.0
 pyjwt
 # For pretty logs
 prettyprinter
+# Blockchain
+web3
