@@ -2,6 +2,7 @@ import os, json, logging, websockets, ssl, asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
 from .utils import getUserId, getUserData, asyncRequest
+from django.utils.translation import gettext as _
 
 import prettyprinter
 from prettyprinter import pformat
@@ -146,8 +147,8 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             await player1['ws'].send(json.dumps({
                 'type': 'game_start',
                 'game_id': game_id,
-                'title': 'Game starting...', # to translate
-                'message': 'You are the player on the left', # to translate
+                'title': _('Game starting...'),
+                'message': _('You are the player on the left'),
                 'player_role': '1',
                 'html': html1,
             }))
@@ -155,8 +156,8 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             await player2['ws'].send(json.dumps({
                 'type': 'game_start',
                 'game_id': game_id,
-                'title': 'Game starting...', # to translate
-                'message': 'You are the player on the right', # to translate
+                'title': _('Game starting...'),
+                'message': _('You are the player on the right'),
                 'player_role': '2',
                 'html': html2,
             }))

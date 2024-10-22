@@ -63,10 +63,6 @@ function listenForm(form) {
       if (!data?.html?.includes('class="errorlist nonfield')) {
         if (data.message != 'starting Semi-Final 1')
           displayMessageInModal(data.message);
-        else
-          announceGame(
-            document.querySelector('h1').textContent,
-            `${document.getElementById('namePlayer1').textContent} vs ${document.getElementById('namePlayer2').textContent}`);
       }
       handleFormSubmission();
     } catch (error) {

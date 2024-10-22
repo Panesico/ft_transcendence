@@ -64,6 +64,11 @@ class PongCalcLocal(AsyncWebsocketConsumer):
        self.p2_name = data['p2_name']
        logger.debug(f"PongCalcLocal > opening_connection with players: {self.p1_name}, {self.p2_name}")
 
+    if data['type'] == 'next_game, game details':
+       self.p1_name = data['p1_name']
+       self.p2_name = data['p2_name']
+       logger.debug(f"PongCalcLocal > opening_connection with players: {self.p1_name}, {self.p2_name}")
+
     if data['type'] == 'players_ready':
         await self.start_game()
 
@@ -96,6 +101,7 @@ class PongCalcLocal(AsyncWebsocketConsumer):
     logger.debug("PongCalcLocal > Game ended")
     winner = self.p1_name if self.gs['scorePlayer1'] > self.gs['scorePlayer2'] else self.p2_name
 
+    logger.debug("PongCalcLocal > Game ended 2")
     # End the game
     await self.send(text_data=json.dumps({
       'type': 'game_end',
@@ -106,10 +112,12 @@ class PongCalcLocal(AsyncWebsocketConsumer):
           'p2_score': self.gs['scorePlayer2'],
         }
     }))
+    logger.debug("PongCalcLocal > Game ended 3")
 
     # Cancel the game loop task
     if hasattr(self, 'game_task'):
       self.game_task.cancel()
+    logger.debug("PongCalcLocal > Game ended 4")
 
 
   async def game_loop(self):

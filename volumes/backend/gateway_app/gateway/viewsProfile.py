@@ -324,12 +324,17 @@ def download_42_avatar(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-async def checkDisplaynameExists(request):
+async def checkNameExists(request):
     logger.debug("")
     logger.debug("checkDisplaynameExists")
     if request.method != 'POST':
       return redirect('405')
     data = json.loads(request.body)
+
+    if request.user.id != 0:
+        user_profile = get_profileapi_variables(request)
+        if data['name'] == user_profile['display_name'] or data['name'] == request.user.username:
+            return JsonResponse({'status': 'success', 'message': 'display name and username are available'})
 
     csrf_token = request.COOKIES.get('csrftoken')
     headers = {
@@ -338,6 +343,7 @@ async def checkDisplaynameExists(request):
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
     }
+
 
     # Check if the display name already exists
     profile_api_url = 'https://profileapi:9002/api/checkDisplaynameExists/'

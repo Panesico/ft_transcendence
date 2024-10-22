@@ -1,13 +1,10 @@
+import os, json, requests, logging
 from django.utils import timezone
 from django.http import JsonResponse
 from django.db import DatabaseError
 from django.forms.models import model_to_dict
-# from .forms import TournamentForm
 from .models import Game, Tournament
-import json
-import os
-import requests
-import logging
+from django.utils.translation import gettext as _
 logger = logging.getLogger(__name__)
 
 def api_saveGame(request):
@@ -117,10 +114,10 @@ def api_createTournament(request):
           logger.debug(f'api_createTournament > Starting tournament: {tournament}')
           tournament.start_tournament()
 
-          game_round = 'Semi-Final 1'
           info = {
               'tournament_id': tournament.id,
-              'game_round': game_round,
+              'game_round': 'Semi-Final 1',
+              'game_round_title': _('Semi-Final 1'),
               'p1_name': tournament.t_p1_name,
               'p2_name': tournament.t_p2_name,
               'p1_id': tournament.t_p1_id,
@@ -183,6 +180,7 @@ def api_updateTournament(request):
               info = {
                   'tournament_id': tournament.id,
                   'game_round': game_round,
+                  'game_round_title': _('Semi-Final 2'),
                   'p1_name': tournament.t_p3_name,
                   'p2_name': tournament.t_p4_name,
                   'p1_id': tournament.t_p3_id,
@@ -202,6 +200,7 @@ def api_updateTournament(request):
               info = {
                   'tournament_id': tournament.id,
                   'game_round': game_round,
+                  'game_round_title': _('Final'),
                   'p1_name': tournament.semifinal1.game_winner_name,
                   'p2_name': tournament.semifinal2.game_winner_name,
                   'p1_id': tournament.semifinal1.game_winner_id,
