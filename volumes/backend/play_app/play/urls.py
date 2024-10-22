@@ -10,4 +10,7 @@ urlpatterns = [
 
   path('api/getGames/<str:user_id>/', views.api_getUserGames, name='getGames'),
   path('api/getMatchMaking/<str:user_id>/', views.api_getMatchMaking, name='getMatchMaking'),
+
+  # BlockChain
+  path('api/connecttoblockchain/', views.connect_to_blockchain, name='connect_to_blockchain'),
 ]

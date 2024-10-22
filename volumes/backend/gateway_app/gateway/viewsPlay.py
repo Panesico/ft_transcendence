@@ -5,8 +5,9 @@ from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from .forms import TournamentFormFrontend
 from .utils import getUserId, getUserData
+#from web3 import Web3
+# from .blockchain import connect_to_blockchain
 logger = logging.getLogger(__name__)
-
 
 def view_tournament(request):
     logger.debug('view_tournament')
@@ -20,6 +21,19 @@ def view_tournament(request):
 def get_tournament(request):
     logger.debug("")
     logger.debug("get_tournament")
+
+    # temp --> to test
+    csrf_token = request.COOKIES.get('csrftoken')
+    headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+    }
+
+    response = requests.get('https://play:9003/api/connecttoblockchain/', headers=headers, verify=os.getenv("CERTFILE"))
+    # --> end test
+
     if request.user.is_authenticated:
         form = TournamentFormFrontend(initial={'player1': request.user.username}) ### use displayName
         form.fields['player1'].label = request.user.username

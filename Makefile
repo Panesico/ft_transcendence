@@ -38,7 +38,7 @@ certs:
 		-keyout key.pem -out cert.pem \
 		-subj "/C=ES/L=Malaga/O=42 Malaga/CN=localhost" \
 		-addext "subjectAltName=DNS:localhost,DNS:gateway,DNS:authentif,\
-		DNS:profileapi,DNS:play,DNS:calcgame, DNS:blockchain"
+		DNS:profileapi,DNS:play,DNS:calcgame,DNS:blockchain"
 
 postgres:
 	docker exec -it postgres sh \

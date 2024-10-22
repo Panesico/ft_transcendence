@@ -8,7 +8,22 @@ import json
 import os
 import requests
 import logging
+from web3 import Web3
 logger = logging.getLogger(__name__)
+
+def connect_to_blockchain(request):
+    logger.debug("")
+    logger.debug("connect_to_blockchain")
+    # Connect to the local Hardhat blockchain running in Docker
+    blockchain_url = "http://blockchain:8545"
+    web3 = Web3(Web3.HTTPProvider(blockchain_url))
+    if web3.is_connected():
+        logger.debug("Connected to the blockchain.")
+        return JsonResponse({'status': 'success', 'message': 'Connected to the blockchain.'})
+    else:
+        logger.error("Failed to connect to the blockchain.")
+        return JsonResponse({'status': 'error', 'message': 'Failed to connect to the blockchain.'})
+
 
 def api_saveGame(request):
     logger.debug("api_saveGame")

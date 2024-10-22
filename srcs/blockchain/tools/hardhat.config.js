@@ -14,11 +14,11 @@ module.exports = {
     hardhat: {
       chainId: 1337, // Chain ID for the local Hardhat network
       accounts: {
-        mnemonic: "test test test test test test test test test test test junk",
-        path: "m/44'/60'/0'/0",
-        initialIndex: 0,
-        count: 1,
-        passphrase: "",
+        mnemonic: "test test test test test test test test test test test junk", // Encryption method
+        path: "m/44'/60'/0'/0", // The hardhat parent of all the derived keys
+        initialIndex: 0, // The initial index to derive
+        count: 1, // nb if of accounts to derive
+        passphrase: "", // Passphrase for the wallet
       },
       mining: {
         auto: true, // Automatically mine blocks
