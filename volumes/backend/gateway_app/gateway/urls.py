@@ -32,7 +32,7 @@ urlpatterns = [
     path('edit_profile_security/', viewsProfile.post_edit_profile_security, name='edit_profile_security'),
     path('edit_profile_avatar/', viewsProfile.post_edit_profile_avatar, name='edit_profile_avatar'),
     path('download_42_avatar/', viewsProfile.download_42_avatar, name='download_42_avatar'),
-    path('play/checkNameExists/', viewsProfile.checkNameExists, name='checkNameExists'),
+    path('play/checkDisplaynameExists/', viewsProfile.checkDisplaynameExists, name='checkDisplaynameExists'),
 
     # invite friends
     path('invite_a_friend', viewsInvitation.post_invite, name='post_invite'),
@@ -42,7 +42,7 @@ urlpatterns = [
 
     # play api
     path('play/', viewsPlay.get_play, name='play'),
-    path('play/saveGame/', viewsPlay.save_game, name='saveGame'),
+    # path('play/saveGame/', viewsPlay.save_game, name='saveGame'),
     path('tournament/', viewsPlay.view_tournament, name='tournament'),
     # path('tournament/update/', viewsPlay.view_tournament_update, name='tournamentUpdate'),
 

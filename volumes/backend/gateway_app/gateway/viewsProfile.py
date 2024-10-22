@@ -324,9 +324,9 @@ def download_42_avatar(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-async def checkNameExists(request):
+async def checkDisplaynameExists(request):
     logger.debug("")
-    logger.debug("checkNameExists")
+    logger.debug("checkDisplaynameExists")
     if request.method != 'POST':
       return redirect('405')
     data = json.loads(request.body)
@@ -342,7 +342,7 @@ async def checkNameExists(request):
     # Check if the display name already exists
     profile_api_url = 'https://profileapi:9002/api/checkDisplaynameExists/'
     response = requests.post(profile_api_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
-    logger.debug(f"checkNameExists > profileapi response: {response.json()}")
+    logger.debug(f"checkDisplaynameExists > profileapi response: {response.json()}")
 
     status = response.json().get("status")
     message = response.json().get("message")
@@ -353,7 +353,7 @@ async def checkNameExists(request):
           # Check if the username already exists
           authentif_url = 'https://authentif:9001/api/checkUsernameExists/'
           response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
-          logger.debug(f"checkNameExists > authentif response: {response.json()}")
+          logger.debug(f"checkDisplaynameExists > authentif response: {response.json()}")
 
           status = response.json().get("status")
           message = response.json().get("message")

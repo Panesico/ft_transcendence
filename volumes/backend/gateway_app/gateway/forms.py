@@ -135,60 +135,60 @@ class EditProfileFormFrontend(forms.Form):
         )
 
   
-class TournamentFormFrontend(forms.Form):
-  player1 = forms.CharField(
-        max_length=16, 
-        widget=forms.TextInput(attrs={
-            'value': 'Name1',
-            'class': 'form-control',
-            'id': 'namePlayer1'
-          }),
-        label=_("Player 1"),
-        required=True,
-        )
-  player2 = forms.CharField(
-        max_length=16, 
-        widget=forms.TextInput(attrs={
-            'value': 'Name2',
-            'class': 'form-control',
-            'id': 'namePlayer2'
-          }),
-        label=_("Player 2"),
-        required=True,
-        )
-  player3 = forms.CharField(
-        max_length=16, 
-        widget=forms.TextInput(attrs={
-            'value': 'Name3',
-            'class': 'form-control',
-            'id': 'namePlayer3'
-          }),
-        label=_("Player 3"),
-        required=True,
-        )
-  player4 = forms.CharField(
-        max_length=16, 
-        widget=forms.TextInput(attrs={
-            'value': 'Name4',
-            'class': 'form-control',
-            'id': 'namePlayer4'
-          }),
-        label=_("Player 4"),
-        required=True,
-        )
+# class TournamentFormFrontend(forms.Form):
+#   player1 = forms.CharField(
+#         max_length=16, 
+#         widget=forms.TextInput(attrs={
+#             'value': 'Name1',
+#             'class': 'form-control',
+#             'id': 'namePlayer1'
+#           }),
+#         label=_("Player 1"),
+#         required=True,
+#         )
+#   player2 = forms.CharField(
+#         max_length=16, 
+#         widget=forms.TextInput(attrs={
+#             'value': 'Name2',
+#             'class': 'form-control',
+#             'id': 'namePlayer2'
+#           }),
+#         label=_("Player 2"),
+#         required=True,
+#         )
+#   player3 = forms.CharField(
+#         max_length=16, 
+#         widget=forms.TextInput(attrs={
+#             'value': 'Name3',
+#             'class': 'form-control',
+#             'id': 'namePlayer3'
+#           }),
+#         label=_("Player 3"),
+#         required=True,
+#         )
+#   player4 = forms.CharField(
+#         max_length=16, 
+#         widget=forms.TextInput(attrs={
+#             'value': 'Name4',
+#             'class': 'form-control',
+#             'id': 'namePlayer4'
+#           }),
+#         label=_("Player 4"),
+#         required=True,
+#         )
   
-  player1_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+#   player1_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
   
-  def clean(self):
-      cleaned_data = super().clean()
-      player1 = cleaned_data.get("player1")
-      player2 = cleaned_data.get("player2")
-      player3 = cleaned_data.get("player3")
-      player4 = cleaned_data.get("player4")
+#   def clean(self):
+#       cleaned_data = super().clean()
+#       player1 = cleaned_data.get("player1")
+#       player2 = cleaned_data.get("player2")
+#       player3 = cleaned_data.get("player3")
+#       player4 = cleaned_data.get("player4")
 
-      players = [player1, player2, player3, player4]
-      if len(players) != len(set(players)):
-          raise ValidationError(_("Player names must be unique."))
+#       players = [player1, player2, player3, player4]
+#       if len(players) != len(set(players)):
+#           raise ValidationError(_("Player names must be unique."))
 
-      return cleaned_data
+#       return cleaned_data
   
