@@ -1,12 +1,12 @@
 #! /bin/sh -l
 
-# sleep 1
-# until nc -z -v -w30 authentif 9001 > /dev/null 2>&1; do
-#   sleep 1
-# done
-
 # Install hardhat dependencies
-npm install --save-dev @nomicfoundation/hardhat-toolbox
+npm install --save-dev @nomicfoundation/hardhat-toolbox --no-audit
+#npm install ethers@latest
 
 
+
+# Not sure if this is needed once the contract is already deployed
 npx hardhat node
+npx hardhat compile
+npx hardhat run scripts/deploy.js --network localhost

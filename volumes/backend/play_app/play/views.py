@@ -11,6 +11,14 @@ import logging
 from web3 import Web3
 logger = logging.getLogger(__name__)
 
+def create_tournnamanet_in_blockchain(request, contract, tournament_id, users_ids):
+  logger.debug("")
+  logger.debug("create_tournnamanet_in_blockchain")
+  
+  contract.functions.createTournament(tournament_id, users_id).transact()
+#  contract.functions.createTournament(tournament_id, ).call()
+
+
 def connect_to_blockchain(request):
     logger.debug("")
     logger.debug("connect_to_blockchain")
@@ -19,6 +27,22 @@ def connect_to_blockchain(request):
     web3 = Web3(Web3.HTTPProvider(blockchain_url))
     if web3.is_connected():
         logger.debug("Connected to the blockchain.")
+
+        # Load the contract address from env variables
+        contract_address = os.getenv('CONTRACT_ADDRESS')
+        logger.debug(f"Contract address: {contract_address}")
+
+        # Load the contract ABI from the JSON file
+        with open(os.getenv('CONTRACT_ABI')) as f:
+          contract_json = json.load(f)
+          contract_abi = contract_json['abi']
+        logger.debug(f"Contract ABI: {contract_abi}")
+
+
+        # Load the contract ABI from the JSON file
+        contract = web3.eth.contract(address=contract_address, abi=contract_abi)
+        logger.debug(f"Contract: {contract}")
+
         return JsonResponse({'status': 'success', 'message': 'Connected to the blockchain.'})
     else:
         logger.error("Failed to connect to the blockchain.")
