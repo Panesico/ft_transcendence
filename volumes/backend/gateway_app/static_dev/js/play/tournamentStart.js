@@ -49,11 +49,11 @@ async function startNewTournament(
         'startNewTournament > .onmessage connection_established:', data.message);
       cfg = getInitialVariables(gameType, data.initial_vars);
 
-    } else if (data.type === 'waiting_room') {  // while finding an opponent
-      // in remote
-      console.log('startNewTournament > .onmessage waiting_room:', data.message);
-      // Load html waiting room
-      document.querySelector('main').innerHTML = data.html;
+      // } else if (data.type === 'waiting_room') {  // while finding an opponent
+      //   // in remote
+      //   console.log('startNewTournament > .onmessage waiting_room:', data.message);
+      //   // Load html waiting room
+      //   document.querySelector('main').innerHTML = data.html;
 
     }  // displays Start button in local and checkboxes in remote
     else if (data.type === 'game_start') {

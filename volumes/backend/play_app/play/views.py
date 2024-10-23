@@ -113,15 +113,15 @@ def api_createTournament(request):
           )
           logger.debug(f'api_createTournament > Starting tournament: {tournament}')
           tournament.start_tournament()
-
+          
           info = {
               'tournament_id': tournament.id,
               'game_round': 'Semi-Final 1',
               'game_round_title': _('Semi-Final 1'),
-              'p1_name': tournament.t_p1_name,
-              'p2_name': tournament.t_p2_name,
-              'p1_id': tournament.t_p1_id,
-              'p2_id': tournament.t_p2_id,
+              'p1_name': Game.objects.get(id=tournament.semifinal1.id).p1_name, 
+              'p2_name': Game.objects.get(id=tournament.semifinal1.id).p2_name,
+              'p1_id': Game.objects.get(id=tournament.semifinal1.id).p1_id,
+              'p2_id': Game.objects.get(id=tournament.semifinal1.id).p2_id,
           }
 
           message = ("starting Semi-Final 1")
@@ -181,10 +181,10 @@ def api_updateTournament(request):
                   'tournament_id': tournament.id,
                   'game_round': game_round,
                   'game_round_title': _('Semi-Final 2'),
-                  'p1_name': tournament.t_p3_name,
-                  'p2_name': tournament.t_p4_name,
-                  'p1_id': tournament.t_p3_id,
-                  'p2_id': tournament.t_p4_id,
+                  'p1_name': Game.objects.get(id=tournament.semifinal2.id).p1_name,
+                  'p2_name': Game.objects.get(id=tournament.semifinal2.id).p2_name,
+                  'p1_id': Game.objects.get(id=tournament.semifinal2.id).p1_id,
+                  'p2_id': Game.objects.get(id=tournament.semifinal2.id).p2_id,
                   'previous_round': 'Semi-Final 1',
                   'previous_winner_name': game_winner_name,
                   'previous_p1_name': data.get('p1_name'),

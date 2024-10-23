@@ -91,10 +91,8 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
 
             logger.debug(f"ProxyCalcGameTournament > opening_connection with players: {self.trmt_info['p1_name']}, {self.trmt_info['p2_name']}, {self.trmt_info['p3_name']}, {self.trmt_info['p4_name']}")
 
-            # Create a new tournament
+            # Create a new tournament and retrieve next game info
             next_game_info = await self.createTournament()
-            logger.debug(f"ProxyCalcGameTournament > createTournament response: {next_game_info}")
-            logger.debug(pformat(next_game_info))
             
             if next_game_info['status'] == 'error':
                 await self.send(json.dumps({
@@ -104,16 +102,9 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
                 return
             
             self.trmt_info['tournament_id'] = next_game_info['info']['tournament_id']
+
             logger.debug(f"ProxyCalcGameTournament > tournament_id: {self.trmt_info['tournament_id']}")
-            # info = {
-            #     'tournament_id': 0,
-            #     'game_round': 'single',
-            #     'game_type': 'pong',
-            #     'p1_name': self.p1_name,
-            #     'p2_name': self.p2_name,
-            #     'p1_id': self.p1_id,
-            #     'p2_id': self.p2_id,
-            # }
+            
             self.game_info = {
                 'tournament_id': self.trmt_info['tournament_id'],
                 'game_round': next_game_info['info']['game_round'],
@@ -128,8 +119,7 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
                 self.game_info['p1_avatar_url'] = self.trmt_info['p1_avatar_url']
             if next_game_info['info']['p2_id'] != 0:
                 self.game_info['p2_avatar_url'] = self.trmt_info['p1_avatar_url']
-                
-            logger.debug(f"ProxyCalcGameTournament > next_game_info: {pformat(next_game_info)}")
+
             logger.debug(f"ProxyCalcGameTournament > self.game_info: {pformat(self.game_info)}")
 
             html = render_to_string('fragments/tournament_start_fragment.html', {'context': self.context, 'info': self.game_info})
@@ -141,6 +131,11 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
                 'html': html,
                 'info': self.game_info,
             }))
+
+            if self.calcgame_ws:
+              self.game_info['type'] = 'opening_connection, game details'
+              await self.calcgame_ws.send(json.dumps(self.game_info))
+            return
 
         elif data['type'] == 'next_game, game details':
             # Create an SSL context that explicitly trusts the calcgame certificate
@@ -264,17 +259,6 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
             'game_winner_name': game_result.get('game_winner_name'),
             'game_winner_id': self.game_info['p1_id'] if game_result.get('game_winner_name') == self.game_info['p1_name'] else self.game_info['p2_id'],
         }
-
-
-        # self.game_info = {
-        #     'tournament_id': self.trmt_info['tournament_id'],
-        #     'game_round': next_game_info['info']['game_round'],
-        #     'game_type': self.trmt_info['game_type'],
-        #     'p1_name': next_game_info['info']['p1_name'],
-        #     'p2_name': next_game_info['info']['p2_name'],
-        #     'p1_id': next_game_info['info']['p1_id'],
-        #     'p2_id': next_game_info['info']['p2_id'],
-        # }
 
         logger.debug(f"ProxyCalcGameTournament > update_tournament data: {pformat(data)}")
         
