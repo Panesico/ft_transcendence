@@ -40,3 +40,5 @@ volumes/frontend/
 *pepe*
 
 user_data.json
+
+.gitmodules

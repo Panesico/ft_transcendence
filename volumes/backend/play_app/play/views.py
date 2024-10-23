@@ -6,11 +6,51 @@ from django.forms.models import model_to_dict
 from asgiref.sync import sync_to_async
 from .models import Game, Tournament
 from django.utils.translation import gettext as _
+from web3 import Web3
 logger = logging.getLogger(__name__)
 
 import prettyprinter
 from prettyprinter import pformat
 prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
+
+
+def create_tournnamanet_in_blockchain(request, contract, tournament_id, users_ids):
+  logger.debug("")
+  logger.debug("create_tournnamanet_in_blockchain")
+  
+  contract.functions.createTournament(tournament_id, users_id).transact()
+#  contract.functions.createTournament(tournament_id, ).call()
+
+
+def connect_to_blockchain(request):
+    logger.debug("")
+    logger.debug("connect_to_blockchain")
+    # Connect to the local Hardhat blockchain running in Docker
+    blockchain_url = "http://blockchain:8545"
+    web3 = Web3(Web3.HTTPProvider(blockchain_url))
+    if web3.is_connected():
+        logger.debug("Connected to the blockchain.")
+
+        # Load the contract address from env variables
+        contract_address = os.getenv('CONTRACT_ADDRESS')
+        logger.debug(f"Contract address: {contract_address}")
+
+        # Load the contract ABI from the JSON file
+        with open(os.getenv('CONTRACT_ABI')) as f:
+          contract_json = json.load(f)
+          contract_abi = contract_json['abi']
+        logger.debug(f"Contract ABI: {contract_abi}")
+
+
+        # Load the contract ABI from the JSON file
+        contract = web3.eth.contract(address=contract_address, abi=contract_abi)
+        logger.debug(f"Contract: {contract}")
+
+        return JsonResponse({'status': 'success', 'message': 'Connected to the blockchain.'})
+    else:
+        logger.error("Failed to connect to the blockchain.")
+        return JsonResponse({'status': 'error', 'message': 'Failed to connect to the blockchain.'})
+
 
 def api_saveGame(request):
     logger.debug("api_saveGame")
@@ -289,27 +329,6 @@ def api_getMatchMaking(request, user_id):
                 target_id = id
         logger.debug(f'api_getMatchMaking > target_id: {target_id} with winrate difference: {target_winrate}')
     return JsonResponse({'status': 'success', 'target_id': target_id})
-
-# def api_getWinrate(request, user_id, game_type):
-#     logger.debug("api_getWinrate")
-#     try:
-#         games = Game.objects.filter(game_type=game_type).filter(p1_id=user_id) | Game.objects.filter(game_type=game_type).filter(p2_id=user_id)
-
-#         wins = 0
-#         total_games = 0
-#         for game in games:
-#             game_dict = (model_to_dict(game))
-#             if str(game_dict['game_winner_id']) == user_id:
-#                 wins += 1
-#             total_games += 1
-
-#         winrate = round((wins / total_games) * 100, 2) if total_games > 0 else 0
-#         logger.debug(f"api_getWinrate > wins: {wins}, total_games: {total_games}, winrate: {winrate}")
-
-#     except (json.JSONDecodeError, DatabaseError) as e:
-#         return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
-    
-#     return JsonResponse({'status': 'success', 'winrate': winrate})
 
 
 async def api_getWinrate(request, user_id, game_type):

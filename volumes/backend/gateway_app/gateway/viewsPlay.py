@@ -3,6 +3,9 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
+
+#from web3 import Web3
+# from .blockchain import connect_to_blockchain
 # from .utils import getUserId, getUserData
 from django.contrib.auth import get_user_model
 from .viewsProfile import get_profileapi_variables
@@ -11,12 +14,24 @@ from django.utils.translation import gettext as _
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
-
 def get_tournament(request):
     logger.debug("")
     logger.debug("get_tournament")
+
     if request.method != 'GET':
       return redirect('405')
+    
+    # temp --> to test
+    csrf_token = request.COOKIES.get('csrftoken')
+    headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+    }
+
+    response = requests.get('https://play:9003/api/connecttoblockchain/', headers=headers, verify=os.getenv("CERTFILE"))
+    # --> end test
     
     if request.user.id != 0:
         user_profile = get_profileapi_variables(request)
