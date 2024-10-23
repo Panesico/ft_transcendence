@@ -42,9 +42,7 @@ urlpatterns = [
 
     # play api
     path('play/', viewsPlay.get_play, name='play'),
-    # path('play/saveGame/', viewsPlay.save_game, name='saveGame'),
-    path('tournament/', viewsPlay.view_tournament, name='tournament'),
-    # path('tournament/update/', viewsPlay.view_tournament_update, name='tournamentUpdate'),
+    path('tournament/', viewsPlay.get_tournament, name='tournament'),
 
     # Languages API
     path('i18n/', include('django.conf.urls.i18n')),
