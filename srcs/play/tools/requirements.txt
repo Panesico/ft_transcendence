@@ -12,3 +12,5 @@ channels==4.1.0
 pillow==10.4.0
 # JWT
 pyjwt
+# For pretty logs
+prettyprinter
