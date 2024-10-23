@@ -15,7 +15,8 @@ class PongCalcRemote(AsyncWebsocketConsumer):
     "paddleWidth": 15,
     "paddleHeight": 80,
     "borderWidth": 15,
-    "paddleSpeed": 10
+    "paddleSpeed": 10,
+    "keys": { 'w': False, 's': False }
   }
 
   def __init__(self, *args, **kwargs):
