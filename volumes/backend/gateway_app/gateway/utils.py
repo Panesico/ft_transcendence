@@ -34,14 +34,14 @@ async def getUserData(user_id):
     if user_id == 0:
       return user
 
-    url = 'https://authentif:9001/api/getUserInfo/' + str(user_id)
+    url = 'https://authentif:9001/api/getUserInfo/' + str(user_id) + '/'
 
     response = await asyncRequest("GET", "", url, "")
     if response.get('status') == 'success':
         user['username'] = response.get('username')
         user['avatar_url'] = response.get('avatar_url')
 
-    url = 'https://profileapi:9002/api/profile/' + str(user_id)
+    url = 'https://profileapi:9002/api/profile/' + str(user_id) + '/'
 
     response = await asyncRequest("GET", "", url, "")
     if response.get('status') != 'error':
