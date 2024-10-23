@@ -37,8 +37,7 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name) {
     if (data.type === 'connection_established, calcgame says hello') {
       console.log(
         'startNewGame > .onmessage connection_established:', data.message);
-      cfg = getInitialVariables(gameMode, gameType, data.initial_vars);
-      console.log('startNewGame > cfg:', cfg);
+      cfg = getInitialVariables(gameType, data.initial_vars);
 
     } else if (data.type === 'waiting_room') {  // while finding an opponent
       // in remote

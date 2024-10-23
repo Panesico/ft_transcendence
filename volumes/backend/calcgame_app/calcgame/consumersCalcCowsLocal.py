@@ -36,7 +36,7 @@ class CowsCalcLocal(AsyncWebsocketConsumer):
         "cows": [],
       }
     
-    self.frameCount = 0;        # frame count
+    self.frameCount = 0;
 
     
   async def connect(self):
