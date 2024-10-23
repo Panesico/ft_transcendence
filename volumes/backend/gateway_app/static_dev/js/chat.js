@@ -1,115 +1,216 @@
-document.addEventListener('DOMContentLoaded', function() {
-    let friendsData = [];
-    const userID = document.getElementById('userID').value;
-    console.log('chat.js userID:', userID);
-    const chatButton = document.getElementById('chatButton');
-    const contactAvatar = document.getElementById('contactAvatar');
-    const contactDisplayName = document.getElementById('contactDisplayName');
-    const messageInput = document.getElementById('messageInput');
-    const sendButton = document.getElementById('sendButton');
-    const unreadCount = document.getElementById('unreadChatsCount');
+function innit_listening() {
+	let friendsData = [];
+	const userID = document.getElementById('userID').value;
+	const chatButton = document.getElementById('chatButton');
+	const contactAvatar = document.getElementById('contactAvatar');
+	const contactDisplayName = document.getElementById('contactDisplayName');
+	const messageInput = document.getElementById('messageInput');
+	const sendButton = document.getElementById('sendButton');
+	const unreadCount = document.getElementById('unreadChatsCount');
+	const currentChatId = document.getElementById('currentChatId');
+	const dateElement = document.getElementById('date');
+	if (!dateElement) {
+		console.error('dateElement not found');
+	} else {
+		console.log('dateElement:', dateElement);}
+	let date = new Date();
 
-    // Listen for the chat button click
-    chatButton.addEventListener('click', function() {
-        const request = new Request('/getFriends/', {
-            method: 'GET',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            credentials: 'include'
-        });
+	dateElement.textContent = date.toDateString();
 
-        // Fetch the friends
-        fetch(request)
-            .then(response => response.json())
-            .then(data => {
-                const contactList = document.getElementById('contactList');
-                console.log('data:', data);
-                friendsData = data.friends;
+	// Listen for the chat button click
+	chatButton.addEventListener('click', function() {
+		const request = new Request('/getFriends/', {
+			method: 'GET',
+			headers: {
+				'X-CSRFToken': getCookie('csrftoken')
+			},
+			credentials: 'include'
+		});
 
-                // Clean the contact list
-                contactList.innerHTML = '';
+		// Fetch the friends
+		fetch(request)
+			.then(response => response.json())
+			.then(data => {
+				const contactList = document.getElementById('contactList');
+				console.log('data:', data);
+				friendsData = data.friends;
 
-                friendsData.forEach(friend => {
-                    const contactItem = document.createElement('a');
-                    contactItem.href = '#';
-                    contactItem.classList.add('list-group-item', 'list-group-item-action', 'bg-dark', 'text-white');
-                    contactItem.dataset.contactId = friend.user_id;
-                    contactItem.textContent = friend.display_name;
-                    contactList.appendChild(contactItem);
+				// Clean the contact list
+				contactList.innerHTML = '';
 
-                    // Listen to the click event on the contact item
-                    contactItem.addEventListener('click', function(event) {
-                        // Remove the 'selected-contact' class from all contacts
-                        const contacts = contactList.getElementsByClassName('list-group-item');
-                        for (let c of contacts) {
-                            c.classList.remove('selected-contact');
-                        }
-                        // Add the 'selected-contact' class to the clicked contact
-                        contactItem.classList.add('selected-contact');
+				friendsData.forEach(friend => {
+					const contactItem = document.createElement('a');
+					contactItem.href = '#';
+					contactItem.classList.add('list-group-item', 'bg-transparent', 'text-white', 'custom-contact', 'd-flex', 'align-items-center');
+					contactItem.dataset.contactId = friend.user_id;
+				
+					// Create avatar element
+					const avatar = document.createElement('img');
+					avatar.src = friend.avatar || "{% static 'images/default_avatar.png' %}";
+					avatar.classList.add('rounded-circle', 'me-2');
+					avatar.style.height = '2rem';
+					avatar.style.width = '2rem';
+					avatar.alt = 'avatar';
+				
+					// Create display name element
+					const displayName = document.createElement('span');
+					displayName.textContent = friend.display_name;
+				
+					// Add the avatar and display name to the contact item
+					contactItem.appendChild(avatar);
+					contactItem.appendChild(displayName);
+				
+					// Add the contact item to the contact list
+					contactList.appendChild(contactItem);
 
-                        // Update the avatar and display name
-                        contactAvatar.src = friend.avatar;
-                        contactDisplayName.textContent = friend.display_name;
-                    });
-                });
+					// Listen to the click event on the contact item
+					contactItem.addEventListener('click', function(event) {
+						// Remove the 'selected-contact' class from all contacts
+						const contacts = contactList.getElementsByClassName('list-group-item');
+						for (let c of contacts) {
+							c.classList.remove('selected-contact');
+						}
+						// Add the 'selected-contact' class to the clicked contact
+						contactItem.classList.add('selected-contact');
 
-                // Update unread messages count
-                const unreadMessages = friendsData.reduce((count, friend) => count + friend.unread_messages, 0);
-                unreadCount.textContent = unreadMessages;
-                unreadCount.style.display = unreadMessages > 0 ? 'block' : 'none';
-            })
-            .catch(error => console.error('Error fetching friends:', error));
-    });
+						// Update the avatar and display name
+						contactAvatar.src = friend.avatar;
+						contactDisplayName.textContent = friend.display_name;
+						currentChatId.value = friend.user_id;
+						
+						// Get all the messages between the user and the selected friend
+						data = {
+							'type': 'chat',
+							'subtype': 'get_conversation',
+							'sender_id': userID,
+							'receiver_id': friend.user_id,
+						};
+						sendMessagesBySocket(data, mainRoomSocket);
+						// Do scroll to the bottom of the chat
+						const chatMessages = document.getElementById('conversation');
+						chatMessages.scrollTop = chatMessages.scrollHeight;
+						console.log('chatMessages.scrollHeight:', chatMessages.scrollHeight);
+						console.log('chatMessages.scrollTop:', chatMessages.scrollTop);
+					});
+				});
+				// Update unread messages count
+				data = {
+					'type': 'chat',
+					'subtype': 'delete_unread_messages',
+					'user_id': userID,
+				};
+				sendMessagesBySocket(data, mainRoomSocket);
+			})
+			.catch(error => console.error('Error fetching friends:', error));
+	});
 
-    // Send message
-    sendButton.addEventListener('click', function() {
-        const selectedContact = document.querySelector('.list-group-item.selected-contact');
-        if (!selectedContact) {
-            console.error('No contact selected');
-            return;
-        }
+	// Send message
+	sendButton.addEventListener('click', function() {
+		const selectedContact = document.querySelector('.list-group-item.selected-contact');
+		if (!selectedContact) {
+			console.error('No contact selected');
+			return;
+		} else if (!messageInput.value) {
+			console.error('No message to send');
+			return;
+		}
 
-        const selectedFriend = friendsData.find(friend => friend.user_id == selectedContact.dataset.contactId);
-        const message = messageInput.value;
-        const receiverId = selectedFriend.user_id;
-        const receiverDisplayName = selectedFriend.display_name;
-        const receiverAvatar = selectedFriend.avatar;
-        const data = {
-            'type': 'chat_message',
-            'sender_id': userID,
-            'receiver_id': receiverId,
-            'receiver_display_name': receiverDisplayName,
-            'receiver_avatar': receiverAvatar,
-            'message': message,
-        };
-        addSentChatMessage(message);
-        sendMessagesBySocket(data, mainRoomSocket);
-        console.log('data:', data);
-        messageInput.value = '';
-    });
-});
+		const selectedFriend = friendsData.find(friend => friend.user_id == selectedContact.dataset.contactId);
+		const message = messageInput.value;
+		const receiverId = selectedFriend.user_id;
+		const receiverDisplayName = selectedFriend.display_name;
+		const receiverAvatar = selectedFriend.avatar;
+		const data = {
+			'type': 'chat',
+			'subtype': 'chat_message',
+			'sender_id': userID,
+			'receiver_id': receiverId,
+			'receiver_display_name': receiverDisplayName,
+			'receiver_avatar': receiverAvatar,
+			'message': message,
+		};
+		addSentChatMessage(message);
+		sendMessagesBySocket(data, mainRoomSocket);
+		console.log('data:', data);
+		messageInput.value = '';
+	});
+}
 
-function addSentChatMessage(message)
+function checkUnreadMessages()
 {
-	const chatMessages = document.getElementById('sendChatMessages');
+	const data = {
+		'type': 'chat',
+		'subtype': 'check_unread_messages',
+		'user_id': userID,
+	};
+	sendMessagesBySocket(data, mainRoomSocket);
+}
+
+function handleChatMessages(data)
+{
+	if (data.subtype === 'innit_listening') {
+		innit_listening();
+		console.log('chat listen init');
+	}
+	else if (data.subtype === 'chat_message')
+	{
+		const currentChatId = document.getElementById('currentChatId');
+		if (currentChatId.value == data.sender_id)
+			addRecvChatMessage(data);
+		checkUnreadMessages();
+	}
+	else if (data.subtype === 'unread_messages') {
+		console.log('parseSocketMessage > data.subtype:', data.subtype);
+		addUnreadMessages(data);
+	} else if (data.subtype === 'load_conversation') {
+		loadConversation(data);
+		checkUnreadMessages();
+	}
+
+}
+
+function loadConversation(data)
+{
+	console.log('loadConversation > data:', data);
+	const conversation = document.getElementById('conversation');
+	conversation.innerHTML = '';
+	data.conversation.forEach(message => {
+		if (message.sender_id == data.sender_id)
+			addSentChatMessage(message.message);
+		else
+			addRecvChatMessage(message);
+	});
+}
+
+function addSentChatMessage(message) {
+	const chatMessages = document.getElementById('conversation');
 	const messageElement = document.createElement('div');
-	messageElement.innerHTML = `
-		<p class="small p-2 me-3 mb-1 rounded-3 bg-dark text-white">
-		${message}
-		</p>
-	`;
+	messageElement.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-1');
+
+	const messageContent = document.createElement('p');
+	messageContent.classList.add('small', 'p-2', 'me-3', 'mb-0', 'rounded-3', 'bg-dark', 'text-white');
+	messageContent.textContent = message;
+
+	messageElement.appendChild(messageContent);
 	chatMessages.appendChild(messageElement);
 }
 
-function addRecvChatMessage(data)
+function addRecvChatMessage(data) {
+	const chatMessages = document.getElementById('conversation');
+	const messageElement = document.createElement('div');
+	messageElement.classList.add('d-flex', 'flex-row', 'justify-content-start', 'mb-1');
+
+	const messageContent = document.createElement('p');
+	messageContent.classList.add('small', 'p-2', 'me-3', 'mb-0', 'rounded-3', 'bg-body-tertiary');
+	messageContent.style.color = 'black';
+	messageContent.textContent = data.message;
+
+	messageElement.appendChild(messageContent);
+	chatMessages.appendChild(messageElement);
+}
+
+function addUnreadMessages(data)
 {
-	const chatMessages = document.getElementById('recvChatMessages');
-	const message = document.createElement('div');
-	message.innerHTML = `
-		 <p class="small p-2 ms-3 mb-1 rounded-3 bg-body-tertiary" style="color: black">
-		 ${data.message}
-		 </p>
-	`;
-	chatMessages.appendChild(message);
+	const unreadChatsCount = document.getElementById('unreadChatscount');
+	unreadChatsCount.textContent = data.unread_messages_count;
 }

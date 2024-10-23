@@ -2,9 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+  # Save single game
   path('api/saveGame/', views.api_saveGame, name='saveGame'),
-  # path('api/newTournament/', views.api_newTournament, name='newTournament'),
 
+  # Create and update tournaments
   path('api/createTournament/', views.api_createTournament, name='createTournament'),
   path('api/updateTournament/', views.api_updateTournament, name='updateTournament'),
 
@@ -13,4 +14,7 @@ urlpatterns = [
 
   # BlockChain
   path('api/connecttoblockchain/', views.connect_to_blockchain, name='connect_to_blockchain'),
+  
+  # Get winrate of a user for a given game type
+  path('api/getWinrate/<str:user_id>/<str:game_type>/', views.api_getWinrate, name='getWinrate'),
 ]

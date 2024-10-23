@@ -15,8 +15,10 @@ class PongCalcLocal(AsyncWebsocketConsumer):
     "paddleWidth": 15,
     "paddleHeight": 80,
     "borderWidth": 15,
-    "paddleSpeed": 10
+    "paddleSpeed": 10,
+    "keys": { 'w': False, 's': False, 5: False, 8: False }
   }
+  
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -60,6 +62,11 @@ class PongCalcLocal(AsyncWebsocketConsumer):
     logger.debug(f"PongCalcLocal > received data: {data}")
     
     if data['type'] == 'opening_connection, game details':
+       self.p1_name = data['p1_name']
+       self.p2_name = data['p2_name']
+       logger.debug(f"PongCalcLocal > opening_connection with players: {self.p1_name}, {self.p2_name}")
+
+    if data['type'] == 'next_game, game details':
        self.p1_name = data['p1_name']
        self.p2_name = data['p2_name']
        logger.debug(f"PongCalcLocal > opening_connection with players: {self.p1_name}, {self.p2_name}")
@@ -146,11 +153,7 @@ class PongCalcLocal(AsyncWebsocketConsumer):
 
   def update_paddle_pos(self):
     if 'w' in self.pressed_keys and self.gs['leftPaddleY'] > self.cfg['borderWidth']:
-        logger.debug("PongCalcLocal > update_paddle_pos > w pressed")
-      # if player == 'left':
         self.gs['leftPaddleY'] -= self.cfg['paddleSpeed']
-      # elif player == 'right':
-      #   self.gs['rightPaddleY'] -= self.cfg['paddleSpeed']
     
     if 's' in self.pressed_keys and self.gs['leftPaddleY'] < self.cfg['canvas']['height'] - self.cfg['paddleHeight'] - self.cfg['borderWidth']:
         self.gs['leftPaddleY'] += self.cfg['paddleSpeed']

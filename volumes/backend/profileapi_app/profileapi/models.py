@@ -10,6 +10,7 @@ class Profile(models.Model):
     wins = models.IntegerField(default=0)
     defeats = models.IntegerField(default=0)
     friends = models.ManyToManyField('self', blank=True, symmetrical=True)
+    blocked_users = models.ManyToManyField('self', blank=True, symmetrical=False)
     preferred_language = models.CharField(max_length=2,choices=[('en', 'English'),('fr', 'French'),('es', 'Spanish')],default='en')
 
     # This method is used to display the object in the admin panel

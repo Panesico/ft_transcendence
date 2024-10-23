@@ -1,7 +1,8 @@
-import os, json, logging, websockets, ssl, asyncio
+import os, json, logging, websockets, ssl, asyncio, requests
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
 from .utils import getUserId, getUserData, asyncRequest
+from django.utils.translation import gettext as _
 
 import prettyprinter
 from prettyprinter import pformat
@@ -83,7 +84,10 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
         while True:
             if game_type in self.waiting:
                 # Filter players with player_name not None
-                filtered_players = {k: v for k, v in self.waiting[game_type].items() if v['player_name'] is not None}
+                filtered_players = {}
+                for player_id, player_info in self.waiting[game_type].items():
+                  if player_info['player_name'] is not None:
+                    filtered_players[player_id] = player_info
 
                 if len(filtered_players) >= 2:
                     # Pop two players from filtered_players
@@ -104,10 +108,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                         "player2": player2,
                     }
 
-                    # logger.debug(f"ProxyCalcGameRemote > Two players connected, starting with ID: {game_id}")
-                    # logger.debug(f"ProxyCalcGameRemote > start_game player1: {player1}")
-                    # logger.debug(f"ProxyCalcGameRemote > start_game player2: {player2}")
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(2) 
                     await self.start_game(game_id)
                 else:
                     await asyncio.sleep(1)
@@ -120,9 +121,9 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
         game = self.active_games[game_id]
         player1 = game['player1']
         player2 = game['player2']
-        logger.debug(f"ProxyCalcGameRemote > start_game player1: {pformat(game)}")
-        logger.debug(f"ProxyCalcGameRemote > start_game player1: {pformat(player1)}")
-        logger.debug(f"ProxyCalcGameRemote > start_game player2: {pformat(player2)}")
+        # logger.debug(f"ProxyCalcGameRemote > start_game game: {pformat(game)}")
+        # logger.debug(f"ProxyCalcGameRemote > start_game player1: {pformat(player1)}")
+        # logger.debug(f"ProxyCalcGameRemote > start_game player2: {pformat(player2)}")
 
         if player1['player_name'] == player2['player_name']:
             player1['player_name'] += "#1"
@@ -146,8 +147,8 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             await player1['ws'].send(json.dumps({
                 'type': 'game_start',
                 'game_id': game_id,
-                'title': 'Game starting...', # to translate
-                'message': 'You are the player on the left', # to translate
+                'title': _('Game starting...'),
+                'message': _('You are the player on the left'),
                 'player_role': '1',
                 'html': html1,
             }))
@@ -155,8 +156,8 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             await player2['ws'].send(json.dumps({
                 'type': 'game_start',
                 'game_id': game_id,
-                'title': 'Game starting...', # to translate
-                'message': 'You are the player on the right', # to translate
+                'title': _('Game starting...'),
+                'message': _('You are the player on the right'),
                 'player_role': '2',
                 'html': html2,
             }))
@@ -221,9 +222,13 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
 
                 # logger.debug(f"ProxyCalcGameRemote > opening_connection player: {pformat(player)}")
                 player['player_id'] = player['context']['user']['user_id']
-                # logger.debug(f"ProxyCalcGameRemote > opening_connection player_id: {player['player_id']}")
 
-                logger.debug(f"Updated waiting[{game_type}][{connect_id}] with player_name: {data['p1_name']}, player_id: {self.waiting[game_type][connect_id]['player_id']}")
+                # Get player winrate
+                url = 'https://play:9003/api/getWinrate/' + str(player['player_id']) + '/' + game_type + '/'
+                response = await asyncRequest("GET", "", url, "")
+                player['winrate'] = response.get('winrate') or 0
+
+                logger.debug(f"Updated waiting[{game_type}][{connect_id}] with player_name: {data['p1_name']}, player_id: {self.waiting[game_type][connect_id]['player_id']}, winrate: {self.waiting[game_type][connect_id]['winrate']}")
             else:
                 logger.error(f"Player {connect_id} not found in waiting")
 
@@ -368,7 +373,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             player2['player_name'] = player2['player_name'][:-2]
 
         data = {
-            'game_type': 'pong',
+            'game_type': game['game_type'],
             'game_round': 'single',
             'p1_name': player1['player_name'],
             'p2_name': player2['player_name'],
@@ -376,8 +381,8 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             'p2_id': player2['player_id'],
             'p1_score': game_result.get('p1_score'),
             'p2_score': game_result.get('p2_score'),
-            'game_winner_name': player1['player_name'] if game_result.get('game_winner_name') == 'p1_name' else player2['player_name'],
-            'game_winner_id': player1['player_id'] if game_result.get('game_winner_name') == 'p1_name' else player2['player_id'],
+            'game_winner_name': player1['player_name'] if game_result.get('game_winner_name') == player1['player_name'] else player2['player_name'],
+            'game_winner_id': player1['player_id'] if game_result.get('game_winner_name') == player1['player_id'] else player2['player_id'],
         }
         
         await asyncRequest("POST", csrf_token, play_url, data)

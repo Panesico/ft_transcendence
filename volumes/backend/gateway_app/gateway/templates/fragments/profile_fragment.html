@@ -44,7 +44,7 @@
 
       <div class="btn-group flex-wrap" style="justify-content: center;">
       <a href="{% url 'edit_profile' %}" onclick="navigate(event, '/edit_profile')" class="btn btn-light mb-2" role="button" style="margin-right: 10px; border-bottom-left-radius: unset; border-top-left-radius: unset">{% trans "Edit profile" %}</a>
-      <a href="{% url 'match_history' %}" onclick="navigate(event, '/profile/match_history')" class="btn btn-light mb-2" role="button" style="margin-right: 10px;">{% trans "Stats" %}</a>
+      <a href="{% url 'match_history' user.username %}" onclick="navigate(event, '/profile/match_history/{{ user.username }}')" class="btn btn-light mb-2" role="button" style="margin-right: 10px;">{% trans "Stats" %}</a>
         <a href="{% url 'list_friends' %}" onclick="navigate(event, '/my_friends')" class="btn btn-light mb-2" role="button" >{% trans "My friends" %}</a>
       
         <!-- This button will be below the others -->

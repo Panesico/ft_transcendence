@@ -6,11 +6,6 @@ async function startNewTournament(
   let game_id;
   let player_role;
 
-  // Allowed controls depending on game mode (local(2p), remote(1p))
-  const keys = (gameMode === 'local') ?
-    { w: false, s: false, 5: false, 8: false, ' ': false, Escape: false } :
-    { w: false, s: false, ' ': false, Escape: false };
-
   // Open websocket connection
   const calcGameSocket = getCalcGameSocket(gameMode, gameType, gameRound);
   if (calcGameSocket === undefined) return;
@@ -49,11 +44,11 @@ async function startNewTournament(
         'startNewTournament > .onmessage connection_established:', data.message);
       cfg = getInitialVariables(gameType, data.initial_vars);
 
-    } else if (data.type === 'waiting_room') {  // while finding an opponent
-      // in remote
-      console.log('startNewTournament > .onmessage waiting_room:', data.message);
-      // Load html waiting room
-      document.querySelector('main').innerHTML = data.html;
+      // } else if (data.type === 'waiting_room') {  // while finding an opponent
+      //   // in remote
+      //   console.log('startNewTournament > .onmessage waiting_room:', data.message);
+      //   // Load html waiting room
+      //   document.querySelector('main').innerHTML = data.html;
 
     }  // displays Start button in local and checkboxes in remote
     else if (data.type === 'game_start') {
@@ -62,18 +57,23 @@ async function startNewTournament(
       document.querySelector('main').innerHTML = data.html;
       if (gameMode === 'local') {
         addStartButtonListener()
-      } else if (gameMode === 'remote') {
-        game_id = data.game_id;
-        player_role = data.player_role;
-        addIndicatorToThisPlayer(player_role);
-        announceGame(data.title, data.message);
-        setPlayerReadyCheckBoxes(player_role, calcGameSocket, game_id);
       }
+      if (gameRound == 'Semi-Final 1') { // start of tournament
+        announceGame(data.info.game_round_title,
+          `${data.info.p1_name} vs ${data.info.p2_name}`);
+      }
+      // else if (gameMode === 'remote') {
+      //   game_id = data.game_id;
+      //   player_role = data.player_role;
+      //   addIndicatorToThisPlayer(player_role);
+      //   announceGame(data.title, data.message);
+      //   setPlayerReadyCheckBoxes(player_role, calcGameSocket, game_id);
+      // }
 
-    }  // updates oppenent's ready checkbox in remote
-    else if (data.type === 'opponent_ready') {
-      console.log('startNewTournament > .onmessage opponent_ready:', data.message);
-      updateOpponentReadyCheckBoxes(data.opponent)
+      // }  // updates oppenent's ready checkbox in remote
+      // else if (data.type === 'opponent_ready') {
+      //   console.log('startNewTournament > .onmessage opponent_ready:', data.message);
+      //   updateOpponentReadyCheckBoxes(data.opponent)
 
     } else if (data.type === 'game_countdown') {
       console.log('startNewTournament > .onmessage game_countdown:', data.message);
@@ -90,17 +90,22 @@ async function startNewTournament(
     } else if (data.type === 'game_end') {
       console.log('startNewTournament > .onmessage game_end:', data.message);
       console.log('game_result:', data.game_result);
+
       document.querySelector('#game-container').innerHTML = data.html;
       document.querySelector('.scorePlayer1').textContent =
         data.game_result.p1_score;
       document.querySelector('.scorePlayer2').textContent =
         data.game_result.p2_score;
 
-      if (gameRound != 'single')
+      if (gameRound != 'single') {
         console.log('game_end gameRound:', gameRound);
+        // console.log('data.info:', data.info);
+        addNextRoundButtonListener(data.info);
+      }
 
     } else if (data.type === 'tournament_end') {
       console.log('startNewTournament > .onmessage tournament_end:', data.message);
+      document.querySelector('main').innerHTML = data.html;
       calcGameSocket.close();
 
     } else
@@ -120,22 +125,21 @@ async function startNewTournament(
 
   // Event listeners for controls
   window.addEventListener('keydown', (e) => {
-    if (e.key in keys) {
-      keys[e.key] = true;
+    if (e.key in cfg.keys) {
+      cfg.keys[e.key] = true;
       notifyKeyPressed();
     }
   });
   window.addEventListener('keyup', (e) => {
-    if (e.key in keys) {
-      keys[e.key] = false;
+    if (e.key in cfg.keys) {
+      cfg.keys[e.key] = false;
       notifyKeyPressed();
     }
   });
 
   function notifyKeyPressed() {
-    // console.log('keys:', keys);
     // Filter out the keys that are pressed
-    const pressedKeys = Object.keys(keys).filter(key => keys[key]);
+    const pressedKeys = Object.keys(cfg.keys).filter(key => cfg.keys[key]);
     // console.log('pressedKeys:', pressedKeys);
     calcGameSocket.send(JSON.stringify(
       { type: 'key_press', keys: pressedKeys, game_id, player_role }));
@@ -143,11 +147,51 @@ async function startNewTournament(
 
   // Event listener for start button
   function addStartButtonListener() {
-    const startButton = document.getElementById('startGame-button');
-    if (startButton) {
-      startButton.addEventListener('click', () => {
-        startButton.removeEventListener('click', arguments.callee);
+    const button = document.getElementById('startGame-button');
+    if (button) {
+      button.addEventListener('click', () => {
+        button.removeEventListener('click', arguments.callee);
         calcGameSocket.send(JSON.stringify({ type: 'players_ready' }));
+      });
+    }
+  }
+  // Event listener for next round button
+  function addNextRoundButtonListener(info) {
+    const button = document.getElementById('nextRound-button');
+    console.log('addNextRoundButtonListener > info:', info);
+    if (button) {
+      button.addEventListener('click', () => {
+        button.removeEventListener('click', arguments.callee);
+
+        calcGameSocket.send(JSON.stringify({
+          type: 'next_game, game details',
+          p1_name: info.p1_name,
+          p2_name: info.p2_name,
+        }));
+
+        announceGame(info.game_round_title,
+          `${info.p1_name} vs ${info.p2_name}`);
+
+        document.querySelector('h1').textContent = info.game_round_title;
+        document.getElementById('namePlayer1').textContent = info.p1_name;
+        document.getElementById('namePlayer2').textContent = info.p2_name;
+        document.querySelector('.scorePlayer1').textContent = '0';
+        document.querySelector('.scorePlayer2').textContent = '0';
+
+        document.getElementById('nextRound-button').style.display = 'none';
+        document.getElementById('startGame-winner').style.display = 'none';
+        document.getElementById('startGame-button').style.display = 'block';
+
+        document.getElementById('photoPlayer1').src = origin + '/static/images/face_48.svg';
+        document.getElementById('photoPlayer2').src = origin + '/static/images/face_48.svg';
+        if (info.p1_avatar_url)
+          document.getElementById('photoPlayer1').src = origin + '/media' + info.p1_avatar_url;
+        else if (info.p2_avatar_url)
+          document.getElementById('photoPlayer2').src = origin + '/media' + info.p2_avatar_url;
+
+
+        addStartButtonListener();
+
       });
     }
   }

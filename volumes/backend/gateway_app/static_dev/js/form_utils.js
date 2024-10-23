@@ -50,6 +50,8 @@ function listenForm(form) {
         }
         if (data.message !== 'Profile updated') {
           window.location.replace('/');
+        } else if (data.message === 'Profile updated') {
+          location.reload();
         }
       } else
         document.querySelector('main').innerHTML = data.html;
@@ -61,10 +63,6 @@ function listenForm(form) {
       if (!data?.html?.includes('class="errorlist nonfield')) {
         if (data.message != 'starting Semi-Final 1')
           displayMessageInModal(data.message);
-        else
-          announceGame(
-            document.querySelector('h1').textContent,
-            `${document.getElementById('namePlayer1').textContent} vs ${document.getElementById('namePlayer2').textContent}`);
       }
       handleFormSubmission();
     } catch (error) {
@@ -140,13 +138,15 @@ async function handleFormSubmission() {
   var forms = document.querySelectorAll('form[id^="invite-play-"]'); // Select forms by unique ID pattern
 
   // Iterate over each form and add an event listener
-  forms.forEach(function (form) {
-    listenForm(form)
-  });
-
-
-
-  if (modalInviteFriend && formFriendInvite) {
+  
+  
+  if (forms.length > 0) {
+    console.log('forms.length > 0');
+    forms.forEach(function (form) {
+      listenForm(form)
+    });
+  }
+  else if (modalInviteFriend && formFriendInvite) {
     console.log('modalInviteFriend && formFriendInvite');
     listenFriendInvitation(modalInviteFriend, formFriendInvite);
   }

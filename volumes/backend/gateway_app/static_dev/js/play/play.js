@@ -132,25 +132,26 @@ function toggleGameMode() {
   const remoteMode = document.getElementById('remoteMode').checked;
   const player2Container = document.getElementById('form-player2');
   const player2Input = document.getElementById('player2-input');
-  const button = document.getElementById('play-game-button');
+  const playGameButton = document.getElementById('play-game-button');
+  const findRemoteButton = document.getElementById('find-remote-button');
 
   if (remoteMode) {
     player2Container.style.display = 'none';
     player2Input.required = false;
-    button.textContent = 'Find remote game';
-    // button.setAttribute('onclick', 'findRemoteGame()');
+    findRemoteButton.style.display = 'block';
+    playGameButton.style.display = 'none';
   } else {
     player2Container.style.display = 'block';
     player2Input.required = true;
-    button.textContent = 'Play game';
-    // button.setAttribute('onclick', 'playLocalGame()');
+    findRemoteButton.style.display = 'none';
+    playGameButton.style.display = 'block';
   }
 }
 
 
 // Called from button on Play page, starts a new game
 async function playGame() {
-  // gameMode: 'local' or 'remote' (or 'ai)
+  // gameMode: 'local' or 'remote'
   // gameType: 'pong' or 'cows'
 
   let gameMode = document.querySelector('input[name="gameMode"]:checked').id;

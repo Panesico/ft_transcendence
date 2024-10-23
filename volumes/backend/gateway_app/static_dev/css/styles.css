@@ -75,6 +75,10 @@ body {
   min-width: 296px;
 }
 
+#photoPlayer1, #photoPlayer2 {
+  border-radius: 50%;
+}
+
 
 /**************************/
 /***      KOW-PONG      ***/
@@ -237,4 +241,24 @@ border-radius: 50%;
   width: 100px;
   height: 100px;
   cursor: pointer;
+}
+
+.custom-contact {
+  border: none;
+  padding: 15px;
+  background-color: transparent;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+  transition: background-color 0.3s ease;
+}
+
+.custom-contact:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.custom-contact:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.selected-contact {
+  background-color: rgba(255, 255, 255, 0.3) !important;
 }

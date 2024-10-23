@@ -137,8 +137,11 @@ function update_dropdown(matching_usernames)
 function onModalOpen(userID, modal) {
   console.log('Modal is open');
 
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const hostname = window.location.hostname;
+  const port = window.location.port ? `:${window.location.port}` : '';
   /* WebSocket */
-  inviteFriendSocket = new WebSocket('wss://localhost:8443/wss/inviteafriend/');
+  inviteFriendSocket = new WebSocket(`${protocol}//${hostname}${port}/wss/inviteafriend/`);
 
   inviteFriendSocket.onopen = function(e) {
     console.log('inviteFriendSocket socket connected');
@@ -204,7 +207,7 @@ function listenFriendInvitation(modal, form) {
   let inputField = document.getElementById('username_input');
   let userID = document.getElementById('userID').value;
 
-  console.warn('User ID:', userID);
+  console.log('User ID:', userID);
   if (userID === '' || userID === undefined) {
     console.error('User ID is not defined');
     // exit ===> handle error

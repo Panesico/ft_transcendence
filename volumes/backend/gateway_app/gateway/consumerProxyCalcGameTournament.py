@@ -69,6 +69,8 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
                 'cookies': self.scope['cookies'],
             }
 
+            p1_id = self.context['user']['user_id']
+
             self.trmt_info = {
                 'tournament_id': 0,
                 'game_type': data['game_type'],
@@ -77,39 +79,81 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
                 'p2_name': data['p2_name'],
                 'p3_name': data['p3_name'],
                 'p4_name': data['p4_name'],
-                'p1_id': self.context['user']['user_id'],
+                'p1_id': p1_id,
                 'p2_id': 0,
                 'p3_id': 0,
                 'p4_id': 0,
             }
 
+            if p1_id != 0:
+                user_data = await getUserData(p1_id)
+                self.trmt_info['p1_avatar_url'] = user_data['avatar_url']
+
             logger.debug(f"ProxyCalcGameTournament > opening_connection with players: {self.trmt_info['p1_name']}, {self.trmt_info['p2_name']}, {self.trmt_info['p3_name']}, {self.trmt_info['p4_name']}")
 
+            # Create a new tournament and retrieve next game info
             next_game_info = await self.createTournament()
-            logger.debug(f"ProxyCalcGameTournament > createTournament response: {next_game_info}")
-            logger.debug(pformat(next_game_info))
             
-            self.trmt_info['tournament_id'] = next_game_info.get('tournament_id')
-            logger.debug(f"ProxyCalcGameTournament > tournament_id: {self.trmt_info['tournament_id']}")
-            # info = {
-            #     'tournament_id': 0,
-            #     'game_round': 'single',
-            #     'game_type': 'pong',
-            #     'p1_name': self.p1_name,
-            #     'p2_name': self.p2_name,
-            #     'p1_id': self.p1_id,
-            #     'p2_id': self.p2_id,
-            # }
+            if next_game_info['status'] == 'error':
+                await self.send(json.dumps({
+                    'type': 'error',
+                    'message': next_game_info['message']
+                }))
+                return
+            
+            self.trmt_info['tournament_id'] = next_game_info['info']['tournament_id']
 
-            html = render_to_string('fragments/tournament_start_fragment.html', {'context': self.context, 'info': self.trmt_info})
+            logger.debug(f"ProxyCalcGameTournament > tournament_id: {self.trmt_info['tournament_id']}")
+            
+            self.game_info = {
+                'tournament_id': self.trmt_info['tournament_id'],
+                'game_round': next_game_info['info']['game_round'],
+                'game_round_title': next_game_info['info']['game_round_title'],
+                'game_type': self.trmt_info['game_type'],
+                'p1_name': next_game_info['info']['p1_name'],
+                'p2_name': next_game_info['info']['p2_name'],
+                'p1_id': next_game_info['info']['p1_id'],
+                'p2_id': next_game_info['info']['p2_id'],
+            }
+            if next_game_info['info']['p1_id'] != 0:
+                self.game_info['p1_avatar_url'] = self.trmt_info['p1_avatar_url']
+            if next_game_info['info']['p2_id'] != 0:
+                self.game_info['p2_avatar_url'] = self.trmt_info['p1_avatar_url']
+
+            logger.debug(f"ProxyCalcGameTournament > self.game_info: {pformat(self.game_info)}")
+
+            html = render_to_string('fragments/tournament_start_fragment.html', {'context': self.context, 'info': self.game_info})
+
             logger.debug(f"ProxyCalcGameTournament > sending game_start page to client")
             await self.send(json.dumps({
                 'type': 'game_start',
                 'message': 'Game starting...',
                 'html': html,
+                'info': self.game_info,
             }))
-        # Forward the message from the client to the calcgame WebSocket server
-        await self.calcgame_ws.send(text_data)
+
+            if self.calcgame_ws:
+              self.game_info['type'] = 'opening_connection, game details'
+              await self.calcgame_ws.send(json.dumps(self.game_info))
+            return
+
+        elif data['type'] == 'next_game, game details':
+            # Create an SSL context that explicitly trusts the calcgame certificate
+            ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+            ssl_context.load_verify_locations(os.getenv("CERTFILE"))
+
+            # Establish the WebSocket connection with the trusted certificate
+            self.calcgame_ws = await websockets.connect(
+                f"wss://calcgame:9004/pongcalc_consumer/local/{self.trmt_info['game_type']}/",
+                ssl=ssl_context
+            )
+
+            # Listener Loop as background task that listens for messages from the calcgame WebSocket and sends those updates to the client. 
+            self.calcgame_task = asyncio.create_task(self.listen_to_calcgame())
+
+        if self.calcgame_ws:
+          # Forward the message from the client to the calcgame WebSocket server
+          await self.calcgame_ws.send(text_data)
     
     async def createTournament(self):
         logger.debug("ProxyCalcGameTournament > createTournament")
@@ -148,38 +192,94 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
         game_result = data_calcgame_response.get('game_result')
         logger.debug(f"ProxyCalcGameTournament > game_end game_result: {game_result}")
 
-        html = render_to_string('fragments/game_end_fragment.html', {
-              'context': self.context,
-              'game_result': game_result
-            })
+        # Update tournament -save game result in database and get next game
+        response = await self.update_tournament(game_result)
+        if response['status'] == 'error':
+            await self.send(json.dumps({
+                'type': 'error',
+                'message': response['message']
+            }))
+            return
+        
+        if response['message'] == 'tournament ended':
+            logger.debug("ProxyCalcGameTournament > tournament ended")
+            await self.tournament_end(response)
+            return
+        
+        response['info']['previous_p1_name'] = self.game_info['p1_name']
+        response['info']['previous_p2_name'] = self.game_info['p2_name']
+
+        # Update game_info with next game info
+        self.game_info['game_round'] = response['info']['game_round']
+        self.game_info['p1_name'] = response['info']['p1_name']
+        self.game_info['p2_name'] = response['info']['p2_name']
+        self.game_info['p1_id'] = response['info']['p1_id']
+        self.game_info['p2_id'] = response['info']['p2_id']
+
+        if response['info']['p1_id'] != 0:
+            response['info']['p1_avatar_url'] = self.trmt_info['p1_avatar_url']
+        if response['info']['p2_id'] != 0:
+            response['info']['p2_avatar_url'] = self.trmt_info['p1_avatar_url']
+
+        html = render_to_string('fragments/tournament_next_game_fragment.html',
+                                {
+                                  'context': self.context,
+                                  'game_result': game_result,
+                                  'info': response['info']
+                                })
         data_calcgame_response['html'] = html
-
-        # Save game to database
-        await self.save_game_to_database(game_result)
-
-        # Notify player that the game has ended and send game_end html
+        data_calcgame_response['info'] = response['info']
+        
+        # Notify player game has ended and send next tournament game html
         await self.send(json.dumps(data_calcgame_response))
+
+        # Close websocket connection to calcgame
+        await self.calcgame_ws.close()
+        self.calcgame_task.cancel()
+
         
 
-    async def save_game_to_database(self, game_result):
-        logger.debug("ProxyCalcGameTournament > save_game_to_database")
+    async def update_tournament(self, game_result):
+        logger.debug("ProxyCalcGameTournament > update_tournament")
         # Save game to database
-        play_url = 'https://play:9003/api/saveGame/'
+        play_url = 'https://play:9003/api/updateTournament/'
 
         csrf_token = self.context['cookies'].get('csrftoken') 
         
         data = {
-            'game_type': 'pong',
-            'game_round': 'single',
-            'p1_name': self.p1_name,
-            'p2_name': self.p2_name,
-            'p1_id': self.p1_id,
-            'p2_id': self.p2_id,
+            'tournament_id': self.trmt_info['tournament_id'],
+            'game_type': self.trmt_info['game_type'],
+            'game_round':  self.game_info['game_round'],
+            'p1_name': self.game_info['p1_name'],
+            'p2_name': self.game_info['p2_name'],
+            'p1_id': self.game_info['p1_id'],
+            'p2_id': self.game_info['p2_id'],
             'p1_score': game_result.get('p1_score'),
             'p2_score': game_result.get('p2_score'),
             'game_winner_name': game_result.get('game_winner_name'),
-            'game_winner_id': self.p1_id if game_result.get('game_winner_name') == 'p1_name' else self.p2_id,
+            'game_winner_id': self.game_info['p1_id'] if game_result.get('game_winner_name') == self.game_info['p1_name'] else self.game_info['p2_id'],
         }
+
+        logger.debug(f"ProxyCalcGameTournament > update_tournament data: {pformat(data)}")
         
         response_json = await asyncRequest("POST", csrf_token, play_url, data)
-        logger.debug(f"ProxyCalcGameTournament > save_game_to_database response: {response_json}")
+        return response_json
+    
+
+    async def tournament_end(self, response):        
+        # Notify player that tournament has ended and send tournament_end html
+        logger.debug(f"ProxyCalcGameTournament > tournament_end response: {pformat(response)}")
+
+        html = render_to_string('fragments/tournament_end_fragment.html',
+                                {
+                                    'context': self.context,
+                                    'info': response['info']
+                                })
+
+        response = {
+            'status': 'success',
+            'type': 'tournament_end',
+            'info': response['info'],
+            'html': html,
+        }
+        await self.send(json.dumps(response))

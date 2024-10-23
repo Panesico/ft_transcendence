@@ -26,25 +26,23 @@ urlpatterns = [
 
     # profile api
     path('profile/', viewsProfile.get_profile, name='profile'),
+    path('profile/match_history/<str:username>/', viewsProfile.get_match_history, name='match_history'),
     path('edit_profile/', viewsProfile.get_edit_profile, name='edit_profile'),
     path('edit_profile_general/', viewsProfile.post_edit_profile_general, name='edit_profile_general'),
     path('edit_profile_security/', viewsProfile.post_edit_profile_security, name='edit_profile_security'),
     path('edit_profile_avatar/', viewsProfile.post_edit_profile_avatar, name='edit_profile_avatar'),
-    path('profile/match_history/', viewsProfile.get_match_history, name='match_history'),
-    path('download_42_avatar', viewsProfile.download_42_avatar, name='download_42_avatar'),
+    path('download_42_avatar/', viewsProfile.download_42_avatar, name='download_42_avatar'),
     path('play/checkNameExists/', viewsProfile.checkNameExists, name='checkNameExists'),
 
     # invite friends
-    path('invite_a_friend', viewsInvitation.post_invite, name='post_invite'),
+    path('invite_a_friend/', viewsInvitation.post_invite, name='post_invite'),
     path('invite_to_play/<int:receiver_id>/', viewsInvitation.invite_to_play, name='invite_to_play'),
     path('my_friends/', views.list_friends, name='list_friends'),
 	  path('getFriends/', views.get_friends, name='get_friends'),
 
     # play api
     path('play/', viewsPlay.get_play, name='play'),
-    path('play/saveGame/', viewsPlay.save_game, name='saveGame'),
-    path('tournament/', viewsPlay.view_tournament, name='tournament'),
-    # path('tournament/update/', viewsPlay.view_tournament_update, name='tournamentUpdate'),
+    path('tournament/', viewsPlay.get_tournament, name='tournament'),
 
     # Languages API
     path('i18n/', include('django.conf.urls.i18n')),
