@@ -68,6 +68,25 @@ def get_edit_profile(request):
     return render(request, 'partials/edit_profile.html', {'form': form, 'profile_data': profile_data})
 
 @login_required
+def get_friend_profile(request, friend_id):
+    logger.debug("")
+    logger.debug("get_friend_profile")
+    if request.method != 'GET':
+        return redirect('405')
+    form = InviteFriendFormFrontend()
+    profile_api_url = 'https://profileapi:9002/api/profile/' + str(friend_id)
+    response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+    if response.status_code == 200:
+        profile_data = response.json()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            html = render_to_string('fragments/friend_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+            return JsonResponse({'html': html, 'status': 'success'})
+        return render(request, 'partials/friend_profile.html', {'form': form, 'profile_data': profile_data})
+    else:
+        logger.debug(f"-------> get_friend_profile > Response: {response.status_code}")
+        return JsonResponse({'status': 'error', 'message': 'Error retrieving friend profile'})
+
+@login_required
 def get_match_history(request, username):
     if request.method != 'GET':
         return redirect('405')
