@@ -147,7 +147,48 @@ def invite_to_play(request, receiver_id):
     user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'sender_username': request.user.username, 'sender_id': request.user.id, 'receiver_id': receiver_id, 'sender_avatar_url': request.user.avatar.url}) 
     return user_response
 
+def block_friends(request, friend_id):
+  logger.debug("")
+  logger.debug('block_friends')
+  logger.debug(f"block_friends > user {request.user.id} wants to block {friend_id}")
 
+  if request.method != 'POST':
+    return redirect('405')
+  
+  # csrf_token = request.COOKIES.get('csrftoken')
+  # headers = {
+  #       'X-CSRFToken': csrf_token,
+  #       'Cookie': f'csrftoken={csrf_token}',
+  #       'Content-Type': 'application/json',
+  #       'Referer': 'https://gateway:8443',
+  #   }
+  
+  # # Check friendship
+  # friendship = check_friendship(int(friend_id), int(request.user.id))
+
+  # if friendship['status'] == 'failure':
+  #   status = 'error'
+  #   message = 'You are not friends with this user'
+  #   form = InviteFriendFormFrontend()
+  #   html = render_to_string('fragments/profile_fragment.html', {'form': form, 'message': message}, request=request)
+  #   user_response = JsonResponse({'html': html, 'status': status, 'message': message})
+  
+  # elif request.user.id == friend_id:
+  #   status = 'error'
+  #   message = 'You cannot block yourself'
+  #   form.add_error(None, 'You cannot block yourself')
+  #   html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
+  #   user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
+  
+  # else:
+  #   status = 'success'
+  #   message = 'Friend blocked!'
+  #   html = render_to_string('fragments/profile_fragment.html', request=request)
+  #   logger.debug(f"block_friends > friend_id: {friend_id}")
+  #   logger.debug(f"block_friends > user_id: {request.user.id}")
+  #   user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'user_id': request.user.id, 'friend_id': friend_id}) 
+
+  # return user_response
     
 
   

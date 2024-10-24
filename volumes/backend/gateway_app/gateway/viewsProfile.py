@@ -1,5 +1,5 @@
-import os, json, logging, requests
-from django.http import JsonResponse
+import os, json, logging, requests, mimetypes
+from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
@@ -9,6 +9,7 @@ from datetime import datetime
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 User = get_user_model()
 
@@ -291,18 +292,6 @@ def post_edit_profile_avatar(request):
     html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
     return JsonResponse({'html': html, 'status': 'error'}, status=400)
 
-import requests
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http import JsonResponse
-
-import requests
-from django.http import HttpResponse, JsonResponse
-from django.core.files.uploadedfile import SimpleUploadedFile
-import json
-import mimetypes
-import logging
-
-logger = logging.getLogger(__name__)
 
 @login_required
 def download_42_avatar(request):
