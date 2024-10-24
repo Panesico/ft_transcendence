@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, viewsBlockchain
 
 urlpatterns = [
   # Save single game
@@ -13,7 +13,7 @@ urlpatterns = [
   path('api/getMatchMaking/<str:user_id>/', views.api_getMatchMaking, name='getMatchMaking'),
 
   # BlockChain
-  path('api/connecttoblockchain/', views.connect_to_blockchain, name='connect_to_blockchain'),
+  path('api/connecttoblockchain/', viewsBlockchain.connect_to_blockchain, name='connect_to_blockchain'),
   
   # Get winrate of a user for a given game type
   path('api/getWinrate/<str:user_id>/<str:game_type>/', views.api_getWinrate, name='getWinrate'),

@@ -59,7 +59,9 @@ profileapi_restart:
 calcgame:
 	docker exec -it calcgame /bin/sh
 blockchain:
-	docker exec -it blockchain /bin/sh
+	docker exec -it blockchain bash
+blockchain_restart:
+	docker restart blockchain
 
 
 

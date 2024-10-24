@@ -1,5 +1,8 @@
 FROM node:18
 
+RUN apt update && \
+  apt install bash
+
 ARG   SERVICE_NAME
 ENV   SERVICE_NAME=${SERVICE_NAME}
 
@@ -10,7 +13,5 @@ COPY  ./tools/ /tmp/
 RUN chmod +x /tmp/entrypoint.sh
 
 EXPOSE 8545
-
-RUN npm install --save-dev hardhat
 
 ENTRYPOINT [ "/tmp/entrypoint.sh" ]
