@@ -1,5 +1,5 @@
-import os, json, logging, requests
-from django.http import JsonResponse
+import os, json, logging, requests, mimetypes
+from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
@@ -9,6 +9,7 @@ from datetime import datetime
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 User = get_user_model()
 
@@ -66,6 +67,25 @@ def get_edit_profile(request):
         html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
         return JsonResponse({'html': html})
     return render(request, 'partials/edit_profile.html', {'form': form, 'profile_data': profile_data})
+
+@login_required
+def get_friend_profile(request, friend_id):
+    logger.debug("")
+    logger.debug("get_friend_profile")
+    if request.method != 'GET':
+        return redirect('405')
+    form = InviteFriendFormFrontend()
+    profile_api_url = 'https://profileapi:9002/api/profile/' + str(friend_id)
+    response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+    if response.status_code == 200:
+        profile_data = response.json()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            html = render_to_string('fragments/friend_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+            return JsonResponse({'html': html, 'status': 'success'})
+        return render(request, 'partials/friend_profile.html', {'form': form, 'profile_data': profile_data})
+    else:
+        logger.debug(f"-------> get_friend_profile > Response: {response.status_code}")
+        return JsonResponse({'status': 'error', 'message': 'Error retrieving friend profile'})
 
 @login_required
 def get_match_history(request, username):
@@ -272,18 +292,6 @@ def post_edit_profile_avatar(request):
     html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
     return JsonResponse({'html': html, 'status': 'error'}, status=400)
 
-import requests
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http import JsonResponse
-
-import requests
-from django.http import HttpResponse, JsonResponse
-from django.core.files.uploadedfile import SimpleUploadedFile
-import json
-import mimetypes
-import logging
-
-logger = logging.getLogger(__name__)
 
 @login_required
 def download_42_avatar(request):

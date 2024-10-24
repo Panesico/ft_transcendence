@@ -294,6 +294,8 @@ def api_getMatchMaking(request, user_id):
 
 async def api_getWinrate(request, user_id, game_type):
   logger.debug("api_getWinrate")
+  if user_id == '0':
+    return JsonResponse({'status': 'success', 'winrate': 0})
   try:
     games = await sync_to_async(list)(Game.objects.filter(game_type=game_type).filter(p1_id=user_id) | Game.objects.filter(game_type=game_type).filter(p2_id=user_id))
 
