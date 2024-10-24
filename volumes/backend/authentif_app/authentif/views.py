@@ -66,7 +66,11 @@ def api_logout(request):
         guest_token = generate_guest_token()
 
         # Create a response indicating logout success
-        response = JsonResponse({'status': 'success', 'message': _('Logged out successfully')})
+        response = JsonResponse({
+              'status': 'success',
+              'type': 'logout_successful',
+              'message': _('Logged out successfully')
+            })
 
         # Set the new guest JWT token as a cookie in the response
         response.set_cookie('jwt_token', guest_token, httponly=True, secure=True, samesite='Lax')
@@ -95,6 +99,7 @@ def api_login(request):
                 # Create response object
                 response = JsonResponse({
                     'status': 'success',
+                    'type': 'login_successful',
                     'message': _('Login successful'),
                     'token': jwt_token,
                     'user_id': user.id
@@ -212,6 +217,7 @@ def api_signup(request):
               # Create response object
               response = JsonResponse({
                   'status': 'success',
+                  'type': 'login_successful',
                   'message': _('Login successful'),
                   'token': jwt_token,
                   'user_id': user.id
@@ -297,7 +303,12 @@ def api_edit_profile(request):
       if form.is_valid():
         logger.debug('api_edit_profile > Form is valid')
         form.save()
-        return JsonResponse({'status': 'success', 'message': _('Profile updated'), 'status': 200})
+        return JsonResponse({
+              'status': 'success',
+              'type': 'profile_updated',
+              'message': _('Profile updated'),
+              'status': 200
+            })
       else:
         logger.debug('api_edit_profile > Form is invalid')
         return JsonResponse({'status': 'error', 'message': _('Invalid profile update')}, status=400)
@@ -451,11 +462,12 @@ def oauth(request):
         logger.info(f"User found: {user.username}")
         jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
         response = JsonResponse({
-        'status': 'success',
-        'message': _('Login successful'),
-        'token': jwt_token,
-        'user_id': user.id
-	    })
+          'status': 'success',
+          'type': 'login_successful',
+          'message': _('Login successful'),
+          'token': jwt_token,
+          'user_id': user.id
+        })
         response['Authorization'] = f'Bearer {jwt_token}'
         response.set_cookie(
         key='jwt_token',
@@ -565,6 +577,7 @@ def oauth(request):
     # Create response object
     response = JsonResponse({
         'status': 'success',
+        'type': 'login_successful',
         'message': _('Login successful'),
         'token': jwt_token,
         'user_id': user.id

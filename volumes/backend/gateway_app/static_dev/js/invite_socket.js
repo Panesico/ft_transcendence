@@ -6,82 +6,80 @@ let inviteFriendSocket;
 //Boolean to check if the input field is focused
 isFocused = false;
 
-function sendFriendRequest(sender_username, sender_id, sender_avatar_url, receiver_username, receiver_id)
-{
+function sendFriendRequest(sender_username, sender_id, sender_avatar_url, receiver_username, receiver_id) {
   console.log('sendFriendRequest > sender_username:', sender_username);
   console.log('sendFriendRequest > sender_id:', sender_avatar_url);
   console.log('sendFriendRequest > sender_avatar_url:', sender_avatar_url);
   console.log('sendFriendRequest > receiver_username:', receiver_username);
   console.log('sendFriendRequest > receiver_id:', receiver_id);
-  sendMessagesBySocket({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}, mainRoomSocket);
-//  mainRoomSocket.send(JSON.stringify({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}));
+  sendMessagesBySocket({ 'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id }, mainRoomSocket);
+  //  mainRoomSocket.send(JSON.stringify({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}));
 }
 
 // Function to get the CSRF token
 function listenSubmit(form) {
   console.log('form: ', form);
   form.addEventListener('submit', async (e) => {
-	e.preventDefault();
+    e.preventDefault();
 
-  // Ensure modal is closed
-  const modal = document.getElementById('inviteFriendModal');
-  const modalInstance = bootstrap.Modal.getInstance(modal);
-  modalInstance.hide();
+    // Ensure modal is closed
+    const modal = document.getElementById('inviteFriendModal');
+    const modalInstance = bootstrap.Modal.getInstance(modal);
+    modalInstance.hide();
 
-	// console.log('Form submitted', e);
-	const formData = new FormData(form);
-	let url = form.action;
+    // console.log('Form submitted', e);
+    const formData = new FormData(form);
+    let url = form.action;
 
-	try {
-	  // Create a new request for file upload
-	  let request = new Request(url, {
-		method: 'POST',
-		headers: {
-		  'X-Requested-With': 'XMLHttpRequest',  // To identify as AJAX request
-		  'X-CSRFToken': getCookie('csrftoken')  // If CSRF token is required
-		},
-		credentials: 'include',  // Include cookies (if necessary)
-		body: formData           // FormData handles the file and other fields
-								 // automatically
-	  });
+    try {
+      // Create a new request for file upload
+      let request = new Request(url, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',  // To identify as AJAX request
+          'X-CSRFToken': getCookie('csrftoken')  // If CSRF token is required
+        },
+        credentials: 'include',  // Include cookies (if necessary)
+        body: formData           // FormData handles the file and other fields
+        // automatically
+      });
 
-	  // Send the request and wait a response
-	  const response = await fetch(request);
-	  const data = await response.json();
+      // Send the request and wait a response
+      const response = await fetch(request);
+      const data = await response.json();
 
-	  console.log('handleFormSubmission > response: ', response);
+      console.log('handleFormSubmission > response: ', response);
 
 
-	  if (!response.ok) {
-		console.error('HTTP error - status:', response.status);
-		throw new Error(`HTTP error - status: ${response.status}`);
-	  }
-
-	  if (!data?.html?.includes('class="errorlist nonfield')) {
-	  	displayMessageInModal(data.message);
-      if (data.message === 'Invitation sent!') {
-        console.warn('Send invitation to ', data.username);
-        // send invitation to the user
-        sendFriendRequest(data.sender_username, data.sender_id, data.sender_avatar_url,
-          data.receiver_username, data.receiver_id
-        );
+      if (!response.ok) {
+        console.error('HTTP error - status:', response.status);
+        throw new Error(`HTTP error - status: ${response.status}`);
       }
 
-	  }
-    console.log('handleFormSubmission > data: ', data);
-	  handleFormSubmission();
+      if (!data?.html?.includes('class="errorlist nonfield')) {
+        displayMessageInModal(data.message);
+        if (data.message === 'Invitation sent!') {
+          console.warn('Send invitation to ', data.username);
+          // send invitation to the user
+          sendFriendRequest(data.sender_username, data.sender_id, data.sender_avatar_url,
+            data.receiver_username, data.receiver_id
+          );
+        }
 
-	} catch (error) {
-	  console.error('Form submission error:', error);
-	  document.querySelector('main').innerHTML =
-		  '<h1>Form submission error</h1>';
-	}
+      }
+      console.log('handleFormSubmission > data: ', data);
+      handleFormSubmission();
+
+    } catch (error) {
+      console.error('Form submission error:', error);
+      document.querySelector('main').innerHTML =
+        '<h1>Form submission error</h1>';
+    }
   });
 }
 
 // Function to upate the dropdown with matching usernames
-function update_dropdown(matching_usernames)
-{
+function update_dropdown(matching_usernames) {
   const usernameInput = document.getElementById('usernameInput');
   const dropdown = document.getElementById('suggestions-list');  // The dropdown element (create this in HTML)
 
@@ -143,18 +141,18 @@ function onModalOpen(userID, modal) {
   /* WebSocket */
   inviteFriendSocket = new WebSocket(`${protocol}//${hostname}${port}/wss/inviteafriend/`);
 
-  inviteFriendSocket.onopen = function(e) {
+  inviteFriendSocket.onopen = function (e) {
     console.log('inviteFriendSocket socket connected');
-//    inviteFriendSocket.send(JSON.stringify({type: 'start', 'userID': userID}));
-    sendMessagesBySocket({type: 'start', 'userID': userID}, inviteFriendSocket);
+    //    inviteFriendSocket.send(JSON.stringify({type: 'start', 'userID': userID}));
+    sendMessagesBySocket({ type: 'start', 'userID': userID }, inviteFriendSocket);
   };
 
-  inviteFriendSocket.onmessage = function(e) {
+  inviteFriendSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
     const message = data['message'];
     const type = data['type'];
     console.log('Received message from socket: ', message);
-    
+
     if (type === 'suggestions') {
       matching_usernames = data['suggestions'];
       console.log('Matching usernames:', matching_usernames);
@@ -162,7 +160,7 @@ function onModalOpen(userID, modal) {
     }
   };
 
-  inviteFriendSocket.onclose = function(e) {
+  inviteFriendSocket.onclose = function (e) {
     console.warn('inviteFriendSocket socket closed unexpectedly');
   };
 
@@ -176,11 +174,10 @@ function onModalOpen(userID, modal) {
 
   modal.addEventListener('hidden.bs.modal', () => {
     onModalClose(modal);
-});
+  });
 }
 
-function onModalClose(modal)
-{
+function onModalClose(modal) {
   const formInviteFriend = document.getElementById('type-invite-friend');
   console.log('Modal is closed');
 
@@ -199,7 +196,7 @@ function onModalClose(modal)
   } else {
     console.warn('WebSocket is not open or already closed');
   }
-  
+
 }
 
 // Function to listen for the friend invitation
@@ -211,12 +208,12 @@ function listenFriendInvitation(modal, form) {
   if (userID === '' || userID === undefined) {
     console.error('User ID is not defined');
     // exit ===> handle error
-  }  
+  }
 
   // Listen for modal open
   modal.addEventListener('show.bs.modal', () => {
     onModalOpen(userID, modal);
-    
+
   })
 
   // Listen for focus on the input field
@@ -226,19 +223,18 @@ function listenFriendInvitation(modal, form) {
 
   // Listen for blur (when user leaves the input field)
   modal.addEventListener('blur', () => {
-    isFocused = true;  
+    isFocused = true;
   });
 
   // Event listen for key press
   console.log('inputField.addEventListene:');
   window.addEventListener('keydown', (e) => {
 
-  // get the key pressed
-  if (isFocused && inviteFriendSocket.readyState === WebSocket.OPEN)
-    {
+    // get the key pressed
+    if (isFocused && inviteFriendSocket.readyState === WebSocket.OPEN) {
       const pressedKey = e.key;
-//      inviteFriendSocket.send(JSON.stringify({type: 'input', 'key': pressedKey}));
-      sendMessagesBySocket({type: 'input', 'key': pressedKey}, inviteFriendSocket);
+      //      inviteFriendSocket.send(JSON.stringify({type: 'input', 'key': pressedKey}));
+      sendMessagesBySocket({ type: 'input', 'key': pressedKey }, inviteFriendSocket);
     }
   });
 
@@ -247,11 +243,10 @@ function listenFriendInvitation(modal, form) {
     listenSubmit(form);
 }
 
-function inviteFriendToPlay(sender_username, sender_id, sender_avatar_url, receiver_id)
-{
+function inviteFriendToPlay(sender_username, sender_id, sender_avatar_url, receiver_id) {
   console.log('inviteFriendToPlay > sender_username:', sender_username);
   console.log('inviteFriendToPlay > sender_id:', sender_id);
   console.log('inviteFriendToPlay > sender_avatar_url:', sender_avatar_url);
   console.log('inviteFriendToPlay > receiver_id:', receiver_id);
-  sendMessagesBySocket({'type': 'invite_game', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_id': receiver_id}, mainRoomSocket);
+  sendMessagesBySocket({ 'type': 'invite_game', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_id': receiver_id }, mainRoomSocket);
 }

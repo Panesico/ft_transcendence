@@ -3,8 +3,6 @@ function listenForm(form) {
     e.preventDefault();
     console.warn('Form submitted', e);
 
-    // console.log('Form submitted', e);
-
     const formData = new FormData(form);
     let url = form.action;
 
@@ -12,6 +10,13 @@ function listenForm(form) {
     formData.forEach((value, key) => {
       jsonObject[key] = value;
     });
+
+    if (url.includes('invite_to_play')) {
+      const gameType =
+        document.querySelector('input[name="chosenGame"]:checked').id;
+      jsonObject['gameType'] = gameType.split('-')[0];
+    }
+
     console.log('jsonObject: ', jsonObject);
     try {
       // console.log('url: ', url);
@@ -38,25 +43,34 @@ function listenForm(form) {
       console.log(
         'listenForm > data.preferred_language ', data.preferred_language);
       console.log('listenForm > data.message: ', data.message);
-      console.log('listenForm > data.html: ', data.html);
-      if (data.status != 'error' && data.message && !data.html) {
-        console.log('data.message: ', data.message);
-        if (data.message === 'Login successful') {
+      // console.log('listenForm > data.html: ', data.html);
+
+      if (data.status != 'error' && data.type && data.message && !data.html) {
+        console.log('data.type: ', data.type, 'data.message: ', data.message);
+
+        if (data.type === 'login_successful') {
           sessionStorage.setItem('afterLogin', 'true');
-        } else if (data.message === 'Sign up successful') {
+          sessionStorage.setItem('afterLoginMessage', data.message);
+
+        } else if (data.type === 'signup_successful') {
           sessionStorage.setItem('afterSignup', 'true');
-        } else if (data.message === 'Profile updated') {
+          sessionStorage.setItem('afterSignupMessage', data.message);
+
+        } else if (data.type === 'profile_updated') {
           sessionStorage.setItem('afterProfileUpdate', 'true');
+          sessionStorage.setItem('afterProfileUpdateMessage', data.message);
+
         }
-        if (data.message !== 'Profile updated') {
+        if (data.type !== 'profile_updated' && data.type !== 'invite_sent') {
           window.location.replace('/');
-        } else if (data.message === 'Profile updated') {
+        } else if (data.type === 'profile_updated') {
           location.reload();
         }
       } else
         document.querySelector('main').innerHTML = data.html;
 
       if (data.message === 'Invitation to play sent!') {
+        console.log('Invitation to play sent, data: ', data);
         inviteFriendToPlay(data.sender_username, data.sender_id, data.sender_avatar_url, data.receiver_id)
       }
 
@@ -134,15 +148,15 @@ async function handleFormSubmission() {
   const formSecurity = document.getElementById('type-security')
   const modalInviteFriend = document.getElementById('inviteFriendModal')
   const formFriendInvite = document.getElementById('type-invite-friend')
-  // Select all forms by their class name
-  var forms = document.querySelectorAll('form[id^="invite-play-"]'); // Select forms by unique ID pattern
+
+  var formsInvitePlay = document.querySelectorAll('form[id^="invite-play-"]'); // Select forms by unique ID pattern
 
   // Iterate over each form and add an event listener
-  
-  
-  if (forms.length > 0) {
-    console.log('forms.length > 0');
-    forms.forEach(function (form) {
+
+
+  if (formsInvitePlay.length > 0) {
+    console.log('formsInvitePlay');
+    formsInvitePlay.forEach(function (form) {
       listenForm(form)
     });
   }
@@ -151,17 +165,21 @@ async function handleFormSubmission() {
     listenFriendInvitation(modalInviteFriend, formFriendInvite);
   }
   else if (formUpload) {
+    console.log('formUpload');
     listenFormUpload(formUpload);
   }
   else if (form) {
+    console.log('form');
     listenForm(form);
   }
 
   if (formGeneral) {
+    console.log('formGeneral');
     listenForm(formGeneral);
   }
 
   if (formSecurity) {
+    console.log('formSecurity');
     listenForm(formSecurity);
   }
 }

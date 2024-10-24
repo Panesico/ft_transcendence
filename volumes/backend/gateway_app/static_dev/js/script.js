@@ -30,8 +30,9 @@ async function loadContent(path) {
       throw new Error(`HTTP error - status: ${response.status}`);
     }
     const data = await response.json();
-    if (data.message && (data.message === 'Logged out successfully')) {
+    if (data.type && data.message && (data.type === 'logout_successful')) {
       sessionStorage.setItem('afterLogout', 'true');
+      sessionStorage.setItem('afterLogoutMessage', data.message);
       window.location.replace('/');
     } else
       document.querySelector('main').innerHTML = data.html;
@@ -44,12 +45,12 @@ async function loadContent(path) {
   }
 }
 
-function isUserLoggedIn() {
-  console.log(
-    'isUserLoggedIn > sessionStorage.getItem(afterLogin): ',
-    sessionStorage.getItem('afterLogin'));
-  return sessionStorage.getItem('afterLogin') === 'true';
-}
+// function isUserLoggedIn() {
+//   console.log(
+//     'isUserLoggedIn > sessionStorage.getItem(afterLogin): ',
+//     sessionStorage.getItem('afterLogin'));
+//   return sessionStorage.getItem('afterLogin') === 'true';
+// }
 
 // Handle navigation
 function navigate(e, path) {
@@ -99,30 +100,40 @@ window.onpopstate = () => {
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOMContentLoaded');
+
+  // The message should be set in sessionStorage before the page is reloaded
+  // because the message needs to be translated
+
   if (sessionStorage.getItem('afterLogin') === 'true') {
-    let message = 'Login successful';
+    let message = sessionStorage.getItem('afterLoginMessage');
     displayMessageInModal(message);
     sessionStorage.removeItem('afterLogin');
+    sessionStorage.removeItem('afterLoginMessage');
 
   } else if (sessionStorage.getItem('afterLogout') === 'true') {
-    let message = 'Logged out successfully';
+    let message = sessionStorage.getItem('afterLogoutMessage');
     displayMessageInModal(message);
     sessionStorage.removeItem('afterLogout');
+    sessionStorage.removeItem('afterLogoutMessage');
 
   } else if (sessionStorage.getItem('afterSignup') === 'true') {
-    let message = 'Signup successful';
+    let message = sessionStorage.getItem('afterSignupMessage');
     displayMessageInModal(message);
     sessionStorage.removeItem('afterSignup');
+    sessionStorage.removeItem('afterSignupMessage');
 
   } else if (sessionStorage.getItem('afterProfileUpdate') === 'true') {
-    let message = 'Profile updated';
+    let message = sessionStorage.getItem('afterProfileUpdateMessage');
     displayMessageInModal(message);
     sessionStorage.removeItem('afterProfileUpdate');
+    sessionStorage.removeItem('afterProfileUpdateMessage');
 
   } else if (sessionStorage.getItem('afterAvatarUpdate') === 'true') {
-    let message = 'Avatar updated';
+    // let message = 'Avatar updated';
+    let message = sessionStorage.getItem('afterAvatarUpdateMessage');
     displayMessageInModal(message);
     sessionStorage.removeItem('afterAvatarUpdate');
+    sessionStorage.removeItem('afterAvatarUpdateMessage');
   }
 });
 

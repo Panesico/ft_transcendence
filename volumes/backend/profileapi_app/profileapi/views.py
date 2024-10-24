@@ -28,13 +28,17 @@ def api_signup(request):
     logger.debug(f"data : {data}")
     try:
       profile = Profile(
-      user_id=data['user_id'],
-      display_name= display_name,
+        user_id=data['user_id'],
+        display_name= display_name,
       )
       logger.debug("--> profile user_id created")
       profile.save()
       logger.debug("--> profile created")
-      return JsonResponse({'message': 'Signup successful'}, status=201)
+      return JsonResponse({
+            'status': 'success',
+            'type': 'signup_successful',
+            'message': _('Signup successful')
+          }, status=201)
     except Exception as e:
       return JsonResponse({'error': str(e)}, status=400)
 
@@ -68,16 +72,20 @@ def api_edit_profile(request):
             if form.is_valid():
                 logger.debug('api_edit_profile > Form is valid')
                 form.save()
-                return JsonResponse({'status': 'success', 'message': 'Profile updated'}, status=200)
+                return JsonResponse({
+                      'status': 'success',
+                      'type': 'profile_updated',
+                      'message': _('Profile updated')
+                    }, status=200)
             else:
                 logger.debug('api_edit_profile > Form is invalid')
-                return JsonResponse({'status': 'error', 'message': 'Invalid profile data'}, status=400)
+                return JsonResponse({'status': 'error', 'message': _('Invalid profile data')}, status=400)
         except (json.JSONDecodeError, DatabaseError) as e:
             logger.debug(f'api_edit_profile > Invalid JSON error: {str(e)}')
-            return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
+            return JsonResponse({'status': 'error', 'message': _('Error: ') + str(e)}, status=400)
     else:
         logger.debug('api_edit_profile > Method not allowed')
-        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+        return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
 def get_profile_api(request, user_id):
     logger.debug("")
@@ -88,19 +96,19 @@ def get_profile_api(request, user_id):
         user_obj = Profile.objects.get(user_id=id)
         logger.debug('user_obj recovered')
         data = {
-            'user_id': user_obj.user_id,
-            'country': user_obj.country,
-            'city': user_obj.city,
-            'display_name': user_obj.display_name,
-            'preferred_language': user_obj.preferred_language,
-            'played_games': user_obj.played_games,
-            'wins': user_obj.wins,
-            'defeats': user_obj.defeats,
+              'user_id': user_obj.user_id,
+              'country': user_obj.country,
+              'city': user_obj.city,
+              'display_name': user_obj.display_name,
+              'preferred_language': user_obj.preferred_language,
+              'played_games': user_obj.played_games,
+              'wins': user_obj.wins,
+              'defeats': user_obj.defeats,
             }
         return JsonResponse(data, status=200)
     except Profile.DoesNotExist:
         logger.debug('get_profile > User not found')
-        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
     except Exception as e:
         logger.debug(f'get_profile > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
@@ -137,7 +145,7 @@ def get_friends(request, user_id):
         return JsonResponse(data, status=200, safe=False)
     except Profile.DoesNotExist:
         logger.debug('get_friends > User not found')
-        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
     except Exception as e:
         logger.debug(f'get_friends > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
@@ -172,7 +180,7 @@ def create_notifications(request):
             logger.debug(f'type: {type}')
             
             if (sender_id == receiver_id):
-                return JsonResponse({'status': 'error', 'message': 'You cannot send a notification to yourself'}, status=400)
+                return JsonResponse({'status': 'error', 'message': _('You cannot send a notification to yourself')}, status=400)
 
             sender_obj = Profile.objects.get(user_id=sender_id)
             receiver_obj = Profile.objects.get(user_id=receiver_id)
@@ -185,13 +193,13 @@ def create_notifications(request):
             )
             notification.save()
 
-            return JsonResponse({'status': 'success', 'message': 'Notification created'}, status=201)
+            return JsonResponse({'status': 'success', 'message': _('Notification created')}, status=201)
         except (json.JSONDecodeError, DatabaseError) as e:
             logger.debug(f'create_notifications > Invalid JSON error: {str(e)}')
             return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
     else:
         logger.debug('create_notifications > Method not allowed')
-        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+        return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
 def get_notifications(request, user_id):
     logger.debug("get_notifications")
@@ -215,7 +223,7 @@ def get_notifications(request, user_id):
         return JsonResponse(data, status=200, safe=False)
     except Profile.DoesNotExist:
         logger.debug('get_notifications > User not found')
-        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
     except Exception as e:
         logger.debug(f'get_notifications > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
@@ -247,8 +255,8 @@ def set_notif_as_readen(request, sender_id, receiver_id, type, response):
                 receiver_obj.save()
     except Profile.DoesNotExist:
         logger.debug('set_notif_as_readen > User not found')
-        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
-    return JsonResponse({'status': 'success', 'message': 'Notification marked as read'}, status=200)
+        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
+    return JsonResponse({'status': 'success', 'message': _('Notification marked as read')}, status=200)
 
 
 def set_all_notifs_as_readen(request, receiver_id):
@@ -264,8 +272,8 @@ def set_all_notifs_as_readen(request, receiver_id):
             logger.debug('notification marked as read')
     except Profile.DoesNotExist:
         logger.debug('set_all_notifs_as_readen > User not found')
-        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
-    return JsonResponse({'status': 'success', 'message': 'All notifications marked as read'}, status=200)
+        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
+    return JsonResponse({'status': 'success', 'message': _('All notifications marked as read')}, status=200)
 
 def check_friendship(request, sender_id, receiver_id):
     logger.debug("check_friendship")
@@ -275,13 +283,13 @@ def check_friendship(request, sender_id, receiver_id):
         logger.debug('sender_obj and receiver_obj recovered')
         if receiver_obj in sender_obj.friends.all():
             logger.debug('check_friendship > Friendship exists')
-            return JsonResponse({'status': 'success', 'message': 'Friendship exists'}, status=404)
+            return JsonResponse({'status': 'success', 'message': _('Friendship exists')}, status=404)
         else:
             logger.debug('check_friendship > Friendship does not exist')
-            return JsonResponse({'status': 'error', 'message': 'Friendship does not exist'}, status=200)
+            return JsonResponse({'status': 'error', 'message': _('Friendship does not exist')}, status=200)
     except Profile.DoesNotExist:
         logger.debug('check_friendship > User not found')
-        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
     except Exception as e:
         logger.debug(f'check_friendship > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

@@ -26,7 +26,11 @@ def get_logout(request):
         # Make the external request to the authentif service
         response = requests.get(authentif_url, cookies=request.COOKIES, verify=os.getenv("CERTFILE"))
         
-        json_response = JsonResponse({'status': 'success', 'message': _('Logged out successfully')})
+        json_response = JsonResponse({
+              'status': 'success',
+              'type': 'logout_successful',
+              'message': _('Logged out successfully')
+            })
 
         # Set cookies from the response into the JsonResponse
         for cookie_name, cookie_value in response.cookies.items():
@@ -93,6 +97,7 @@ def post_login(request):
         logger.error(f"post_login > Error calling auth service: {str(e)}")
         return JsonResponse({'status': 'error', 'message': 'Authentication service unavailable'}, status=503)
 
+    # logger.debug(f"post_login > authentif response: {response.json()}")
     # Handle the response from the auth service
     if response.ok:
         # Extract token and message from the auth service
@@ -100,9 +105,10 @@ def post_login(request):
         jwt_token = response_data.get("token")
         user_id = response_data.get("user_id")
         message = response_data.get("message")
+        type = response_data.get("type")
 
         if jwt_token:
-            user_response = JsonResponse({'status': 'success', 'message': message, 'user_id': user_id})
+            user_response = JsonResponse({'status': 'success', 'type': type, 'message': message, 'user_id': user_id})
             profile_data = get_profileapi_variables(request=request)
             logger.debug(f"post_login > profile_data: {profile_data}")
             preferred_language = profile_data.get('preferred_language')
@@ -175,9 +181,10 @@ def post_signup(request):
     jwt_token = response_data.get("token")
     user_id = response_data.get("user_id")
     message = response_data.get("message")
+    type = response_data.get("type")
 
     if jwt_token:
-        user_response = JsonResponse({'status': 'success', 'message': message, 'user_id': user_id})
+        user_response = JsonResponse({'status': 'success', 'type': type, 'message': message, 'user_id': user_id})
         # Set the JWT token in a secure, HTTP-only cookie
         user_response.set_cookie('jwt_token', jwt_token, httponly=True, secure=True, samesite='Lax')
         return user_response
@@ -261,7 +268,7 @@ def oauth(request):
         # Create a base JsonResponse with status and message
         json_response_data = {
             'status': 'success',
-            'message': response_data.get("message", "No message provided")
+            'message': response_data.get("message", _("No message provided"))
         }
 
         # Merge response_data into the JsonResponse data

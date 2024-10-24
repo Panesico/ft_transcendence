@@ -3,26 +3,23 @@ let mainRoomSocket;
 unreadNotifications = false;
 
 // Safe way to send messages by socket
-function sendMessagesBySocket(message, socket)
-{
+function sendMessagesBySocket(message, socket) {
   console.log('sendMessagesBySocket > message:', message);
   console.log('sendMessagesBySocket > socket.readyState:', socket.readyState);
-  if (socket.readyState === WebSocket.OPEN)
-  {
+  if (socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(message));
     return true;
   }
-  else
-  {
+  else {
     console.warn('sendMessagesBySocket > socket.readyState:', socket.readyState);
     return false;
   }
 }
 
 // Add event listener to the notification
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
-  notificationDropdown.addEventListener('click', function() {
+  notificationDropdown.addEventListener('click', function () {
     console.log('Notification dropdown clicked');
     unreadNotifications = false;
     const bellIcon = notificationDropdown.querySelector('img');
@@ -30,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
       bellIcon.src = '/media/utils_icons/bell_down.png';
 
       // Mark notification as read
-      sendMessagesBySocket({'type': 'mark_notification_as_read', 'receiver_id': receiver_id}, mainRoomSocket);
+      sendMessagesBySocket({ 'type': 'mark_notification_as_read', 'receiver_id': receiver_id }, mainRoomSocket);
     }
   }
   );
@@ -58,66 +55,59 @@ window.onload = () => {
   console.log('mainRoomSocket userID:', userID);
 
   // On websocket open
-  mainRoomSocket.onopen = function(e) {
+  mainRoomSocket.onopen = function (e) {
     console.log('mainRoomSocket opened');
-    sendMessagesBySocket({'type': 'message', 'message': 'main socket opened',}, mainRoomSocket);
-//    mainRoomSocket.send(JSON.stringify({'type': 'message', 'message': 'main socket opened',}));
+    sendMessagesBySocket({ 'type': 'message', 'message': 'main socket opened', }, mainRoomSocket);
+    //    mainRoomSocket.send(JSON.stringify({'type': 'message', 'message': 'main socket opened',}));
   };
 
   // On websocket message
-  mainRoomSocket.onmessage = function(e) {
+  mainRoomSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
     console.log('Received message from socket: ', data);
     parseSocketMessage(data);
   };
 
   // On websocket close
-  mainRoomSocket.onclose = function(e) {
+  mainRoomSocket.onclose = function (e) {
     console.error('mainRoomSocket socket closed unexpectedly');
   };
 
-// Close the main room socket when the window is closed
-window.onbeforeunload = () => {
-  if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
-    mainRoomSocket.close();
+  // Close the main room socket when the window is closed
+  window.onbeforeunload = () => {
+    if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
+      mainRoomSocket.close();
+    }
+  }
+
+
+  // Close the main room socket when the window is closed
+  window.onbeforeunload = () => {
+    if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
+      mainRoomSocket.close();
+    }
+  }
+
+  // Parse the socket message
+  function parseSocketMessage(data) {
+    console.log('parseSocketMessage > data:', data);
+    if (data.type === 'friend_request') {
+      addFriendRequestNotification(data);
+    }
+    else if (data.type === 'friend_request_response') {
+      addFriendResponseNotification(data);
+    }
+    else if (data.type === 'chat') {
+      handleChatMessages(data);
+    }
+    else if (data.type === 'game_request') {
+      addFriendRequestNotification(data);
+    }
+    else if (data.type === 'game_request_response') {
+      addFriendResponseNotification(data);
+    }
+    else {
+      console.log('parseSocketMessage > data.type:', data.type);
+    }
   }
 }
-
-
-// Close the main room socket when the window is closed
-window.onbeforeunload = () => {
-  if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
-    mainRoomSocket.close();
-  }
-}
-
-// Parse the socket message
-function parseSocketMessage(data)
-{
-  console.log('parseSocketMessage > data:', data);
-  if (data.type === 'friend_request') {
-    addFriendRequestNotification(data);
-  }
-  else if (data.type === 'friend_request_response') {
-    addFriendResponseNotification(data);
-  }
-  else if (data.type === 'chat') {
-    handleChatMessages(data);
-  }
-  else if (data.type === 'game_request') {
-    addFriendRequestNotification(data);
-  }
-  else if (data.type === 'game_request_response') {
-    addFriendResponseNotification(data);
-  }
-  else if (data.type === 'game_request') {
-    addFriendRequestNotification(data);
-  }
-  else if (data.type === 'game_request_response') {
-    addFriendResponseNotification(data);
-  }
-  else
-  {
-    console.log('parseSocketMessage > data.type:', data.type);
-  }
-}}

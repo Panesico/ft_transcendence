@@ -1,4 +1,4 @@
-import os
+import os, json, logging, requests
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
@@ -6,9 +6,7 @@ from django.template.loader import render_to_string
 from .forms import InviteFriendFormFrontend
 from django.contrib import messages
 from authentif.models import User
-import json
-import logging
-import requests
+from django.utils.translation import gettext as _
 logger = logging.getLogger(__name__)
 
 def get_authentif_variables(user_id):
@@ -76,32 +74,31 @@ def post_invite(request):
   # Check if username exists
   if data['username'] not in usernames:
     status = 'error'
-    message = 'Username does not exist'
-    form.add_error(None, 'Username does not exist')
+    message = _('Username does not exist')
+    form.add_error(None, message)
     html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
     user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
     return user_response
   elif friendship['status'] == 'success':
     status = 'error'
-    message = 'Friendship already exists'
+    message = _('Friendship already exists')
     form = InviteFriendFormFrontend()
     html = render_to_string('fragments/profile_fragment.html', {'form': form, 'message': message}, request=request)
     user_response = JsonResponse({'html': html, 'status': status, 'message': message})
     return user_response
   elif data['username'] == sender_username:
     status = 'error'
-    message = 'You cannot invite yourself'
-    form.add_error(None, 'You cannot invite yourself')
+    message = _('You cannot invite yourself')
+    form.add_error(None, message)
     html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
     user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
     return user_response
   else:
     status = 'success'
-    message = 'Invitation sent!'
+    message = _('Invitation sent!')
     html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
     receiver_id = users_id[usernames.index(data['username'])]
-    logger.debug(f"post_invite > receiver_username: {data['username']}")
-    logger.debug(f"post_invite > receiver_id: {receiver_id}")
+    logger.debug(f"post_invite > receiver_username: {data['username']}, receiver_id: {receiver_id}")
     user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'receiver_username': data['username'], 'receiver_id': receiver_id, 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url}) 
     return user_response
 
@@ -114,38 +111,52 @@ def invite_to_play(request, receiver_id):
   logger.debug('post_invite_to_play')
   if request.method != 'POST':
     return redirect('405')
-  csrf_token = request.COOKIES.get('csrftoken')
-  headers = {
-        'X-CSRFToken': csrf_token,
-        'Cookie': f'csrftoken={csrf_token}',
-        'Content-Type': 'application/json',
-        'Referer': 'https://gateway:8443',
-    }
+  # csrf_token = request.COOKIES.get('csrftoken')
+  # headers = {
+  #       'X-CSRFToken': csrf_token,
+  #       'Cookie': f'csrftoken={csrf_token}',
+  #       'Content-Type': 'application/json',
+  #       'Referer': 'https://gateway:8443',
+  #   }
+  sender_id = request.user.id
   
   # Check friendship
-  friendship = check_friendship(int(receiver_id), int(request.user.id))
+  friendship = check_friendship(int(receiver_id), int(sender_id))
+  logger.debug(f"invite_to_play > friendship: {friendship}")
   if friendship['status'] == 'failure':
     status = 'error'
-    message = 'Add this player as a friend before inviting them to play'
+    message = _('Add this player as a friend before inviting them to play')
     form = InviteFriendFormFrontend()
     html = render_to_string('fragments/profile_fragment.html', {'form': form, 'message': message}, request=request)
     user_response = JsonResponse({'html': html, 'status': status, 'message': message})
     return user_response
-  elif request.user.id == receiver_id:
+  
+  elif sender_id == receiver_id:
     status = 'error'
-    message = 'You cannot invite yourself'
-    form.add_error(None, 'You cannot invite yourself')
+    message = _('You cannot invite yourself')
+    form.add_error(None, message)
     html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
     user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
-    return
-  else:
-    status = 'success'
-    message = 'Invitation to play sent!'
-    html = render_to_string('fragments/play_fragment.html', request=request)
-    logger.debug(f"invite_to_play > receiver_id: {receiver_id}")
-    logger.debug(f"invite_to_play > sender_id: {request.user.id}")
-    user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'sender_username': request.user.username, 'sender_id': request.user.id, 'receiver_id': receiver_id, 'sender_avatar_url': request.user.avatar.url}) 
     return user_response
+  
+  else:    
+    logger.debug(f"invite_to_play > receiver_id: {receiver_id}, sender_id: {sender_id}")
+    data = json.loads(request.body)
+    
+    user_response = JsonResponse({
+        'status': 'success',
+        'type': 'invite_sent',
+        'message': _('Invitation to play sent!'),
+        'sender_username': request.user.username,
+        'sender_id': sender_id,
+        'receiver_id': receiver_id,
+        'sender_avatar_url': request.user.avatar.url,
+        'game_type': data['gameType'],
+        'game_mode': 'invite'
+    })
+    logger.debug(f"invite_to_play > user_response: {user_response}")
+    return user_response
+
 
 def block_friends(request, friend_id):
   logger.debug("")
