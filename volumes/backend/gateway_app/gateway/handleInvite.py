@@ -3,7 +3,7 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 def get_authentif_variables(user_id):
-  authentif_api_url = 'https://authentif:9001/api/getUserInfo/' + str(user_id)
+  authentif_api_url = 'https://authentif:9001/api/getUserInfo/' + str(user_id) + '/'
   logger.debug(f"get_authentif_variables > authentif_api_url: {authentif_api_url}")
   response = requests.get(authentif_api_url, verify=os.getenv("CERTFILE"))
   logger.debug(f"get_authentif_variables > Response: {response}")

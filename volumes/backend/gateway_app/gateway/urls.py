@@ -36,16 +36,14 @@ urlpatterns = [
     path('play/checkNameExists/', viewsProfile.checkNameExists, name='checkNameExists'),
 
     # invite friends
-    path('invite_a_friend', viewsInvitation.post_invite, name='post_invite'),
+    path('invite_a_friend/', viewsInvitation.post_invite, name='post_invite'),
     path('invite_to_play/<int:receiver_id>/', viewsInvitation.invite_to_play, name='invite_to_play'),
     path('my_friends/', views.list_friends, name='list_friends'),
 	path('getFriends/', views.get_friends, name='get_friends'),
 
     # play api
     path('play/', viewsPlay.get_play, name='play'),
-    # path('play/saveGame/', viewsPlay.save_game, name='saveGame'),
-    path('tournament/', viewsPlay.view_tournament, name='tournament'),
-    # path('tournament/update/', viewsPlay.view_tournament_update, name='tournamentUpdate'),
+    path('tournament/', viewsPlay.get_tournament, name='tournament'),
 
     # Languages API
     path('i18n/', include('django.conf.urls.i18n')),

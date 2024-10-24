@@ -17,19 +17,46 @@ function getInitialVariables(gameType, initialVars) {
   canvas.width = initialVars.canvas.width;
   canvas.height = initialVars.canvas.height;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#d3d3d3';  // Set the fill color
+  ctx.fillStyle = '#d3d3d3';
   ctx.strokeStyle = '#d3d3d3';
 
   // Game configuration variables for each game
-  let cfg = gameType === 'pong' ? {
-    ballSize: initialVars.ballSize,
-    paddleWidth: initialVars.paddleWidth,
-    paddleHeight: initialVars.paddleHeight,
-    borderWidth: initialVars.borderWidth,
-    canvas,
-    ctx,
-  } :
-    {};
+  let cfg = (gameType === 'pong')
+    ? { // if pong
+      ballSize: initialVars.ballSize,
+      paddleWidth: initialVars.paddleWidth,
+      paddleHeight: initialVars.paddleHeight,
+      borderWidth: initialVars.borderWidth,
+      canvas,
+      ctx,
+      keys: initialVars.keys,
+    } : { // if cows
+      playerDimension: initialVars.playerDimension,
+      cowDimension: initialVars.cowDimension,
+      canvas,
+      ctx,
+      keys: initialVars.keys,
+    };
+
+  // Load images for cows game
+  if (gameType === 'cows') {
+    const baseUrl = window.location.origin;
+
+    cfg.player1Image = new Image();
+    cfg.player1Image.src = `${baseUrl}/static/images/game/spaceship1.png`;
+
+    cfg.player2Image = new Image();
+    cfg.player2Image.src = `${baseUrl}/static/images/game/spaceship2.png`;
+
+    cfg.cowImage = new Image();
+    cfg.cowImage.src = `${baseUrl}/static/images/game/cow400.png`;
+
+    cfg.backgroundImage = new Image();
+    cfg.backgroundImage.src = `${baseUrl}/static/images/game/nightsky.jpg`;
+
+    cfg.earthImage = new Image();
+    cfg.earthImage.src = `${baseUrl}/static/images/game/earth.png`;
+  }
 
   return cfg;
 }
@@ -99,6 +126,50 @@ function renderPongGame(cfg, gameState) {
   // Draw ball
   cfg.ctx.fillRect(
     gameState.ballX, gameState.ballY, cfg.ballSize, cfg.ballSize);
+}
+
+// Render the cows game state on the canvas
+function renderCowsGame(cfg, gameState) {
+  document.querySelector('.scorePlayer1').textContent = gameState.scorePlayer1;
+  document.querySelector('.scorePlayer2').textContent = gameState.scorePlayer2;
+  cfg.ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+
+  cfg.ctx.clearRect(0, 0, cfg.canvas.width, cfg.canvas.height);
+
+  // Draw background
+  cfg.ctx.drawImage(cfg.backgroundImage, 0, 0, cfg.canvas.width, cfg.canvas.height);
+
+  // Draw earth
+  cfg.ctx.drawImage(cfg.earthImage, cfg.canvas.width / 2 - 100, cfg.canvas.height / 2 - 100, 200, 200);
+
+  // Draw players
+  cfg.ctx.drawImage(cfg.player1Image, gameState.player1X, gameState.player1Y, cfg.playerDimension, cfg.playerDimension);
+  cfg.ctx.drawImage(cfg.player2Image, gameState.player2X, gameState.player2Y, cfg.playerDimension, cfg.playerDimension);
+
+  // Draw hit zone
+  if (gameState.player1_hit) {
+    cfg.ctx.beginPath();
+    cfg.ctx.arc(
+      gameState.player1X + cfg.playerDimension / 2,
+      gameState.player1Y + cfg.playerDimension / 2,
+      cfg.playerDimension / 2, 0, Math.PI * 2
+    );
+    cfg.ctx.fill();
+  }
+  if (gameState.player2_hit) {
+    cfg.ctx.beginPath();
+    cfg.ctx.arc(
+      gameState.player2X + cfg.playerDimension / 2,
+      gameState.player2Y + cfg.playerDimension / 2,
+      cfg.playerDimension / 2, 0, Math.PI * 2
+    );
+    cfg.ctx.fill();
+  }
+
+  // Draw cows
+  gameState.cows.forEach(cow => {
+    cfg.ctx.drawImage(cfg.cowImage, cow.x, cow.y, cfg.cowDimension, cfg.cowDimension);
+  });
 }
 
 

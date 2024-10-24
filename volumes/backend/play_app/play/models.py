@@ -1,5 +1,5 @@
 from django.db import models
-import logging
+import logging, random
 logger = logging.getLogger(__name__)
 
 # Game model with 2 players, score and winner
@@ -79,21 +79,32 @@ class Tournament(models.Model):
         logger.debug('class Tournament > start_tournament')
         if not self.semifinal1 and not self.semifinal2:
             logger.debug('class Tournament > start_tournament > Create semi-final games')
-            ### NEED TO add randomizer to determine who plays who ###
+
+            players = [
+                {'id': self.t_p1_id, 'name': self.t_p1_name},
+                {'id': self.t_p2_id, 'name': self.t_p2_name},
+                {'id': self.t_p3_id, 'name': self.t_p3_name},
+                {'id': self.t_p4_id, 'name': self.t_p4_name},
+            ]
+            logger.debug(f'Players: {players}')
+            random.shuffle(players)
+            logger.debug(f'Players: {players}')
+            
             self.semifinal1 = Game.objects.create(
                 game_type=self.game_type,
                 game_round='semifinal1',
-                p1_id=self.t_p1_id, p1_name=self.t_p1_name,
-                p2_id=self.t_p2_id, p2_name=self.t_p2_name,
+                p1_id=players[0]['id'], p1_name=players[0]['name'],
+                p2_id=players[1]['id'], p2_name=players[1]['name'],
                 p1_score=0, p2_score=0
             )
             self.semifinal2 = Game.objects.create(
                 game_type=self.game_type,
                 game_round='semifinal2',
-                p1_id=self.t_p3_id, p1_name=self.t_p3_name,
-                p2_id=self.t_p4_id, p2_name=self.t_p4_name,
+                p1_id=players[2]['id'], p1_name=players[2]['name'],
+                p2_id=players[3]['id'], p2_name=players[3]['name'],
                 p1_score=0, p2_score=0
             )
+
             self.save()
 
     def create_final(self):

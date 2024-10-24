@@ -24,6 +24,9 @@ venv/
 .DS_Store
 Thumbs.db
 
+# Node
+node_modules/
+
 # Ignore static files collected by collectstatic
 volumes/frontend/
 
@@ -40,3 +43,5 @@ volumes/frontend/
 *pepe*
 
 user_data.json
+
+.gitmodules

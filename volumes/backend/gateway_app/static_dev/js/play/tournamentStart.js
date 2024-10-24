@@ -6,11 +6,6 @@ async function startNewTournament(
   let game_id;
   let player_role;
 
-  // Allowed controls depending on game mode (local(2p), remote(1p))
-  const keys = (gameMode === 'local') ?
-    { w: false, s: false, 5: false, 8: false, ' ': false, Escape: false } :
-    { w: false, s: false, ' ': false, Escape: false };
-
   // Open websocket connection
   const calcGameSocket = getCalcGameSocket(gameMode, gameType, gameRound);
   if (calcGameSocket === undefined) return;
@@ -49,11 +44,11 @@ async function startNewTournament(
         'startNewTournament > .onmessage connection_established:', data.message);
       cfg = getInitialVariables(gameType, data.initial_vars);
 
-    } else if (data.type === 'waiting_room') {  // while finding an opponent
-      // in remote
-      console.log('startNewTournament > .onmessage waiting_room:', data.message);
-      // Load html waiting room
-      document.querySelector('main').innerHTML = data.html;
+      // } else if (data.type === 'waiting_room') {  // while finding an opponent
+      //   // in remote
+      //   console.log('startNewTournament > .onmessage waiting_room:', data.message);
+      //   // Load html waiting room
+      //   document.querySelector('main').innerHTML = data.html;
 
     }  // displays Start button in local and checkboxes in remote
     else if (data.type === 'game_start') {
@@ -130,22 +125,21 @@ async function startNewTournament(
 
   // Event listeners for controls
   window.addEventListener('keydown', (e) => {
-    if (e.key in keys) {
-      keys[e.key] = true;
+    if (e.key in cfg.keys) {
+      cfg.keys[e.key] = true;
       notifyKeyPressed();
     }
   });
   window.addEventListener('keyup', (e) => {
-    if (e.key in keys) {
-      keys[e.key] = false;
+    if (e.key in cfg.keys) {
+      cfg.keys[e.key] = false;
       notifyKeyPressed();
     }
   });
 
   function notifyKeyPressed() {
-    // console.log('keys:', keys);
     // Filter out the keys that are pressed
-    const pressedKeys = Object.keys(keys).filter(key => keys[key]);
+    const pressedKeys = Object.keys(cfg.keys).filter(key => cfg.keys[key]);
     // console.log('pressedKeys:', pressedKeys);
     calcGameSocket.send(JSON.stringify(
       { type: 'key_press', keys: pressedKeys, game_id, player_role }));

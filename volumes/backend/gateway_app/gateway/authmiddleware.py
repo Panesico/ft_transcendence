@@ -79,7 +79,7 @@ class JWTAuthenticationMiddleware:
                 request.user = self.create_guest_user()
 
         except (ExpiredSignatureError, InvalidTokenError, User.DoesNotExist) as e:
-            logger.error(f"JWT Error: {str(e)} - Treating as guest user.")
+            # logger.error(f"JWT Error: {str(e)} - Treating as guest user.")
             request.user = self.create_guest_user()
 
     def process_response(self, request, response):

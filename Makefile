@@ -38,7 +38,7 @@ certs:
 		-keyout key.pem -out cert.pem \
 		-subj "/C=ES/L=Malaga/O=42 Malaga/CN=localhost" \
 		-addext "subjectAltName=DNS:localhost,DNS:gateway,DNS:authentif,\
-		DNS:profileapi,DNS:play,DNS:calcgame"
+		DNS:profileapi,DNS:play,DNS:calcgame,DNS:blockchain"
 
 postgres:
 	docker exec -it postgres sh \
@@ -58,9 +58,11 @@ profileapi_restart:
 	docker restart profileapi
 calcgame:
 	docker exec -it calcgame /bin/sh
+blockchain:
+	docker exec -it blockchain /bin/sh
 
 
 
 .phony: all down stop logs prune routine reset certs postgres \
 	gateway gateway_restart authentif authentif_restart \
-	profileapi profileapi_restart calcgame
+	profileapi profileapi_restart calcgame blockchain

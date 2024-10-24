@@ -77,7 +77,7 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
             info = {
                 'tournament_id': 0,
                 'game_round': 'single',
-                'game_type': 'pong',
+                'game_type': self.game_type,
                 'p1_name': self.p1_name,
                 'p2_name': self.p2_name,
                 'p1_id': self.p1_id,
@@ -140,10 +140,10 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
         logger.debug("ProxyCalcGameLocal > save_game_to_database")
         # Save game to database
         play_url = 'https://play:9003/api/saveGame/'
-        csrf_token = self.context['cookies'].get('csrftoken')  
-
+        csrf_token = self.context['cookies'].get('csrftoken') 
+        
         data = {
-            'game_type': 'pong',
+            'game_type': self.game_type,
             'game_round': 'single',
             'p1_name': self.p1_name,
             'p2_name': self.p2_name,
@@ -152,7 +152,7 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
             'p1_score': game_result.get('p1_score'),
             'p2_score': game_result.get('p2_score'),
             'game_winner_name': game_result.get('game_winner_name'),
-            'game_winner_id': self.p1_id if game_result.get('game_winner_name') == 'p1_name' else self.p2_id,
+            'game_winner_id': self.p1_id if game_result.get('game_winner_name') == self.p1_name else self.p2_id,
         }
         
         await asyncRequest("POST", csrf_token, play_url, data)

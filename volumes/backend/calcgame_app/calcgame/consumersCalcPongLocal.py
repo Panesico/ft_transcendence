@@ -15,8 +15,10 @@ class PongCalcLocal(AsyncWebsocketConsumer):
     "paddleWidth": 15,
     "paddleHeight": 80,
     "borderWidth": 15,
-    "paddleSpeed": 10
+    "paddleSpeed": 10,
+    "keys": { 'w': False, 's': False, 5: False, 8: False }
   }
+  
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -101,7 +103,6 @@ class PongCalcLocal(AsyncWebsocketConsumer):
     logger.debug("PongCalcLocal > Game ended")
     winner = self.p1_name if self.gs['scorePlayer1'] > self.gs['scorePlayer2'] else self.p2_name
 
-    logger.debug("PongCalcLocal > Game ended 2")
     # End the game
     await self.send(text_data=json.dumps({
       'type': 'game_end',
@@ -112,12 +113,10 @@ class PongCalcLocal(AsyncWebsocketConsumer):
           'p2_score': self.gs['scorePlayer2'],
         }
     }))
-    logger.debug("PongCalcLocal > Game ended 3")
 
     # Cancel the game loop task
     if hasattr(self, 'game_task'):
       self.game_task.cancel()
-    logger.debug("PongCalcLocal > Game ended 4")
 
 
   async def game_loop(self):
@@ -154,11 +153,7 @@ class PongCalcLocal(AsyncWebsocketConsumer):
 
   def update_paddle_pos(self):
     if 'w' in self.pressed_keys and self.gs['leftPaddleY'] > self.cfg['borderWidth']:
-        logger.debug("PongCalcLocal > update_paddle_pos > w pressed")
-      # if player == 'left':
         self.gs['leftPaddleY'] -= self.cfg['paddleSpeed']
-      # elif player == 'right':
-      #   self.gs['rightPaddleY'] -= self.cfg['paddleSpeed']
     
     if 's' in self.pressed_keys and self.gs['leftPaddleY'] < self.cfg['canvas']['height'] - self.cfg['paddleHeight'] - self.cfg['borderWidth']:
         self.gs['leftPaddleY'] += self.cfg['paddleSpeed']
