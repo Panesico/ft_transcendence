@@ -30,11 +30,11 @@ function listenForm(form) {
         credentials: 'include',
         body: JSON.stringify(jsonObject)
       });
-      console.log('handleFormSubmission > request: ', request);
+      // console.log('handleFormSubmission > request: ', request);
       const response = await fetch(request);
       const data = await response.json();
 
-      console.log('handleFormSubmission > response: ', response);
+      // console.log('handleFormSubmission > response: ', response);
 
       if (!response.ok && !data.html.includes('class="errorlist nonfield')) {
         throw new Error(`HTTP error - status: ${response.status}`);
@@ -61,17 +61,20 @@ function listenForm(form) {
           sessionStorage.setItem('afterProfileUpdateMessage', data.message);
 
         }
+
+        // Redirect home
         if (data.type !== 'profile_updated' && data.type !== 'invite_sent') {
           window.location.replace('/');
         } else if (data.type === 'profile_updated') {
           location.reload();
         }
+
       } else
         document.querySelector('main').innerHTML = data.html;
 
       if (data.message === 'Invitation to play sent!') {
         console.log('Invitation to play sent, data: ', data);
-        inviteFriendToPlay(data.sender_username, data.sender_id, data.sender_avatar_url, data.receiver_id)
+        inviteFriendToPlay(data.sender_username, data.sender_id, data.sender_avatar_url, data.receiver_id, data.game_type, data.game_mode);
       }
 
       if (!data?.html?.includes('class="errorlist nonfield')) {

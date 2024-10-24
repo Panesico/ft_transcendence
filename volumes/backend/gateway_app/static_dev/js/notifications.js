@@ -139,7 +139,26 @@ function createAcceptButton(sender_id, receiver_id, newNotification) {
   //     mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id}));
   // //    newNotification.remove(); uncomment
   //   }
-  acceptButton.onclick = playGameInvite('invite', 'pong', sender_id, receiver_id);
+
+  return acceptButton;
+}
+
+function createGameAcceptButton(sender_id, receiver_id, sender_username, receiver_username, newNotification, game_mode, game_type) {
+  const acceptButton = document.createElement('img');
+  acceptButton.src = '/media/utils_icons/accept.png';
+  acceptButton.alt = 'Accept';
+  acceptButton.style.height = '2rem';
+  acceptButton.style.width = '2rem';
+  acceptButton.style.objectFit = 'cover';
+  acceptButton.style.marginLeft = '10px';
+  acceptButton.style.cursor = 'pointer';
+  acceptButton.style.backgroundColor = 'transparent';
+
+  //   acceptButton.onclick = function() {
+  //     mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id}));
+  // //    newNotification.remove(); uncomment
+  //   }
+  acceptButton.onclick = playGameInvite(game_mode, game_type, sender_username, sender_id, receiver_username, receiver_id);
 
   return acceptButton;
 }
@@ -237,11 +256,30 @@ function addFriendRequestNotification(data) {
   // Create a span element for the message
   const message = createMessageElement(sender_username, ' sent you a friend request.');
   if (data.type === 'game_request') {
-    message.textContent = `${sender_username} invited you to play a game.`;
+    console.log('game_request data:', data);
+    // data = {
+    //   date: "2024-10-24 17:49:53"
+    //   game_mode: "invite"
+    //   game_type: "pong"
+    //   message: "code has invited you to play: Pong"
+    //   receiver_avatar_url: "/media//avatars/default.png"
+    //   receiver_id: 3
+    //   receiver_username: "code"
+    //   sender_avatar_url: "/media/avatars/default.png"
+    //   sender_id: 2
+    //   sender_username: "code"
+    //   type: "game_request"
+    // }
+    // message.textContent = `${sender_username} invited you to play a game.`;
+    message.textContent = data.message;
   }
 
   // Add button to accept the friend request represented by accept png
-  const acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
+  let acceptButton;
+  if (data.type === 'game_request')
+    acceptButton = createGameAcceptButton(sender_id, receiver_id, sender_username, receiver_username, newNotification, data.game_mode, data.game_type);
+  else
+    acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
 
   // Add button to decline the friend request represented by decline png
   const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);
@@ -300,11 +338,22 @@ function addFriendResponseNotification(data) {
     inputMessage = ' declined your friend request.';
   }
   else if (data.response === 'accept' && data.type === 'game_request_response') {
+    console.log('game_request_response data:', data);
     inputMessage = ' accepted your game request.';
   }
 
   const message = createMessageElement(receiver_username, inputMessage);
-  appendAvatarAndMessage(avatar, message, newNotification);
+  if (data.response === 'accept' && data.type === 'game_request_response') {
+    // add createGameAcceptButton and createDeclineButton
+    const acceptButton = createGameAcceptButton(sender_id, receiver_id, sender_username, receiver_username, newNotification,
+      '', //data.game_mode,
+      ''); //data.game_type);
+    const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);
+
+    appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status);
+  }
+  else
+    appendAvatarAndMessage(avatar, message, newNotification);
 
   // Change default down icon notification to the new notification icon
   changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id, data.status);

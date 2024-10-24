@@ -12,7 +12,14 @@ function sendFriendRequest(sender_username, sender_id, sender_avatar_url, receiv
   console.log('sendFriendRequest > sender_avatar_url:', sender_avatar_url);
   console.log('sendFriendRequest > receiver_username:', receiver_username);
   console.log('sendFriendRequest > receiver_id:', receiver_id);
-  sendMessagesBySocket({ 'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id }, mainRoomSocket);
+  sendMessagesBySocket({
+    'type': 'friend_request',
+    'sender_username': sender_username,
+    'sender_id': sender_id,
+    'sender_avatar_url': sender_avatar_url,
+    'receiver_username': receiver_username,
+    'receiver_id': receiver_id
+  }, mainRoomSocket);
   //  mainRoomSocket.send(JSON.stringify({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}));
 }
 
@@ -243,10 +250,17 @@ function listenFriendInvitation(modal, form) {
     listenSubmit(form);
 }
 
-function inviteFriendToPlay(sender_username, sender_id, sender_avatar_url, receiver_id) {
-  console.log('inviteFriendToPlay > sender_username:', sender_username);
-  console.log('inviteFriendToPlay > sender_id:', sender_id);
-  console.log('inviteFriendToPlay > sender_avatar_url:', sender_avatar_url);
-  console.log('inviteFriendToPlay > receiver_id:', receiver_id);
-  sendMessagesBySocket({ 'type': 'invite_game', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_id': receiver_id }, mainRoomSocket);
+function inviteFriendToPlay(sender_username, sender_id, sender_avatar_url, receiver_id, game_type, game_mode) {
+  console.log('inviteFriendToPlay > sender_username:', sender_username, 'sender_id:', sender_id, 'sender_avatar_url:', sender_avatar_url, 'receiver_id:', receiver_id, 'game_type:', game_type, 'game_mode:', game_mode);
+
+  sendMessagesBySocket({
+    'type': 'invite_game',
+    'sender_username': sender_username,
+    'sender_id': sender_id,
+    'sender_avatar_url': sender_avatar_url,
+    'receiver_id': receiver_id,
+    'game_type': game_type,
+    'game_mode': game_mode,
+  }
+    , mainRoomSocket);
 }

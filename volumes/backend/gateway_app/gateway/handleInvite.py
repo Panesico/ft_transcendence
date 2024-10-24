@@ -1,5 +1,7 @@
 import json, asyncio, logging, requests, os
 from datetime import datetime
+from django.utils.translation import gettext as _
+from .utils import getUserData
 logger = logging.getLogger(__name__)
 
 def get_authentif_variables(user_id):
@@ -38,13 +40,18 @@ async def invite_to_game(self, content, users_connected):
   logger.debug(f'invite_to_game > content: {content}')
   sender_id = content.get('sender_id', '')
   receiver_id = content.get('receiver_id', '')
+  game_type = content.get('game_type')
+
   sender_avatar_url = content.get('sender_avatar_url', '')
   sender_username = content.get('sender_username', '')
   logger.debug(f'invite_to_game > sender_username: {sender_username}')
-  receiver_username = self.username
-  logger.debug(f'invite_to_game > sender_username: {sender_username}')
-  message = sender_username + ' has invited you to join a game.'
+  
+  receiver_data = await getUserData(receiver_id)
+  receiver_username = receiver_data['username']
+  logger.debug(f'invite_to_game > receiver_username: {receiver_username}')
+  message = sender_username + _(' has invited you to play: ') + game_type.capitalize()
   date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+  logger.debug(f'invite_to_game > message: {message}, {date}')
 
   if receiver_id in users_connected:
     await users_connected[receiver_id].send_json({
@@ -56,7 +63,9 @@ async def invite_to_game(self, content, users_connected):
       'sender_avatar_url': sender_avatar_url,
       'receiver_avatar_url': self.avatar_url,
       'message': message,
-      'date': date
+      'date': date,
+      'game_type': game_type,
+      'game_mode': content.get('game_mode'),
     })
 
   # Save notification in database

@@ -66,6 +66,8 @@ class mainRoom(AsyncJsonWebsocketConsumer):
         logger.debug(f'mainRoom > check_unread_messages')
         await checkForChatMessages(self)
     elif typeMessage == 'invite_game':
+      logger.debug(f'mainRoom > invite_game')
+      logger.debug(f'mainRoom > invite_game > content: {content}')
       await invite_to_game(self, content, users_connected)
     
     elif typeMessage == 'game_request_response':

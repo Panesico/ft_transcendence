@@ -182,16 +182,18 @@ async function playGame() {
   startNewGame(gameMode, gameType, gameRound, p1_name, p2_name);
 }
 
-// Called from button on Play page, starts a new game
-async function playGameInvite(gameMode, gameType, sender_id, receiver_id) {
+// Called from invite notification, starts a new game
+async function playGameInvite(gameMode, gameType, sender_username, sender_id, receiver_username, receiver_id) {
   // gameMode: 'invite'
   // gameType: 'pong' or 'cows'
 
-  let p1_name = sender_id;
-  let p2_name = receiver_id;
+  let p1_id = sender_id;
+  let p1_name = sender_username;
+  let p2_id = receiver_id;
+  let p2_name = receiver_username;
 
   // gameRound: 'single'
   let gameRound = 'single';
 
-  startNewGame(gameMode, gameType, gameRound, p1_name, p2_name);
+  // startNewGame(gameMode, gameType, gameRound, p1_name, p2_name);
 }
