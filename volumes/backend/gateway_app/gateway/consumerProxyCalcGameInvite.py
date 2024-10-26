@@ -191,6 +191,12 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
                 logger.debug(f"Player {connect_id} disconnected and removed from waiting[{game_type}]")
                 break  # Stop once the player is found and removed
 
+        # Close the game if the player is in an active game
+        for game_id, game in self.active_games.items():
+            if connect_id == game['player1']['channel_name'] or connect_id == game['player2']['channel_name']:
+                await self.close_game(game_id)
+                break        
+
         # Close the WebSocket connection to the calcgame service if it exists
         if hasattr(self, 'calcgame_ws'):
             await self.calcgame_ws.close()
@@ -386,3 +392,49 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
         # Remove the game from active_games
         self.active_games.pop(game_id)
         logger.debug("ProxyCalcGameInvite > game removed from active_games")
+
+
+    async def close_game(self, game_id):
+        logger.debug(f"ProxyCalcGameRemote > close_game game_id: {game_id}")
+        game = self.active_games[game_id]
+        player1 = game['player1']
+        player2 = game['player2']
+
+        # Close the WebSocket connection to the calcgame service
+        await game['calcgame_ws'].close()
+
+        # The disconnecting player forfeits the game
+        if player1['channel_name'] == self.channel_name:
+            disconnecting_player = player1
+            remaining_player = player2
+            game_result = {
+                'p1_score': 0,
+                'p2_score': 3,
+            }
+        else:
+            disconnecting_player = player2
+            remaining_player = player1
+            game_result = {
+                'p1_score': 3,
+                'p2_score': 0,
+            }
+
+        game_result['game_id'] = game_id
+        game_result['game_winner_name'] = remaining_player['player_name']
+
+        # Save game to database
+        await self.save_game_to_database(game_id, game, player1, player2, game_result)
+
+        # Notify the remaining player that the game has ended
+        html = render_to_string('fragments/game_end_fragment.html', {
+              'context': remaining_player['context'],
+              'game_result': game_result
+            })
+
+        await remaining_player['ws'].send(json.dumps({
+            'type': 'disconnection',
+            'game_result': game_result,
+            'html': html,
+            'title': _('Forfeit'),
+            'message': _('Your opponent has disconnected'),
+        }))

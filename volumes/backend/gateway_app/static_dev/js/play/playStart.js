@@ -91,6 +91,8 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
     } else if (data.type === 'game_end') {
       console.log('startNewGame > .onmessage game_end:', data.message);
       console.log('game_result:', data.game_result);
+      // console.log('game_end data:', data);
+
       document.querySelector('#game-container').innerHTML = data.html;
       document.querySelector('.scorePlayer1').textContent =
         data.game_result.p1_score;
@@ -99,6 +101,22 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
 
       if (gameRound != 'single')
         console.log('game_end gameRound:', gameRound);
+
+      calcGameSocket.close();
+
+    } else if (data.type === 'disconnection') {
+      console.log('startNewGame > .onmessage disconnection:', data.message);
+      console.log('game_result:', data.game_result);
+      // console.log('disconnection data:', data);
+
+      document.querySelector('#game-container').innerHTML = data.html;
+      document.querySelector('.scorePlayer1').textContent =
+        data.game_result.p1_score;
+      document.querySelector('.scorePlayer2').textContent =
+        data.game_result.p2_score;
+      announceGame(data.title, data.message);
+      if (gameRound != 'single')
+        console.log('disconnection gameRound:', gameRound);
 
       calcGameSocket.close();
 
