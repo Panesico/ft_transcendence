@@ -19,11 +19,5 @@ Remote game:
 
   @BenjaminLarger
 - Add an href associated to the avatar displayed in notification to his profile
-- Block player
-- Ensure modal close after message displayed
-- When sending invite to play a game from my_friends page
-profileapi  | check_friendship
-profileapi  | sender_obj and receiver_obj recovered
-profileapi  | check_friendship > Friendship exists
-profileapi  | Not Found: /api/checkfriendship/3/2/
-profileapi  | INFO:     172.20.0.9:44418 - "GET /api/checkfriendship/3/2/ HTTP/1.1" 404 Not Found
+- Block player -> iZaak
+- Ensure modal close after message displayed -> not sure
