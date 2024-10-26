@@ -43,6 +43,9 @@ certs:
 postgres:
 	docker exec -it postgres sh \
 		-c "psql -U postgres_main_user -d transcendence_db"
+deletenotifications:
+	docker exec -it postgres sh \
+		-c "psql -U postgres_main_user -d transcendence_db -c 'DELETE FROM profileapi_notification;'"
 
 gateway:
 	docker exec -it gateway /bin/sh

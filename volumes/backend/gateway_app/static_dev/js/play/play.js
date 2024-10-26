@@ -177,23 +177,31 @@ async function playGame() {
   }
 
   // gameRound: 'single', 'Semi-Final 1', 'Semi-Final 2', 'Final'
-  let gameRound = 'single';
+  const gameRound = 'single';
+  const invite_data = {};
 
-  startNewGame(gameMode, gameType, gameRound, p1_name, p2_name);
+  startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, invite_data);
 }
 
 // Called from invite notification, starts a new game
-async function playGameInvite(gameMode, gameType, sender_username, sender_id, receiver_username, receiver_id) {
+async function playGameInvite(gameMode, gameType, p1_name, invite_data) {
   // gameMode: 'invite'
   // gameType: 'pong' or 'cows'
 
-  let p1_id = sender_id;
-  let p1_name = sender_username;
-  let p2_id = receiver_id;
-  let p2_name = receiver_username;
+  // const invite_data = {
+  //   sender_id,
+  //   sender_username,
+  //   receiver_id,
+  //   receiver_username,
+  // };
+
+  let p2_name = '';
 
   // gameRound: 'single'
-  let gameRound = 'single';
+  const gameRound = 'single';
 
-  // startNewGame(gameMode, gameType, gameRound, p1_name, p2_name);
+  console.log('playGameInvite > invite_data: ', invite_data, '. This user is p1_name: ', p1_name, ', gameMode: ', gameMode, ', gameType: ', gameType);
+
+  // return;
+  startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, invite_data);
 }

@@ -1,5 +1,5 @@
 // Open WebSocket connection to calcgame and start a new local or remote game
-async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name) {
+async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, invite_data) {
 
   let cfg;
   let game_id;
@@ -27,6 +27,16 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name) {
       calcGameSocket.send(JSON.stringify({
         type: 'opening_connection, my name is',
         p1_name: p1_name,
+        game_type: gameType
+      }));
+
+    else if (gameMode === 'invite')
+      calcGameSocket.send(JSON.stringify({
+        type: 'opening_connection, invite',
+        sender_name: invite_data.sender_username,
+        sender_id: invite_data.sender_id,
+        receiver_name: invite_data.receiver_username,
+        receiver_id: invite_data.receiver_id,
         game_type: gameType
       }));
   };

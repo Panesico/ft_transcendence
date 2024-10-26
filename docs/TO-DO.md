@@ -27,3 +27,5 @@ profileapi  | sender_obj and receiver_obj recovered
 profileapi  | check_friendship > Friendship exists
 profileapi  | Not Found: /api/checkfriendship/3/2/
 profileapi  | INFO:     172.20.0.9:44418 - "GET /api/checkfriendship/3/2/ HTTP/1.1" 404 Not Found
+- When sender cancels game invitation AFTER receiver accepted, we need to notify the receiver and to send him to another page.
+'type': 'cancel_waiting_room'

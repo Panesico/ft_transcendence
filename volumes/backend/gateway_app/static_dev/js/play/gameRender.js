@@ -226,7 +226,7 @@ function getCalcGameSocket(gameMode, gameType, gameRound) {
   }  // if single game
   else if (
     gameRound === 'single' &&
-    (gameMode === 'local' || gameMode === 'remote') &&
+    (gameMode === 'local' || gameMode === 'remote' || gameMode === 'invite') &&
     (gameType === 'pong' || gameType === 'cows')) {
     calcGameSocket =
       new WebSocket(`/wss/calcgame/${gameMode}/?gameType=${gameType}`);

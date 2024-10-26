@@ -1,6 +1,7 @@
 import json, asyncio, logging, requests, os
 from datetime import datetime
 from .handleInvite import get_authentif_variables
+from django.utils.translation import gettext as _
 
 logger = logging.getLogger(__name__)
 
@@ -16,15 +17,16 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url, s
   receiver_username = content.get('receiver_username', '')
   receiver_id = content.get('receiver_id', '')
   sender_avatar_url = content.get('sender_avatar_url', '')
+  game_mode = content.get('game_mode', '')
+  game_type = content.get('game_type', '')
   receiver_avatar_url = receiver_avatar_url
   response = content.get('response', '')
   type = content.get('type', '')
   logger.debug(f'friendRequestResponse > type: {type}')
   message = f'{sender_username} has accepted your friend request.'
   if type == 'game_request_response':
-    message = f'{sender_username} has accepted your game request.'
+    message = _(' is waiting to play ') + game_type.capitalize()
   logger.debug(f'friendRequestResponse > message: {message}')
-
 
   # Send response to frontend sender
   if sender_id in users_connected:
@@ -39,7 +41,9 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url, s
       'receiver_username': receiver_username,
       'receiver_avatar_url': receiver_avatar_url,
       'receiver_id': receiver_id,
-      'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+      'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+      'game_mode': game_mode,
+      'game_type': game_type
     })
   
   # Set the notification as read

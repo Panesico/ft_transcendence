@@ -146,7 +146,7 @@ function createAcceptButton(sender_id, receiver_id, newNotification) {
 function createGameAcceptButton(sender_id, receiver_id, sender_username, receiver_username, newNotification, game_mode, game_type) {
   const acceptButton = document.createElement('img');
   acceptButton.src = '/media/utils_icons/accept.png';
-  acceptButton.alt = 'Accept';
+  acceptButton.alt = 'accept';
   acceptButton.style.height = '2rem';
   acceptButton.style.width = '2rem';
   acceptButton.style.objectFit = 'cover';
@@ -158,8 +158,6 @@ function createGameAcceptButton(sender_id, receiver_id, sender_username, receive
   //     mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id}));
   // //    newNotification.remove(); uncomment
   //   }
-  acceptButton.onclick = playGameInvite(game_mode, game_type, sender_username, sender_id, receiver_username, receiver_id);
-
   return acceptButton;
 }
 
@@ -199,21 +197,50 @@ function createDeclineButton(sender_id, receiver_id, newNotification) {
   return declineButton;
 }
 
-function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, type) {
+function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, type, data) {
   response_type = type + '_response';
   console.log('listenUserResponse > response_type:', response_type);
+
   acceptButton.addEventListener('click', function () {
     console.log('Accept button clicked');
-    if (sendMessagesBySocket({ 'type': response_type, 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username }, mainRoomSocket) == true) {
+
+    // Sender is notified that the receiver has accepted the invite
+    if (sendMessagesBySocket({
+      'type': response_type,
+      'response': 'accept',
+      'sender_id': sender_id,
+      'receiver_id': receiver_id,
+      'sender_username': sender_username,
+      'receiver_username': receiver_username,
+      'game_mode': data.game_mode,
+      'game_type': data.game_type
+    }, mainRoomSocket) == true) {
       acceptButton.remove();
       declineButton.remove();
     }
+
+    // console.log('listenUserResponse > type:', type, ', data:', data);
+    if (type === 'game_request') {
+      // Receiver accepts the invite and goes to the waiting room
+      playGameInvite(data.game_mode, data.game_type, receiver_username, { sender_username, sender_id, receiver_username, receiver_id });
+    }
+    else if (type === 'game_request_response') {
+      // Sender accepts the invite response and goes to the waiting room
+      playGameInvite(data.game_mode, data.game_type, sender_username, { sender_username, sender_id, receiver_username, receiver_id });
+    }
+
     //    mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id}));
   });
 
   declineButton.addEventListener('click', function () {
     console.log('Decline button clicked');
     if (sendMessagesBySocket({ 'type': response_type, 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username }, mainRoomSocket) == true) {
+
+      if (type === 'game_request_response') {
+        // Sender cancels the invite response. The receiver in the waiting room needs to be notified
+        sendMessagesBySocket({ 'type': 'cancel_waiting_room', 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username }, mainRoomSocket);
+      }
+
       acceptButton.remove();
       declineButton.remove();
     }
@@ -239,6 +266,20 @@ function addFriendRequestNotification(data) {
   sender_username = data.sender_username;
   sender_id = data.sender_id;
   sender_avatar_url = data.sender_avatar_url;
+  console.log('addFriendRequestNotification > data:', data);
+  // example.data = {
+  //   date: "2024-10-24 17:49:53"
+  //   game_mode: "invite"
+  //   game_type: "pong"
+  //   message: "code has invited you to play: Pong"
+  //   receiver_avatar_url: "/media//avatars/default.png"
+  //   receiver_id: 3
+  //   receiver_username: "code"
+  //   sender_avatar_url: "/media/avatars/default.png"
+  //   sender_id: 2
+  //   sender_username: "code"
+  //   type: "game_request"
+  // }
 
   // Remove the 'no notifications' message
   removeEmptyMessage();
@@ -256,30 +297,17 @@ function addFriendRequestNotification(data) {
   // Create a span element for the message
   const message = createMessageElement(sender_username, ' sent you a friend request.');
   if (data.type === 'game_request') {
-    console.log('game_request data:', data);
-    // data = {
-    //   date: "2024-10-24 17:49:53"
-    //   game_mode: "invite"
-    //   game_type: "pong"
-    //   message: "code has invited you to play: Pong"
-    //   receiver_avatar_url: "/media//avatars/default.png"
-    //   receiver_id: 3
-    //   receiver_username: "code"
-    //   sender_avatar_url: "/media/avatars/default.png"
-    //   sender_id: 2
-    //   sender_username: "code"
-    //   type: "game_request"
-    // }
     // message.textContent = `${sender_username} invited you to play a game.`;
     message.textContent = data.message;
   }
 
   // Add button to accept the friend request represented by accept png
   let acceptButton;
-  if (data.type === 'game_request')
-    acceptButton = createGameAcceptButton(sender_id, receiver_id, sender_username, receiver_username, newNotification, data.game_mode, data.game_type);
-  else
-    acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
+  // if (data.type === 'game_request') {
+  //   acceptButton = createGameAcceptButton(sender_id, receiver_id, sender_username, receiver_username, newNotification, data.game_mode, data.game_type);
+  // }
+  // else
+  acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
 
   // Add button to decline the friend request represented by decline png
   const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);
@@ -302,7 +330,7 @@ function addFriendRequestNotification(data) {
   unreadNotifications = true;
 
   // Add event listener to the buttons accept and decline
-  listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, data.type);
+  listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, data.type, data);
 }
 
 /* -------------------Friend Response notification------------------- */
@@ -339,18 +367,24 @@ function addFriendResponseNotification(data) {
   }
   else if (data.response === 'accept' && data.type === 'game_request_response') {
     console.log('game_request_response data:', data);
-    inputMessage = ' accepted your game request.';
+    inputMessage = data.message;
   }
 
   const message = createMessageElement(receiver_username, inputMessage);
   if (data.response === 'accept' && data.type === 'game_request_response') {
     // add createGameAcceptButton and createDeclineButton
-    const acceptButton = createGameAcceptButton(sender_id, receiver_id, sender_username, receiver_username, newNotification,
-      '', //data.game_mode,
-      ''); //data.game_type);
+    // const acceptButton = createGameAcceptButton(sender_id, receiver_id, sender_username, receiver_username, newNotification,
+    //   data.game_mode,
+    //   data.game_type);
+
+    const acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
+
     const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);
 
     appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status);
+
+    // Add event listener to the buttons accept and decline
+    listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, data.type, data);
   }
   else
     appendAvatarAndMessage(avatar, message, newNotification);
