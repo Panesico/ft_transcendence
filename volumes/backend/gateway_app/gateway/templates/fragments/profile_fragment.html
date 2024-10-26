@@ -1,14 +1,9 @@
 {% load i18n %}
 {% load static %}
-<div class="container text-center">
-	<header style="min-height: 60vh; background: #dadbdc;
-		  background: linear-gradient(to right, #747474, #333333);
-		  color: white; clip-path: ellipse(50vw 2000vh at 50% 50%);
-		  display: flex; align-items: center; justify-content: center;
-		  flex-wrap: wrap; min-width: 500px;
-		  margin-top: 80px; padding: 20px;">
+<div class="container text-center mt-5 p-3 d-flex align-items-center justify-content-center flex-wrap" style="min-height: 60vh; background: #dadbdc; background: linear-gradient(to right, #747474, #333333); color: white; clip-path: ellipse(50vw 2000vh at 50% 50%); min-width: 500px;">
+
 	  <div class="profile-page-details">
-      <h1 style="margin-bottom: 1rem; align-self: flex-start;">{% trans "Profile page" %}</h1>
+      <h1 class="my-4 align-self-start">{% trans "Profile page" %}</h1>
       
       {% if user.avatar %}
         <img src="{{ user.avatar.url }}" alt="{{ user.username }}" style="height: 10rem; width: 10rem; object-fit: center;
@@ -19,13 +14,13 @@
         border-radius: 50%; border: 2px solid #fff;">
       {% endif %}
 
-      <h1 style="font-weight: 400; font-size: 1.3rem; margin: 1rem 0;">{{ user.username }}</h1>
+      <h2 class="fs-4 my-3">{{ user.username }}</h2>
 
-      <div style="display: flex; justify-content: center;">
+      <div class="d-flex justify-content-center align-items-center mb-4">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12 ,2Z"></path>
           </svg>
-          <p>{{ profile_data.city }}, {{ profile_data.country }}</p>
+          <p class="ps-1 mb-0">{{ profile_data.city }}, {{ profile_data.country }}</p>
       </div>
 
       {% comment %} <div style="display: flex; justify-content: space-evenly; width: 100%; margin-bottom: 1rem;">
@@ -44,8 +39,8 @@
       </div> {% endcomment %}
 
       <div class="btn-group flex-wrap" style="justify-content: center;">
-      <a href="{% url 'edit_profile' %}" onclick="navigate(event, '/edit_profile')" class="btn btn-light mb-2" role="button" style="margin-right: 10px; border-bottom-left-radius: unset; border-top-left-radius: unset">{% trans "Edit profile" %}</a>
-      <a href="{% url 'match_history' user.username %}" onclick="navigate(event, '/profile/match_history/{{ user.username }}')" class="btn btn-light mb-2" role="button" style="margin-right: 10px;">{% trans "Stats" %}</a>
+        <a href="{% url 'edit_profile' %}" onclick="navigate(event, '/edit_profile')" class="btn btn-light mb-2 me-2" role="button" style="border-bottom-left-radius: unset; border-top-left-radius: unset">{% trans "Edit profile" %}</a>
+        <a href="{% url 'match_history' user.username %}" onclick="navigate(event, '/profile/match_history/{{ user.username }}')" class="btn btn-light mb-2 me-2" role="button">{% trans "Stats" %}</a>
         <a href="{% url 'list_friends' %}" onclick="navigate(event, '/my_friends')" class="btn btn-light mb-2" role="button" >{% trans "My friends" %}</a>
       
         <!-- This button will be below the others -->
@@ -53,8 +48,8 @@
           {% trans "Invite a friend" %}
         </button>
       </div>
-    </div>
-  </header>
+
+    </div>  
 </div>
 
 <!-- Modal -->
