@@ -26,7 +26,9 @@ function innit_listening() {
 			},
 			credentials: 'include'
 		});
-
+		// Reset the chat
+		contactDisplayName.textContent = 'Select a contact';
+		contactAvatar.src = "{% static 'images/cow200.png' %}";
 		// Fetch the friends
 		fetch(request)
 			.then(response => response.json())
@@ -38,6 +40,13 @@ function innit_listening() {
 				// Clean the contact list
 				contactList.innerHTML = '';
 
+				if (data.friends.length === 0) {
+					const noFriends = document.createElement('p');
+					noFriends.textContent = 'You do not have any friends yet';
+					noFriends.classList.add('no-friends-message');
+					contactList.appendChild(noFriends);
+					return;
+				}
 				friendsData.forEach(friend => {
 					const contactItem = document.createElement('a');
 					contactItem.href = '#';
@@ -46,7 +55,7 @@ function innit_listening() {
 				
 					// Create avatar element
 					const avatar = document.createElement('img');
-					avatar.src = friend.avatar || "{% static 'images/default_avatar.png' %}";
+					avatar.src = friend.avatar || "{% static 'images/cow200.png' %}";
 					avatar.classList.add('rounded-circle', 'me-2');
 					avatar.style.height = '2rem';
 					avatar.style.width = '2rem';
