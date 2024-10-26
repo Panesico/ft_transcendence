@@ -128,8 +128,15 @@ function listenFormUpload(form) {
       }
 
       // Handle the response data
-      if (data.status != 'error' && data.message) {
-        console.log('data.message: ', data.message);
+      if (data.status != 'error' && data.type && data.message && !data.html) {
+        console.log('data.type: ', data.type, 'data.message: ', data.message);
+
+        if (data.type === 'profile_updated') {
+          sessionStorage.setItem('afterProfileUpdate', 'true');
+          sessionStorage.setItem('afterProfileUpdateMessage', data.message);
+          location.reload();
+        }
+
       } else
         document.querySelector('main').innerHTML = data.html;
       if (!data?.html?.includes('class="errorlist nonfield')) {

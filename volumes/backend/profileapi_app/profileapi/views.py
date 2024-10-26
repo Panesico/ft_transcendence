@@ -57,17 +57,14 @@ def api_edit_profile(request):
             logger.debug('user_obj recovered')
 
             # Log the current profile data
-            logger.debug(f'country: {user_obj.country}')
-            logger.debug(f'city: {user_obj.city}')
-            logger.debug(f'preferred_language: {user_obj.preferred_language}')
+            logger.debug(f'country: {user_obj.country}, city: {user_obj.city}, preferred_language: {user_obj.preferred_language}')
 
             # Ensure data is passed as a dictionary
             form = EditProfileForm(data, instance=user_obj)
-            logger.debug(f'form: {form}')
+            # logger.debug(f'form: {form}')
             # Log the current profile data
             logger.debug('------------------------------')
-            logger.debug(f'country: {user_obj.country}')
-            logger.debug(f'city: {user_obj.city}')
+            logger.debug(f'country: {user_obj.country}, city: {user_obj.city}')
 
             if form.is_valid():
                 logger.debug('api_edit_profile > Form is valid')
