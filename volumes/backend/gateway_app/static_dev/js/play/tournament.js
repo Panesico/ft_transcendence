@@ -76,7 +76,7 @@ async function playTournament() {
   const p4_name = document.getElementById('player4-input').value;
 
   const gameType =
-    document.querySelector('input[name="chosenGame"]:checked').id;
+    document.querySelector('input[name="chosenGame-tnmt"]:checked').id;
 
   console.log(gameType, p1_name, p2_name, p3_name, p4_name);
 

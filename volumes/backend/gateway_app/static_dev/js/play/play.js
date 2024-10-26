@@ -11,6 +11,7 @@ function checkValidInputGame(gameMode, gameType, p1_name, p2_name) {
     (gameMode !== 'local' && gameMode !== 'remote') ||
     (gameType !== 'pong' && gameType !== 'cows')) {
     let error = 'Invalid selection';
+    console.log('gameMode: ', gameMode, ', gameType: ', gameType);
     if (lang === 'fr')
       error = 'Sélection invalide';
     else if (lang === 'es')
@@ -159,7 +160,7 @@ async function playGame() {
   if (gameMode === 'remoteMode') gameMode = 'remote';
 
   const gameType =
-    document.querySelector('input[name="chosenGame"]:checked').id;
+    document.querySelector('input[name="chosenGame-play"]:checked').id;
 
   const p1_name = document.getElementById('player1-input').value;
   let p2_name = '';
