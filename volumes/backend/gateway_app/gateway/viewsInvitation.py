@@ -27,10 +27,7 @@ def check_friendship(sender_id, receiver_id):
   logger.debug(f"check_friendship > url: {url}")
   response = requests.get(url, verify=os.getenv("CERTFILE"))
   logger.debug(f"check_friendship > response: {response}")
-  if response.status_code == 200:
-    return response.json()
-  else:
-    return response.json()
+  return response.json()
 
 def post_invite(request):
   logger.debug("")

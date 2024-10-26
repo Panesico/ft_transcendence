@@ -317,16 +317,13 @@ def check_friendship(request, sender_id, receiver_id):
         logger.debug('sender_obj and receiver_obj recovered')
         if receiver_obj in sender_obj.friends.all():
             logger.debug('check_friendship > Friendship exists')
-            return JsonResponse({'status': 'success', 'message': _('Friendship exists')}, status=404)
+            return JsonResponse({'status': 'success', 'message': _('Friendship exists')}, status=200)
         else:
             logger.debug('check_friendship > Friendship does not exist')
-            return JsonResponse({'status': 'error', 'message': _('Friendship does not exist')}, status=200)
+            return JsonResponse({'status': 'failure', 'message': _('Friendship does not exist')}, status=200)
     except Profile.DoesNotExist:
         logger.debug('check_friendship > User not found')
         return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
-    except Exception as e:
-        logger.debug(f'check_friendship > {str(e)}')
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 def check_displayname_exists(request):
     logger.debug("check_displayname_exists")
