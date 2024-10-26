@@ -39,7 +39,7 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
     # user should not be able to play against themselves through two remote games
 
     async def connect(self):
-        logger.debug("ProxyCalcGameRemote > connect")
+        logger.debug("ProxyCalcGameInvite > connect")
         await self.accept()
         
         # Extract the query selector from the WebSocket URL
@@ -50,7 +50,7 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
             game_type = None
         
         if game_type == None or game_type not in ['pong', 'cows']:
-            logger.error("ProxyCalcGameRemote > No game_type provided, connection closed")
+            logger.error("ProxyCalcGameInvite > No game_type provided, connection closed")
             await self.close()
             return
         
@@ -86,92 +86,40 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
     async def check_waiting(self, game_type):
       while True:
         if game_type in self.waiting:
-            winrate_groups = { 'low': [], 'mid': [], 'high': [], 'any': [] }            
-            now = datetime.now()
-
-            # Pool players by winrate
             for player_id, player_info in self.waiting[game_type].items():
                 if player_info['player_name'] is not None:
-                    # Calculate how long the player has been in the queue
-                    waiting_time = now - player_info['queue_date']
-                    
-                    # Add players to the correct winrate group
-                    winrate = player_info['winrate']
-                    if waiting_time >= timedelta(seconds=10):
-                        winrate_groups['any'].append((player_id, player_info))
-                    elif winrate <= 33:
-                        winrate_groups['low'].append((player_id, player_info))
-                    elif winrate <= 66:
-                        winrate_groups['mid'].append((player_id, player_info))
-                    else:
-                        winrate_groups['high'].append((player_id, player_info))
-
-                    logger.debug(f"--------Player '{player_info['player_name']}', winrate groups 'low'[{len(winrate_groups['low'])}], 'mid'[{len(winrate_groups['mid'])}], 'high'[{len(winrate_groups['high'])}], 'any'[{len(winrate_groups['any'])}], waiting_time: {waiting_time}")
-
-
-            # If player in 'any' queue, match them with anyone
-            if len(winrate_groups['any']) >= 1:
-                any_player = winrate_groups['any'].pop(0)
-
-                for group in ['low', 'mid', 'high']:                    
-                    if winrate_groups[group]:
-                        
-                        logger.debug(f"--------Matched players in winrate group {group} with any player")
-                        player2_id, player2 = winrate_groups[group].pop(0)
-                        player1_id, player1 = any_player
-                        self.waiting[game_type].pop(player1_id)
-                        self.waiting[game_type].pop(player2_id)
+                    for other_player_id, other_player_info in self.waiting[game_type].items():
+                      # Check if 2 players have the same combined_id
+                      if player_info['combined_id'] == other_player_info['combined_id'] and player_id != other_player_id:
+                        logger.debug(f"Matched players with combined_id {player_info['combined_id']}")
+                        self.waiting[game_type].pop(player_id)
+                        self.waiting[game_type].pop(other_player_id)
 
                         # Create a new game
                         game_id = self.unique_id
                         self.unique_id += 1
                         self.active_games[game_id] = {
-                            "game_type": player1['game_type'],
-                            "player1": player1,
-                            "player2": player2,
+                          "game_type": player_info['game_type'],
+                          "player1": player_info,
+                          "player2": other_player_info,
                         }
 
                         await asyncio.sleep(2)
                         await self.start_game(game_id)
-                        break
+                        break                        
 
-            for group in ['low', 'mid', 'high']:
-                if len(winrate_groups[group]) >= 2:
-                    logger.debug(f"--------Matched players in winrate group {group}")
-                    player1_id, player1 = winrate_groups[group].pop(0)
-                    player2_id, player2 = winrate_groups[group].pop(0)
-
-                    # Remove the players from the waiting queue
-                    self.waiting[game_type].pop(player1_id)
-                    self.waiting[game_type].pop(player2_id)
-
-                    # Create a new game
-                    game_id = self.unique_id
-                    self.unique_id += 1
-                    self.active_games[game_id] = {
-                        "game_type": player1['game_type'],
-                        "player1": player1,
-                        "player2": player2,
-                    }
-
-                    await asyncio.sleep(2)
-                    await self.start_game(game_id)
-                    break
-
-            await asyncio.sleep(1)
-        else:
-            await asyncio.sleep(1)
+        await asyncio.sleep(1)
 
 
     async def start_game(self, game_id):
         logger.debug("")
-        logger.debug(f"ProxyCalcGameRemote > start_game game_id: {game_id}")
+        logger.debug(f"ProxyCalcGameInvite > start_game game_id: {game_id}")
         game = self.active_games[game_id]
         player1 = game['player1']
         player2 = game['player2']
-        # logger.debug(f"ProxyCalcGameRemote > start_game game: {pformat(game)}")
-        # logger.debug(f"ProxyCalcGameRemote > start_game player1: {pformat(player1)}")
-        # logger.debug(f"ProxyCalcGameRemote > start_game player2: {pformat(player2)}")
+        # logger.debug(f"ProxyCalcGameInvite > start_game game: {pformat(game)}")
+        # logger.debug(f"ProxyCalcGameInvite > start_game player1: {pformat(player1)}")
+        # logger.debug(f"ProxyCalcGameInvite > start_game player2: {pformat(player2)}")
 
         if player1['player_name'] == player2['player_name']:
             player1['player_name'] += "#1"
@@ -211,7 +159,7 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
             }))
             
         except Exception as e:
-            logger.error(f"ProxyCalcGameRemote > start_game Error notifying players: {e}")
+            logger.error(f"ProxyCalcGameInvite > start_game Error notifying players: {e}")
 
         # Create an SSL context that explicitly trusts the calcgame certificate
         ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
@@ -232,7 +180,7 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
-        logger.debug("ProxyCalcGameRemote > disconnect")
+        logger.debug("ProxyCalcGameInvite > disconnect")
 
         connect_id = self.channel_name
 
@@ -254,12 +202,12 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         # Handle messages received from the client
-        logger.debug(f"ProxyCalcGameRemote > receive from {self.channel_name}")
-        logger.debug(f"ProxyCalcGameRemote > receive from client: {text_data}")
+        logger.debug(f"ProxyCalcGameInvite > receive from {self.channel_name}")
+        logger.debug(f"ProxyCalcGameInvite > receive from client: {text_data}")
         data = json.loads(text_data)
         connect_id = self.channel_name
 
-        if data['type'] == 'opening_connection, my name is':
+        if data['type'] == 'opening_connection, invite':
             # Client confirms connection with their player name
             game_type = data['game_type']
             if connect_id in self.waiting[game_type]:
@@ -269,14 +217,10 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
                 player['game_type'] = game_type
                 player['player_id'] = player['context']['user']['user_id']
                 player['queue_date'] = datetime.now()
+                player['combined_id'] = f"{data['sender_id']}_{data['receiver_id']}"
 
-                # Get player winrate
-                url = 'https://play:9003/api/getWinrate/' + str(player['player_id']) + '/' + game_type + '/'
-                response = await asyncRequest("GET", "", url, "")
-                player['winrate'] = response.get('winrate') or 0
-
-                logger.debug(f"Updated waiting[{game_type}][connect_id] with player_name: {data['p1_name']}, player_id: {self.waiting[game_type][connect_id]['player_id']}, winrate: {self.waiting[game_type][connect_id]['winrate']}")
-                # logger.debug(f"ProxyCalcGameRemote > opening_connection player: {pformat(player)}")
+                logger.debug(f"Updated waiting[{game_type}][connect_id] with player_name: {data['p1_name']}, player_id: {self.waiting[game_type][connect_id]['player_id']}, combined_id: {self.waiting[game_type][connect_id]['combined_id']}")
+                # logger.debug(f"ProxyCalcGameInvite > opening_connection player: {pformat(player)}")
             else:
                 logger.error(f"Player {connect_id} not found in waiting")
 
@@ -341,7 +285,7 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
                         'p1_name': player1['player_name'],
                         'p2_name': player2['player_name'],
                     })
-                    logger.debug(f"ProxyCalcGameRemote > listen_to_calcgame:  p1_name: {player1['player_name']}, p2_name: {player2['player_name']}")
+                    logger.debug(f"ProxyCalcGameInvite > listen_to_calcgame:  p1_name: {player1['player_name']}, p2_name: {player2['player_name']}")
                     await calcgame_ws.send(text_data)
 
                     # Send message received from calcgame to both players
@@ -361,11 +305,11 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
                     await player2['ws'].send(calcgame_response)                
 
         except websockets.exceptions.ConnectionClosed:
-            logger.debug("ProxyCalcGameRemote > calcgame connection closed")
+            logger.debug("ProxyCalcGameInvite > calcgame connection closed")
             pass
 
     async def waiting_room(self, context):
-        logger.debug("ProxyCalcGameRemote > player in waiting_room")
+        logger.debug("ProxyCalcGameInvite > player in waiting_room")
 
         html = render_to_string('fragments/waiting_room.html', context=context)
 
@@ -376,7 +320,7 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
         }))
 
     async def game_end(self, game_id, calcgame_response):
-        logger.debug(f"ProxyCalcGameRemote > game_end game_id: {game_id}")
+        logger.debug(f"ProxyCalcGameInvite > game_end game_id: {game_id}")
         game = self.active_games[game_id]
         player1 = game['player1']
         player2 = game['player2']
@@ -410,7 +354,7 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
 
 
     async def save_game_to_database(self, game_id, game, player1, player2, game_result):
-        logger.debug(f"ProxyCalcGameRemote > save_game_to_database game_id: {game_id}")
+        logger.debug(f"ProxyCalcGameInvite > save_game_to_database game_id: {game_id}")
         # Save game to database
         play_url = 'https://play:9003/api/saveGame/'
         csrf_token = player1['context']['cookies'].get('csrftoken')
@@ -437,8 +381,8 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
 
         # Close the websocket connection to the calcgame service
         await game['calcgame_ws'].close()
-        logger.debug(f"ProxyCalcGameRemote > calcgame_ws closed")
+        logger.debug(f"ProxyCalcGameInvite > calcgame_ws closed")
 
         # Remove the game from active_games
         self.active_games.pop(game_id)
-        logger.debug("ProxyCalcGameRemote > game removed from active_games")
+        logger.debug("ProxyCalcGameInvite > game removed from active_games")

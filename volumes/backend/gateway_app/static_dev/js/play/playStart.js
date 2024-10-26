@@ -33,6 +33,7 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
     else if (gameMode === 'invite')
       calcGameSocket.send(JSON.stringify({
         type: 'opening_connection, invite',
+        p1_name: p1_name,
         sender_name: invite_data.sender_username,
         sender_id: invite_data.sender_id,
         receiver_name: invite_data.receiver_username,
@@ -62,7 +63,7 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
       document.querySelector('main').innerHTML = data.html;
       if (gameMode === 'local') {
         addStartButtonListener()
-      } else if (gameMode === 'remote') {
+      } else if (gameMode === 'remote' || gameMode === 'invite') {
         game_id = data.game_id;
         player_role = data.player_role;
         addIndicatorToThisPlayer(player_role);
