@@ -26,9 +26,9 @@ function innit_listening() {
 			},
 			credentials: 'include'
 		});
-		// Reset the chat
-		contactDisplayName.textContent = 'Select a contact';
-		contactAvatar.src = "{% static 'images/cow200.png' %}";
+		// Reset header
+		contactDisplayName.textContent = 'Select a friend';
+		contactAvatar.src = "{% static 'images/default_avatar.png' %}";
 		// Fetch the friends
 		fetch(request)
 			.then(response => response.json())
@@ -39,10 +39,9 @@ function innit_listening() {
 
 				// Clean the contact list
 				contactList.innerHTML = '';
-
-				if (data.friends.length === 0) {
+				if (friendsData.length === 0) {
 					const noFriends = document.createElement('p');
-					noFriends.textContent = 'You do not have any friends yet';
+					noFriends.textContent = 'No friends yet';
 					noFriends.classList.add('no-friends-message');
 					contactList.appendChild(noFriends);
 					return;
@@ -55,7 +54,7 @@ function innit_listening() {
 				
 					// Create avatar element
 					const avatar = document.createElement('img');
-					avatar.src = friend.avatar || "{% static 'images/cow200.png' %}";
+					avatar.src = friend.avatar || "{% static 'images/default_avatar.png' %}";
 					avatar.classList.add('rounded-circle', 'me-2');
 					avatar.style.height = '2rem';
 					avatar.style.width = '2rem';
@@ -83,8 +82,12 @@ function innit_listening() {
 						contactItem.classList.add('selected-contact');
 
 						// Update the avatar and display name
+						const contactAvatarLink = document.getElementById('contactAvatarLink');
+						const contactDisplayNameLink = document.getElementById('contactDisplayNameLink');
+						contactAvatarLink.href = '/friend_profile/' + friend.user_id;
 						contactAvatar.src = friend.avatar;
 						contactDisplayName.textContent = friend.display_name;
+						contactDisplayNameLink.href = '/friend_profile/' + friend.user_id;
 						currentChatId.value = friend.user_id;
 						
 						// Get all the messages between the user and the selected friend
