@@ -41,5 +41,6 @@ volumes/frontend/
 *Mimi*
 *niko*
 *pepe*
+volumes/backend/blockchain_app/node_modules/*
 
 user_data.json
