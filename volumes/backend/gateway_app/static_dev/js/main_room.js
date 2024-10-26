@@ -92,19 +92,22 @@ window.onload = () => {
   function parseSocketMessage(data) {
     console.log('parseSocketMessage > data:', data);
     if (data.type === 'friend_request') {
-      addFriendRequestNotification(data);
+      addRequestNotification(data);
     }
     else if (data.type === 'friend_request_response') {
-      addFriendResponseNotification(data);
+      addResponseNotification(data);
     }
     else if (data.type === 'chat') {
       handleChatMessages(data);
     }
     else if (data.type === 'game_request') {
-      addFriendRequestNotification(data);
+      addRequestNotification(data);
     }
     else if (data.type === 'game_request_response') {
-      addFriendResponseNotification(data);
+      addResponseNotification(data);
+    }
+    else if (data.type === 'cancel_waiting_room') {
+      addResponseNotification(data);
     }
     else {
       console.log('parseSocketMessage > data.type:', data.type);

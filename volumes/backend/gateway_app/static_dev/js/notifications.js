@@ -4,14 +4,14 @@ function removeEmptyMessage() {
   const emptyMessage = document.getElementById('notificationContent');
   if (emptyMessage) {
     if (emptyMessage.innerHTML.trim() === 'You have no notifications') {
-      console.log('addFriendRequestNotification > Removing empty message');
+      console.log('addRequestNotification > Removing empty message');
       emptyMessage.remove();
       unreadNotifications = false;
 
     }
     else {
-      console.log('addFriendRequestNotification > No empty message to remove');
-      console.log('addFriendRequestNotification > emptyMessage.innerHTML:', emptyMessage.innerHTML);
+      console.log('addRequestNotification > No empty message to remove');
+      console.log('addRequestNotification > emptyMessage.innerHTML:', emptyMessage.innerHTML);
     }
 
   }
@@ -164,15 +164,15 @@ function createGameAcceptButton(sender_id, receiver_id, sender_username, receive
 function changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id, status) {
   if (notificationDropdownClass) {
     //notificationDropdown.insertBefore(newNotification, notificationDropdown.firstChild);
-    console.log('addFriendRequestNotification > notificationDropdown:', notificationDropdown);
+    console.log('addRequestNotification > notificationDropdown:', notificationDropdown);
     const bellIcon = notificationDropdown.querySelector('img');
     if (bellIcon && status !== 'accepted' && status !== 'declined') {
-      console.log('addFriendRequestNotification > status:', status);
+      console.log('addRequestNotification > status:', status);
       bellIcon.src = '/media/utils_icons/bell_up.png';
     }
   }
   else {
-    console.log('addFriendRequestNotification > notificationDropdown is null');
+    console.log('addRequestNotification > notificationDropdown is null');
   }
 }
 
@@ -238,7 +238,7 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
 
       if (type === 'game_request_response') {
         // Sender cancels the invite response. The receiver in the waiting room needs to be notified
-        sendMessagesBySocket({ 'type': 'cancel_waiting_room', 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username }, mainRoomSocket);
+        sendMessagesBySocket({ 'type': 'cancel_waiting_room', 'response': 'decline', 'sender_id': receiver_id, 'receiver_id': sender_id, 'sender_username': receiver_username, 'receiver_username': sender_username }, mainRoomSocket);
       }
 
       acceptButton.remove();
@@ -257,7 +257,7 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
   });
 }
 
-function addFriendRequestNotification(data) {
+function addRequestNotification(data) {
   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
   const notificationDropdownClass = document.getElementById('notificationClassContent');
   receiver_username = data.receiver_username;
@@ -266,7 +266,7 @@ function addFriendRequestNotification(data) {
   sender_username = data.sender_username;
   sender_id = data.sender_id;
   sender_avatar_url = data.sender_avatar_url;
-  console.log('addFriendRequestNotification > data:', data);
+  console.log('addRequestNotification > data:', data);
   // example.data = {
   //   date: "2024-10-24 17:49:53"
   //   game_mode: "invite"
@@ -334,7 +334,7 @@ function addFriendRequestNotification(data) {
 }
 
 /* -------------------Friend Response notification------------------- */
-function addFriendResponseNotification(data) {
+function addResponseNotification(data) {
   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
   const notificationDropdownClass = document.getElementById('notificationClassContent');
   receiver_username = data.receiver_username;
@@ -366,8 +366,12 @@ function addFriendResponseNotification(data) {
     inputMessage = ' declined your friend request.';
   }
   else if (data.response === 'accept' && data.type === 'game_request_response') {
-    console.log('game_request_response data:', data);
     inputMessage = data.message;
+  }
+  else if (data.type === 'cancel_waiting_room') {
+    inputMessage = data.message;
+    document.querySelector('main').innerHTML = data.html;
+    console.warn('redirect to home');
   }
 
   const message = createMessageElement(receiver_username, inputMessage);

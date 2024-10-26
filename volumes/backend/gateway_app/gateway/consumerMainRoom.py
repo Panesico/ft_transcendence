@@ -1,6 +1,6 @@
 import json, asyncio, logging, requests, os
 from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
-from .handleMainRoom import readMessage, friendRequestResponse, friendRequest, handleNewConnection, checkForNotifications, markNotificationAsRead
+from .handleMainRoom import readMessage, requestResponse, friendRequest, handleNewConnection, checkForNotifications, markNotificationAsRead
 from .handleChatMessages import sendChatMessage, innitChat, getConversation, checkForChatMessages
 from .handleInvite import get_authentif_variables, invite_to_game
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     elif typeMessage == 'friend_request':
       await friendRequest(content, users_connected, self)
     elif typeMessage == 'friend_request_response':
-      await friendRequestResponse(content, users_connected, self.avatar_url, self)
+      await requestResponse(content, users_connected, self.avatar_url, self)
     elif typeMessage == 'mark_notification_as_read':
       await markNotificationAsRead(self, content, self.user_id)
     elif typeMessage == 'chat':
@@ -68,7 +68,9 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     elif typeMessage == 'invite_game':
       logger.debug(f'mainRoom > invite_game')
       logger.debug(f'mainRoom > invite_game > content: {content}')
-      await invite_to_game(self, content, users_connected)
-    
+      await invite_to_game(self, content, users_connected)    
     elif typeMessage == 'game_request_response':
-      await friendRequestResponse(content, users_connected, self.avatar_url, self)
+      await requestResponse(content, users_connected, self.avatar_url, self)
+    elif typeMessage == 'cancel_waiting_room':
+      logger.debug(f'mainRoom > cancel_waiting_room, username: {self.username}')
+      await requestResponse(content, users_connected, self.avatar_url, self)

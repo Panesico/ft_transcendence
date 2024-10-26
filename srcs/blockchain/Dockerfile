@@ -10,8 +10,8 @@ WORKDIR /usr/src/app/${SERVICE_NAME}_app
 
 COPY  ./tools/ /tmp/
 
-RUN chmod +x /tmp/entrypoint.sh
+RUN chmod +x /tmp/init_hardhat.sh
 
 EXPOSE 8545
 
-ENTRYPOINT [ "/tmp/entrypoint.sh" ]
+ENTRYPOINT [ "/tmp/init_hardhat.sh" ]

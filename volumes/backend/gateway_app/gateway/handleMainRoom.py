@@ -2,6 +2,7 @@ import json, asyncio, logging, requests, os
 from datetime import datetime
 from .handleInvite import get_authentif_variables
 from django.utils.translation import gettext as _
+from django.template.loader import render_to_string
 
 logger = logging.getLogger(__name__)
 
@@ -9,8 +10,8 @@ def readMessage(message):
   logger.debug(f"readMessage > message: {message}")
   return message
 
-async def friendRequestResponse(content, users_connected, receiver_avatar_url, self):
-  logger.debug(f'friendRequestResponse > Friend request response: {content}')
+async def requestResponse(content, users_connected, receiver_avatar_url, self):
+  logger.debug(f'requestResponse > Friend request response: {content}')
 
   sender_id = content.get('sender_id', '')
   sender_username = content.get('sender_username', '')
@@ -19,18 +20,22 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url, s
   sender_avatar_url = content.get('sender_avatar_url', '')
   game_mode = content.get('game_mode', '')
   game_type = content.get('game_type', '')
+  html = ''
   receiver_avatar_url = receiver_avatar_url
   response = content.get('response', '')
   type = content.get('type', '')
-  logger.debug(f'friendRequestResponse > type: {type}')
+  logger.debug(f'requestResponse > type: {type}')
   message = f'{sender_username} has accepted your friend request.'
   if type == 'game_request_response':
     message = _(' is waiting to play ') + game_type.capitalize()
-  logger.debug(f'friendRequestResponse > message: {message}')
+  elif type == 'cancel_waiting_room':
+    message = _(' has canceled the game request.')
+    html = render_to_string('fragments/home_fragment.html')
+  logger.debug(f'requestResponse > message: {message}')
 
   # Send response to frontend sender
   if sender_id in users_connected:
-    logger.debug(f'friendRequestResponse > sender_id: {sender_id} is in users_connected {response}')
+    logger.debug(f'requestResponse > sender_id: {sender_id} is in users_connected {response}')
     await users_connected[sender_id].send_json({
       'type': type,
       'response': response,
@@ -43,7 +48,8 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url, s
       'receiver_id': receiver_id,
       'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
       'game_mode': game_mode,
-      'game_type': game_type
+      'game_type': game_type,
+      'html': html
     })
   
   # Set the notification as read
@@ -58,18 +64,46 @@ async def friendRequestResponse(content, users_connected, receiver_avatar_url, s
       }
   try:
     response = requests.get(profileapi_url, headers=headers, verify=os.getenv("CERTFILE"))
-    logger.debug(f'friendRequestResponse > response: {response}')
-    logger.debug(f'friendRequestResponse > response.json(): {response.json()}')
+    logger.debug(f'requestResponse > response: {response}')
+    logger.debug(f'requestResponse > response.json(): {response.json()}')
 
     response.raise_for_status()
     if response.status_code == 200:
-      logger.debug(f'friendRequestResponse > Notification marked as read')
+      logger.debug(f'requestResponse > Notification marked as read')
     else:
-      logger.debug(f'friendRequestResponse > Error marking notification as read')
+      logger.debug(f'requestResponse > Error marking notification as read')
   except Exception as e:
-    logger.debug(f'friendRequestResponse > Error marking notification as read: {e}')
+    logger.debug(f'requestResponse > Error marking notification as read: {e}')
     return
 
+# async def cancelGameRequest(content, users_connected, receiver_avatar_url, self):
+#   logger.debug(f'cancelGameRequest > Game request response: {content}')
+
+#   sender_id = content.get('sender_id', '')
+#   sender_username = content.get('sender_username', '')
+#   receiver_username = content.get('receiver_username', '')
+#   receiver_id = content.get('receiver_id', '')
+#   sender_avatar_url = content.get('sender_avatar_url', '')
+#   game_mode = content.get('game_mode', '')
+#   game_type = content.get('game_type', '')
+#   receiver_avatar_url = receiver_avatar_url
+#   response = content.get('response', '')
+#   type = content.get('type', '')
+
+#   logger.debug(f'cancelGameRequest > type: {type}')
+#   message = f'{sender_username} has canceled the game request.'
+
+#   csrf_token = self.scope['cookies']['csrftoken']
+#   headers = {
+#           'X-CSRFToken': csrf_token,
+#           'Cookie': f'csrftoken={csrf_token}',
+#           'Content-Type': 'application/json',
+#           'HTTP_HOST': 'profileapi',
+#           'Referer': 'https://gateway:8443',
+#       }
+#   try:
+#     response = requests.get(profileapi_url, headers=headers, verify=os.getenv("CERTFILE"))
+#     logger.debug(f
 
 async def friendRequest(content, users_connected, self):
   sender_id = content.get('sender_id', '')
