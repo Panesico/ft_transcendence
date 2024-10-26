@@ -29,6 +29,8 @@ urlpatterns = [
 
     # Friends
     path('api/checkfriendship/<int:sender_id>/<int:receiver_id>/', views.check_friendship, name='check_friendship'),
+	path('api/blockFriend/<int:friend_id>/', views.block_friends, name='block'),
+	path('api/unblockFriend/<int:friend_id>/', views.unblock_friends, name='unblock'),
 	
     path('livechat/', include('livechat.urls')),
 

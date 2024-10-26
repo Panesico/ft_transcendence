@@ -175,15 +175,57 @@ def block_friends(request, user_id):
     }
 
   if request.user.id == user_id:
-    status = 'error'
-    message = 'You cannot block yourself'
-    user_response =  JsonResponse({'status': status, 'message': message})
-  
+    user_response = JsonResponse({'status': 'error', 'message': _('You cannot block yourself')})
   else:
     logger.debug(f"block_friends > user_id: {user_id}")
     logger.debug(f"block_friends > user_id: {request.user.id}")
-    status = 'success'
-    message = 'Friend blocked!'
-    request = requests.post('https://profileapi:9002/api/blockFriend/' + str(user_id) + '/', headers=headers, verify=os.getenv("CERTFILE"))
+    data = {
+      'user_id': request.user.id,
+    }
+    request = requests.post(
+      'https://profileapi:9002/api/blockFriend/' + str(user_id) + '/',
+      headers=headers,
+      json=data,
+      verify=os.getenv("CERTFILE")
+      )
+    if request.status_code == 200:
+      user_response = JsonResponse({'status': 'success', 'message': _('User blocked')})
+    else:
+      user_response = JsonResponse({'status': 'error', 'message': _('An error occured')})
+  return user_response
 
+def unblock_friends(request, user_id):
+  logger.debug("")
+  logger.debug('unblock_friends')
+  logger.debug(f"unblock_friends > user {request.user.id} wants to unblock {user_id}")
+
+  if request.method != 'POST':
+    return redirect('405')
+  
+  csrf_token = request.COOKIES.get('csrftoken')
+  headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+    }
+
+  if request.user.id == user_id:
+    user_response = JsonResponse({'status': 'error', 'message': _('You cannot unblock yourself')})
+  else:
+    logger.debug(f"unblock_friends > user_id: {user_id}")
+    logger.debug(f"unblock_friends > user_id: {request.user.id}")
+    data = {
+      'user_id': request.user.id,
+    }
+    request = requests.post(
+      'https://profileapi:9002/api/unblockFriend/' + str(user_id) + '/',
+      headers=headers,
+      json=data,
+      verify=os.getenv("CERTFILE")
+      )
+    if request.status_code == 200:
+      user_response = JsonResponse({'status': 'success', 'message': _('User unblocked')})
+    else:
+      user_response = JsonResponse({'status': 'error', 'message': _('An error occured')})
   return user_response

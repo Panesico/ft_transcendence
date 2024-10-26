@@ -105,6 +105,7 @@ def get_full_profile(request, user_id):
               'city': user_obj.city,
               'display_name': user_obj.display_name,
               'preferred_language': user_obj.preferred_language,
+              'blocked_users': list(user_obj.blocked_users.values_list('id', flat=True)),
               'played_games': user_obj.played_games,
               'wins': user_obj.wins,
               'defeats': user_obj.defeats,
@@ -344,3 +345,48 @@ def check_displayname_exists(request):
             return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
     logger.debug('check_displayname_exists > Method not allowed')
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
+
+def block_friends(request, friend_id):
+    logger.debug("block_friends")
+    try:
+        if request.method != 'POST':
+            logger.debug('block_friends > Method not allowed')
+            return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+        logger.debug('request.user.id: ' + str(user_id))
+        user_obj = Profile.objects.get(user_id=user_id)
+        logger.debug('user_obj recovered')
+        friend_obj = Profile.objects.get(user_id=friend_id)
+        logger.debug('friend_obj recovered')
+        user_obj.blocked_users.add(friend_obj)
+        user_obj.save()
+        logger.debug('Friend blocked')
+        return JsonResponse({'status': 'success', 'message': _('Friend blocked')}, status=200)
+    except Profile.DoesNotExist:
+        logger.debug('block_friends > User not found')
+        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
+
+def unblock_friends(request, friend_id):
+    logger.debug("unblock_friends")
+    try:
+        if request.method != 'POST':
+            logger.debug('unblock_friends > Method not allowed')
+            return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+        logger.debug('request.user.id: ' + str(user_id))
+        user_obj = Profile.objects.get(user_id=user_id)
+        logger.debug('user_obj recovered')
+        friend_obj = Profile.objects.get(user_id=friend_id)
+        logger.debug('friend_obj recovered')
+        user_obj.blocked_users.remove(friend_obj)
+        user_obj.save()
+        logger.debug('Friend unblocked')
+        return JsonResponse({'status': 'success', 'message': _('Friend unblocked')}, status=200)
+    except Profile.DoesNotExist:
+        logger.debug('unblock_friends > User not found')
+        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
+    except Exception as e:
+        logger.debug(f'unblock_friends > {str(e)}')
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

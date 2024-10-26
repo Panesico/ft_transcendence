@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-04 10:21+0000\n"
+"POT-Creation-Date: 2024-10-26 11:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ENGLISH <LL@li.org>\n"
@@ -17,6 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: gateway/consumerProxyCalcGameRemote.py:198
+#: gateway/consumerProxyCalcGameRemote.py:207
+msgid "Game starting..."
+msgstr ""
+
+#: gateway/consumerProxyCalcGameRemote.py:199
+msgid "You are the player on the left"
+msgstr ""
+
+#: gateway/consumerProxyCalcGameRemote.py:208
+msgid "You are the player on the right"
+msgstr ""
 
 #: gateway/forms.py:12 gateway/forms.py:31 gateway/forms.py:78
 msgid "Username"
@@ -50,33 +63,25 @@ msgstr "Country"
 msgid "City"
 msgstr "City"
 
-#: gateway/forms.py:114
+#: gateway/forms.py:112
+msgid "Language"
+msgstr "Language"
+
+#: gateway/forms.py:125
 msgid "New password"
 msgstr "New password"
 
-#: gateway/forms.py:122
+#: gateway/forms.py:133
 msgid "Confirm new Password"
 msgstr "Confirm new Password"
 
-#: gateway/forms.py:134
-msgid "Player 1"
-msgstr "Player 1"
+#: gateway/handleInvite.py:52
+msgid " has invited you to play: "
+msgstr ""
 
-#: gateway/forms.py:144
-msgid "Player 2"
-msgstr "Player 2"
-
-#: gateway/forms.py:154
-msgid "Player 3"
-msgstr "Player 3"
-
-#: gateway/forms.py:164
-msgid "Player 4"
-msgstr "Player 4"
-
-#: gateway/forms.py:179
-msgid "Player names must be unique."
-msgstr "Player names must be unique."
+#: gateway/templates/base_index.html:82
+msgid "Choose..."
+msgstr ""
 
 #: gateway/templates/fragments/404_fragment.html:3
 msgid "Page Not Found"
@@ -90,251 +95,509 @@ msgstr "The page you're looking for does not exist."
 msgid "Method Not Allowed"
 msgstr "Method Not Allowed"
 
-#: gateway/templates/fragments/edit_profile_fragment.html:2
+#: gateway/templates/fragments/edit_profile_fragment.html:3
 msgid "Edit profile information of "
 msgstr "Edit profile information of "
 
-#: gateway/templates/fragments/edit_profile_fragment.html:7
-msgid "Avatar"
-msgstr "Avatar"
+#: gateway/templates/fragments/edit_profile_fragment.html:33
+#, fuzzy
+#| msgid "Upload avatar"
+msgid "Upload Avatar"
+msgstr "Upload avatar"
 
-#: gateway/templates/fragments/edit_profile_fragment.html:11
-#: gateway/templates/fragments/myfriends_fragment.html:16
-#: gateway/templates/fragments/profile_fragment.html:14
-#: gateway/templates/includes/header.html:61
-msgid "default icon"
-msgstr "default icon"
-
-#: gateway/templates/fragments/edit_profile_fragment.html:28
-msgid "User info"
+#: gateway/templates/fragments/edit_profile_fragment.html:43
+#, fuzzy
+#| msgid "User info"
+msgid "User Info"
 msgstr "User info"
 
-#: gateway/templates/fragments/edit_profile_fragment.html:44
-#: gateway/templates/fragments/edit_profile_fragment.html:69
+#: gateway/templates/fragments/edit_profile_fragment.html:62
+#, fuzzy
+#| msgid "Language"
+msgid "Preferred Language"
+msgstr "Language"
+
+#: gateway/templates/fragments/edit_profile_fragment.html:65
+msgid "English"
+msgstr "English"
+
+#: gateway/templates/fragments/edit_profile_fragment.html:68
+msgid "Spanish"
+msgstr "Spanish"
+
+#: gateway/templates/fragments/edit_profile_fragment.html:71
+msgid "French"
+msgstr "French"
+
+#: gateway/templates/fragments/edit_profile_fragment.html:75
 msgid "Submit"
 msgstr "Submit"
 
-#: gateway/templates/fragments/edit_profile_fragment.html:53
-msgid "Security"
-msgstr "Security"
+#: gateway/templates/fragments/edit_profile_fragment.html:103
+#, fuzzy
+#| msgid "Confirm Password"
+msgid "Change Password"
+msgstr "Confirm Password"
 
-#: gateway/templates/fragments/edit_profile_fragment.html:82
-#: gateway/templates/fragments/edit_profile_fragment.html:83
-msgid "Passwords do not match!"
-msgstr "Passwords do not match!"
+#: gateway/templates/fragments/friend_profile_fragment.html:13
+#: gateway/templates/fragments/myfriends_fragment.html:69
+msgid "Block"
+msgstr ""
+
+#: gateway/templates/fragments/friend_profile_fragment.html:23
+msgid "Send friend request"
+msgstr ""
+
+#: gateway/templates/fragments/friend_profile_fragment.html:24
+msgid "Invite to play"
+msgstr ""
+
+#: gateway/templates/fragments/friend_profile_fragment.html:63
+#: gateway/templates/fragments/match_history_fragment.html:5
+msgid "Game statistics"
+msgstr ""
+
+#: gateway/templates/fragments/friend_profile_fragment.html:66
+#: gateway/templates/fragments/match_history_fragment.html:10
+msgid "Games"
+msgstr "Games"
+
+#: gateway/templates/fragments/friend_profile_fragment.html:70
+#: gateway/templates/fragments/match_history_fragment.html:14
+msgid "Wins"
+msgstr "Wins"
+
+#: gateway/templates/fragments/friend_profile_fragment.html:74
+#: gateway/templates/fragments/match_history_fragment.html:18
+msgid "Loses"
+msgstr ""
+
+#: gateway/templates/fragments/friend_profile_fragment.html:81
+#: gateway/templates/fragments/match_history_fragment.html:25
+msgid "Total score"
+msgstr ""
+
+#: gateway/templates/fragments/friend_profile_fragment.html:85
+#: gateway/templates/fragments/match_history_fragment.html:29
+msgid "Winrate"
+msgstr ""
+
+#: gateway/templates/fragments/game_end_fragment.html:4
+#: gateway/templates/fragments/tournament_next_game_fragment.html:4
+#, fuzzy
+#| msgid "Won"
+msgid "won"
+msgstr "Won"
+
+#: gateway/templates/fragments/game_end_fragment.html:8
+msgid "Go back to Play "
+msgstr ""
 
 #: gateway/templates/fragments/game_fragment.html:5
-#: gateway/templates/includes/header.html:31
+#: gateway/templates/fragments/game_remote_fragment.html:5
 msgid "Game"
 msgstr "Game"
 
 #: gateway/templates/fragments/game_fragment.html:14
-#: gateway/templates/fragments/game_fragment.html:25
+#: gateway/templates/fragments/game_fragment.html:16
+#: gateway/templates/fragments/game_fragment.html:26
+#: gateway/templates/fragments/game_remote_fragment.html:14
+#: gateway/templates/fragments/game_remote_fragment.html:16
+#: gateway/templates/fragments/game_remote_fragment.html:27
+#: gateway/templates/fragments/game_remote_fragment.html:29
+#: gateway/templates/fragments/tournament_start_fragment.html:13
+#: gateway/templates/fragments/tournament_start_fragment.html:15
+#: gateway/templates/fragments/tournament_start_fragment.html:26
+#: gateway/templates/fragments/tournament_start_fragment.html:28
 msgid "user profile picture"
 msgstr "user profile picture"
 
-#: gateway/templates/fragments/game_fragment.html:16
-#: gateway/templates/fragments/game_fragment.html:40
-msgid "Player1"
-msgstr "Player1"
-
-#: gateway/templates/fragments/game_fragment.html:24
-#: gateway/templates/fragments/game_fragment.html:42
-msgid "Player2"
-msgstr "Player2"
-
-#: gateway/templates/fragments/game_fragment.html:43
+#: gateway/templates/fragments/game_fragment.html:35
+#: gateway/templates/fragments/tournament_next_game_fragment.html:8
+#: gateway/templates/fragments/tournament_start_fragment.html:38
 msgid "Start"
 msgstr "Start"
 
-#: gateway/templates/fragments/home_fragment.html:5
-msgid "Welcome to Pong,"
+#: gateway/templates/fragments/game_remote_fragment.html:49
+#: gateway/templates/fragments/game_remote_fragment.html:53
+msgid "ready"
+msgstr ""
+
+#: gateway/templates/fragments/home_fragment.html:6
+#, fuzzy
+#| msgid "Welcome to Pong,"
+msgid "Welcome,"
 msgstr "Welcome to Pong,"
 
-#: gateway/templates/fragments/home_fragment.html:7
-msgid "Welcome to Pong"
+#: gateway/templates/fragments/home_fragment.html:8
+#, fuzzy
+#| msgid "Welcome to Pong"
+msgid "Welcome"
 msgstr "Welcome to Pong"
 
-#: gateway/templates/fragments/login_fragment.html:7
-#: gateway/templates/fragments/login_fragment.html:31
-#: gateway/templates/includes/header.html:51
+#: gateway/templates/fragments/home_fragment.html:12
+#: gateway/templates/fragments/waiting_room.html:9
+msgid "Cow in Space"
+msgstr ""
+
+#: gateway/templates/fragments/login_fragment.html:4
+#: gateway/templates/fragments/login_fragment.html:29
+#: gateway/templates/includes/header.html:40
 msgid "Log In"
 msgstr "Log In"
 
-#: gateway/templates/fragments/login_fragment.html:34
+#: gateway/templates/fragments/login_fragment.html:38
+msgid "Login with 42"
+msgstr ""
+
+#: gateway/templates/fragments/login_fragment.html:41
 msgid "Don't have an account?"
 msgstr "Don't have an account?"
 
-#: gateway/templates/fragments/myfriends_fragment.html:3
+#: gateway/templates/fragments/match_history_fragment.html:42
+msgid "Game History"
+msgstr ""
+
+#: gateway/templates/fragments/match_history_fragment.html:47
+msgid "Date"
+msgstr ""
+
+#: gateway/templates/fragments/match_history_fragment.html:48
+msgid "Type"
+msgstr ""
+
+#: gateway/templates/fragments/match_history_fragment.html:49
+msgid "Player 1"
+msgstr "Player 1"
+
+#: gateway/templates/fragments/match_history_fragment.html:50
+msgid "Player 2"
+msgstr "Player 2"
+
+#: gateway/templates/fragments/match_history_fragment.html:51
+msgid "Result"
+msgstr ""
+
+#: gateway/templates/fragments/match_history_fragment.html:52
+msgid "Winner"
+msgstr ""
+
+#: gateway/templates/fragments/myfriends_fragment.html:5
+#: gateway/templates/fragments/profile_fragment.html:45
+#: gateway/templates/includes/header.html:69
 msgid "My friends"
 msgstr "My friends"
 
-#: gateway/templates/fragments/myfriends_fragment.html:30
-msgid "Played"
+#: gateway/templates/fragments/myfriends_fragment.html:46
+#: gateway/templates/fragments/play_fragment.html:22
+#: gateway/templates/fragments/tournament_form_fragment.html:13
+msgid "Game selection"
+msgstr ""
+
+#: gateway/templates/fragments/myfriends_fragment.html:63
+#: gateway/templates/includes/header.html:24
+#, fuzzy
+#| msgid "Played"
+msgid "Play"
 msgstr "Played"
 
-#: gateway/templates/fragments/myfriends_fragment.html:30
-msgid "Won"
-msgstr "Won"
+#: gateway/templates/fragments/myfriends_fragment.html:81
+msgid "Let's make some "
+msgstr ""
 
-#: gateway/templates/fragments/myfriends_fragment.html:30
-msgid "Lost"
-msgstr "Lost"
+#: gateway/templates/fragments/myfriends_fragment.html:82
+#, fuzzy
+#| msgid "My friends"
+msgid "friends"
+msgstr "My friends"
 
-#: gateway/templates/fragments/myfriends_fragment.html:36
-msgid "Let's chat"
-msgstr "Let's chat"
+#: gateway/templates/fragments/play_fragment.html:7
+msgid "Choose your Game"
+msgstr ""
 
-#: gateway/templates/fragments/myfriends_fragment.html:37
-msgid "Let's play"
-msgstr "Let's play"
+#: gateway/templates/fragments/play_fragment.html:51
+msgid "Select game mode:"
+msgstr ""
 
-#: gateway/templates/fragments/myfriends_fragment.html:44
-msgid "Please log in to see your friends."
-msgstr "Please log in to see your friends."
+#: gateway/templates/fragments/play_fragment.html:52
+msgid "Game mode selection"
+msgstr ""
 
-#: gateway/templates/fragments/myfriends_fragment.html:58
-msgid "Chat messages"
-msgstr "Chat messages"
+#: gateway/templates/fragments/play_fragment.html:55
+msgid "Local"
+msgstr "Local"
 
-#: gateway/templates/fragments/myfriends_fragment.html:67
-msgid "avatar 1"
-msgstr "avatar 1"
+#: gateway/templates/fragments/play_fragment.html:58
+msgid "Remote"
+msgstr "Remote"
 
-#: gateway/templates/fragments/myfriends_fragment.html:69
-msgid "What's up crackos ?"
-msgstr "What's up crackos ?"
+#: gateway/templates/fragments/play_fragment.html:78
+#: gateway/templates/fragments/tournament_form_fragment.html:43
+#: gateway/templates/fragments/tournament_form_fragment.html:48
+#: gateway/templates/fragments/tournament_form_fragment.html:53
+#: gateway/viewsPlay.py:44 gateway/viewsPlay.py:72
+#, fuzzy
+#| msgid "Player1"
+msgid "Name Player"
+msgstr "Player1"
 
-#: gateway/templates/fragments/myfriends_fragment.html:75
-msgid "Type message"
-msgstr "Type message"
+#: gateway/templates/fragments/play_fragment.html:79
+#: gateway/templates/fragments/tournament_form_fragment.html:44
+#: gateway/templates/fragments/tournament_form_fragment.html:49
+#: gateway/templates/fragments/tournament_form_fragment.html:54
+#: gateway/viewsPlay.py:45 gateway/viewsPlay.py:73
+msgid "Name"
+msgstr ""
 
-#: gateway/templates/fragments/myfriends_fragment.html:75
-msgid "Recipient's username"
-msgstr "Recipient's username"
+#: gateway/templates/fragments/play_fragment.html:83
+#, fuzzy
+#| msgid "Played"
+msgid "Play game"
+msgstr "Played"
 
-#: gateway/templates/fragments/myfriends_fragment.html:76
-msgid "Send"
-msgstr "Send"
+#: gateway/templates/fragments/play_fragment.html:84
+msgid "Find remote game"
+msgstr ""
 
-#: gateway/templates/fragments/myfriends_fragment.html:90
-msgid "Notification"
-msgstr "Notification"
-
-#: gateway/templates/fragments/myfriends_fragment.html:94
-msgid "Invitation sent to \"login\""
-msgstr "Invitation sent to \"login\""
-
-#: gateway/templates/fragments/profile_fragment.html:9
+#: gateway/templates/fragments/profile_fragment.html:6
 msgid "Profile page"
 msgstr "Profile page"
 
-#: gateway/templates/fragments/profile_fragment.html:28
-msgid "Games"
-msgstr "Games"
+#: gateway/templates/fragments/profile_fragment.html:12
+#: gateway/templates/includes/header.html:53
+msgid "default icon"
+msgstr "default icon"
 
-#: gateway/templates/fragments/profile_fragment.html:32
-msgid "Wins"
-msgstr "Wins"
-
-#: gateway/templates/fragments/profile_fragment.html:36
-msgid "Defeats"
-msgstr "Defeats"
-
-#: gateway/templates/fragments/profile_fragment.html:39
-msgid "Edit my profile"
+#: gateway/templates/fragments/profile_fragment.html:43
+#: gateway/templates/includes/header.html:63
+#, fuzzy
+#| msgid "Edit my profile"
+msgid "Edit profile"
 msgstr "Edit my profile"
 
-#: gateway/templates/fragments/profile_fragment.html:40
-msgid "All my friends"
-msgstr "All my friends"
+#: gateway/templates/fragments/profile_fragment.html:44
+#: gateway/templates/includes/header.html:66
+msgid "Stats"
+msgstr "Stats"
 
-#: gateway/templates/fragments/profile_fragment.html:42
+#: gateway/templates/fragments/profile_fragment.html:49
 msgid "Invite a friend"
 msgstr "Invite a friend"
 
-#: gateway/templates/fragments/profile_fragment.html:57
+#: gateway/templates/fragments/profile_fragment.html:62
 msgid "Let's invite a friend"
 msgstr "Let's invite a friend"
 
-#: gateway/templates/fragments/profile_fragment.html:66
+#: gateway/templates/fragments/profile_fragment.html:80
 msgid "Close"
 msgstr "Close"
 
-#: gateway/templates/fragments/profile_fragment.html:67
+#: gateway/templates/fragments/profile_fragment.html:81
 msgid "Send invite"
 msgstr "Send invite"
 
 #: gateway/templates/fragments/signup_fragment.html:7
-#: gateway/templates/fragments/signup_fragment.html:37
-#: gateway/templates/includes/header.html:46
+#: gateway/templates/fragments/signup_fragment.html:38
+#: gateway/templates/includes/header.html:35
 msgid "Sign Up"
 msgstr "Sign Up"
 
-#: gateway/templates/fragments/signup_fragment.html:40
+#: gateway/templates/fragments/signup_fragment.html:41
 msgid "Already have an account?"
 msgstr "Already have an account?"
 
+#: gateway/templates/fragments/tournament_end_fragment.html:5
+msgid "And the grand winner is:"
+msgstr ""
+
 #: gateway/templates/fragments/tournament_form_fragment.html:7
-#: gateway/templates/includes/header.html:25
+#: gateway/templates/includes/header.html:29
 msgid "Tournament"
 msgstr "Tournament"
 
-#: gateway/templates/fragments/tournament_form_fragment.html:12
+#: gateway/templates/fragments/tournament_form_fragment.html:11
+msgid "Choose game:"
+msgstr ""
+
+#: gateway/templates/fragments/tournament_form_fragment.html:29
 msgid "Enter player names:"
 msgstr "Enter player names:"
 
-#: gateway/templates/fragments/tournament_form_fragment.html:46
+#: gateway/templates/fragments/tournament_form_fragment.html:59
 msgid "Start Tournament"
 msgstr "Start Tournament"
 
-#: gateway/templates/includes/header.html:8
+#: gateway/templates/fragments/tournament_next_game_fragment.html:6
+msgid "Next Round"
+msgstr ""
+
+#: gateway/templates/fragments/waiting_room.html:5
+msgid "Waiting for player..."
+msgstr ""
+
+#: gateway/templates/includes/chat_modal.html:16
+msgid "Chat messages"
+msgstr "Chat messages"
+
+#: gateway/templates/includes/chat_modal.html:27
+msgid "Contacts"
+msgstr ""
+
+#: gateway/templates/includes/chat_modal.html:30
+#: gateway/templates/includes/chat_modal.html:34
+#: gateway/templates/includes/chat_modal.html:38
+#, fuzzy
+#| msgid "avatar 1"
+msgid "avatar"
+msgstr "avatar 1"
+
+#: gateway/templates/includes/chat_modal.html:31
+#: gateway/templates/includes/chat_modal.html:54
+#: gateway/templates/includes/chat_modal.html:87
+msgid "Select a contact"
+msgstr ""
+
+#: gateway/templates/includes/chat_modal.html:35
+msgid "Contact 1"
+msgstr ""
+
+#: gateway/templates/includes/chat_modal.html:39
+msgid "Contact 2"
+msgstr ""
+
+#: gateway/templates/includes/chat_modal.html:51
+msgid "avatar 1"
+msgstr "avatar 1"
+
+#: gateway/templates/includes/chat_modal.html:72
+msgid "Type message"
+msgstr "Type message"
+
+#: gateway/templates/includes/chat_modal.html:72
+msgid "Recipient's username"
+msgstr "Recipient's username"
+
+#: gateway/templates/includes/chat_modal.html:73
+msgid "Send"
+msgstr "Send"
+
+#: gateway/templates/includes/chat_modal.html:86
+msgid "You dont have any friend yet"
+msgstr ""
+
+#: gateway/templates/includes/header.html:10
 msgid "Toggle navigation"
 msgstr "Toggle navigation"
 
-#: gateway/templates/includes/header.html:20
+#: gateway/templates/includes/header.html:19
 msgid "Home"
 msgstr "Home"
 
-#: gateway/templates/includes/header.html:36
-msgid "Local"
-msgstr "Local"
-
-#: gateway/templates/includes/header.html:39
-msgid "Remote"
-msgstr "Remote"
-
-#: gateway/templates/includes/header.html:67
+#: gateway/templates/includes/header.html:60
 msgid "Profile"
 msgstr "Profile"
 
-#: gateway/templates/includes/header.html:70
-msgid "Settings"
-msgstr "Settings"
-
-#: gateway/templates/includes/header.html:72
-msgid "Stats"
-msgstr "Stats"
-
-#: gateway/templates/includes/header.html:77
+#: gateway/templates/includes/header.html:75
 msgid "Logout"
 msgstr "Logout"
 
-#: gateway/templates/includes/header.html:85
-msgid "Language"
-msgstr "Language"
+#: gateway/templates/includes/header.html:141
+msgid "You have no notifications"
+msgstr ""
 
-#: gateway/templates/includes/header.html:89
-msgid "English"
-msgstr "English"
+#: gateway/viewsAuth.py:32
+msgid "Logged out successfully"
+msgstr ""
 
-#: gateway/templates/includes/header.html:92
-msgid "Spanish"
-msgstr "Spanish"
+#: gateway/viewsAuth.py:50
+#, fuzzy
+#| msgid "Method Not Allowed"
+msgid "Method not allowed"
+msgstr "Method Not Allowed"
 
-#: gateway/templates/includes/header.html:95
-msgid "French"
-msgstr "French"
+#: gateway/viewsAuth.py:271
+msgid "No message provided"
+msgstr ""
+
+#: gateway/viewsAuth.py:299
+msgid "Failed to login with 42"
+msgstr ""
+
+#: gateway/viewsInvitation.py:77
+msgid "Username does not exist"
+msgstr ""
+
+#: gateway/viewsInvitation.py:84
+msgid "Friendship already exists"
+msgstr ""
+
+#: gateway/viewsInvitation.py:91 gateway/viewsInvitation.py:136
+msgid "You cannot invite yourself"
+msgstr ""
+
+#: gateway/viewsInvitation.py:98
+#, fuzzy
+#| msgid "Invitation sent to \"login\""
+msgid "Invitation sent!"
+msgstr "Invitation sent to \"login\""
+
+#: gateway/viewsInvitation.py:128
+msgid "Add this player as a friend before inviting them to play"
+msgstr ""
+
+#: gateway/viewsInvitation.py:149
+#, fuzzy
+#| msgid "Invitation sent to \"login\""
+msgid "Invitation to play sent!"
+msgstr "Invitation sent to \"login\""
+
+#~ msgid "Player 3"
+#~ msgstr "Player 3"
+
+#~ msgid "Player 4"
+#~ msgstr "Player 4"
+
+#~ msgid "Player names must be unique."
+#~ msgstr "Player names must be unique."
+
+#~ msgid "Avatar"
+#~ msgstr "Avatar"
+
+#~ msgid "Security"
+#~ msgstr "Security"
+
+#~ msgid "Passwords do not match!"
+#~ msgstr "Passwords do not match!"
+
+#~ msgid "Player2"
+#~ msgstr "Player2"
+
+#~ msgid "Lost"
+#~ msgstr "Lost"
+
+#~ msgid "Let's chat"
+#~ msgstr "Let's chat"
+
+#~ msgid "Let's play"
+#~ msgstr "Let's play"
+
+#~ msgid "Please log in to see your friends."
+#~ msgstr "Please log in to see your friends."
+
+#~ msgid "What's up crackos ?"
+#~ msgstr "What's up crackos ?"
+
+#~ msgid "Notification"
+#~ msgstr "Notification"
+
+#~ msgid "Defeats"
+#~ msgstr "Defeats"
+
+#~ msgid "All my friends"
+#~ msgstr "All my friends"
+
+#~ msgid "Settings"
+#~ msgstr "Settings"
 
 #~ msgid "Edit"
 #~ msgstr "Edit"

@@ -61,10 +61,10 @@
 
                     </form>
 
-                    <form method="post" id="block-{{ friend.user_id }}" action="{% url 'block' friend.user_id %}" class="px-3">
-                      {% csrf_token %}
-                      <button type="submit" id="block_button-{{ friend.user_id }}" class="btn btn-danger" >{% trans "Block" %}</button>
-                    </form> 
+                    <div class="form-check form-switch">
+                      <input id="blockSwitch" data-user-id="{{ friend.user_id }}" class="form-check-input" type="checkbox"  onchange="blockFriend(event)" {% if is_blocked %}checked{% endif %}>
+                      <label class="form-check-label" for="blockSwitch">{% trans "Block" %}</label>
+                    </div>
                     
                 </div>
 
@@ -93,3 +93,13 @@
   </div>
 
 </div>
+
+<style>
+  .form-check-input:checked {
+      background-color: red;
+      border-color: red;
+  }
+  .display-4 {
+      font-size: 2.5rem;
+  }
+</style>

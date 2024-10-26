@@ -74,19 +74,44 @@ def get_friend_profile(request, friend_id):
     logger.debug("get_friend_profile")
     if request.method != 'GET':
         return redirect('405')
+    
     form = InviteFriendFormFrontend()
-    profile_api_url = 'https://profileapi:9002/api/getFullProfile/' + str(friend_id)
+    
+    # Obtener el perfil del amigo
+    profile_api_url = f'https://profileapi:9002/api/getFullProfile/{friend_id}/'
     response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
-    if response.status_code == 200:
-        profile_data = response.json()
-        logger.debug(f"get_friend_profile > profile_data: {profile_data}")
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            html = render_to_string('fragments/friend_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
-            return JsonResponse({'html': html, 'status': 'success'})
-        return render(request, 'partials/friend_profile.html', {'form': form, 'profile_data': profile_data})
-    else:
+    if response.status_code != 200:
         logger.debug(f"-------> get_friend_profile > Response: {response.status_code}")
         return JsonResponse({'status': 'error', 'message': 'Error retrieving friend profile'})
+    
+    profile_data = response.json()
+    logger.debug(f"get_friend_profile > profile_data: {profile_data}")
+    
+    # Obtener el perfil del usuario actual
+    user_profile_api_url = f'https://profileapi:9002/api/getFullProfile/{request.user.id}/'
+    user_response = requests.get(user_profile_api_url, verify=os.getenv("CERTFILE"))
+    if user_response.status_code != 200:
+        logger.debug(f"-------> get_friend_profile > User Response: {user_response.status_code}")
+        return JsonResponse({'status': 'error', 'message': 'Error retrieving user profile'})
+    
+    user_profile_data = user_response.json()
+    logger.debug(f"get_friend_profile > user_profile_data: {user_profile_data}")
+    
+    # Verificar si el amigo está en la lista de usuarios bloqueados
+    is_blocked = friend_id in user_profile_data.get('blocked_users', [])
+    logger.debug(f"get_friend_profile > is_blocked: {is_blocked}")
+    # Pasar la información al contexto de la plantilla
+    context = {
+        'form': form,
+        'profile_data': profile_data,
+        'is_blocked': is_blocked,
+    }
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        html = render_to_string('fragments/friend_profile_fragment.html', context, request=request)
+        return JsonResponse({'html': html, 'status': 'success'})
+    
+    return render(request, 'partials/friend_profile.html', context)
 
 @login_required
 def get_match_history(request, username):

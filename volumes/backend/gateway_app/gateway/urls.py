@@ -41,6 +41,7 @@ urlpatterns = [
     path('my_friends/', views.list_friends, name='list_friends'),
 	path('getFriends/', views.get_friends, name='get_friends'),
 	path('blockFriend/<int:user_id>/', viewsInvitation.block_friends, name='block'),
+	path('unblockFriend/<int:user_id>/', viewsInvitation.unblock_friends, name='unblock'),
 
     # play api
     path('play/', viewsPlay.get_play, name='play'),

@@ -9,7 +9,7 @@
                     <div class="card-body text-center position-relative">
                         <div class="position-absolute top-0 end-0 p-2">
                             <div class="form-check form-switch">
-                                <input id="blockSwitch" data-user-id="{{ profile_data.user_id }}" class="form-check-input" type="checkbox"  onchange="toggleBlock(this)">
+                                <input id="blockSwitch" data-user-id="{{ profile_data.user_id }}" class="form-check-input" type="checkbox"  onchange="blockFriend(event)" {% if is_blocked %}checked{% endif %}>
                                 <label class="form-check-label" for="blockSwitch">{% trans "Block" %}</label>
                             </div>
                         </div>
@@ -104,13 +104,3 @@
         font-size: 2.5rem;
     }
 </style>
-
-<script>
-    function toggleBlock(element) {
-        if (element.checked) {
-            element.nextElementSibling.style.color = 'red';
-        } else {
-            element.nextElementSibling.style.color = '';
-        }
-    }
-</script>

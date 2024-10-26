@@ -27,8 +27,8 @@ function innit_listening() {
 			credentials: 'include'
 		});
 		// Reset header
-		contactDisplayName.textContent = 'Select a friend';
-		contactAvatar.src = "{% static 'images/default_avatar.png' %}";
+		contactDisplayName.textContent = selectFriendmsg;
+		contactAvatar.src = contactAvatarSrc;
 		// Fetch the friends
 		fetch(request)
 			.then(response => response.json())
@@ -41,7 +41,7 @@ function innit_listening() {
 				contactList.innerHTML = '';
 				if (friendsData.length === 0) {
 					const noFriends = document.createElement('p');
-					noFriends.textContent = 'No friends yet';
+					noFriends.textContent = noFriendsmsg;
 					noFriends.classList.add('no-friends-message');
 					contactList.appendChild(noFriends);
 					return;
