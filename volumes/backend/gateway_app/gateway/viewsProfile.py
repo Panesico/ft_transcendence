@@ -75,10 +75,11 @@ def get_friend_profile(request, friend_id):
     if request.method != 'GET':
         return redirect('405')
     form = InviteFriendFormFrontend()
-    profile_api_url = 'https://profileapi:9002/api/profile/' + str(friend_id)
+    profile_api_url = 'https://profileapi:9002/api/getFullProfile/' + str(friend_id)
     response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
     if response.status_code == 200:
         profile_data = response.json()
+        logger.debug(f"get_friend_profile > profile_data: {profile_data}")
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             html = render_to_string('fragments/friend_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
             return JsonResponse({'html': html, 'status': 'success'})
@@ -135,8 +136,8 @@ def post_edit_profile_security(request):
     response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
     status = response.json().get("status")
     message = response.json().get("message")
-    logger.debug(f"status: {status}, message: {message}")
-    logger.debug(f"post_edit_profile > Response: {response.json()}")
+    type = response.json().get("type")
+    logger.debug(f"post_edit_profile > response.json from authentif editprofile: {response.json()}")
     
      # Redirection usage
     form = LogInFormFrontend()
@@ -146,7 +147,7 @@ def post_edit_profile_security(request):
     if response.ok:
       logger.debug('post_edit_profile > Response OK')
 #      html = render_to_string('fragments/login_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
-      user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
+      user_response =  JsonResponse({'type': type, 'status': status, 'message': message})
       user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
       return user_response
 
@@ -191,7 +192,7 @@ def post_edit_profile_general(request):
     response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
     status = response.json().get("status")
     message = response.json().get("message")
-    logger.debug(f"status: {status}, message: {message}")
+    type = response.json().get("type")
     logger.debug(f"post_edit_profile_general > Response: {response.json()}")
 
     # Redirection usage
@@ -204,7 +205,7 @@ def post_edit_profile_general(request):
         logger.debug(f"post_edit_profile > preferred_language: {preferred_language}")
         #html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'preferred_language': preferred_language}, request=request)
         #user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'preferred_language': preferred_language})
-        user_response =  JsonResponse({'status': status, 'message': message, 'preferred_language': preferred_language})
+        user_response =  JsonResponse({'status': status, 'type': type, 'message': message, 'preferred_language': preferred_language})
         user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
         return user_response
         
@@ -266,13 +267,13 @@ def post_edit_profile_avatar(request):
     response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
     status = response.json().get("status")
     message = response.json().get("message")
-    logger.debug(f"status: {status}, message: {message}")
-    logger.debug(f"post_edit_profile > Response: {response.json()}")
+    type = response.json().get("type")
+    logger.debug(f"post_edit_profile > response.json from authentif editprofile: {response.json()}")
     html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
 
     if  response.ok:
         logger.debug('post_edit_profile_avatar > Response OK')
-        user_response =  JsonResponse({'message': message, 'status': 'success'})
+        user_response =  JsonResponse({'type': type, 'message': message, 'status': 'success'})
         user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
         return user_response
     else:
@@ -382,8 +383,3 @@ async def checkNameExists(request):
           return JsonResponse({'status': 'failure', 'message': 'Name not available'})    
     
     return JsonResponse({'status': 'error', 'message': message})
-
-
-
-
-   

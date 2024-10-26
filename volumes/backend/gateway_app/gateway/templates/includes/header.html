@@ -59,14 +59,20 @@
               <a class="dropdown-item bg-dark text-light" href="{% url 'profile' %}" onclick="navigate(event, '/profile')">{% trans "Profile" %}</a>
             </li>
             <li>
-              <a class="dropdown-item bg-dark text-light" href="#">{% trans "Settings" %}</a>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'edit_profile' %}" onclick="navigate(event, '/edit_profile')">{% trans "Edit profile" %}</a>
             </li>
-            <li><a class="dropdown-item bg-dark text-light" href="#">{% trans "Stats" %}</a>
+            <li>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'match_history' user.username %}" onclick="navigate(event, '/profile/match_history/{{ user.username }}')">{% trans "Stats" %}</a>
+            </li>
+            <li>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'list_friends' %}" onclick="navigate(event, '/my_friends')">{% trans "My friends" %}</a>
             </li>
             <li>
               <hr class="dropdown-divider">
             </li>
-            <li><a class="dropdown-item bg-dark text-light" href="{% url 'logout' %}" onclick="navigate(event, '/logout')">{% trans "Logout" %}</a></li> 
+            <li>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'logout' %}" onclick="navigate(event, '/logout')">{% trans "Logout" %}</a>
+            </li> 
           </ul>
 
         </li>

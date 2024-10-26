@@ -26,6 +26,7 @@ Thumbs.db
 
 # Node
 node_modules/
+volumes/backend/blockchain_app/node_modules/
 
 # Ignore static files collected by collectstatic
 volumes/frontend/

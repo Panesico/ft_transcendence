@@ -289,16 +289,14 @@ def api_edit_profile(request):
       user_id = data.get('user_id')
       logger.debug(f'user_id: {user_id}')
       try :
-        logger.debug(f'extract user_obj')
-        try:
-          user_obj = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-          return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
+        logger.debug(f'api_edit_profile > extract user_obj')
+        user_obj = User.objects.get(id=user_id)
         #user_obj = User.objects.filter(id=user_id).first()
         logger.debug(f'user_obj username: {user_obj.username}')
         form = EditProfileForm(data, instance=user_obj)
-        logger.debug(f'form: {form}')
+        # logger.debug(f'form: {form}')
       except User.DoesNotExist:
+        logger.debug('api_edit_profile > User not found')
         return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
       if form.is_valid():
         logger.debug('api_edit_profile > Form is valid')

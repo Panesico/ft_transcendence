@@ -26,7 +26,9 @@ function innit_listening() {
 			},
 			credentials: 'include'
 		});
-
+		// Reset header
+		contactDisplayName.textContent = 'Select a friend';
+		contactAvatar.src = "{% static 'images/default_avatar.png' %}";
 		// Fetch the friends
 		fetch(request)
 			.then(response => response.json())
@@ -37,7 +39,13 @@ function innit_listening() {
 
 				// Clean the contact list
 				contactList.innerHTML = '';
-
+				if (friendsData.length === 0) {
+					const noFriends = document.createElement('p');
+					noFriends.textContent = 'No friends yet';
+					noFriends.classList.add('no-friends-message');
+					contactList.appendChild(noFriends);
+					return;
+				}
 				friendsData.forEach(friend => {
 					const contactItem = document.createElement('a');
 					contactItem.href = '#';
@@ -74,8 +82,12 @@ function innit_listening() {
 						contactItem.classList.add('selected-contact');
 
 						// Update the avatar and display name
+						const contactAvatarLink = document.getElementById('contactAvatarLink');
+						const contactDisplayNameLink = document.getElementById('contactDisplayNameLink');
+						contactAvatarLink.href = '/friend_profile/' + friend.user_id;
 						contactAvatar.src = friend.avatar;
 						contactDisplayName.textContent = friend.display_name;
+						contactDisplayNameLink.href = '/friend_profile/' + friend.user_id;
 						currentChatId.value = friend.user_id;
 						
 						// Get all the messages between the user and the selected friend
