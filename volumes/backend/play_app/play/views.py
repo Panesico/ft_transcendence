@@ -8,9 +8,9 @@ from .models import Game, Tournament
 from django.utils.translation import gettext as _
 from web3 import Web3
 logger = logging.getLogger(__name__)
-
 import prettyprinter
 from prettyprinter import pformat
+from .viewsBlockchain import save_tournament_results_in_blockchain, create_tournament_in_blockchain
 prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
 
 def api_saveGame(request):
@@ -56,7 +56,7 @@ def api_saveGame(request):
     logger.debug('api_saveGame > Method not allowed')
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
- 
+
 def api_createTournament(request):
     logger.debug("api_createTournament")
     if request.method == 'POST':
@@ -90,7 +90,7 @@ def api_createTournament(request):
           }
 
           message = ("starting Semi-Final 1")
-          
+
           return JsonResponse({'status': 'success', 'message': message, 'info': info})
         except (json.JSONDecodeError, DatabaseError) as e:
             logger.debug(f'api_createTournament > Error: {str(e)}')
@@ -191,9 +191,12 @@ def api_updateTournament(request):
                   'tournament': model_to_dict(tournament),
                   'game_round': game_round
               }
+              # Save the results in the blockchain
+              blockchain_response = save_tournament_results_in_blockchain(tournament, game_winner_id)
               message = ("tournament ended")
             logger.debug(f'api_updateTournament > {game_round}: {message}')
             logger.debug(f'api_updateTournament > info: {info}')
+
             return JsonResponse({'status': 'success', 'message': message, 'info': info})
         except (json.JSONDecodeError, DatabaseError) as e:
             logger.debug(f'api_updateTournament > Error: {str(e)}')

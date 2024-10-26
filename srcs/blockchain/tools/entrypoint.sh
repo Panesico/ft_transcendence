@@ -11,12 +11,9 @@ npx hardhat node &
 # Wait for the node to be ready
 sleep 10
 
-# Compile and deploy the contract only if it is not already deployed
-if [ ! -f "./deployedAddress.json" ]; then
-    echo "Deploying contract"
-    npx hardhat compile
-    npx hardhat run scripts/deploy.js --network localhost
-fi
+# Compile and deploy the contract
+npx hardhat compile
+npx hardhat run scripts/deploy.js --network localhost
 
 # Keep the script running to maintain the node
 wait

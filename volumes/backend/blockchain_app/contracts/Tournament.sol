@@ -64,7 +64,26 @@ contract TournamentManager {
         return false;
     }
 
-    function helloworld() public pure returns (string memory) {
-        return "Hello World!";
+    // Get tournament winner
+    function getWinner(uint256 _tournamentId) public view returns (uint256) {
+        require(tournaments[_tournamentId].exists, "Tournament does not exist");
+
+        Tournament storage tournament = tournaments[_tournamentId];
+        require(tournament.users_id.length > 0, "No users in the tournament");
+
+        uint256 winner = tournament.users_id[0];
+        uint256 maxScore = tournament.scores[winner];
+
+        for (uint256 i = 1; i < tournament.users_id.length; i++) {
+            uint256 score = tournament.scores[tournament.users_id[i]];
+            if (score > maxScore) {
+                winner = tournament.users_id[i];
+                maxScore = score;
+            }
+        }
+
+        require(maxScore == 2, "No winner in the tournament");
+
+        return winner;
     }
 }

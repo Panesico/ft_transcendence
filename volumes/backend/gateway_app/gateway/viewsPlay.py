@@ -21,18 +21,6 @@ def get_tournament(request):
     if request.method != 'GET':
       return redirect('405')
     
-    # temp --> to test
-    csrf_token = request.COOKIES.get('csrftoken')
-    headers = {
-        'X-CSRFToken': csrf_token,
-        'Cookie': f'csrftoken={csrf_token}',
-        'Content-Type': 'application/json',
-        'Referer': 'https://gateway:8443',
-    }
-
-    response = requests.get('https://play:9003/api/connecttoblockchain/', headers=headers, verify=os.getenv("CERTFILE"))
-    # --> end test
-    
     if request.user.id != 0:
         user_profile = get_profileapi_variables(request)
         info = {
