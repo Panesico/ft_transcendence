@@ -19,12 +19,12 @@ m Minor module: Multiple language supports.
 M Major module: Implementing a remote authentication. (42 Auth)
 M Major module: Implement Two-Factor Authentication (2FA) and JWT.
 
-# To-do / considered:
 ◦ Major module: Store the score of a tournament in the Blockchain.
 ◦ Major module: Live chat.
 ◦ Major module: Infrastructure Setup for Log Management.
 
-◦ Major module: Introduce an AI Opponent.
+# To-do / considered:
+
 
 
 
@@ -38,6 +38,7 @@ M Major module: Implement Two-Factor Authentication (2FA) and JWT.
 
 # AI-Algo
 ◦ Minor module: User and Game Stats Dashboards
+◦ Major module: Introduce an AI Opponent.
 
 # Cybersecurity
 ◦ Major module: Implement WAF/ModSecurity with Hardened Configuration

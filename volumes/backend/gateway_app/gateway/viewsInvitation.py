@@ -29,6 +29,15 @@ def check_friendship(sender_id, receiver_id):
   logger.debug(f"check_friendship > response: {response}")
   return response.json()
 
+def check_notification_already_sent(sender_id, receiver_id):
+  logger.debug(f"check_notification_already_sent > sender_id: {sender_id}")
+  logger.debug(f"check_notification_already_sent > receiver_id: {receiver_id}")
+  url = 'https://profileapi:9002/api/checkdoublenotif/' + str(sender_id) + '/' + str(receiver_id) + '/friend_request/'
+  logger.debug(f"check_notification_already_sent > url: {url}")
+  response = requests.get(url, verify=os.getenv("CERTFILE"))
+  logger.debug(f"check_notification_already_sent > response: {response}")
+  return response.json()
+
 def post_invite(request):
   logger.debug("")
   logger.debug('post_invite')
@@ -45,7 +54,6 @@ def post_invite(request):
     }
 
   # Recover data from the form
-#  data = json.loads(request.body)
   data = request.POST.dict()
   data['user_id'] = request.user.id
   logger.debug(f"post_invite > data: {data}")
@@ -68,6 +76,9 @@ def post_invite(request):
   # Check friendship
   friendship = check_friendship(sender_id, users_id[usernames.index(data['username'])])
 
+  # Check if the request has been already sent
+  similar_request = check_notification_already_sent(sender_id, users_id[usernames.index(data['username'])])
+
   # Check if username exists
   if data['username'] not in usernames:
     status = 'error'
@@ -86,6 +97,13 @@ def post_invite(request):
   elif data['username'] == sender_username:
     status = 'error'
     message = _('You cannot invite yourself')
+    form.add_error(None, message)
+    html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
+    user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
+    return user_response
+  elif similar_request['status'] == 'error':
+    status = 'error'
+    message = _('Invitation already sent')
     form.add_error(None, message)
     html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
     user_response =  JsonResponse({'html': html, 'status': status, 'message': message})

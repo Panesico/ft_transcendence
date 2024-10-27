@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/getnotif/<str:user_id>/', views.get_notifications, name='get_notifications'),
     path('api/setnotifasread/<str:sender_id>/<str:receiver_id>/<str:type>/<str:response>/', views.set_notif_as_readen, name='set_notif_as_readen'),
     path('api/setallnotifasread/<str:receiver_id>/', views.set_all_notifs_as_readen, name='set_all_notifs_as_readen'),
+    path('api/checkdoublenotif/<str:sender_id>/<str:receiver_id>/<str:type>/', views.check_if_double_request_exists, name='check_if_double_request_exists'),
 
     # Friends
     path('api/checkfriendship/<int:sender_id>/<int:receiver_id>/', views.check_friendship, name='check_friendship'),

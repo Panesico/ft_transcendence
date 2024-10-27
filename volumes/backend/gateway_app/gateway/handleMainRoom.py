@@ -119,31 +119,11 @@ async def friendRequest(content, users_connected, self):
   if user_data is None:
     logger.debug(f'friendRequest > Error getting receiver_username')
     return
-
-
-
   logger.debug(f'friendRequest > sender_id: {sender_id}')
   logger.debug(f'friendRequest > Friend request: {content}')
   logger.debug(f'friendRequest > sender_username: {sender_username}')
   logger.debug(f'friendRequest > receiver_username: {receiver_username}')
   logger.debug(f'friendRequest > receiver_id: {receiver_id}')
-
-  # Check if user_id is in users_connected
-  if receiver_id in users_connected:
-    logger.debug(f'friendRequest > receiver_id: {receiver_id} is in users_connected')
-    # Get current date and time
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    await users_connected[receiver_id].send_json({
-      'type': 'friend_request',
-      'message': message,
-      'sender_username': sender_username,
-      'sender_id': sender_id,
-      'sender_avatar_url': sender_avatar_url,
-      'receiver_avatar_url': self.avatar_url,
-      'receiver_username': receiver_username,
-      'receiver_id': receiver_id,
-      'date': date
-    })
 
   # Save friend request in database
   logger.debug(f'friendRequest > Save friend request in database')
@@ -168,6 +148,22 @@ async def friendRequest(content, users_connected, self):
       # We can now mark the notification as read
 
       logger.debug(f'friendRequest > Friend request saved in database')
+      # Check if user_id is in users_connected
+      if receiver_id in users_connected:
+        logger.debug(f'friendRequest > receiver_id: {receiver_id} is in users_connected')
+        # Get current date and time
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        await users_connected[receiver_id].send_json({
+          'type': 'friend_request',
+          'message': message,
+          'sender_username': sender_username,
+          'sender_id': sender_id,
+          'sender_avatar_url': sender_avatar_url,
+          'receiver_avatar_url': self.avatar_url,
+          'receiver_username': receiver_username,
+          'receiver_id': receiver_id,
+          'date': date
+        })
     else:
       logger.debug(f'friendRequest > Error saving friend request in database')
   except Exception as e:
