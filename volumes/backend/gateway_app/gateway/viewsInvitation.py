@@ -34,23 +34,13 @@ def post_invite(request):
   logger.debug('post_invite')
   if request.method != 'POST':
     return redirect('405')
-  csrf_token = request.COOKIES.get('csrftoken')
-
-  # Cookies & headers
-  headers = {
-        'X-CSRFToken': csrf_token,
-        'Cookie': f'csrftoken={csrf_token}',
-        'Content-Type': 'application/json',
-        'Referer': 'https://gateway:8443',
-    }
 
   # Recover data from the form
-#  data = json.loads(request.body)
   data = request.POST.dict()
   data['user_id'] = request.user.id
   logger.debug(f"post_invite > data: {data}")
-  logger.debug(f"post_edit_profile > data: {data}")
-  form = InviteFriendFormFrontend(request.POST)
+  formData = {'friendName': data['username']}  
+  form = InviteFriendFormFrontend(formData)
 
   # Get incoming user data
   sender_username = User.objects.get(id=request.user.id).username
@@ -65,20 +55,22 @@ def post_invite(request):
   usernames = user_data.get('usernames')
   users_id = user_data.get('users_id')
 
+  # Check if input is valid and username exists
+  if not form.is_valid() or data['username'] not in usernames:
+      logger.debug(f"post_invite > not in usernames")
+      status = 'error'
+      message = _('Username not valid')
+      form.add_error(None, message)
+      html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
+      user_response = JsonResponse({'html': html, 'status': status, 'message': message})
+      return user_response  
+
   # Check friendship
   friendship = check_friendship(sender_id, users_id[usernames.index(data['username'])])
 
-  # Check if username exists
-  if data['username'] not in usernames:
+  if friendship['status'] == 'success':
     status = 'error'
-    message = _('Username does not exist')
-    form.add_error(None, message)
-    html = render_to_string('fragments/profile_fragment.html', {'form': form}, request=request)
-    user_response =  JsonResponse({'html': html, 'status': status, 'message': message})
-    return user_response
-  elif friendship['status'] == 'success':
-    status = 'error'
-    message = _('Friendship already exists')
+    message = _('Already friends')
     form = InviteFriendFormFrontend()
     html = render_to_string('fragments/profile_fragment.html', {'form': form, 'message': message}, request=request)
     user_response = JsonResponse({'html': html, 'status': status, 'message': message})
@@ -99,22 +91,13 @@ def post_invite(request):
     user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'receiver_username': data['username'], 'receiver_id': receiver_id, 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url}) 
     return user_response
 
-  form = InviteFriendFormFrontend(request.POST)
-  html = render_to_string('fragments/profile_fragment.html', {}, request=request)
-  return render(request, 'partials//profile.html', {'status': 'success', 'form': form})
 
 def invite_to_play(request, receiver_id):
   logger.debug("")
   logger.debug('post_invite_to_play')
   if request.method != 'POST':
     return redirect('405')
-  # csrf_token = request.COOKIES.get('csrftoken')
-  # headers = {
-  #       'X-CSRFToken': csrf_token,
-  #       'Cookie': f'csrftoken={csrf_token}',
-  #       'Content-Type': 'application/json',
-  #       'Referer': 'https://gateway:8443',
-  #   }
+  
   sender_id = request.user.id
   
   # Check friendship

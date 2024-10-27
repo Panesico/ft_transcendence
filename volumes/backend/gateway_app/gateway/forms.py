@@ -1,6 +1,14 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+import re
+
+def validate_username(value):
+    if not re.match(r'^\w+$', value):
+        raise ValidationError(
+            _('Username can only contain alphanumeric characters and underscores.'),
+            params={'value': value},
+        )
 
 class LogInFormFrontend(forms.Form):
   username = forms.CharField(
@@ -11,6 +19,7 @@ class LogInFormFrontend(forms.Form):
           }),
         label=_('Username'), 
         required=True,
+        validators=[validate_username],
   )
   password = forms.CharField(
         widget=forms.PasswordInput(attrs={
@@ -30,6 +39,7 @@ class SignUpFormFrontend(forms.Form):
           }),
         label=_('Username'), 
         required=True,
+        validators=[validate_username],
         )
   password = forms.CharField(
         widget=forms.PasswordInput(attrs={
@@ -54,10 +64,11 @@ class InviteFriendFormFrontend(forms.Form):
         widget=forms.TextInput(attrs={
 						'type': 'text',
             'class': 'form-control',
-            'id': 'login-name'
+            'id': 'usernameInput'
           }),
         label=_("Friend's Name"),
         required=True,
+        validators=[validate_username],
         )
 
 class EditProfileFormFrontend(forms.Form):
@@ -77,6 +88,7 @@ class EditProfileFormFrontend(forms.Form):
           }),
         label=_('Username'), 
         required=False,
+        validators=[validate_username],
         )
   display_name = forms.CharField(
         max_length=16, 
@@ -86,6 +98,7 @@ class EditProfileFormFrontend(forms.Form):
           }),
         label=_('DisplayName'), 
         required=False,
+        validators=[validate_username],
         )
   country = forms.CharField(
         max_length=16, 
@@ -95,6 +108,7 @@ class EditProfileFormFrontend(forms.Form):
           }),
         label=_('Country'), 
         required=False,
+        validators=[validate_username],
         )
   city = forms.CharField(
         max_length=16, 
@@ -104,6 +118,7 @@ class EditProfileFormFrontend(forms.Form):
           }),
         label=_('City'), 
         required=False,
+        validators=[validate_username],
         )
 
   preferred_language = forms.ChoiceField(
