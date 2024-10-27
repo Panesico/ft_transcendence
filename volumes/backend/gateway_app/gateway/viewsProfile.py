@@ -98,18 +98,19 @@ def get_friend_profile(request, friend_id):
     
     # Verificar si el amigo está en la lista de usuarios bloqueados
     is_blocked = friend_id in user_profile_data.get('blocked_users', [])
+    im_blocked = request.user.id in profile_data.get('blocked_users', [])
     logger.debug(f"get_friend_profile > is_blocked: {is_blocked}")
     # Pasar la información al contexto de la plantilla
     context = {
         'form': form,
         'profile_data': profile_data,
         'is_blocked': is_blocked,
+        'im_blocked': im_blocked,
     }
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string('fragments/friend_profile_fragment.html', context, request=request)
-        return JsonResponse({'html': html, 'status': 'success'})
-    
+        return JsonResponse({'html': html, 'status': 'success', 'is_blocked': is_blocked, 'im_blocked': im_blocked})
     return render(request, 'partials/friend_profile.html', context)
 
 @login_required

@@ -46,14 +46,19 @@ def list_friends(request):
     profile_api_url = 'https://profileapi:9002/api/getfriends/' + str(request.user.id) + '/'
     response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
     friends = response.json()
+    request_user_profile = requests.get('https://profileapi:9002/api/profile/' + str(request.user.id) + '/', verify=os.getenv("CERTFILE"))
+    response_user_profile = request_user_profile.json()
     logger.debug(f"list_friends > friends: {friends}")
-    if response.status_code == 200:
+    if response.status_code == 200 and request_user_profile.status_code == 200:
+      blocked_users = response_user_profile['blocked_users']
+      logger.debug(f"list_friends > blocked_users: {blocked_users}")
       if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         # if friends is empty
         if not friends or len(friends) == 0:
           html = render_to_string('fragments/myfriends_fragment.html', request=request)
           return JsonResponse({'html': html, 'status': 200})
         else:
+
           html = render_to_string('fragments/myfriends_fragment.html', {'friends': friends}, request=request)
           return JsonResponse({'html': html, 'status': 200})
       return render(request, 'partials/myfriends.html', {'friends': friends})

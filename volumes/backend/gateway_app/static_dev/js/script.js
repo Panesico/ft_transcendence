@@ -99,7 +99,7 @@ window.onpopstate = () => {
 // }
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOMContentLoaded');
+  console.log('Session Storage listener > DOMContentLoaded');
 
   // The message should be set in sessionStorage before the page is reloaded
   // because the message needs to be translated
@@ -134,6 +134,18 @@ document.addEventListener('DOMContentLoaded', () => {
     displayMessageInModal(message);
     sessionStorage.removeItem('afterAvatarUpdate');
     sessionStorage.removeItem('afterAvatarUpdateMessage');
+
+  } else if (sessionStorage.getItem('afterBlock') === 'true') {
+    let message = sessionStorage.getItem('afterBlockMessage');
+    displayMessageInModal(message);
+    sessionStorage.removeItem('afterBlock');
+    sessionStorage.removeItem('afterBlockMessage');
+
+  } else if (sessionStorage.getItem('afterUnblock') === 'true') {
+    let message = sessionStorage.getItem('afterUnblockMessage');
+    displayMessageInModal(message);
+    sessionStorage.removeItem('afterUnblock');
+    sessionStorage.removeItem('afterUnblockMessage');
   }
 });
 

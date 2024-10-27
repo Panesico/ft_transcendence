@@ -9,7 +9,7 @@
 
 <section>
 		<!-- Modal -->
-		<div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+		<div class="modal fade" id="chatModal" tabindex="-2" aria-labelledby="chatModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" style="height: 90vh;" role="document">
 				<div class="modal-content" style="background: linear-gradient(to left, #747474, #333333);">
 					<div class="modal-header d-flex justify-content-center align-items-center">
@@ -29,14 +29,6 @@
 										<a href="#" class="list-group-item custom-contact bg-transparent text-white d-flex align-items-center" aria-current="true">
 											<img src="{% static 'images/default_avatar.png' %}" class="rounded-circle me-2" style="height: 2rem; width: 2rem;" alt="{% trans "avatar" %}">
 											{% trans "Select a contact" %}
-										</a>
-										<a href="#" class="list-group-item custom-contact bg-transparent text-white d-flex align-items-center">
-											<img src="{% static 'images/default_avatar.png' %}" class="rounded-circle me-2" style="height: 2rem; width: 2rem;" alt="{% trans "avatar" %}">
-											{% trans "Contact 1" %}
-										</a>
-										<a href="#" class="list-group-item custom-contact bg-transparent text-white d-flex align-items-center">
-											<img src="{% static 'images/default_avatar.png' %}" class="rounded-circle me-2" style="height: 2rem; width: 2rem;" alt="{% trans "avatar" %}">
-											{% trans "Contact 2" %}
 										</a>
 									</div>
 								</div>
@@ -79,6 +71,12 @@
                     </div>
                   </div>
 									<p id="date" class="small mb-0" style="color: white;">23 Jan 2:00 pm</p>
+									<div id="blockSwitchContainer" style="display: none;">
+										<div class="form-check form-switch">
+											<input id="blockSwitch" data-user-id="" class="form-check-input" type="checkbox" {% if is_blocked %}checked{% endif %}>
+											<label class="form-check-label text-white" for="blockSwitch">{% trans "Block" %}</label>
+										</div>
+									</div>
 								</div>
 
 								<!-- Scrollable chat content -->
