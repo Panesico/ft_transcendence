@@ -15,7 +15,7 @@ class PongCalcRemote(AsyncWebsocketConsumer):
     "paddleWidth": 15,
     "paddleHeight": 80,
     "borderWidth": 15,
-    "paddleSpeed": 10,
+    "paddleSpeed": 7,
     "keys": { 'w': False, 's': False }
   }
 
@@ -37,8 +37,6 @@ class PongCalcRemote(AsyncWebsocketConsumer):
     
     self.frameCount = 0;        # frame count
     self.lastContactFrame = 0;  # last frame where ball made contact with paddle
-    self.pauseFrameCount = 0;   # to avoid repeat pause key press
-    self.gamePaused = False;
     
   async def connect(self):
     # Accept the WebSocket connection
@@ -59,7 +57,9 @@ class PongCalcRemote(AsyncWebsocketConsumer):
   async def receive(self, text_data):
     # Handle messages received from the client
     data = json.loads(text_data)
-    logger.debug(f"PongCalcRemote > received data: {data}")
+
+    if not data['type'] == 'key_press':
+      logger.debug(f"PongCalcRemote > received data: {data}")
     
     if data['type'] == 'opening_connection, game details':
       self.game_id = data['game_id']
@@ -125,6 +125,7 @@ class PongCalcRemote(AsyncWebsocketConsumer):
       while True:
           # Wait before continuing the loop (in seconds)
           await asyncio.sleep(0.02)
+          self.frameCount += 1
 
           self.update_paddle_pos()
 
