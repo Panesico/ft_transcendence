@@ -1,16 +1,10 @@
-import os
+import os, requests, logging
 from django.http import JsonResponse
-from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
-from .forms import InviteFriendFormFrontend
-from django.contrib import messages
-import json
-import logging
-import requests
+from django.utils.translation import gettext as _
+# from django.template.response import TemplateResponse
 logger = logging.getLogger(__name__)
-# May deelete this import
-from django.template.response import TemplateResponse
 
 def get_home(request):
     logger.debug("")
@@ -66,20 +60,4 @@ def list_friends(request):
     else:
       if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'error': 'Error retrieving friends'}, status=500)
-      return render(request, 'partials/myfriends.html', {'error': 'Error retrieving friends'})
-
-
-	# if request.method == 'GET':
-	# 	if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-	# 		logger.debug("list_friends > GET")
-	# 		html = render_to_string('fragments/myfriends_fragment.html', {'my_variable': my_variable}, request=request)
-	# 		return JsonResponse({'html': html})
-	# 	return render(request, 'partials/myfriends.html', {'my_variable': my_variable})
-	# else:
-	# 	logger.debug("post_login > not POST returning 405")
-	# 	html = render_to_string('fragments/405_fragment.html', {'my_variable': my_variable}, request=request)
-	# 	return JsonResponse({'html': html}, status=405)
-
-
-    #Handle form error
-
+      return render(request, 'partials/myfriends.html', {'error': _('Error retrieving friends')})

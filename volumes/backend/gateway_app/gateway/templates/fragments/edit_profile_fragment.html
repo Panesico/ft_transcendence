@@ -106,20 +106,3 @@
     </div>
   </div>
 </div>
-
-<script>
-  function validatePasswords() {
-    var newPassword = document.getElementById('{{ form.new_password.id_for_label }}').value;
-    var confirmPassword = document.getElementById('{{ form.confirm_password.id_for_label }}').value;
-
-    // Define the error message
-    var errorMessage = "{{ 'Passwords do not match!'|escapejs }}";
-
-    if (newPassword !== confirmPassword) {
-      alert(errorMessage);
-      return false; // Prevent form submission
-    }
-    return true; // Allow form submission
-  }
-</script>
-

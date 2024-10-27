@@ -58,10 +58,7 @@ function createDateElement(dateString, newNotification) {
   dateElement.style.color = 'grey';
   container.appendChild(dateElement);
 
-  const endiv = document.createElement('div');
-
-  endiv.appendChild(container);
-  newNotification.appendChild(endiv);
+  newNotification.appendChild(container);
 
   return dateElement;
 }
@@ -71,17 +68,38 @@ function appendElements(avatar, message, acceptButton, declineButton, newNotific
   newNotification.style.color = 'white';
   newNotification.style.setProperty('--bs-dropdown-link-hover-bg', 'transparent');
 
-  newNotification.appendChild(avatar);
-  newNotification.appendChild(message);
   // Set data atribute to identify the notification
   newNotification.setAttribute('data-type', 'friend-invite');
   newNotification.setAttribute('data-userid', sender_id);
 
+  const contentDiv = document.createElement('div');
+  contentDiv.style.display = 'flex';
+  contentDiv.style.flexDirection = 'row';
+  contentDiv.style.justifyContent = 'space-between';
+  contentDiv.style.alignItems = 'center';
+  contentDiv.style.width = '100%';
+
+  const leftContainer = document.createElement('div');
+  leftContainer.style.display = 'flex';
+  leftContainer.style.flexDirection = 'row';
+  leftContainer.style.alignItems = 'center';
+
+  leftContainer.appendChild(avatar);
+  leftContainer.appendChild(message);
+
+  contentDiv.appendChild(leftContainer);
+
   // Set buttons only if status is pending
   if (status !== 'accepted' && status !== 'declined') {
-    newNotification.appendChild(acceptButton);
-    newNotification.appendChild(declineButton);
+    const markersDiv = document.createElement('div');
+    markersDiv.style.display = 'flex';
+    markersDiv.style.flexDirection = 'row';
+    markersDiv.style.alignItems = 'center';
+    markersDiv.appendChild(acceptButton);
+    markersDiv.appendChild(declineButton);
+    contentDiv.appendChild(markersDiv);
   }
+  newNotification.appendChild(contentDiv);
 
   // Add a separator
   const separator = document.createElement('hr');
@@ -126,7 +144,7 @@ function appendAvatarAndMessage(avatar, message, newNotification) {
 
 function createAcceptButton(sender_id, receiver_id, newNotification) {
   const acceptButton = document.createElement('img');
-  acceptButton.src = '/media/utils_icons/accept.png';
+  acceptButton.src = '/media/utils_icons/check_73F84A.svg';
   acceptButton.alt = 'Accept';
   acceptButton.style.height = '2rem';
   acceptButton.style.width = '2rem';
@@ -140,24 +158,6 @@ function createAcceptButton(sender_id, receiver_id, newNotification) {
   // //    newNotification.remove(); uncomment
   //   }
 
-  return acceptButton;
-}
-
-function createGameAcceptButton(sender_id, receiver_id, sender_username, receiver_username, newNotification, game_mode, game_type) {
-  const acceptButton = document.createElement('img');
-  acceptButton.src = '/media/utils_icons/accept.png';
-  acceptButton.alt = 'accept';
-  acceptButton.style.height = '2rem';
-  acceptButton.style.width = '2rem';
-  acceptButton.style.objectFit = 'cover';
-  acceptButton.style.marginLeft = '10px';
-  acceptButton.style.cursor = 'pointer';
-  acceptButton.style.backgroundColor = 'transparent';
-
-  //   acceptButton.onclick = function() {
-  //     mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id}));
-  // //    newNotification.remove(); uncomment
-  //   }
   return acceptButton;
 }
 
@@ -178,7 +178,7 @@ function changeNotificationIconToUp(notificationDropdownClass, newNotification, 
 
 function createDeclineButton(sender_id, receiver_id, newNotification) {
   const declineButton = document.createElement('img');
-  declineButton.src = '/media/utils_icons/decline.png';
+  declineButton.src = '/media/utils_icons/cancel_EE3324.svg';
   declineButton.alt = 'Decline';
   declineButton.style.height = '2rem';
   declineButton.style.width = '2rem';
@@ -302,12 +302,7 @@ function addRequestNotification(data) {
   }
 
   // Add button to accept the friend request represented by accept png
-  let acceptButton;
-  // if (data.type === 'game_request') {
-  //   acceptButton = createGameAcceptButton(sender_id, receiver_id, sender_username, receiver_username, newNotification, data.game_mode, data.game_type);
-  // }
-  // else
-  acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
+  const acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
 
   // Add button to decline the friend request represented by decline png
   const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);
@@ -376,11 +371,6 @@ function addResponseNotification(data) {
 
   const message = createMessageElement(receiver_username, inputMessage);
   if (data.response === 'accept' && data.type === 'game_request_response') {
-    // add createGameAcceptButton and createDeclineButton
-    // const acceptButton = createGameAcceptButton(sender_id, receiver_id, sender_username, receiver_username, newNotification,
-    //   data.game_mode,
-    //   data.game_type);
-
     const acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
 
     const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);

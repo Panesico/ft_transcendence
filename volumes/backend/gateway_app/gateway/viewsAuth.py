@@ -87,9 +87,17 @@ def post_login(request):
         'Referer': 'https://gateway:8443',
         'Authorization': f'Bearer {jwt_token}',
     }
-    # Get the request data (credentials)
+    
     data = json.loads(request.body)
-
+    
+    # Validate the form data
+    form = LogInFormFrontend(data)
+    if not form.is_valid():
+        message = _("Invalid form data")
+        form.add_error(None, message)
+        html = render_to_string('fragments/login_fragment.html', {'form': form}, request=request)
+        return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
+    
     # Forward the request to the auth service
     try:
         response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
@@ -97,11 +105,12 @@ def post_login(request):
         logger.error(f"post_login > Error calling auth service: {str(e)}")
         return JsonResponse({'status': 'error', 'message': 'Authentication service unavailable'}, status=503)
 
-    # logger.debug(f"post_login > authentif response: {response.json()}")
+    response_data = response.json()
+    logger.debug(f"post_login > authentif response: {response_data}")
     # Handle the response from the auth service
     if response.ok:
+        # logger.debug("post_login > Response OK")
         # Extract token and message from the auth service
-        response_data = response.json()
         jwt_token = response_data.get("token")
         user_id = response_data.get("user_id")
         message = response_data.get("message")
@@ -123,9 +132,17 @@ def post_login(request):
             return JsonResponse({'status': 'error', 'message': 'Failed to retrieve token'}, status=500)
     
     else:
-        response_data = response.json()
+        # logger.debug("post_login > Response NOT OK")
         message = response_data.get("message", "Login failed")
-        return JsonResponse({'status': 'error', 'message': message}, status=response.status_code)
+        status = response_data.get("status", "error")
+
+        data = json.loads(request.body)
+        form = LogInFormFrontend(data)
+        form.add_error(None, message)
+
+        html = render_to_string('fragments/login_fragment.html', {'form': form}, request=request)
+        return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
+
 
 # Signup
 
@@ -144,6 +161,7 @@ def get_signup(request):
     logger.debug('get_signup')
     if request.method != 'GET':
       return redirect('405')
+    
     form = SignUpFormFrontend()
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
@@ -155,6 +173,16 @@ def post_signup(request):
     authentif_url = 'https://authentif:9001/api/signup/' 
     if request.method != 'POST':
       return redirect('405')
+    
+    data = json.loads(request.body)
+    
+    # Validate the form data
+    form = SignUpFormFrontend(data)
+    if not form.is_valid():
+        message = _("Invalid form data")
+        form.add_error(None, message)
+        html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
+        return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
 
     csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
     jwt_token = request.COOKIES.get('jwt_token')
@@ -165,22 +193,16 @@ def post_signup(request):
         'Referer': 'https://gateway:8443',
         'Authorization': f'Bearer {jwt_token}',
     }
-    data = json.loads(request.body)
-
-    # logger.debug(f'csrf_token: {csrf_token}')
-    # logger.debug(f'Extracted headers: {headers}')
-    # logger.debug(f'Extracted data from JSON: {data}')
     
     response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
 
-    status = response.json().get("status")
-    message = response.json().get("message")
-    logger.debug(f"status: {status}, message: {message}")
-    logger.debug(f"post_signup > Response: {response.json()}")
     response_data = response.json()
+    status = response_data.get("status")
+    message = response_data.get("message")
+    logger.debug(f"post_signup > status: {status}, message: {message}")
+    logger.debug(f"post_signup > response.json: {response_data}")
     jwt_token = response_data.get("token")
     user_id = response_data.get("user_id")
-    message = response_data.get("message")
     type = response_data.get("type")
 
     if jwt_token:
@@ -192,12 +214,8 @@ def post_signup(request):
         # logger.debug('post_signup > Response NOT OK')
         data = json.loads(request.body)
         form = SignUpFormFrontend(data)
-        # existing_errors = form.non_field_errors.as_text()
-        # logger.debug(f"existing_errors: {existing_errors}")
         form.add_error(None, message)
-        # form._non_field_errors = form._create_errors(message)
-        # existing_errors = form.non_field_errors.as_text()
-        # logger.debug(f"existing_errors: {existing_errors}")
+        
         html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
         return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
 

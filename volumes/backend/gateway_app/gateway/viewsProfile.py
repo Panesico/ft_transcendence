@@ -4,8 +4,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from .forms import InviteFriendFormFrontend, EditProfileFormFrontend, LogInFormFrontend
-from django.contrib import messages
-from datetime import datetime
+from django.utils.translation import gettext as _
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
@@ -153,8 +152,17 @@ def post_edit_profile_security(request):
     # Recover data from the form
     data = json.loads(request.body)
     data['user_id'] = request.user.id
-    logger.debug(f"data : {data['user_id']}")
     logger.debug(f"post_edit_profile > data: {data}")
+
+    profile_data = get_profileapi_variables(request=request)
+
+    # Check form is valid
+    form = EditProfileFormFrontend(data)
+    if not form.is_valid():
+        message = _("Invalid form data")
+        form.add_error(None, message)
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+        return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
 
     # Send and recover response from the profileapi service
     authentif_url = 'https://authentif:9001/api/editprofile/' 
@@ -166,7 +174,6 @@ def post_edit_profile_security(request):
     
      # Redirection usage
     form = LogInFormFrontend()
-    profile_data = get_profileapi_variables(request=request)
     preferred_language = profile_data.get('preferred_language')
 
     if response.ok:
@@ -204,13 +211,22 @@ def post_edit_profile_general(request):
         'Referer': 'https://gateway:8443',
     }
 
-
     # Recover data from the form
     data = json.loads(request.body)
     logger.debug(f"post data : {data}")
     data['user_id'] = request.user.id
     logger.debug(f"user_id : {data['user_id']}")
     logger.debug(f"post_edit_profile > data: {data}")
+
+    profile_data = get_profileapi_variables(request=request)
+
+    # Check form is valid
+    form = EditProfileFormFrontend(data)
+    if not form.is_valid():
+        message = _("Invalid form data")
+        form.add_error(None, message)
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+        return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
 
     # Send and recover response from the profileapi service
     authentif_url = 'https://profileapi:9002/api/editprofile/' 
@@ -314,7 +330,7 @@ def post_edit_profile_avatar(request):
     profile_data = get_profileapi_variables(request=request)
     logger.debug('profile_data: %s', profile_data)
     form = EditProfileFormFrontend(data)
-    form.add_error(None, 'Please select a file to upload')
+    form.add_error(None, _('Please select a file to upload'))
     html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
     return JsonResponse({'html': html, 'status': 'error'}, status=400)
 
