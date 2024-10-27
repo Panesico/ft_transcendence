@@ -19,7 +19,7 @@
 
                     <div class="d-flex align-items-center justify-content-center ps-3">                      
                         <img src="{% if friend.avatar %}{{ friend.avatar }}{% else %}{% static 'images/default-avatar.svg' %}" alt="{{ friend.username }}{% endif %}" href="/friend_profile/{{ friend.user_id }}" onclick="navigate(event, '/friend_profile/{{ friend.user_id }}')"
-                            style="height: 7rem; width: 7rem; object-fit: center; height: 7rem; width: 7rem; object-fit: center; border-radius: 50%; border: 2px solid #fff;">                      
+                            style="height: 7rem; width: 7rem; object-fit: cover; height: 7rem; width: 7rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">                      
                     </div>
                     
                     <div class="card-body">

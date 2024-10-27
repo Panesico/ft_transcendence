@@ -6,11 +6,11 @@
       <h1 class="my-4 align-self-start">{% trans "Profile page" %}</h1>
       
       {% if user.avatar %}
-        <img src="{{ user.avatar.url }}" alt="{{ user.username }}" style="height: 10rem; width: 10rem; object-fit: center;
+        <img src="{{ user.avatar.url }}" alt="{{ user.username }}" style="height: 10rem; width: 10rem; object-fit: cover;
       border-radius: 50%; border: 2px solid #fff;">
       {% else %}
         <img src="{% static 'images/default-avatar.svg' %}" alt="{% trans "default icon" %}"
-        style="height: 10rem; width: 10rem; object-fit: center;
+        style="height: 10rem; width: 10rem; object-fit: cover;
         border-radius: 50%; border: 2px solid #fff;">
       {% endif %}
 
