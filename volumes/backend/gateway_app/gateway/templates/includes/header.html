@@ -2,7 +2,7 @@
 {% load static %}
 {% comment %} {% load custom_filters %} {% endcomment %}
 <div class="container-fluid">
-  <a class="navbar-brand" href="{% url 'home' %}"
+  <a class="navbar-brand ps-2" href="{% url 'home' %}"
     onclick="navigate(event, '/')">Pongscendence</a>
   <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
     data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
@@ -117,8 +117,7 @@
 
             <p class="nav-link dropdown-toggle m-0" id="navbarDropdownNotifications"
             role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="/media/utils_icons/bell_up.png" alt="{{ user.username }}"
-                style="height: rem; width: 2rem; object-fit: cover;">
+              <img src="/media/utils_icons/bell_up.png" alt="{{ user.username }}" style="height: 24px; width: 24px; object-fit: cover;">
             </p>
 
             <ul class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="navbarDropdownNotifications">
@@ -132,10 +131,10 @@
           {% else %}
 
             <p class="nav-link dropdown-toggle m-0" id="navbarDropdownNotifications" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="/media/utils_icons/bell_down.png" alt="{{ user.username }}" style="height: rem; width: 2rem; object-fit: cover;">
+              <img src="/media/utils_icons/bell_down.png" alt="{{ user.username }}" style="height: 24px; width: 24px; object-fit: cover;">
             </p>
 
-            <ul class="dropdown-menu dropdown-menu-end bg-dark" id="notificationClassContent" aria-labelledby="navbarDropdownNotifications" style="max-height: 300px; overflow-y: auto;" style="max-height: 300px; overflow-y: auto;">
+            <ul class="dropdown-menu dropdown-menu-end bg-dark" id="notificationClassContent" aria-labelledby="navbarDropdownNotifications" style="max-height: 300px; overflow-y: auto; width: max-content;">
               <li class="dropdown-item text-white" id="notificationContent" style="--bs-dropdown-link-hover-bg: transparent;">{% trans "You have no notifications" %}
               </li>
             </ul>
