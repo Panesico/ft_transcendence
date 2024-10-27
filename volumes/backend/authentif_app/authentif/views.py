@@ -1,17 +1,16 @@
-import json
-import os
-import requests
-import logging
-from django.contrib.auth import login, logout, authenticate
+import os, json, requests, logging, jwt
+from django.conf import settings
+from django.contrib.auth import login
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
 from authentif.forms import SignUpForm, LogInForm, EditProfileForm
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext as _
+from django.views.decorators.csrf import csrf_exempt
 from authentif.models import User
-import jwt
 from datetime import datetime, timedelta, timezone
 from .authmiddleware import login_required, generate_guest_token, JWTAuthenticationMiddleware
+
 logger = logging.getLogger(__name__)
 
 def generate_jwt_token(user):
@@ -49,9 +48,9 @@ def api_get_user_info(request, user_id):
                   'avatar_url': avatar_url
                 })
         else:
-            return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+            return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
     except User.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
         
 @login_required
 def api_logout(request):
@@ -77,7 +76,7 @@ def api_logout(request):
 
         return response
     else:
-        return JsonResponse({'error': 'No active session found.'}, status=400)
+        return JsonResponse({'error': _('No active session found')}, status=400)
     
 def api_login(request):
     logger.debug("api_login")
@@ -317,13 +316,6 @@ def api_edit_profile(request):
     logger.debug('api_edit_profile > Method not allowed')
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
-import requests
-from django.shortcuts import redirect, render
-from django.conf import settings
-from django.contrib.auth import login
-
-import requests
-from django.conf import settings
 
 def exchange_code_for_token(auth_code):
     data = {
@@ -343,14 +335,6 @@ def get_42_user_data(token):
     response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
     return response.json()
 
-from django.http import JsonResponse, HttpResponseRedirect
-from django.views.decorators.csrf import csrf_exempt
-from django.core.files.uploadedfile import SimpleUploadedFile
-
-logger = logging.getLogger(__name__)
-
-import requests
-from django.utils.translation import gettext as _
 
 def create_or_get_user(request, user_data):
     """

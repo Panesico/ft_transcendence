@@ -1,15 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserChangeForm
-from django.contrib.auth import authenticate
-# from django.contrib.auth.models import User
-from authentif.models import User
+from .models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 import logging
 logger = logging.getLogger(__name__)
 
-from django import forms
-from .models import User
 
 class SignUpForm(forms.ModelForm):
     confirm_password = forms.CharField(widget=forms.PasswordInput, required=False)
@@ -27,13 +23,13 @@ class SignUpForm(forms.ModelForm):
         # If id_42 is provided, no need for password
         if not id_42:
             if not password or not confirm_password:
-                raise forms.ValidationError("Password and confirmation are required.")
+                raise forms.ValidationError(_("Password and confirmation are required"))
             if password != confirm_password:
-                raise forms.ValidationError("Passwords do not match.")
+                raise forms.ValidationError(_("Passwords do not match"))
 
         # If id_42 is set, we don't need a password, vice versa
         if id_42 and password:
-            raise forms.ValidationError("Cannot set both password and id_42.")
+            raise forms.ValidationError(_("Cannot set both password and id_42"))
 
         return cleaned_data
 
