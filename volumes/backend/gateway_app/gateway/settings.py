@@ -213,24 +213,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Channels
 
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
-#     },
-# }
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('redis', 6379)],
-        },
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
 
 # SSL - HTTPS - Security
 
 # Defines a set of host/domain names that Django will accept requests from
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcgame', 'gateway', 'authentif', 'profileapi', 'play', 'redis', '10.12.4.4']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcgame', 'gateway', 'authentif', 'profileapi', 'play']
 
 
 # Redirect all HTTP traffic to HTTPS

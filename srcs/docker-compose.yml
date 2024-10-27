@@ -27,8 +27,6 @@ services:
     container_name: gateway
     environment:
       - PYTHONPATH=/usr/src/app/authentif_app
-      # - REDIS_HOST=redis
-      # - REDIS_URL=redis://redis:6379/0
     env_file:
       - .env
     ports:
@@ -45,7 +43,6 @@ services:
       - calcgame
       - profileapi
       - play
-      - redis
     # command:
     #   - daphne
     #   - -e
@@ -187,18 +184,6 @@ services:
       - transcendence
     # restart: unless-stopped
 
-  redis:
-    image: redis:7.4.1-alpine3.20
-    container_name: redis
-    # env_file:
-    #   - .env
-    expose:
-      - 6379
-    # ports:
-    #   - "6379:6379"
-    networks:
-      - transcendence
-    # restart: unless-stopped
 
 volumes:
   frontend:

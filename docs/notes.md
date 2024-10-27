@@ -57,9 +57,6 @@ openssl req -x509 -nodes -newkey rsa:4096 -days 365 \
 - python manage.py makemessages -l <language_code>
 - python manage.py compilemessages
 
-# To monitor redis
-docker exec -it redis redis-cli monitor
-
 # Blockchain
 
 ## Remove current project

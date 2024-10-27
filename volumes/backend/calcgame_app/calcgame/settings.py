@@ -176,20 +176,11 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             "hosts": [('redis', 6379)],
-#         },
-#     },
-# }
-
 
 # SSL - HTTPS - Security
 
 # Defines a set of host/domain names that Django will accept requests from
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcgame', 'gateway', 'authentif', 'profileapi', 'play', 'redis']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcgame', 'gateway', 'authentif', 'profileapi', 'play']
 
 
 # Redirect all HTTP traffic to HTTPS
