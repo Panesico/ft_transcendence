@@ -109,6 +109,15 @@ function innit_listening() {
 								contactDisplayName.textContent = friend.display_name;
 								contactDisplayNameLink.href = '/friend_profile/' + friend.user_id;
 								currentChatId.value = friend.user_id;
+								
+						                // update gameInvitePopup with friend.user_id
+								const gameInvitePopup = document.getElementById('gameInvitePopup');
+								const gameInviteForm = gameInvitePopup.querySelector('form');
+								// console.log('gameInviteForm:', gameInviteForm);
+								gameInviteForm.id = `chat-invite-play-${friend.user_id}`;
+								gameInviteForm.action = `/invite_to_play/${friend.user_id}/`;
+								listenForm(gameInviteForm);
+								// console.log('gameInviteForm:', gameInviteForm);
 
 								// Add block switch
 								blockSwitchContainer.style.display = 'block';

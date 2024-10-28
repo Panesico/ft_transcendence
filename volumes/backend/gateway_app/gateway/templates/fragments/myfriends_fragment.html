@@ -46,12 +46,12 @@
 
                     <div class="btn-group mx-auto" role="group" aria-label="{% trans 'Game selection' %}">
 
-                        <input type="radio" class="btn-check" name="chosenGame-myfriends" id="pong-{{ friend.user_id }}" autocomplete="off" checked>
+                        <input type="radio" class="btn-check" name="chosenGame" id="pong-{{ friend.user_id }}" autocomplete="off" checked data-gametype="pong">
                         <label class="btn btn-outline-success d-flex flex-column justify-content-between align-items-center p-2" for="pong-{{ friend.user_id }}" style="width: 80px; border-bottom-left-radius: 0;">
                           <img src="{% static 'images/cover-pong-8bits.jpg' %}" alt="Space Pong" title="Space Pong" class="img-fluid">
                         </label>
                       
-                        <input type="radio" class="btn-check" name="chosenGame-myfriends" id="cows-{{ friend.user_id }}" autocomplete="off">
+                        <input type="radio" class="btn-check" name="chosenGame" id="cows-{{ friend.user_id }}" autocomplete="off" data-gametype="cows">
                         <label class="btn btn-outline-success d-flex flex-column justify-content-between align-items-center p-2" for="cows-{{ friend.user_id }}" style="width: 80px; border-bottom-right-radius: 0;">
                           <img src="{% static 'images/cover-cows.jpg' %}" alt="Space Cows" title="Space Cows" class="img-fluid">
                         </label>

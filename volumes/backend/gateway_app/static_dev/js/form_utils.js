@@ -13,11 +13,13 @@ function listenForm(form) {
 
     if (url.includes('invite_to_play')) {
       const gameType =
-        document.querySelector('input[name="chosenGame-myfriends"]:checked').id;
-      jsonObject['gameType'] = gameType.split('-')[0];
+        form.querySelector('input[name="chosenGame"]:checked').dataset.gametype;
+      // console.log('url: ', url, ', gameType: ', gameType);
+      jsonObject['gameType'] = gameType;
     }
 
     console.log('jsonObject: ', jsonObject);
+
     try {
       // console.log('url: ', url);
       let request = new Request(url, {
