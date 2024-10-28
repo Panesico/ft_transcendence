@@ -210,7 +210,13 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
         # Handle messages received from the client
         logger.debug(f"ProxyCalcGameInvite > receive from {self.channel_name}")
         logger.debug(f"ProxyCalcGameInvite > receive from client: {text_data}")
-        data = json.loads(text_data)
+        
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON received: {e}")
+            return
+        
         connect_id = self.channel_name
 
         if data['type'] == 'opening_connection, invite':

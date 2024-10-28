@@ -54,7 +54,13 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         # Handle messages received from the client
         logger.debug("ProxyCalcGameLocal > receive from client")
-        data = json.loads(text_data)
+        
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON received: {e}")
+            return
+        
         # save the player names and context to build html later
         if data['type'] == 'opening_connection, game details':
             self.p1_name = data['p1_name']
