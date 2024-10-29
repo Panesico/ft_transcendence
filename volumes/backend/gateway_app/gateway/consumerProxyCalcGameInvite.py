@@ -333,13 +333,14 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
         player2 = game['player2']
         dataCalcgame = json.loads(calcgame_response)
         game_result = dataCalcgame.get('game_result')
-
+        logger.debug(f"ProxyCalcGameInvite > game_end game_result: {game_result}")
         # Update winner name with actual name
         if game_result.get('game_winner_name') == 'p1_name':
             game_result['game_winner_name'] = player1['player_name']
         else:
             game_result['game_winner_name'] = player2['player_name']
 
+        logger.debug(f"ProxyCalcGameInvite > updated game_result: {game_result}")
         # Save game to database
         await self.save_game_to_database(game_id, game, player1, player2, game_result)
 
@@ -381,7 +382,7 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
             'p1_score': game_result.get('p1_score'),
             'p2_score': game_result.get('p2_score'),
             'game_winner_name': player1['player_name'] if game_result.get('game_winner_name') == player1['player_name'] else player2['player_name'],
-            'game_winner_id': player1['player_id'] if game_result.get('game_winner_name') == player1['player_id'] else player2['player_id'],
+            'game_winner_id': player1['player_id'] if game_result.get('game_winner_name') == player1['player_name'] else player2['player_id'],
         }
         
         await asyncRequest("POST", csrf_token, play_url, data)
