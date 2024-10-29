@@ -1,4 +1,4 @@
-import os, json, logging, websockets, ssl, asyncio, aiohttp, jwt
+import os, json, logging, websockets, ssl, asyncio, aiohttp, jwt, random
 from django.conf import settings
 
 import prettyprinter
@@ -7,6 +7,15 @@ prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
 
 logger = logging.getLogger(__name__)
 logging.getLogger('websockets').setLevel(logging.WARNING)
+
+used_ids = set()
+def generate_unique_id():
+    while True:
+        id = random.randint(1, 1000000)
+        if id not in used_ids:
+            used_ids.add(id)
+            return id
+
 
 async def getDecodedJWT(jwt_token):
     decoded_data = jwt.decode(

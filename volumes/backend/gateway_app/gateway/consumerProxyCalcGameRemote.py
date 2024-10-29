@@ -2,7 +2,7 @@ import os, json, logging, websockets, ssl, asyncio
 from datetime import datetime, timedelta
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest
+from .utils import getUserId, getUserData, asyncRequest, generate_unique_id
 from django.utils.translation import gettext as _
 
 import prettyprinter
@@ -33,10 +33,6 @@ logging.getLogger('websockets').setLevel(logging.WARNING)
 class ProxyCalcGameRemote(AsyncWebsocketConsumer):
     active_games = {} # Dictionary to store active games
     waiting = {} # Dictionary to store players waiting for a game
-    unique_id = 1
-
-    # Add check 
-    # user should not be able to play against themselves through two remote games
 
     async def connect(self):
         logger.debug("ProxyCalcGameRemote > connect")
@@ -110,7 +106,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                     else:
                         winrate_groups['high'].append((player_id, player_info))
 
-                    logger.debug(f"--------Player '{player_info['player_name']}', winrate groups 'low'[{len(winrate_groups['low'])}], 'mid'[{len(winrate_groups['mid'])}], 'high'[{len(winrate_groups['high'])}], 'any'[{len(winrate_groups['any'])}], waiting_time: {waiting_time}")
+                    # logger.debug(f"Player '{player_info['player_name']}', winrate groups 'low'[{len(winrate_groups['low'])}], 'mid'[{len(winrate_groups['mid'])}], 'high'[{len(winrate_groups['high'])}], 'any'[{len(winrate_groups['any'])}], waiting_time: {waiting_time}")
 
 
             # If player in 'any' queue, match them with anyone
@@ -120,20 +116,20 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                 for group in ['low', 'mid', 'high']:                    
                     if winrate_groups[group]:
                         
-                        logger.debug(f"--------Matched players in winrate group {group} with any player")
                         player2_id, player2 = winrate_groups[group].pop(0)
                         player1_id, player1 = any_player
+                        # Remove the players from the waiting queue
                         self.waiting[game_type].pop(player1_id)
                         self.waiting[game_type].pop(player2_id)
 
                         # Create a new game
-                        game_id = self.unique_id
-                        self.unique_id += 1
+                        game_id = generate_unique_id()
                         self.active_games[game_id] = {
                             "game_type": player1['game_type'],
                             "player1": player1,
                             "player2": player2,
                         }
+                        logger.debug(f"--------Matched players in winrate group {group} with any player, player1: {player1['player_name']}, player2: {player2['player_name']}, game_type[game_id]: {game_type}[{game_id}]")
 
                         await asyncio.sleep(2)
                         await self.start_game(game_id)
@@ -141,22 +137,20 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
 
             for group in ['low', 'mid', 'high']:
                 if len(winrate_groups[group]) >= 2:
-                    logger.debug(f"--------Matched players in winrate group {group}")
                     player1_id, player1 = winrate_groups[group].pop(0)
                     player2_id, player2 = winrate_groups[group].pop(0)
-
                     # Remove the players from the waiting queue
                     self.waiting[game_type].pop(player1_id)
                     self.waiting[game_type].pop(player2_id)
 
                     # Create a new game
-                    game_id = self.unique_id
-                    self.unique_id += 1
+                    game_id = generate_unique_id()
                     self.active_games[game_id] = {
                         "game_type": player1['game_type'],
                         "player1": player1,
                         "player2": player2,
                     }
+                    logger.debug(f"--------Matched players in winrate group {group}, player1: {player1['player_name']}, player2: {player2['player_name']}, game_type[game_id]: {game_type}[{game_id}]")
 
                     await asyncio.sleep(2)
                     await self.start_game(game_id)
@@ -287,11 +281,14 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                 player['queue_date'] = datetime.now()
 
                 # Get player winrate
-                url = 'https://play:9003/api/getWinrate/' + str(player['player_id']) + '/' + game_type + '/'
-                response = await asyncRequest("GET", "", url, "")
-                player['winrate'] = response.get('winrate') or 0
+                if player['player_id'] == 0:
+                    player['winrate'] = 0
+                else:
+                  url = 'https://play:9003/api/getWinrate/' + str(player['player_id']) + '/' + game_type + '/'
+                  response = await asyncRequest("GET", "", url, "")
+                  player['winrate'] = response.get('winrate') or 0
 
-                logger.debug(f"Updated waiting[{game_type}][connect_id] with player_name: {data['p1_name']}, player_id: {self.waiting[game_type][connect_id]['player_id']}, winrate: {self.waiting[game_type][connect_id]['winrate']}")
+                logger.debug(f"______Updated waiting[{game_type}][connect_id] with player_name: {data['p1_name']}, player_id: {self.waiting[game_type][connect_id]['player_id']}, winrate: {self.waiting[game_type][connect_id]['winrate']}")
                 # logger.debug(f"ProxyCalcGameRemote > opening_connection player: {pformat(player)}")
             else:
                 logger.error(f"Player {connect_id} not found in waiting")

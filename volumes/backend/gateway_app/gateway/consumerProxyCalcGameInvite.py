@@ -2,7 +2,7 @@ import os, json, logging, websockets, ssl, asyncio
 from datetime import datetime, timedelta
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest
+from .utils import getUserId, getUserData, asyncRequest, generate_unique_id
 from django.utils.translation import gettext as _
 
 import prettyprinter
@@ -33,10 +33,6 @@ logging.getLogger('websockets').setLevel(logging.WARNING)
 class ProxyCalcGameInvite(AsyncWebsocketConsumer):
     active_games = {} # Dictionary to store active games
     waiting = {} # Dictionary to store players waiting for a game
-    unique_id = 1
-
-    # Add check 
-    # user should not be able to play against themselves through two remote games
 
     async def connect(self):
         logger.debug("ProxyCalcGameInvite > connect")
@@ -96,8 +92,7 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
                         self.waiting[game_type].pop(other_player_id)
 
                         # Create a new game
-                        game_id = self.unique_id
-                        self.unique_id += 1
+                        game_id = generate_unique_id()
                         self.active_games[game_id] = {
                           "game_type": player_info['game_type'],
                           "player1": player_info,
