@@ -5,12 +5,12 @@ from django.db import DatabaseError
 from django.forms.models import model_to_dict
 from asgiref.sync import sync_to_async
 from .models import Game, Tournament
+from .viewsBlockchain import save_tournament_results_in_blockchain, create_tournament_in_blockchain
 from django.utils.translation import gettext as _
-from web3 import Web3
+
 logger = logging.getLogger(__name__)
 import prettyprinter
 from prettyprinter import pformat
-from .viewsBlockchain import save_tournament_results_in_blockchain, create_tournament_in_blockchain
 prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
 
 def api_saveGame(request):
@@ -361,7 +361,7 @@ def api_user_games(request, user_id):
       },
       'games_list': games_list
     }
-
+    
     data['pong']['winrate'] = round((data['pong']['wins'] / data['pong']['count']) * 100, 2) if data['pong']['count'] > 0 else 0
 
     data['cows']['winrate'] = round((data['cows']['wins'] / data['cows']['count']) * 100, 2) if data['cows']['count'] > 0 else 0

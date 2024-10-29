@@ -92,9 +92,29 @@
                     <td class="date-column">{{ game.date }}</td>
                     <td>{{ game.game_type }}</td>
                     <td class="vertical-line p-0"></td>
-                    <td>{% if user_id == game.p1_id %}{{ username }}{% else %}{{ game.p1_name }}{% endif %}</td>
+                    <td>
+                      {% if game.p1_id == user_id %}
+                        {{ username }}
+                      {% else %}
+                        {% if game.p1_id != 0 %}
+                          <a href="{% url 'user_profile' game.p1_id %}" class="link-dark">{{ game.p1_name }}</a>
+                        {% else %}
+                          {{ game.p1_name }}
+                        {% endif %}
+                      {% endif %}
+                    </td>
                     <td>{{ game.p1_score }} - {{ game.p2_score }}</td>
-                    <td>{% if user_id == game.p2_id %}{{ username }}{% else %}{{ game.p2_name }}{% endif %}</td>
+                    <td>
+                      {% if game.p2_id == user_id %}
+                        {{ username }}
+                      {% else %}
+                        {% if game.p2_id != 0 %}
+                          <a href="{% url 'user_profile' game.p2_id %}" class="link-dark">{{ game.p2_name }}</a>
+                        {% else %}
+                          {{ game.p2_name }}
+                        {% endif %}
+                      {% endif %}
+                    </td>
                     <td class="vertical-line p-0"></td>
                     <td>{% if user_id == game.game_winner_id %}{{ username }}{% else %}{{ game.game_winner_name }}{% endif %}</td>
                   </tr>
