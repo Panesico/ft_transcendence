@@ -1,6 +1,5 @@
 Auth:
-- Prevent log-in and sign-up if already logged in
-- Password validator commented. Uncomment 2 * validate_password() in api_signup() and api_edit_profile() of volumes/backend/authentif_app/authentif/views.py
+- Password validator commented while in development. Uncomment 2 * validate_password() in api_signup() and api_edit_profile() of authentif_app/authentif/views.py
 
 Remote game:
 - user shouldn't be able to play against themselves through two remote games

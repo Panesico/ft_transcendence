@@ -4,9 +4,9 @@ from django.utils.translation import gettext_lazy as _
 import re
 
 def validate_username(value):
-    if not re.match(r'^\w+$', value):
+    if not re.match(r'^[\w-]+$', value):
         raise ValidationError(
-            _('Username can only contain alphanumeric characters and underscores.'),
+            _('Username can only contain alphanumeric characters, underscores and hyphens.'),
             params={'value': value},
         )
 
