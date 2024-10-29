@@ -28,6 +28,12 @@ body {
   height: 80px;
 }
 
+.vertical-line {
+  border-left: 2px solid #000;
+  height: 100%;
+  width: 0px;
+}
+
 /**************************/
 /*** Floating animation ***/
 /**************************/

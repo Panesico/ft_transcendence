@@ -27,10 +27,13 @@ urlpatterns = [
     # profile api
     path('profile/', viewsProfile.get_profile, name='profile'),
     path('profile/match_history/<str:username>/', viewsProfile.get_match_history, name='match_history'),
+    path('userprofile/<int:user_id>/', viewsProfile.view_user_profile, name='user_profile'),
+
     path('edit_profile/', viewsProfile.get_edit_profile, name='edit_profile'),
     path('edit_profile_general/', viewsProfile.post_edit_profile_general, name='edit_profile_general'),
     path('edit_profile_security/', viewsProfile.post_edit_profile_security, name='edit_profile_security'),
     path('edit_profile_avatar/', viewsProfile.post_edit_profile_avatar, name='edit_profile_avatar'),
+    
     path('friend_profile/<int:friend_id>/', viewsProfile.get_friend_profile, name='friend_profile'),
     path('download_42_avatar/', viewsProfile.download_42_avatar, name='download_42_avatar'),
     path('play/checkNameExists/', viewsProfile.checkNameExists, name='checkNameExists'),

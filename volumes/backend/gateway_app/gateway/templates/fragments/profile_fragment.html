@@ -23,24 +23,9 @@
           <p class="ps-1 mb-0">{{ profile_data.city }}, {{ profile_data.country }}</p>
       </div>
 
-      {% comment %} <div style="display: flex; justify-content: space-evenly; width: 100%; margin-bottom: 1rem;">
-          <div class="col-4">
-            <h4>{{ user.played_games }}</h4>
-            <p>{% trans "Games" %}</p>
-          </div>
-          <div class="col-4">
-            <h4>{{ user.wins }}</h4>
-            <p>{% trans "Wins" %}</p>
-          </div>
-          <div class="col-4">
-            <h4>{{ user.defeats }}</h4>
-            <p>{% trans "Defeats" %}</p>
-          </div>
-      </div> {% endcomment %}
-
       <div class="btn-group flex-wrap" style="justify-content: center;">
         <a href="{% url 'edit_profile' %}" onclick="navigate(event, '/edit_profile')" class="btn btn-light mb-2 me-2" role="button" style="border-bottom-left-radius: unset; border-top-left-radius: unset">{% trans "Edit profile" %}</a>
-        <a href="{% url 'match_history' user.username %}" onclick="navigate(event, '/profile/match_history/{{ user.username }}')" class="btn btn-light mb-2 me-2" role="button">{% trans "Stats" %}</a>
+        <a href="{% url 'user_profile' user.id %}" onclick="navigate(event, '/userprofile/{{ user.id }}')" class="btn btn-light mb-2 me-2" role="button">{% trans "Stats" %}</a>
         <a href="{% url 'list_friends' %}" onclick="navigate(event, '/my_friends')" class="btn btn-light mb-2" role="button" >{% trans "My friends" %}</a>
       
         <!-- This button will be below the others -->

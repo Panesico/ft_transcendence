@@ -133,6 +133,31 @@ def get_match_history(request, username):
     else:
         logger.debug(f"-------> get_match_history > Response: {response.status_code}")
         return JsonResponse({'status': 'error', 'message': 'Error retrieving match history'})
+    
+@login_required
+def view_user_profile(request, user_id):
+    logger.debug("view_user_profile")
+    if request.method != 'GET':
+        return redirect('405')
+    
+    try:
+       user = User.objects.get(id=user_id)
+    except:
+        return redirect('404')
+    
+    get_history_url = 'https://play:9003/api/userGames/' + str(user_id) + '/'
+    response = requests.get(get_history_url, verify=os.getenv("CERTFILE"))
+
+    if response.ok:
+        data = response.json().get('data')
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            html = render_to_string('fragments/userprofile_fragment.html', {'data': data, 'user_id': user_id, 'username': user.username}, request=request)
+            return JsonResponse({'html': html, 'status': 'success'})
+        
+        return render(request, 'partials/userprofile.html', {'data': data, 'user_id': user_id, 'username': user.username})
+    else:
+        logger.debug(f"view_user_profile > Response: {response.status_code}")
+        return JsonResponse({'status': 'error', 'message': _('Error retrieving match history')})
 
 @login_required
 def post_edit_profile_security(request):
