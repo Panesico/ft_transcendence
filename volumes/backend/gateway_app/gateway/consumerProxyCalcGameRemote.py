@@ -54,8 +54,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             await self.close()
             return
         
-        # Generate a unique player ID for this connection
-        connect_id = self.channel_name
+        connect_id = self.channel_name # unique player ID for this connection
         jwt_token = self.scope['cookies']['jwt_token']
         user_id = await getUserId(jwt_token)
         user = await getUserData(user_id)
@@ -64,7 +63,13 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             'session': self.scope['session'],
             'cookies': self.scope['cookies'],
         }
+        
+        # if user is already in waiting room, close connection
+        if user_id != 0 and await self.userIsAlreadyInGame(user_id, user, context, game_type): 
+            logger.error(f"Player {user_id} already in a game, connection closed")
+            return
 
+        # Add player to waiting room
         if game_type not in self.waiting:
             self.waiting[game_type] = {}
         
@@ -74,12 +79,11 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             'player_id': 0,
             'ws': self,
             'context': context,
-        }
-        
+        }        
         logger.debug(f"Player connected and added to waiting: {connect_id}")
-
         await self.waiting_room(context)
-        
+
+        # Start a background task to check for waiting players
         self.check_waiting_task = asyncio.create_task(self.check_waiting(game_type))
     
 
@@ -499,3 +503,35 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             'title': _('Forfeit'),
             'message': _('Your opponent has disconnected'),
         }))
+        
+
+    async def userIsAlreadyInGame(self, user_id, user, context, game_type):
+        is_in_game = False
+        if game_type not in self.waiting:
+            return False
+        
+        # check if user_id is in waiting room
+        for player_id, player_info in self.waiting[game_type].items():
+            if player_info['player_id'] == user_id:
+                is_in_game = True
+                break
+                    
+        if not is_in_game:
+            return False
+        
+        info = {
+            'p1_label': user['username'],
+            'p1_value': user['profile']['display_name'],
+        }
+        html = render_to_string('fragments/play_fragment.html', {'info': info, 'context': context})
+        
+        await self.send(json.dumps({
+            'type': 'already_in_game',
+            'html': html,
+            'title': _('Cancelled'),
+            'message': _('You are already waiting for a game'),
+        }))
+
+        await self.close()
+
+        return True

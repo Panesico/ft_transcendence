@@ -1,9 +1,6 @@
 Auth:
 - Password validator commented while in development. Uncomment 2 * validate_password() in api_signup() and api_edit_profile() of authentif_app/authentif/views.py
 
-Remote game:
-- user shouldn't be able to play against themselves through two remote games
-
 @iisaacc
 -	Minor module: Show in more languages (3 minimum).
   - Username and password are not being translated X
