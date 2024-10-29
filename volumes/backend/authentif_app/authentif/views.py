@@ -1,14 +1,16 @@
 import os, json, requests, logging, jwt
 from django.conf import settings
-from django.contrib.auth import login
 from django.http import JsonResponse
-from django.contrib.auth.hashers import make_password
-from authentif.forms import SignUpForm, LogInForm, EditProfileForm
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
-from authentif.models import User
 from datetime import datetime, timedelta, timezone
+from .forms import SignUpForm, LogInForm, EditProfileForm
+from .models import User
 from .authmiddleware import login_required, generate_guest_token, JWTAuthenticationMiddleware
 
 logger = logging.getLogger(__name__)
@@ -176,22 +178,17 @@ def api_signup(request):
           form = SignUpForm(data=data)
           if form.is_valid():
               user = form.save(commit=False)
-              user.password = make_password(data['password'])
-              user = form.save()
 
+              # Password validation
+              password = data.get('password') # clear text password
+              # validate_password(password, user)
+              
+              user.password = make_password(data['password']) # hashed password
+              user = form.save()
               username = data.get('username')
-              password = data.get('password')
               logger.info(f'api_signup > User.username: {user.username}, hased pwd {user.password}')
 
-              try:
-                  user_obj = User.objects.get(username=username)
-              except User.DoesNotExist:
-                  logger.debug(f'api_signup > User not found: {username}')
-                  user.delete()
-                  return JsonResponse({
-                      'status': 'error', 
-                      'message': _('User not found')
-                  }, status=400)
+              user_obj = User.objects.get(username=username)
 
               # Check if the user is active
               if not user_obj.is_active:
@@ -233,8 +230,7 @@ def api_signup(request):
                   secure=True,  # Only send the cookie over HTTPS (ensure your environment supports this)
                   samesite='Lax',  # Control cross-site request behavior
                   max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
-              )
-              
+              )              
               return response
 
               
@@ -251,12 +247,12 @@ def api_signup(request):
         except json.JSONDecodeError:
             logger.debug('api_signup > Invalid JSON')
             return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
+        except DjangoValidationError as e:
+                  logger.debug(f'Password validation error: {e.messages}')
+                  return JsonResponse({'status': 'error', 'message': _('Not a valid password')}, status=400)
         except Exception as e:
             logger.error(f'api_signup > Unexpected error: {e}')
-            return JsonResponse({
-                'status': 'error', 
-                'message': _('An unexpected error occurred')
-            }, status=500)
+            return JsonResponse({'status': 'error','message': _('An unexpected error occurred')}, status=500)
     logger.debug('api_signup > Method not allowed')
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
@@ -286,17 +282,17 @@ def api_edit_profile(request):
       data = json.loads(request.body)
       logger.debug(f'data: {data}')
       user_id = data.get('user_id')
-      logger.debug(f'user_id: {user_id}')
-      try :
-        logger.debug(f'api_edit_profile > extract user_obj')
-        user_obj = User.objects.get(id=user_id)
-        #user_obj = User.objects.filter(id=user_id).first()
-        logger.debug(f'user_obj username: {user_obj.username}')
-        form = EditProfileForm(data, instance=user_obj)
-        # logger.debug(f'form: {form}')
-      except User.DoesNotExist:
-        logger.debug('api_edit_profile > User not found')
-        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
+      user_obj = User.objects.get(id=user_id)
+      #user_obj = User.objects.filter(id=user_id).first()
+      logger.debug(f'user_obj username: {user_obj.username}, user_obj id: {user_obj.id}')
+
+      # Password validation
+      new_password = data.get('new_password')
+      # validate_password(new_password)
+      
+      form = EditProfileForm(data, instance=user_obj)
+      # logger.debug(f'form: {form}')
+      
       if form.is_valid():
         logger.debug('api_edit_profile > Form is valid')
         form.save()
@@ -311,7 +307,13 @@ def api_edit_profile(request):
         return JsonResponse({'status': 'error', 'message': _('Invalid profile update')}, status=400)
     except json.JSONDecodeError:
       logger.debug('api_edit_profile > Invalid JSON')
-      return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
+      return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)    
+    except User.DoesNotExist:
+      logger.debug('api_edit_profile > User not found')
+      return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
+    except DjangoValidationError as e:
+          logger.debug(f'Password validation error: {e.messages}')
+          return JsonResponse({'status': 'error', 'message': _('Not a valid password')}, status=400)
   else:
     logger.debug('api_edit_profile > Method not allowed')
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
