@@ -20,23 +20,23 @@
 
       <li class="nav-item d-flex align-items-center">
         <a class="nav-link" href="{% url 'play' %}"
-          onclick="navigate(event, '/play')">{% trans "Play" %}</a>
+          onclick="navigate(event, '{% url 'play' %}')">{% trans "Play" %}</a>
       </li>
 
       <li class="nav-item d-flex align-items-center">
         <a class="nav-link" href="{% url 'tournament' %}"
-          onclick="navigate(event, '/tournament')">{% trans "Tournament" %}</a>
+          onclick="navigate(event, '{% url 'tournament' %}')">{% trans "Tournament" %}</a>
       </li>
 
       {% if not user.is_authenticated %}
         <li class="nav-item d-flex align-items-center">
           <a class="nav-link" href="{% url 'signup' %}"
-            onclick="navigate(event, '/signup')">{% trans "Sign Up" %}</a>
+            onclick="navigate(event, '{% url 'signup' %}')">{% trans "Sign Up" %}</a>
         </li>
 
         <li class="nav-item d-flex align-items-center">
           <a class="nav-link" href="{% url 'login' %}"
-            onclick="navigate(event, '/login')">{% trans "Log In" %}</a>
+            onclick="navigate(event, '{% url 'login' %}')">{% trans "Log In" %}</a>
         </li>
       {% endif %}
 
@@ -56,22 +56,22 @@
 
           <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownUser" style="--bs-dropdown-min-width: 6rem">
             <li>
-              <a class="dropdown-item bg-dark text-light" href="{% url 'profile' %}" onclick="navigate(event, '/profile')">{% trans "Profile" %}</a>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'profile' %}" onclick="navigate(event, '{% url 'profile' %}')">{% trans "Profile" %}</a>
             </li>
             <li>
-              <a class="dropdown-item bg-dark text-light" href="{% url 'edit_profile' %}" onclick="navigate(event, '/edit_profile')">{% trans "Edit profile" %}</a>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'edit_profile' %}" onclick="navigate(event, '{% url 'edit_profile' %}')">{% trans "Edit profile" %}</a>
             </li>
             <li>
-              <a class="dropdown-item bg-dark text-light" href="{% url 'user_profile' user.id %}" onclick="navigate(event, '/userprofile/{{ user.id }}')">{% trans "Stats" %}</a>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'user_profile' user.id %}" onclick="navigate(event, '{% url 'user_profile' user.id %}')">{% trans "Stats" %}</a>
             </li>
             <li>
-              <a class="dropdown-item bg-dark text-light" href="{% url 'list_friends' %}" onclick="navigate(event, '/my_friends')">{% trans "My friends" %}</a>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'list_friends' %}" onclick="navigate(event, '{% url 'list_friends' %}')">{% trans "My friends" %}</a>
             </li>
             <li>
               <hr class="dropdown-divider">
             </li>
             <li>
-              <a class="dropdown-item bg-dark text-light" href="{% url 'logout' %}" onclick="navigate(event, '/logout')">{% trans "Logout" %}</a>
+              <a class="dropdown-item bg-dark text-light" href="{% url 'logout' %}" onclick="navigate(event, '{% url 'logout' %}')">{% trans "Logout" %}</a>
             </li> 
           </ul>
 

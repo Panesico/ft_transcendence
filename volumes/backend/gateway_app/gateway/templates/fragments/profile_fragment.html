@@ -24,9 +24,9 @@
       </div>
 
       <div class="btn-group flex-wrap" style="justify-content: center;">
-        <a href="{% url 'edit_profile' %}" onclick="navigate(event, '/edit_profile')" class="btn btn-light mb-2 me-2" role="button" style="border-bottom-left-radius: unset; border-top-left-radius: unset">{% trans "Edit profile" %}</a>
-        <a href="{% url 'user_profile' user.id %}" onclick="navigate(event, '/userprofile/{{ user.id }}')" class="btn btn-light mb-2 me-2" role="button">{% trans "Stats" %}</a>
-        <a href="{% url 'list_friends' %}" onclick="navigate(event, '/my_friends')" class="btn btn-light mb-2" role="button" >{% trans "My friends" %}</a>
+        <a href="{% url 'edit_profile' %}" onclick="navigate(event, '{% url 'edit_profile' %}')" class="btn btn-light mb-2 me-2" role="button" style="border-bottom-left-radius: unset; border-top-left-radius: unset">{% trans "Edit profile" %}</a>
+        <a href="{% url 'user_profile' user.id %}" onclick="navigate(event, '{% url 'user_profile' user.id %}')" class="btn btn-light mb-2 me-2" role="button">{% trans "Stats" %}</a>
+        <a href="{% url 'list_friends' %}" onclick="navigate(event, '{% url 'list_friends' %}')" class="btn btn-light mb-2" role="button" >{% trans "My friends" %}</a>
       
         <!-- This button will be below the others -->
         <button type="button" class="btn btn-light mb-2" data-bs-toggle="modal" data-bs-target="#inviteFriendModal" style="width: 100%; border-top-right-radius: unset; border-bottom-right-radius: unset;">

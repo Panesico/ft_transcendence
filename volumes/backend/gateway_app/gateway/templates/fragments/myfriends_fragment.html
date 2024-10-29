@@ -18,13 +18,13 @@
                   <div class="d-flex flex-row align-items-center justify-content-center">
 
                     <div class="d-flex align-items-center justify-content-center ps-3">                      
-                        <img src="{% if friend.avatar %}{{ friend.avatar }}{% else %}{% static 'images/default-avatar.svg' %}" alt="{{ friend.username }}{% endif %}" href="/friend_profile/{{ friend.user_id }}" onclick="navigate(event, '/friend_profile/{{ friend.user_id }}')"
+                        <img src="{% if friend.avatar %}{{ friend.avatar }}{% else %}{% static 'images/default-avatar.svg' %}" alt="{{ friend.username }}{% endif %}" href="{% url 'user_profile' friend.user_id %}" onclick="navigate(event, '{% url 'user_profile' friend.user_id %}')"
                             style="height: 7rem; width: 7rem; object-fit: cover; height: 7rem; width: 7rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">                      
                     </div>
                     
                     <div class="card-body">
                       <h4 class="card-title">
-                        <a class="text-decoration-none" style="color: white" href="/friend_profile/{{ friend.user_id }}" onclick="navigate(event, '/friend_profile/{{ friend.user_id }}')">{{ friend.username }}</a>
+                        <a class="text-decoration-none" style="color: white" href="{% url 'user_profile' friend.user_id %}" onclick="navigate(event, '{% url 'user_profile' friend.user_id %}')">{{ friend.username }}</a>
                       </h4>
                       <p class="card-text">
                         <svg width="18" height="18" viewBox="0 0 24 24">
@@ -81,7 +81,7 @@
                 <span class="text-danger">{% trans "friends" %}</span>!
             </p>
             <a href="{% url 'profile' %}" style="border: 2px solid #d3d3d3; border-radius: 8px;" class="p-2"
-            onclick="navigate(event, '/profile')">
+            onclick="navigate(event, '{% url 'profile' %}')">
                 <img src="/media/utils_icons/add_friends.png" role="button" alt="add friends" class="img-fluid" style="width: 50px; height: 50px;">
             </a>
           </div>
