@@ -48,7 +48,7 @@
 									</div>
 
                   <div class="position-relative">
-                    <button onclick="toggleGameInvitePopup()" class="btn btn-secondary" style="">{% trans "Invite to play" %}</button>
+                    <button onclick="toggleGameInvitePopup()" class="btn btn-secondary">{% trans "Invite to play" %}</button>
                     <div id="gameInvitePopup" style="display: none;" class="position-absolute start-0" style="bottom: -20px">
                       <form method="post" id="chat-invite-play-0" action="{% url 'invite_to_play' 0 %}" class="d-flex flex-column justify-content-center relative" style="background-color: #333; border-radius: 10px;">
                         {% csrf_token %}

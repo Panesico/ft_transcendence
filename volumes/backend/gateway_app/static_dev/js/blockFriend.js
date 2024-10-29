@@ -15,7 +15,7 @@ async function checkIfImBlocked (friendId) {
 			throw new Error('Error fetching friend profile');
 		}
 		const data = await response.json();
-		console.log('checkIfImBlocked > data:', data);
+		// console.log('checkIfImBlocked > data:', data);
 		console.log('checkIfImBlocked > data.im_blocked:', data.im_blocked);
 		return data.im_blocked;
 	} catch (error) {
@@ -41,7 +41,7 @@ async function checkIfBlocked (friendId) {
 			throw new Error('Error fetching friend profile');
 		}
 		const data = await response.json();
-		console.log('checkIfBlocked > data:', data);
+		// console.log('checkIfBlocked > data:', data);
 		console.log('checkIfBlocked > data.is_blocked:', data.is_blocked);
 		return data.is_blocked;
 	} catch (error) {

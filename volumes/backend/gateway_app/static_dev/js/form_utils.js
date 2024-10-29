@@ -1,4 +1,5 @@
 function listenForm(form) {
+  // console.warn('listenForm called by:', new Error().stack.split('\n')[2].trim());
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     console.warn('Form submitted', e);
@@ -47,7 +48,13 @@ function listenForm(form) {
       console.log('listenForm > data.message: ', data.message);
       // console.log('listenForm > data.html: ', data.html);
 
-      if (data.status != 'error' && data.type && data.message && !data.html) {
+      if (data.type === 'invite_sent') {
+        console.log('Invitation to play sent, data: ', data);
+        inviteFriendToPlay(data.sender_username, data.sender_id, data.sender_avatar_url, data.receiver_id, data.game_type, data.game_mode);
+        return;
+
+      }
+      else if (data.status != 'error' && data.type && data.message && !data.html) {
         console.log('data.type: ', data.type, 'data.message: ', data.message);
 
         if (data.type === 'login_successful') {
@@ -64,20 +71,16 @@ function listenForm(form) {
 
         }
 
-        // Redirect home
-        if (data.type !== 'profile_updated' && data.type !== 'invite_sent') {
-          window.location.replace('/');
-        } else if (data.type === 'profile_updated') {
+        // Reload or redirect home
+        if (data.type === 'profile_updated') {
           location.reload();
+        }
+        else {
+          window.location.replace('/');
         }
 
       } else
         document.querySelector('main').innerHTML = data.html;
-
-      if (data.message === 'Invitation to play sent!') {
-        console.log('Invitation to play sent, data: ', data);
-        inviteFriendToPlay(data.sender_username, data.sender_id, data.sender_avatar_url, data.receiver_id, data.game_type, data.game_mode);
-      }
 
       if (!data?.html?.includes('class="errorlist nonfield')) {
         if (data.message != 'starting Semi-Final 1')

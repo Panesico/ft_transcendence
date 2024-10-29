@@ -116,12 +116,13 @@ function innit_listening() {
 								// console.log('gameInviteForm:', gameInviteForm);
 								gameInviteForm.id = `chat-invite-play-${friend.user_id}`;
 								gameInviteForm.action = `/invite_to_play/${friend.user_id}/`;
-								listenForm(gameInviteForm);
-								// console.log('gameInviteForm:', gameInviteForm);
+								const newGameInviteForm = gameInviteForm.cloneNode(true);
+								gameInvitePopup.replaceChild(newGameInviteForm, gameInviteForm);
+								listenForm(newGameInviteForm);
 
 								// Add block switch
 								blockSwitchContainer.style.display = 'block';
-								const blockSwitch = document.getElementById('blockSwitch');
+								const blockSwitch = blockSwitchContainer.querySelector('input');
 								blockSwitch.setAttribute('data-user-id', friend.user_id);
 								blockSwitch.setAttribute('id', `blockSwitch-${friend.user_id}`);
 								blockSwitch.addEventListener('change', function() {
