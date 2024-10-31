@@ -327,7 +327,7 @@ def api_user_games(request, user_id):
 
     try:
         games = Game.objects.filter(p1_id=user_id) | Game.objects.filter(p2_id=user_id)
-        games = games.filter(game_winner_name__isnull=False)
+        games = games.filter(game_winner_name__isnull=False).order_by('-date')
         games_list = []
         for game in games:
             game_dict = (model_to_dict(game))
