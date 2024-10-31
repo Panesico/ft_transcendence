@@ -19,3 +19,5 @@ pyjwt
 prettyprinter
 # Blockchain
 web3
+# 2FA
+pyotp

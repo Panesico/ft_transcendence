@@ -11,25 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta, timezone
 from .forms import SignUpForm, LogInForm, EditProfileForm
 from .models import User
-from .authmiddleware import login_required, generate_guest_token, JWTAuthenticationMiddleware
+from .authmiddleware import login_required, generate_guest_token, JWTAuthenticationMiddleware, generate_jwt_token, get_user_id
 
 logger = logging.getLogger(__name__)
-
-def generate_jwt_token(user):
-    secret_key = os.environ.get('DJANGO_SECRET_KEY')  # Load the secret key from env variable
-    if not secret_key:
-        raise Exception("JWT_SECRET_KEY environment variable is missing")
-    
-    payload = {
-        'user_id': user.id,
-        'exp': datetime.now(timezone.utc) + timedelta(hours=1),  # Token expiration time
-        'iat': datetime.now(timezone.utc),  # Issued at time
-    }
-
-    # Ensure you're using a secure algorithm, like HS256
-    token = jwt.encode(payload, secret_key, algorithm='HS256')
-    
-    return token
 
 
 def api_get_user_info(request, user_id):
@@ -61,7 +45,7 @@ def api_logout(request):
 
     if token:
         # Blacklist the current JWT token
-        JWTAuthenticationMiddleware.blacklist_token(token)
+        JWTAuthenticationMiddleware.blacklist_token(token, 25200)
 
         # Generate a new guest token
         guest_token = generate_guest_token()
@@ -90,7 +74,11 @@ def api_login(request):
 
             if form.is_valid():
                 user = form.get_user()
-                login(request, user)
+                try:
+                    login(request, user)
+                except Exception as e:
+                    logger.error(f'api_login > Failed to log in user: {e}')
+                    return JsonResponse({'status': 'error', 'message': _('Wrong credentials')}, status=401)
                 logger.debug(f"api_login > User.id: {user.id}")
 
                 # Generate a JWT token for the authenticated user
@@ -207,8 +195,8 @@ def api_signup(request):
                         'status': 'error', 
                         'message': _('Failed to create profile')
                     }, status=500)
-              jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
-              logger.debug(f"token >>>>>>>>>>>: {jwt_token}")
+              logger.debug(f"BEFORE TOKEN BABY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+              jwt_token = generate_jwt_token(user)
       
               # Create response object
               response = JsonResponse({
@@ -582,3 +570,25 @@ def oauth(request):
     response.set_cookie('django_language', language, samesite='Lax', httponly=True, secure=True)
     
     return response
+
+
+import pyotp
+
+def enable_2fa(request):
+    # Assuming `user` is an instance of the User model
+    if request.user_id is None or request.user_id == 0:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    user = User.objects.get(pk=request.user_id)
+    user.two_factor_token = pyotp.random_base32()
+    user.save()
+    
+    return JsonResponse({'status': 'success', 'message': '2FA enabled'}, status=200)
+
+@login_required
+def disable_2fa(request):
+    user = User.objects.get(pk=request.user_id)
+    user.two_factor_token = None
+    user.save()
+    
+    return JsonResponse({'status': 'success', 'message': '2FA disabled'}, status=200)
+
