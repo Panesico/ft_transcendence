@@ -8,18 +8,21 @@
 
     <div class="col-md-10">
 
-      <div class="people-nearby">
+      <div class="myfriends-container">
 
         {% if friends %}
 
           {% for friend in friends %}
-            <div class="card mb-3 flex-row justify-content-between {% if friend.im_blocked %}blocked {% endif %}" style="background-color: lightslategray;">
-
+            <div class="card mb-3 flex-row justify-content-between {% if friend.im_blocked %}blocked {% endif %}" style="background-color: lightslategray;" data-userid="{{ friend.user_id }}">
+            
                   <div class="d-flex flex-row align-items-center justify-content-center">
 
-                    <div class="d-flex align-items-center justify-content-center ps-3">                      
+                    <div class="d-flex align-items-center justify-content-center ps-3 position-relative">
                         <img src="{% if friend.avatar %}{{ friend.avatar }}{% else %}{% static 'images/default-avatar.svg' %}" alt="{{ friend.username }}{% endif %}" href="{% url 'user_profile' friend.user_id %}" onclick="navigate(event, '{% url 'user_profile' friend.user_id %}')"
-                            style="height: 7rem; width: 7rem; object-fit: cover; height: 7rem; width: 7rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">                      
+                            style="height: 7rem; width: 7rem; object-fit: cover; height: 7rem; width: 7rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
+                        <span class="position-absolute translate-middle badge rounded-pill bg-success" style="top: 5px; left: 30px; display: none" data-online={{ friend.user_id }}>
+                          online
+                        </span>
                     </div>
                     
                     <div class="card-body">

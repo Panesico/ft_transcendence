@@ -25,20 +25,17 @@
 								<input type="hidden" id="currentChatId" value="">
 								<div class="mb-3">
 									<h6 style="color: white;">{% trans "Contacts" %}</h6>
-									<div class="list-group" id="contactList" style="height: 300px; overflow-y: auto;">
-										<a href="#" class="list-group-item custom-contact bg-transparent text-white d-flex align-items-center" aria-current="true">
-											<img src="{% static 'images/default_avatar.png' %}" class="rounded-circle me-2" style="height: 2rem; width: 2rem;" alt="{% trans "avatar" %}">
-											{% trans "Select a contact" %}
-										</a>
-									</div>
+									<ul class="list-group" id="contactList" style="height: 300px; overflow-y: auto;">
+                    {% comment %} Contacts will be loaded here {% endcomment %}
+									</ul>
 								</div>
 							</div>
 
 							<!-- Chat Content (Right Column) -->
 							<div class="col-8">
 								<!-- Sticky header with contact name and avatar -->
-								<div class="sticky-top bg-dark d-flex justify-content-between align-items-center p-2 rounded-3 " style="z-index: 1; top: 0; background-color: #333;">
-									<div class="d-flex align-items-center">
+								<div id="contactContainer" class="sticky-top bg-dark justify-content-between align-items-center p-2 rounded-3 " style="z-index: 1; top: 0; background-color: #333; display: none;">
+									<div id="contactAvatarAndName" class="d-flex align-items-center">
 										<a id="contactAvatarLink" href="#">
 											<img id="contactAvatar" src="{% static 'images/game/cow400.png' %}" style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff; margin-right: 1rem;" alt="{% trans "avatar 1" %}">
 										</a>

@@ -109,8 +109,50 @@ window.onload = () => {
     else if (data.type === 'cancel_waiting_room') {
       addResponseNotification(data);
     }
+    else if (data.type === 'user_connected' || data.type === 'user_left') {
+      updateOnlineFriends(data);
+    }
     else {
       console.log('parseSocketMessage > data.type:', data.type);
     }
   }
+}
+
+// Add or remove badge for online friends on my_friends page and chat modal
+function updateOnlineFriends(data) {
+  console.log('updateOnlineFriends > data:', data);
+  const userIdToUpdate = data.user_id;
+
+  // for my_friends page
+  const myfriendsContainer = document.querySelector('.myfriends-container');
+  // console.log('myfriendsContainer:', myfriendsContainer);
+  if (myfriendsContainer) {
+    const friendElement = myfriendsContainer.querySelector(`span[data-online="${userIdToUpdate}"]`);
+    // console.log('friendElement:', friendElement);
+    if (friendElement) {
+      if (data.type === 'user_connected') {
+        friendElement.style.display = 'block';
+      }
+      else if (data.type === 'user_left') {
+        friendElement.style.display = 'none';
+      }
+    }
+  }
+
+  // for chat modal
+  const contactList = document.querySelector('#contactList');
+  // console.log('contactList:', contactList);
+  if (contactList) {
+    const friendElement = contactList.querySelector(`span[data-online="${userIdToUpdate}"]`);
+    // console.log('friendElement:', friendElement);
+    if (friendElement) {
+      if (data.type === 'user_connected') {
+        friendElement.style.display = 'block';
+      }
+      else if (data.type === 'user_left') {
+        friendElement.style.display = 'none';
+      }
+    }
+  }
+
 }

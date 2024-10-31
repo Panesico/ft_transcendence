@@ -32,7 +32,9 @@ class mainRoom(AsyncJsonWebsocketConsumer):
       # Broadcast message to room group
       for user, connection in users_connected.items():
         await connection.send_json({
-          'message': f'{self.user_id} has left the main room.'
+          'message': f'{self.user_id} has left the main room.',
+          'type': 'user_left',
+          'user_id': self.user_id,
         })
     
     # Leave room group on disconnect

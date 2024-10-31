@@ -199,7 +199,9 @@ async def handleNewConnection(self, users_connected):
     # Broadcast message to room group
     for user, connection in users_connected.items():
       await connection.send_json({
-        'message': f'{self.user_id} has joined the main room.'
+        'message': f'{self.user_id} has joined the main room.',
+        'type': 'user_connected',
+        'user_id': self.user_id,
       })
   else:
     logger.debug(f'mainRoom > self.user_id: {self.user_id} closed connection')
