@@ -3,6 +3,10 @@ from datetime import datetime
 from .handleInvite import get_authentif_variables
 from django.utils.translation import gettext as _
 from django.template.loader import render_to_string
+import prettyprinter
+from prettyprinter import pformat
+prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +34,13 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
     message = _(' is waiting to play ') + game_type.capitalize()
   elif type == 'cancel_waiting_room':
     message = _(' has canceled the game request.')
-    html = render_to_string('fragments/home_fragment.html')
+    user = { 'username': receiver_username }
+    context = {
+        'user': user,
+        'session': self.scope['session'],
+        'cookies': self.scope['cookies'],
+    }
+    html = render_to_string('fragments/home_fragment.html', context=context)
   logger.debug(f'requestResponse > message: {message}')
 
   # Send response to frontend sender
