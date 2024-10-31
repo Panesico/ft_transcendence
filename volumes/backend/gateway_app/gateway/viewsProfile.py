@@ -9,9 +9,12 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+# from .utils import getUserData
+import prettyprinter
+from prettyprinter import pformat
+prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
 
 User = get_user_model()
-
 logger = logging.getLogger(__name__)
 
 def get_profileapi_variables(request):
@@ -141,7 +144,10 @@ def view_user_profile(request, user_id):
         return redirect('405')
     
     try:
-       user = User.objects.get(id=user_id)
+        user = User.objects.get(id=user_id)
+        profile = get_profileapi_variables(request)
+        # logger.debug(f"view_user_profile > user: {pformat(user.__dict__)}")
+        # logger.debug(f"view_user_profile > profile: {pformat(profile)}")
     except:
         return redirect('404')
     
@@ -151,10 +157,27 @@ def view_user_profile(request, user_id):
     if response.ok:
         data = response.json().get('data')
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            html = render_to_string('fragments/userprofile_fragment.html', {'data': data, 'user_id': user_id, 'username': user.username}, request=request)
+            html = render_to_string('fragments/userprofile_fragment.html',
+                                    {
+                                       'data': data,
+                                       'target': {
+                                          'user_id': user_id,
+                                          'username': user.username,
+                                          'avatar': user.avatar,
+                                          'profile': profile
+                                        }
+                                    }, request=request)
             return JsonResponse({'html': html, 'status': 'success'})
         
-        return render(request, 'partials/userprofile.html', {'data': data, 'user_id': user_id, 'username': user.username})
+        return render(request, 'partials/userprofile.html', {
+                                       'data': data,
+                                       'target': {
+                                          'user_id': user_id,
+                                          'username': user.username,
+                                          'avatar': user.avatar,
+                                          'profile': profile
+                                        }
+                                    })
     else:
         logger.debug(f"view_user_profile > Response: {response.status_code}")
         return JsonResponse({'status': 'error', 'message': _('Error retrieving match history')})

@@ -366,5 +366,5 @@ def api_user_games(request, user_id):
 
     data['cows']['winrate'] = round((data['cows']['wins'] / data['cows']['count']) * 100, 2) if data['cows']['count'] > 0 else 0
 
-    logger.debug(f"api_user_games > games_list: {pformat(data)}")
+    # logger.debug(f"api_user_games > games_list: {pformat(data)}")
     return JsonResponse({'status': 'success', 'data': data})
