@@ -86,7 +86,10 @@ function innit_listening() {
             const onlineStatus = document.createElement('span');
             onlineStatus.classList.add('position-absolute', 'translate-middle', 'bg-success', 'online-status-chat');
             onlineStatus.dataset.online = friend.user_id;
-            onlineStatus.style.display = 'none';
+            if (friend.online)
+              onlineStatus.style.display = 'block';
+            else
+              onlineStatus.style.display = 'none';
 
             // Create display name element
             const displayName = document.createElement('span');
@@ -174,6 +177,8 @@ function innit_listening() {
                 sendMessagesBySocket(messageData, mainRoomSocket);
               });
             }
+            // // addOnlineStatusBadge on friends from contact list
+            // sendMessagesBySocket({ 'type': 'get_connected_friends', 'sender_id': userID, }, mainRoomSocket);
           });
         });
 

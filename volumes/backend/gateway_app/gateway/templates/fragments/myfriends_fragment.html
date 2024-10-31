@@ -20,7 +20,7 @@
                     <div class="d-flex align-items-center justify-content-center ps-3 position-relative">
                         <img src="{% if friend.avatar %}{{ friend.avatar }}{% else %}{% static 'images/default-avatar.svg' %}" alt="{{ friend.username }}{% endif %}" href="{% url 'user_profile' friend.user_id %}" onclick="navigate(event, '{% url 'user_profile' friend.user_id %}')"
                             style="height: 7rem; width: 7rem; object-fit: cover; height: 7rem; width: 7rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
-                        <span class="position-absolute translate-middle badge rounded-pill bg-success" style="top: 5px; left: 30px; display: none" data-online={{ friend.user_id }}>
+                        <span class="position-absolute translate-middle badge rounded-pill bg-success" style="top: 5px; left: 30px; display: {% if friend.online %}block{% else %}none{% endif %};" data-online={{ friend.user_id }}>
                           online
                         </span>
                     </div>
@@ -33,8 +33,7 @@
                         <svg width="18" height="18" viewBox="0 0 24 24">
                             <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12 ,2Z"></path>
                         </svg>
-                        {{ friend.city }}, {{ friend.country }}<br>
-                        {% comment %} <span class="text-muted">{% trans "Played" %}: 10, {% trans "Won" %}: 5, {% trans "Lost" %}: 5</span> {% endcomment %}
+                        {{ friend.city }}, {{ friend.country }}
                       </p>
                     </div>
 

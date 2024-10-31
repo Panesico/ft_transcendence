@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
+from .consumerMainRoom import users_connected
+from .authmiddleware import login_required
 # from django.template.response import TemplateResponse
 logger = logging.getLogger(__name__)
 
@@ -17,11 +19,10 @@ def get_home(request):
         return JsonResponse({'html': html, 'status': status, 'message': message})
     return render(request, 'partials/home.html', {'status': status, 'message': message})
 
+@login_required
 def get_friends(request):
   logger.debug("")
   logger.debug(f"get_friends > request: {request}")
-  if not request.user.is_authenticated:
-    return redirect('login')
   if request.method != 'GET':
     return redirect('405')
 
@@ -31,14 +32,18 @@ def get_friends(request):
   friends = response.json()
   logger.debug(f"get_friends > friends: {friends}")
   if response.status_code == 200:
+    logger.debug(f"get_friends > users_connected: {users_connected}")
+    # Add 'online': true to friends who are in users_connected
+    for friend in friends:
+      if friend['user_id'] in users_connected:
+        friend['online'] = True
     return JsonResponse({'friends': friends}, status=200)
 
 
+@login_required
 def list_friends(request):
     logger.debug("")
     logger.debug(f"list_friends > request: {request}")
-    if not request.user.is_authenticated:
-      return redirect('login')
     if request.method != 'GET':
       return redirect('405')
 
@@ -46,22 +51,31 @@ def list_friends(request):
     profile_api_url = 'https://profileapi:9002/api/getfriends/' + str(request.user.id) + '/'
     response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
     friends = response.json()
+
     request_user_profile = requests.get('https://profileapi:9002/api/profile/' + str(request.user.id) + '/', verify=os.getenv("CERTFILE"))
     response_user_profile = request_user_profile.json()
+
     logger.debug(f"list_friends > friends: {friends}")
     if response.status_code == 200 and request_user_profile.status_code == 200:
+      logger.debug(f"list_friends > users_connected: {users_connected}")
+      # Add 'online': true to friends who are in users_connected
+      for friend in friends:
+        if friend['user_id'] in users_connected:
+          friend['online'] = True
+
       blocked_users = response_user_profile['blocked_users']
       logger.debug(f"list_friends > blocked_users: {blocked_users}")
+      
       if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         # if friends is empty
         if not friends or len(friends) == 0:
           html = render_to_string('fragments/myfriends_fragment.html', request=request)
           return JsonResponse({'html': html, 'status': 200})
         else:
-
           html = render_to_string('fragments/myfriends_fragment.html', {'friends': friends}, request=request)
           return JsonResponse({'html': html, 'status': 200})
       return render(request, 'partials/myfriends.html', {'friends': friends})
+    
     else:
       if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'error': 'Error retrieving friends'}, status=500)

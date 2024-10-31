@@ -282,4 +282,26 @@ async def markNotificationAsRead(self, content, user_id):
   else:
     logger.debug(f'markNotificationAsRead > Error marking notification as read')
     return
-  
+
+
+# async def getConnectedFriends(self, content, users_connected):  
+#   # Get friends
+#   logger.debug(f"getConnectedFriends > content: {content}")
+
+#   profile_api_url = 'https://profileapi:9002/api/getfriends/' + content.get('sender_id', '') + '/'
+#   response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+#   friends = response.json()
+#   logger.debug(f"getConnectedFriends > friends: {friends}")
+#   logger.debug(f"getConnectedFriends > users_connected: {users_connected}")
+
+#   if response.ok:
+#     connected_friends_ids = [friend['user_id'] for friend in friends if friend['user_id'] in users_connected]
+#     logger.debug(f"getConnectedFriends > connected_friends_ids: {connected_friends_ids}")
+
+#     await self.send_json({
+#       'type': 'connected_friends',
+#       'sender_id': self.user_id,
+#       'connected_friends_ids': connected_friends_ids,
+#     })
+#   else:
+#     logger.error(f"getConnectedFriends > Error retrieving friends")
