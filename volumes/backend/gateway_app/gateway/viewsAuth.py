@@ -116,6 +116,8 @@ def post_login(request):
         message = response_data.get("message")
         type = response_data.get("type")
 
+        if type == "2FA":
+            return JsonResponse(response.json())
         if jwt_token:
             user_response = JsonResponse({'status': 'success', 'type': type, 'message': message, 'user_id': user_id})
             profile_data = get_profileapi_variables(request=request)
@@ -323,3 +325,136 @@ def oauth_callback(request):
     and 'state' from the URL, then send it back to the parent window using postMessage.
     """
     return render(request, 'fragments/oauth_callback.html')
+
+@login_required
+def enable2FA_redir(request):
+    authentif_url = 'https://authentif:9001/api/enable2FA/'
+
+    csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+    jwt_token = request.COOKIES.get('jwt_token')
+
+    headers = {
+    'X-CSRFToken': csrf_token,
+    'Cookie': f'csrftoken={csrf_token}',
+    'Content-Type': 'application/json',
+    'Referer': 'https://gateway:8443',
+    'Authorization': f'Bearer {jwt_token}',
+    }
+    response = requests.get(authentif_url, headers=headers, verify=os.getenv("CERTFILE"))
+
+    return JsonResponse(response.json())
+
+@login_required
+def confirm2FA_redir(request):
+    # Ensure this is a POST request
+    if request.method != 'POST':
+        return JsonResponse({"status": "error", "message": "Invalid request method. Use POST."}, status=405)
+
+    # Extract the OTP code from the request body
+    try:
+        body = json.loads(request.body)
+        otp_code = body.get("otp_code")
+        if not otp_code:
+            return JsonResponse({"status": "error", "message": "OTP code is required"}, status=400)
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": "Invalid JSON format"}, status=400)
+
+    authentif_url = 'https://authentif:9001/api/confirm2FA/'
+
+    csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+    jwt_token = request.COOKIES.get('jwt_token')
+
+    headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+        'Authorization': f'Bearer {jwt_token}',
+    }
+
+    # Prepare the payload to send
+    payload = {
+        'otp_code': otp_code
+    }
+
+    # Send POST request to the authentif service
+    try:
+        response = requests.post(authentif_url, headers=headers, json=payload, verify=os.getenv("CERTFILE"))
+        response_data = response.json()  # Parse the response to JSON
+        return JsonResponse(response_data, status=response.status_code)  # Return the response from the authentif service
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+
+@login_required
+def disable2FA_redir(request):
+    authentif_url = 'https://authentif:9001/api/disable2FA/'
+
+    csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+    jwt_token = request.COOKIES.get('jwt_token')
+
+    headers = {
+    'X-CSRFToken': csrf_token,
+    'Cookie': f'csrftoken={csrf_token}',
+    'Content-Type': 'application/json',
+    'Referer': 'https://gateway:8443',
+    'Authorization': f'Bearer {jwt_token}',
+    }
+    response = requests.post(authentif_url, headers=headers, verify=os.getenv("CERTFILE"))
+
+    return JsonResponse(response.json())
+
+
+import os
+import requests
+from django.http import JsonResponse
+from django.shortcuts import render
+import json
+
+def verify2FA_redir(request, user_id):
+    if request.method == 'GET':
+        return render(request, 'fragments/2FA_fragment.html', {"USER_ID": user_id})
+    elif request.method != 'POST':
+        return JsonResponse({"status": "error", "message": "Invalid request method. Use POST."}, status=405)
+
+    authentif_url = f'https://authentif:9001/api/verify2FA/{user_id}/'
+
+    csrf_token = request.COOKIES.get('csrftoken')
+    jwt_token = request.COOKIES.get('jwt_token')
+
+    headers = {
+        'X-CSRFToken': csrf_token,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+        'Authorization': f'Bearer {jwt_token}',
+    }
+    
+    payload = json.loads(request.body)  # Decode the JSON request body
+    otp_code = payload.get('otp_code')  # Extract the otp_code
+
+
+    payload = {
+        'otp_code': otp_code,  # This should be coming from the form submission
+    }
+
+    logger.debug(f"verify2FA_redir > payload: {payload}")
+    #body
+    logger.debug(f"verify2FA_redir > body: {request.body}")
+
+    # Send the POST request with the same payload
+    response = requests.post(authentif_url, headers=headers, json=payload, verify=os.getenv("CERTFILE"))
+
+    json_response = JsonResponse(response.json())
+
+    # Copy cookies from the response and add them to the JsonResponse
+    for cookie_name, cookie_value in response.cookies.items():
+        json_response.set_cookie(
+            key=cookie_name,
+            value=cookie_value,
+            httponly=True,
+            secure=True,
+            samesite='Lax',
+        )
+
+    return json_response
