@@ -95,7 +95,7 @@ def post_login(request):
     if not form.is_valid():
         message = _("Invalid form data")
         form.add_error(None, message)
-        html = render_to_string('fragments/login_fragment.html', {'form': form}, request=request)
+        html = render_to_string('fragments/login_fragment.html', {'form': form, 'CLIENT_ID': settings.CLIENT_ID, 'REDIRECT_URI': settings.REDIRECT_URI}, request=request)
         return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
     
     # Forward the request to the auth service
@@ -142,7 +142,7 @@ def post_login(request):
         form = LogInFormFrontend(data)
         form.add_error(None, message)
 
-        html = render_to_string('fragments/login_fragment.html', {'form': form}, request=request)
+        html = render_to_string('fragments/login_fragment.html', {'form': form, 'CLIENT_ID': settings.CLIENT_ID, 'REDIRECT_URI': settings.REDIRECT_URI}, request=request)
         return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
 
 
