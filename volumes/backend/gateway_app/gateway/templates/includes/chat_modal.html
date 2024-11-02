@@ -37,10 +37,10 @@
 								<div id="contactContainer" class="sticky-top bg-dark justify-content-between align-items-center p-2 rounded-3 " style="z-index: 1; top: 0; background-color: #333; display: none;">
 									<div id="contactAvatarAndName" class="d-flex align-items-center">
 										<a id="contactAvatarLink" href="#">
-											<img id="contactAvatar" src="{% static 'images/game/cow400.png' %}" style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff; margin-right: 1rem;" alt="{% trans "avatar 1" %}">
+											<img id="contactAvatar" src="{% static 'images/game/cow400.png' %}" style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;" class="me-2" alt="{% trans "avatar" %} 1">
 										</a>
 										<a id="contactDisplayNameLink" href="#">
-											<p id="contactDisplayName" style="color: white; margin: 0;">{% trans "Select a contact" %}</p>
+											<p id="contactDisplayName" class="m-0" style="color: white;">{% trans "Select a contact" %}</p>
 										</a>
 									</div>
 
@@ -90,7 +90,7 @@
 					<div class="modal-footer">
 						<div id="chat-log" class="input-group mb-0">
 							<input id="messageInput" type="text" class="form-control" placeholder="{% trans "Type message" %}" aria-label="{% trans "Recipient's username" %}" aria-describedby="button-addon2" />
-							<button id="sendButton" class="btn btn-danger" type="button" style="padding-top: .55rem;">{% trans "Send" %}</button>
+							<button id="sendButton" class="btn btn-danger pt-2" type="button">{% trans "Send" %}</button>
 						</div>
 					</div>
 				</div>

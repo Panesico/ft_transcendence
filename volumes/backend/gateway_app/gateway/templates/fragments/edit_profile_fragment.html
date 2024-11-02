@@ -15,7 +15,7 @@
   <div class="col-md-4">
     <div class="panel panel-default">
       <div class="panel-body">
-        <h4 class="panel-title" style="margin-top: 30px">Avatar</h4>
+        <h4 class="panel-title mt-4">Avatar</h4>
         <div class="text-center">
           {% if user.avatar %}
             <img src="{{ user.avatar.url }}" alt="{{ user.username }}" style="height: 10rem; width: 10rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
@@ -40,7 +40,7 @@
   <div class="col-md-4">
     <div class="panel panel-default">
       <div class="panel-body">
-        <h4 class="panel-title" style="margin-top: 30px">{%trans "User Info"%}</h4>
+        <h4 class="panel-title mt-4">{%trans "User Info"%}</h4>
         <form method="post" action="{% url 'edit_profile_general' %}" id="type-general" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="mb-3">
@@ -82,7 +82,7 @@
   <div class="col-md-4">
     <div class="panel panel-default">
       <div class="panel-body">
-        <h4 class="panel-title" style="margin-top: 30px">Security</h4>
+        <h4 class="panel-title mt-4">Security</h4>
         <form method="post" action="{% url 'edit_profile_security' %}" id="type-security" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="mb-3">
