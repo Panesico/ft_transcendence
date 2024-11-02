@@ -102,6 +102,13 @@
           </div>
           <button type="submit" class="btn btn-success">{% trans "Change Password" %}</button>
         </form>
+        <!-- Enable 2FA Button -->
+        {% if user.two_factor_token %}
+        <button id="2fa-button" class="btn btn-danger" onclick="disable2FA()">Disable 2FA</button>
+        {% else %}
+            <button id="2fa-button" class="btn btn-primary" onclick="enable2FA()">Enable 2FA</button>
+        {% endif %}
+        <div id="2fa-qr-code" class="mt-3"></div>
       </div>
     </div>
   </div>

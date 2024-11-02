@@ -23,6 +23,10 @@ urlpatterns = [
     path('logout/', viewsAuth.get_logout, name='logout'),
     path('oauth', viewsAuth.oauth, name='oauth'),
     path('oauth_callback', viewsAuth.oauth_callback, name='oauth_callback'),
+    path('enable2FA/', viewsAuth.enable2FA_redir, name='enable2FA'),
+    path('disable2FA/', viewsAuth.disable2FA_redir, name='disable2FA'),
+    path('confirm2FA/', viewsAuth.confirm2FA_redir, name='confirm2FA'),
+    path('verify2FA/<int:user_id>/', viewsAuth.verify2FA_redir, name='verify2FA'),
 
     # profile api
     path('profile/', viewsProfile.get_profile, name='profile'),

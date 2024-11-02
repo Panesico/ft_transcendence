@@ -30,6 +30,7 @@ class GuestUser:
     def __str__(self):
         return 'Guest User'
 
+
 def generate_guest_token():
 	"""Generate a JWT for the guest user."""
 	guest_payload = {
@@ -85,11 +86,13 @@ class JWTAuthenticationMiddleware:
             decoded_data = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"], options={"verify_exp": False})
             
             # Check if it's a guest token
+            
             if decoded_data.get('role') == 'guest':
                 request.user = self.create_guest_user()
                 return
-            
+
             user_id = decoded_data.get('user_id')
+            
             exp = datetime.fromtimestamp(decoded_data['exp'], timezone.utc)
             
             # If it's not a guest, get refresh_exp
@@ -116,7 +119,8 @@ class JWTAuthenticationMiddleware:
                 request.user = user
             else:
                 # Token is valid as an access token
-                request.user = User.objects.get(pk=user_id)
+                user = User.objects.get(pk=user_id)
+                request.user = user
 
         except (ExpiredSignatureError, InvalidTokenError, User.DoesNotExist) as e:
             logger.error(f"JWT Error: {str(e)} - Treating as guest user.")
@@ -150,13 +154,24 @@ class JWTAuthenticationMiddleware:
             except Exception as e:
                 logger.error(f'Unknown error when decoding response JWT token: {str(e)}')
 
-                # 4. If the user is not authenticated (guest user), generate and set guest token
+        self.verify_or_generate_guest_token(request, response)
+
+        return response
+
+    def verify_or_generate_guest_token(self, request, response):
+        jwt_token = request.COOKIES.get('jwt_token')
+
         if isinstance(request.user, GuestUser) or not request.user.is_authenticated:
+            if jwt_token:
+                try:
+                    jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
+                    return
+                except:
+                    pass
+            # Generate and set a new guest token if no valid token exists
             guest_token = generate_guest_token()
             response['Authorization'] = f'Bearer {guest_token}'
             response.set_cookie('jwt_token', guest_token, httponly=True, secure=True, samesite='Lax')
-
-        return response
 
     def create_guest_user(self):
         """Create a guest user (user_id=0)."""

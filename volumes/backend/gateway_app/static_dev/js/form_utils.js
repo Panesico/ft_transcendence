@@ -69,7 +69,43 @@ function listenForm(form) {
           sessionStorage.setItem('afterProfileUpdate', 'true');
           sessionStorage.setItem('afterProfileUpdateMessage', data.message);
 
+        } else if (data.type === '2FA') {
+            try {
+                const verifyResponse = await fetch('/verify2FA/' + data.user_id + "/", {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    credentials: 'include'
+                });
+        
+                // Check if the response is a redirect (status code 302)
+                if (verifyResponse.status === 302) {
+                    // Handle the redirect, maybe to a login page or another appropriate action
+                    const redirectUrl = verifyResponse.headers.get('Location');
+                    window.location.href = redirectUrl; // Redirect to the new URL
+                    return;
+                }
+        
+                // Check if the response is OK (status code 200)
+                if (!verifyResponse.ok) {
+                    throw new Error(`HTTP error! Status: ${verifyResponse.status}`);
+                }
+        
+                // Get the HTML content from the response
+                const verifyHtml = await verifyResponse.text();
+                
+                // Insert the received HTML into a specific element in the DOM
+                document.querySelector('main').innerHTML = verifyHtml;
+        
+            } catch (error) {
+                console.error('2FA verification template load error:', error);
+            }
+            return; // You can remove this return if there are further actions
         }
+        
+        
 
         // Reload or redirect home
         if (data.type === 'profile_updated') {
