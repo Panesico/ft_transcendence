@@ -590,13 +590,13 @@ import base64
 @login_required
 def enable2FA(request):
     if request.user.id is None or request.user.id == 0:
-        return JsonResponse({"status": 'error', 'message': 'Unauthorized'}, status=401)
+        return JsonResponse({"status": 'error', 'message': _('Unauthorized'), 'qr_code': "", 'two_fa_enabled': False}, status=401)
     
     user = User.objects.get(pk=request.user.id)
 
     if user.two_factor_token:
         # 2FA is already enabled for the user
-        return JsonResponse({'status': 'success', 'message': '2FA is already enabled', 'two_fa_enabled': True}, status=200)
+        return JsonResponse({'status': 'error', 'message': _('2FA is already enabled'), 'qr_code': "", 'two_fa_enabled': True}, status=200)
 
     # Generate a new TOTP secret and QR code
     totp = pyotp.TOTP(pyotp.random_base32())
@@ -607,7 +607,7 @@ def enable2FA(request):
     cache.set(cache_key, secret, timeout=300)  # Cache for 5 minutes
 
     # Generate QR code for authenticator app
-    qr = qrcode.make(totp.provisioning_uri(name=str(user.id), issuer_name="Authentif"))
+    qr = qrcode.make(totp.provisioning_uri(name=str(user.id), issuer_name="Pongscendence"))
     qr_io = BytesIO()
     qr.save(qr_io, format="PNG")
     qr_io.seek(0)
@@ -615,11 +615,11 @@ def enable2FA(request):
     # Encode QR code in base64
     qr_code_base64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
     qr_code_url = f"data:image/png;base64,{qr_code_base64}"
-
+    
     return JsonResponse({
-        'status': 'success', 
-        'qr_code': qr_code_url, 
-        'message': '2FA setup initiated, please verify OTP to enable', 
+        'status': 'success',
+        'message': _('Scan the QR code, then enter the OTP below to confirm'),
+        'qr_code': qr_code_url,
         'two_fa_enabled': False
     }, status=200)
 
@@ -629,25 +629,25 @@ from django.core.cache import cache
 def confirmEnable2FA(request):
     # Check if the request is a POST request
     if request.method != 'POST':
-        return JsonResponse({"status": "error", "message": "Invalid request method. Use POST."}, status=405)
+        return JsonResponse({"status": "error", "message": _("Invalid request method. Use POST.")}, status=405)
 
     if request.user.id is None or request.user.id == 0:
-        return JsonResponse({"status": "error", "message": "Unauthorized"}, status=401)
+        return JsonResponse({"status": "error", "message": _("Unauthorized")}, status=401)
 
     # Get OTP code from request body
     try:
         body = json.loads(request.body)
         otp_code = body.get("otp_code")
         if not otp_code:
-            return JsonResponse({"status": "error", "message": "OTP code is required"}, status=400)
+            return JsonResponse({"status": "error", "message": _("OTP code is required")}, status=400)
     except json.JSONDecodeError:
-        return JsonResponse({"status": "error", "message": "Invalid JSON format"}, status=400)
+        return JsonResponse({"status": "error", "message": _("Invalid JSON format")}, status=400)
 
     # Retrieve temporary TOTP secret from cache
     cache_key = f"2fa_setup_{request.user.id}"
     temp_secret = cache.get(cache_key)
     if not temp_secret:
-        return JsonResponse({"status": "error", "message": "No 2FA setup in progress or setup expired"}, status=400)
+        return JsonResponse({"status": "error", "message": _("No 2FA setup in progress or setup expired")}, status=400)
 
     # Verify OTP using the TOTP secret
     totp = pyotp.TOTP(temp_secret)
@@ -662,11 +662,11 @@ def confirmEnable2FA(request):
 
         return JsonResponse({
             "status": "success",
-            "message": "2FA is now enabled",
+            "message": _("2FA is now enabled"),
             "two_fa_enabled": True
         }, status=200)
     else:
-        return JsonResponse({"status": "error", "message": "Invalid OTP code"}, status=400)
+        return JsonResponse({"status": "error", "message": _("Invalid OTP code")}, status=400)
 
 @login_required
 def disable2FA(request):
@@ -675,16 +675,16 @@ def disable2FA(request):
         if user.two_factor_token:
             user.two_factor_token = None
             user.save()
-            return JsonResponse({'status': 'success', 'message': '2FA disabled'})
+            return JsonResponse({"status": "success", "message": _("2FA disabled successfully")})
         else:
-            return JsonResponse({'status': 'error', 'message': '2FA is not enabled'}, status=400)
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+            return JsonResponse({"status": "error", "message": _("2FA is not enabled")}, status=400)
+    return JsonResponse({"status": "error", "message": _("Invalid request")}, status=400)
 
 
 def verify2FA(request, user_id):
     # Ensure user_id is provided
     if not user_id:
-        return JsonResponse({"status": "error", "message": "User ID is required"}, status=400)
+        return JsonResponse({"status": "error", "message": _("User ID is required")}, status=400)
 
     # Generate the cache key for the user and attempt to retrieve the cached JWT token
     cache_key = f"2fa_user_{user_id}"
@@ -697,23 +697,23 @@ def verify2FA(request, user_id):
 
     # Verify the JWT token and user ID are in cache
     if not cached_jwt or cached_jwt != current_jwt:
-        return JsonResponse({"status": "error", "message": "Token or user mismatch"}, status=401)
+        return JsonResponse({"status": "error", "message": _("Token or user mismatch")}, status=401)
 
     # Attempt to retrieve the user and check if they have 2FA enabled
     try:
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "User not found"}, status=404)
+        return JsonResponse({"status": "error", "message": _("User not found")}, status=404)
 
     if not user.two_factor_token:
-        return JsonResponse({"status": "error", "message": "2FA is not enabled for this user"}, status=400)
+        return JsonResponse({"status": "error", "message": _("2FA is not enabled for this user")}, status=400)
 
     # Retrieve and verify the OTP code
     payload = json.loads(request.body)  # Decode the JSON request body
     otp_code = payload.get('otp_code')  # Extract the otp_code
 
     if not otp_code:
-        return JsonResponse({"status": "error", "message": "OTP code is required"}, status=400)
+        return JsonResponse({"status": "error", "message": _("OTP code is required")}, status=400)
 
     # Use pyotp to verify the provided OTP code
     totp = pyotp.TOTP(user.two_factor_token)
@@ -721,9 +721,9 @@ def verify2FA(request, user_id):
         new_token = generate_jwt_token(user)
 
         # Respond with success and set the new JWT as a secure cookie
-        response = JsonResponse({"status": "success", "message": "2FA verified"})
+        response = JsonResponse({"status": "success", "message": _("2FA verified")})
         response.set_cookie('jwt_token', new_token, httponly=True, secure=True, samesite='Lax')
 
         return response
     else:
-        return JsonResponse({"status": "error", "message": "Invalid OTP code"}, status=400)
+        return JsonResponse({"status": "error", "message": _("Invalid OTP code")}, status=400)

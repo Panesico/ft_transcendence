@@ -341,23 +341,25 @@ def enable2FA_redir(request):
     'Authorization': f'Bearer {jwt_token}',
     }
     response = requests.get(authentif_url, headers=headers, verify=os.getenv("CERTFILE"))
+    data = response.json()
 
-    return JsonResponse(response.json())
+    html = render_to_string('fragments/2FA_enable_fragment.html', {'data': data}, request=request)
+    return JsonResponse({'html': html, 'status': data.get('status'), 'message': data.get('message'), 'two_fa_enabled': data.get('two_fa_enabled')})
 
 @login_required
 def confirm2FA_redir(request):
     # Ensure this is a POST request
     if request.method != 'POST':
-        return JsonResponse({"status": "error", "message": "Invalid request method. Use POST."}, status=405)
+        return JsonResponse({"status": "error", "message": _("Invalid request method. Use POST.")}, status=405)
 
     # Extract the OTP code from the request body
     try:
         body = json.loads(request.body)
         otp_code = body.get("otp_code")
         if not otp_code:
-            return JsonResponse({"status": "error", "message": "OTP code is required"}, status=400)
+            return JsonResponse({"status": "error", "message": _("OTP code is required")}, status=400)
     except json.JSONDecodeError:
-        return JsonResponse({"status": "error", "message": "Invalid JSON format"}, status=400)
+        return JsonResponse({"status": "error", "message": _("Invalid JSON format")}, status=400)
 
     authentif_url = 'https://authentif:9001/api/confirm2FA/'
 
@@ -380,7 +382,7 @@ def confirm2FA_redir(request):
     # Send POST request to the authentif service
     try:
         response = requests.post(authentif_url, headers=headers, json=payload, verify=os.getenv("CERTFILE"))
-        response_data = response.json()  # Parse the response to JSON
+        response_data = response.json()
         return JsonResponse(response_data, status=response.status_code)  # Return the response from the authentif service
     except requests.exceptions.RequestException as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
@@ -413,7 +415,7 @@ import json
 
 def verify2FA_redir(request, user_id):
     if request.method == 'GET':
-        return render(request, 'fragments/2FA_fragment.html', {"USER_ID": user_id})
+        return render(request, 'fragments/2FA_verify_fragment.html', {"USER_ID": user_id})
     elif request.method != 'POST':
         return JsonResponse({"status": "error", "message": "Invalid request method. Use POST."}, status=405)
 

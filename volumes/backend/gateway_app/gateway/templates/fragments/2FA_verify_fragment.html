@@ -1,8 +1,8 @@
 {% load i18n %}
 <div id="two-fa-required" class="page p-4">
     <div class="d-flex flex-column justify-content-center align-items-center ms-auto me-auto text-center" style="width: 300px;">
-      <h1 class="mb-4" style="font-size: 3rem; font-weight: bold;">
-        2FA <span style="color: red;">REQUIRED</span>
+      <h1 class="mb-4 font-weight-bold">
+        2FA <span class="text-danger">{% trans "required" %}</span>
       </h1>
   
       <!-- Feedback message area -->
@@ -14,8 +14,7 @@
         <input type="text" id="otp_code" placeholder="{% trans 'Enter Code' %}" class="form-control text-center" required>
       </div>
   
-      <div id="config2FA" hidden="true"
-      user-id-2fa="{{ USER_ID }}"></div>
+      <div id="config2FA" hidden="true" user-id-2fa="{{ USER_ID }}"></div>
 
       <!-- Verify button -->
       <button class="btn btn-secondary w-100" onclick="verify2FA()">{% trans "Verify" %}</button>
