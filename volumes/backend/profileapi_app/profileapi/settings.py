@@ -29,6 +29,25 @@ DEBUG = True
 
 # Application definition
 
+# Internationalization
+# https://docs.djangoproject.com/en/4.2/topics/i18n/
+
+TIME_ZONE = 'UTC'
+USE_TZ = True
+USE_I18N = True
+USE_L10N = True
+# Path to the translation files
+LOCALE_PATHS = [
+    BASE_DIR /'translations/',
+]
+
+# Define the languages that the application will support
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Spanish'),
+    ('fr', 'French'),
+]
+
 INSTALLED_APPS = [
     
     'django.contrib.auth',

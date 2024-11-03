@@ -3,7 +3,7 @@
 <div id="home" class="page p-4">
 
   {% if user.username %}
-  <h1>{% trans "Welcome," %} <span class="text-danger">{{ user.username }}</span>!</h1>
+  <h1>{% trans "Welcome" %}, <span class="text-danger">{{ user.username }}</span>!</h1>
   {% else %}
   <h1>{% trans "Welcome" %}</h1>
   {% endif %}

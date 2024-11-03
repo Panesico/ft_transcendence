@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-from django.utils.translation import gettext_lazy as _ # For translations
 import os
 import logging
 
@@ -202,14 +201,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Setting to handle media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# from django.conf import settings
-# from django.conf.urls.static import static
-
-# urlpatterns = [
-#     # ... your url patterns
-# ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
 
 # Channels
 

@@ -44,10 +44,10 @@ postgres:
 	docker exec -it postgres sh \
 		-c "psql -U postgres_main_user -d transcendence_db"
 deletenotifications:
-	docker exec -it postgres sh \
+	docker exec postgres sh \
 		-c "psql -U postgres_main_user -d transcendence_db -c 'DELETE FROM profileapi_notification;'"
 deletefriendships:
-	docker exec -it postgres sh \
+	docker exec postgres sh \
 		-c "psql -U postgres_main_user -d transcendence_db -c 'DELETE FROM profileapi_profile_friends;;'"
 
 gateway:
@@ -69,8 +69,28 @@ blockchain:
 blockchain_restart:
 	docker restart blockchain
 
+MAKEMESSAGES_CMD	= "\
+    python manage.py makemessages -l en && \
+    python manage.py makemessages -l fr && \
+    python manage.py makemessages -l es"
 
+COMPILEMESSAGES_CMD	= "python manage.py compilemessages"
+
+makemessages:
+	docker exec authentif sh -c $(MAKEMESSAGES_CMD)
+	docker exec calcgame sh -c $(MAKEMESSAGES_CMD)
+	docker exec gateway sh -c $(MAKEMESSAGES_CMD)
+	docker exec play sh -c $(MAKEMESSAGES_CMD)
+	docker exec profileapi sh -c $(MAKEMESSAGES_CMD)
+
+compilemessages:
+	docker exec authentif sh -c $(COMPILEMESSAGES_CMD)
+	docker exec calcgame sh -c $(COMPILEMESSAGES_CMD)
+	docker exec gateway sh -c $(COMPILEMESSAGES_CMD)
+	docker exec play sh -c $(COMPILEMESSAGES_CMD)
+	docker exec profileapi sh -c $(COMPILEMESSAGES_CMD)
 
 .phony: all down stop logs prune routine reset certs postgres \
 	gateway gateway_restart authentif authentif_restart \
-	profileapi profileapi_restart calcgame blockchain
+	profileapi profileapi_restart calcgame blockchain \
+	makemessages compilemessages

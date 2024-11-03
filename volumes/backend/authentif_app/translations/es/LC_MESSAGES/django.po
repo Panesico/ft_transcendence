@@ -1,0 +1,190 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-11-03 14:40+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: authentif/forms.py:26
+msgid "Password and confirmation are required"
+msgstr "Se requieren la contraseña y la confirmación"
+
+#: authentif/forms.py:28 authentif/forms.py:109
+msgid "Passwords do not match"
+msgstr "Las contraseñas no coinciden"
+
+#: authentif/forms.py:32
+msgid "Cannot set both password and id_42"
+msgstr "No se puede establecer tanto la contraseña como el id_42"
+
+#: authentif/forms.py:58
+msgid "New Username"
+msgstr "Nuevo nombre de usuario"
+
+#: authentif/forms.py:62
+msgid "New Password"
+msgstr "Nueva contraseña"
+
+#: authentif/forms.py:66
+msgid "Confirm Password"
+msgstr "Confirmar contraseña"
+
+#: authentif/forms.py:70
+msgid "Avatar"
+msgstr "Avatar"
+
+#: authentif/models.py:56
+msgid "Either password or id_42 must be set."
+msgstr "Debe establecerse la contraseña o el id_42."
+
+#: authentif/models.py:58
+msgid "You cannot set both password and id_42."
+msgstr "No puede establecer tanto la contraseña como el id_42."
+
+#: authentif/views.py:37 authentif/views.py:39 authentif/views.py:311
+#: authentif/views.py:706
+msgid "User not found"
+msgstr "Usuario no encontrado"
+
+#: authentif/views.py:57
+msgid "Logged out successfully"
+msgstr "Cierre de sesión exitoso"
+
+#: authentif/views.py:65
+msgid "No active session found"
+msgstr "No se encontró una sesión activa"
+
+#: authentif/views.py:81
+msgid "Wrong credentials"
+msgstr "Credenciales incorrectas"
+
+#: authentif/views.py:94
+msgid "2FA required"
+msgstr "Se requiere 2FA"
+
+#: authentif/views.py:104 authentif/views.py:215 authentif/views.py:449
+#: authentif/views.py:563
+msgid "Login successful"
+msgstr "Inicio de sesión exitoso"
+
+#: authentif/views.py:124
+msgid "Invalid username or password"
+msgstr "Nombre de usuario o contraseña inválidos"
+
+#: authentif/views.py:128 authentif/views.py:247 authentif/views.py:271
+#: authentif/views.py:308
+msgid "Invalid JSON"
+msgstr "JSON inválido"
+
+#: authentif/views.py:131 authentif/views.py:255 authentif/views.py:273
+#: authentif/views.py:317
+msgid "Method not allowed"
+msgstr "Método no permitido"
+
+#: authentif/views.py:197
+msgid "User is inactive"
+msgstr "El usuario está inactivo"
+
+#: authentif/views.py:206
+msgid "Failed to create profile"
+msgstr "Error al crear el perfil"
+
+#: authentif/views.py:250 authentif/views.py:314
+msgid "Not a valid password"
+msgstr "Contraseña no válida"
+
+#: authentif/views.py:253
+msgid "An unexpected error occurred"
+msgstr "Ocurrió un error inesperado"
+
+#: authentif/views.py:265
+msgid "User exists"
+msgstr "El usuario ya existe"
+
+#: authentif/views.py:268
+msgid "User does not exist"
+msgstr "El usuario no existe"
+
+#: authentif/views.py:300
+msgid "Profile updated"
+msgstr "Perfil actualizado"
+
+#: authentif/views.py:305
+msgid "Invalid profile update"
+msgstr "Actualización de perfil inválida"
+
+#: authentif/views.py:593 authentif/views.py:635
+msgid "Unauthorized"
+msgstr "No autorizado"
+
+#: authentif/views.py:599
+msgid "2FA is already enabled"
+msgstr "2FA ya está habilitado"
+
+#: authentif/views.py:621
+msgid "Scan the QR code, then enter the OTP below to confirm"
+msgstr "Escanee el código QR, luego ingrese el OTP a continuación para confirmar"
+
+#: authentif/views.py:632
+msgid "Invalid request method. Use POST."
+msgstr "Método de solicitud inválido. Use POST."
+
+#: authentif/views.py:642 authentif/views.py:716
+msgid "OTP code is required"
+msgstr "Se requiere el código OTP"
+
+#: authentif/views.py:644
+msgid "Invalid JSON format"
+msgstr "Formato de JSON inválido"
+
+#: authentif/views.py:650
+msgid "No 2FA setup in progress or setup expired"
+msgstr "No hay configuración de 2FA en progreso o la configuración ha expirado"
+
+#: authentif/views.py:665
+msgid "2FA is now enabled"
+msgstr "2FA ahora está habilitado"
+
+#: authentif/views.py:669 authentif/views.py:729
+msgid "Invalid OTP code"
+msgstr "Código OTP inválido"
+
+#: authentif/views.py:678
+msgid "2FA disabled successfully"
+msgstr "2FA deshabilitado con éxito"
+
+#: authentif/views.py:680
+msgid "2FA is not enabled"
+msgstr "2FA no está habilitado"
+
+#: authentif/views.py:681
+msgid "Invalid request"
+msgstr "Solicitud inválida"
+
+#: authentif/views.py:687
+msgid "User ID is required"
+msgstr "Se requiere ID de usuario"
+
+#: authentif/views.py:700
+msgid "Token or user mismatch"
+msgstr "El token o el usuario no coinciden"
+
+#: authentif/views.py:709
+msgid "2FA is not enabled for this user"
+msgstr "2FA no está habilitado para este usuario"
+
+#: authentif/views.py:724
+msgid "2FA verified"
+msgstr "2FA verificado"

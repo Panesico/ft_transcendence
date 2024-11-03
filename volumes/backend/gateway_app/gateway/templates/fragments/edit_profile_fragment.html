@@ -1,6 +1,6 @@
 {% load i18n %}
 {% load static %}
-<h1 class="pt-4"> {%trans "Edit profile information of " %} <span class="text-danger">{{ user.username }}</span></h1>
+<h1 class="pt-4"> {% trans "Edit profile" %}: <span class="text-danger">{{ user.username }}</span></h1>
 <div class="row">
 
   {% if form.non_field_errors %}

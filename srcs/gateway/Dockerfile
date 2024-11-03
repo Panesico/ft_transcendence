@@ -1,10 +1,8 @@
-FROM python:3.9-alpine3.18
+FROM  python:3.9.20-alpine3.20
 
-RUN apk update && \
-  apk add --no-cache \
-  postgresql-client \
-  gettext \
-  && rm -rf /var/cache/apk/*
+RUN   apk update && \
+  apk add postgresql-client gettext && \
+  rm -rf /var/cache/apk/*
 
 RUN   pip install --upgrade pip
 
