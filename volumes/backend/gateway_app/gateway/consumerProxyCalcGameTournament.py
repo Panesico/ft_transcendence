@@ -1,7 +1,8 @@
 import os, json, logging, websockets, ssl, asyncio, aiohttp
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest
+from .utils import getUserId, getUserData, asyncRequest, get_player_language
+from django.utils.translation import activate, gettext as _
 
 import prettyprinter
 from prettyprinter import pformat
@@ -128,6 +129,8 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
 
             logger.debug(f"ProxyCalcGameTournament > self.game_info: {pformat(self.game_info)}")
 
+            player_language = get_player_language(self.context)
+            activate(player_language)
             html = render_to_string('fragments/tournament_start_fragment.html', {'context': self.context, 'info': self.game_info})
 
             logger.debug(f"ProxyCalcGameTournament > sending game_start page to client")
@@ -227,6 +230,8 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
         if response['info']['p2_id'] != 0:
             response['info']['p2_avatar_url'] = self.trmt_info['p1_avatar_url']
 
+        player_language = get_player_language(self.context)
+        activate(player_language)
         html = render_to_string('fragments/tournament_next_game_fragment.html',
                                 {
                                   'context': self.context,
@@ -276,6 +281,8 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
         # Notify player that tournament has ended and send tournament_end html
         logger.debug(f"ProxyCalcGameTournament > tournament_end response: {pformat(response)}")
 
+        player_language = get_player_language(self.context)
+        activate(player_language)
         html = render_to_string('fragments/tournament_end_fragment.html',
                                 {
                                     'context': self.context,

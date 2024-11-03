@@ -2,8 +2,8 @@ import os, json, logging, websockets, ssl, asyncio
 from datetime import datetime, timedelta
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest, generate_unique_id
-from django.utils.translation import gettext as _
+from .utils import getUserId, getUserData, asyncRequest, generate_unique_id, get_player_language
+from django.utils.translation import activate, gettext as _
 
 import prettyprinter
 from prettyprinter import pformat
@@ -131,27 +131,35 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
             'p1_avatar_url': player1['context']['user']['avatar_url'],
             'p2_avatar_url': player2['context']['user']['avatar_url'],
         }
-        html1 = render_to_string('fragments/game_remote_fragment.html', {'context': player1['context'], 'info': info})
-        html2 = render_to_string('fragments/game_remote_fragment.html', {'context': player2['context'], 'info': info})
 
-        try: # Notify players that the game is starting            
-            await player1['ws'].send(json.dumps({
+        player1_language = get_player_language(player1['context'])
+        player2_language = get_player_language(player2['context'])
+
+        activate(player1_language)
+        html1 = render_to_string('fragments/game_remote_fragment.html', {'context': player1['context'], 'info': info})
+        message1 = {
                 'type': 'game_start',
                 'game_id': game_id,
                 'title': _('Game starting...'),
                 'message': _('You are the player on the left'),
                 'player_role': '1',
                 'html': html1,
-            }))
-
-            await player2['ws'].send(json.dumps({
+            }
+        
+        activate(player2_language)
+        html2 = render_to_string('fragments/game_remote_fragment.html', {'context': player2['context'], 'info': info})
+        message2 = {
                 'type': 'game_start',
                 'game_id': game_id,
                 'title': _('Game starting...'),
                 'message': _('You are the player on the right'),
                 'player_role': '2',
                 'html': html2,
-            }))
+            }
+
+        try: # Notify players that the game is starting            
+            await player1['ws'].send(json.dumps(message1))
+            await player2['ws'].send(json.dumps(message2))
             
         except Exception as e:
             logger.error(f"ProxyCalcGameInvite > start_game Error notifying players: {e}")
@@ -318,6 +326,8 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
     async def waiting_room(self, context):
         logger.debug("ProxyCalcGameInvite > player in waiting_room")
 
+        player_language = get_player_language(context)
+        activate(player_language)
         html = render_to_string('fragments/waiting_room.html', context=context)
 
         await self.send(json.dumps({
@@ -345,18 +355,22 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
         await self.save_game_to_database(game_id, game, player1, player2, game_result)
 
         # Notify players that the game has ended and send game_end html
+        player1_language = get_player_language(player1['context'])
+        player2_language = get_player_language(player2['context'])
+
+        activate(player1_language)
         html1 = render_to_string('fragments/game_end_fragment.html', {
               'context': player1['context'],
               'game_result': game_result
             })
+        dataCalcgame['html'] = html1
+        await player1['ws'].send(json.dumps(dataCalcgame))
+
+        activate(player2_language)
         html2 = render_to_string('fragments/game_end_fragment.html', {
               'context': player2['context'],
               'game_result': game_result
             })
-
-        dataCalcgame['html'] = html1
-        await player1['ws'].send(json.dumps(dataCalcgame))
-
         dataCalcgame['html'] = html2
         await player2['ws'].send(json.dumps(dataCalcgame))
 
@@ -428,6 +442,8 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
         await self.save_game_to_database(game_id, game, player1, player2, game_result)
 
         # Notify the remaining player that the game has ended
+        player_language = get_player_language(remaining_player['context'])
+        activate(player_language)
         html = render_to_string('fragments/game_end_fragment.html', {
               'context': remaining_player['context'],
               'game_result': game_result

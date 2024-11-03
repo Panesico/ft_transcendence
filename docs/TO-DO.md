@@ -17,3 +17,6 @@ Auth:
 - Block player -> iZaak
 - Ensure modal close after message displayed -> double notification
 - Delete friends request when accepted
+
+
+- Cows game, freezes when both players touch a cow at the same time

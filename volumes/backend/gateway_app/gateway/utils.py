@@ -96,3 +96,20 @@ async def asyncRequest(method, csrf_token, url, data):
         return None
     
     return response_json
+
+
+def get_player_language(context):
+    cookies = context.get('cookies', {})
+    user = context.get('user', {})
+    profile = user.get('profile', {})
+    
+    # Check for language in cookies
+    if 'django_language' in cookies:
+        return cookies['django_language']
+    
+    # Check for preferred language in profile
+    if 'preferred_language' in profile:
+        return profile['preferred_language']
+    
+    # Default to 'en'
+    return 'en'

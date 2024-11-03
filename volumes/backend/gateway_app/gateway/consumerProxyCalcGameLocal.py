@@ -1,7 +1,8 @@
 import os, json, logging, websockets, ssl, asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest
+from .utils import getUserId, getUserData, asyncRequest, get_player_language
+from django.utils.translation import activate, gettext as _
 
 import prettyprinter
 from prettyprinter import pformat
@@ -92,6 +93,8 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
             
             logger.debug(f"ProxyCalcGameLocal > user: {pformat(user)}")
 
+            player_language = get_player_language(self.context)
+            activate(player_language)
             html = render_to_string('fragments/game_fragment.html', {'context': self.context, 'info': info})
             logger.debug(f"ProxyCalcGameLocal > sending game_start page to client")
             await self.send(json.dumps({
@@ -129,6 +132,8 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
         game_result = data_calcgame_response.get('game_result')
         logger.debug(f"ProxyCalcGameLocal > game_end game_result: {game_result}")
 
+        player_language = get_player_language(self.context)
+        activate(player_language)
         html = render_to_string('fragments/game_end_fragment.html', {
               'context': self.context,
               'game_result': game_result
