@@ -82,7 +82,7 @@ def api_createTournament(request):
           info = {
               'tournament_id': tournament.id,
               'game_round': 'Semi-Final 1',
-              'game_round_title': _('Semi-Final 1'),
+              'game_round_title': 'Semi-Final 1', # don't translate
               'p1_name': Game.objects.get(id=tournament.semifinal1.id).p1_name, 
               'p2_name': Game.objects.get(id=tournament.semifinal1.id).p2_name,
               'p1_id': Game.objects.get(id=tournament.semifinal1.id).p1_id,
@@ -146,7 +146,7 @@ def api_updateTournament(request):
               info = {
                   'tournament_id': tournament.id,
                   'game_round': game_round,
-                  'game_round_title': _('Semi-Final 2'),
+                  'game_round_title': 'Semi-Final 2', # don't translate
                   'p1_name': Game.objects.get(id=tournament.semifinal2.id).p1_name,
                   'p2_name': Game.objects.get(id=tournament.semifinal2.id).p2_name,
                   'p1_id': Game.objects.get(id=tournament.semifinal2.id).p1_id,
@@ -166,7 +166,7 @@ def api_updateTournament(request):
               info = {
                   'tournament_id': tournament.id,
                   'game_round': game_round,
-                  'game_round_title': _('Final'),
+                  'game_round_title': 'Final', # don't translate
                   'p1_name': tournament.semifinal1.game_winner_name,
                   'p2_name': tournament.semifinal2.game_winner_name,
                   'p1_id': tournament.semifinal1.game_winner_id,

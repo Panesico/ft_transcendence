@@ -96,4 +96,3 @@ msgstr "Friend blocked"
 #: profileapi/views.py:447
 msgid "Friend unblocked"
 msgstr "Friend unblocked"
-

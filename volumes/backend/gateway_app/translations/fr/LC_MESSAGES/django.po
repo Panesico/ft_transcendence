@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSION DU PACKAGE\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-03 15:21+0000\n"
+"POT-Creation-Date: 2024-11-03 16:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: NOM COMPLET <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUE <LL@li.org>\n"
@@ -18,40 +18,52 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: gateway/consumerProxyCalcGameInvite.py:141
-#: gateway/consumerProxyCalcGameInvite.py:150
-#: gateway/consumerProxyCalcGameRemote.py:196
-#: gateway/consumerProxyCalcGameRemote.py:205
+#: gateway/consumerProxyCalcGameInvite.py:143
+#: gateway/consumerProxyCalcGameInvite.py:154
+#: gateway/consumerProxyCalcGameRemote.py:200
+#: gateway/consumerProxyCalcGameRemote.py:211
 msgid "Game starting..."
 msgstr "Le jeu commence..."
 
-#: gateway/consumerProxyCalcGameInvite.py:142
-#: gateway/consumerProxyCalcGameRemote.py:197
+#: gateway/consumerProxyCalcGameInvite.py:144
+#: gateway/consumerProxyCalcGameRemote.py:201
 msgid "You are the player on the left"
 msgstr "Vous êtes le joueur à gauche"
 
-#: gateway/consumerProxyCalcGameInvite.py:151
-#: gateway/consumerProxyCalcGameRemote.py:206
+#: gateway/consumerProxyCalcGameInvite.py:155
+#: gateway/consumerProxyCalcGameRemote.py:212
 msgid "You are the player on the right"
 msgstr "Vous êtes le joueur à droite"
 
-#: gateway/consumerProxyCalcGameInvite.py:440
-#: gateway/consumerProxyCalcGameRemote.py:500
+#: gateway/consumerProxyCalcGameInvite.py:456
+#: gateway/consumerProxyCalcGameRemote.py:517
 msgid "Forfeit"
 msgstr "Abandon"
 
-#: gateway/consumerProxyCalcGameInvite.py:441
-#: gateway/consumerProxyCalcGameRemote.py:501
+#: gateway/consumerProxyCalcGameInvite.py:457
+#: gateway/consumerProxyCalcGameRemote.py:518
 msgid "Your opponent has disconnected"
 msgstr "Votre adversaire s'est déconnecté"
 
-#: gateway/consumerProxyCalcGameRemote.py:528
+#: gateway/consumerProxyCalcGameRemote.py:548
 msgid "Cancelled"
 msgstr "Annulé"
 
-#: gateway/consumerProxyCalcGameRemote.py:529
+#: gateway/consumerProxyCalcGameRemote.py:549
 msgid "You are already waiting for a game"
 msgstr "Vous attendez déjà un jeu"
+
+#: gateway/consumerProxyCalcGameTournament.py:115
+msgid "Semi-Final 1"
+msgstr "Demi-finale 1"
+
+#: gateway/consumerProxyCalcGameTournament.py:117
+msgid "Semi-Final 2"
+msgstr "Demi-finale 2"
+
+#: gateway/consumerProxyCalcGameTournament.py:119
+msgid "Final"
+msgstr "Finale"
 
 #: gateway/forms.py:9
 msgid ""
