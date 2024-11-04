@@ -3,7 +3,7 @@ from profileapi.forms import InviteFriendForm
 from profileapi.models import Profile, Notification
 from profileapi.forms import EditProfileForm
 from django.db import DatabaseError
-from django.utils.translation import gettext as _
+from django.utils.translation import activate, gettext as _
 import json
 import os
 import requests
@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 @csrf_exempt
 def api_signup(request):
     logger.debug("--> hello from api_signup")
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     if (request.method != 'POST'):
         logger.debug("Method not allowed")
         return HttpResponse('Method not allowed', status=405)
@@ -45,6 +47,8 @@ def api_signup(request):
 
 def api_edit_profile(request):
     logger.debug("api_edit_profile")
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     if request.method == 'POST':
         try:
             data = json.loads(request.body)

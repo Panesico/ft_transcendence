@@ -1,9 +1,10 @@
 import os, json, requests, logging
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from .forms import SignUpFormFrontend, LogInFormFrontend
 from .viewsProfile import get_profileapi_variables
 import jwt
@@ -11,6 +12,7 @@ from django.utils.translation import gettext as _
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 logger = logging.getLogger(__name__)
+
 
 # Logout
 
@@ -80,8 +82,10 @@ def post_login(request):
 
     csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
     jwt_token = request.COOKIES.get('jwt_token')
+    django_language = request.COOKIES.get('django_language', 'en')
     headers = {
         'X-CSRFToken': csrf_token,
+        'X-Language': django_language,
         'Cookie': f'csrftoken={csrf_token}',
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
@@ -188,8 +192,10 @@ def post_signup(request):
 
     csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
     jwt_token = request.COOKIES.get('jwt_token')
+    django_language = request.COOKIES.get('django_language', 'en')
     headers = {
         'X-CSRFToken': csrf_token,
+        'X-Language': django_language,
         'Cookie': f'csrftoken={csrf_token}',
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
@@ -221,39 +227,14 @@ def post_signup(request):
         html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
         return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
 
-import requests
-import os
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect
-
-import json
-import os
-import requests
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect
-
-import json
-import os
-import requests
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect
-
-import json
-import os
-import requests
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect
-from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def oauth(request):
-    authentif_url = 'https://authentif:9001/api/oauth/'  # External auth service endpoint
+    authentif_url = 'https://authentif:9001/api/oauth/'
     
-    # Only allow POST requests
     if request.method != 'POST':
-        return redirect('405')  # Redirect to a 405 page for incorrect methods
+        return redirect('405')
 
-    # Parse JSON data from the request body
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
@@ -270,15 +251,16 @@ def oauth(request):
     try:
         # Set up the JSON data to send in the POST request to the external service
         payload = json.dumps({'code': auth_code})  # Convert the data to a JSON string
-        csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+        csrf_token = request.COOKIES.get('csrftoken')
         jwt_token = request.COOKIES.get('jwt_token')
-
+        django_language = request.COOKIES.get('django_language', 'en')
         headers = {
-        'X-CSRFToken': csrf_token,
-        'Cookie': f'csrftoken={csrf_token}',
-        'Content-Type': 'application/json',
-        'Referer': 'https://gateway:8443',
-        'Authorization': f'Bearer {jwt_token}',
+          'X-CSRFToken': csrf_token,
+          'X-Language': django_language,
+          'Cookie': f'csrftoken={csrf_token}',
+          'Content-Type': 'application/json',
+          'Referer': 'https://gateway:8443',
+          'Authorization': f'Bearer {jwt_token}',
         }
         # Make the POST request to the external authentif service
         response = requests.post(authentif_url, cookies=request.COOKIES,data=payload, headers=headers, verify=os.getenv("CERTFILE"))
@@ -330,17 +312,18 @@ def oauth_callback(request):
 def enable2FA_redir(request):
     authentif_url = 'https://authentif:9001/api/enable2FA/'
 
-    csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+    csrf_token = request.COOKIES.get('csrftoken')
     jwt_token = request.COOKIES.get('jwt_token')
-
+    django_language = request.COOKIES.get('django_language', 'en')
     headers = {
-    'X-CSRFToken': csrf_token,
-    'Cookie': f'csrftoken={csrf_token}',
-    'Content-Type': 'application/json',
-    'Referer': 'https://gateway:8443',
-    'Authorization': f'Bearer {jwt_token}',
+        'X-CSRFToken': csrf_token,
+        'X-Language': django_language,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+        'Authorization': f'Bearer {jwt_token}',
     }
-    response = requests.get(authentif_url, headers=headers, verify=os.getenv("CERTFILE"))
+    response = requests.post(authentif_url, headers=headers, verify=os.getenv("CERTFILE"))
     data = response.json()
 
     html = render_to_string('fragments/2FA_enable_fragment.html', {'data': data}, request=request)
@@ -365,9 +348,10 @@ def confirm2FA_redir(request):
 
     csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
     jwt_token = request.COOKIES.get('jwt_token')
-
+    django_language = request.COOKIES.get('django_language', 'en')
     headers = {
         'X-CSRFToken': csrf_token,
+        'X-Language': django_language,
         'Cookie': f'csrftoken={csrf_token}',
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
@@ -394,13 +378,14 @@ def disable2FA_redir(request):
 
     csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
     jwt_token = request.COOKIES.get('jwt_token')
-
+    django_language = request.COOKIES.get('django_language', 'en')
     headers = {
-    'X-CSRFToken': csrf_token,
-    'Cookie': f'csrftoken={csrf_token}',
-    'Content-Type': 'application/json',
-    'Referer': 'https://gateway:8443',
-    'Authorization': f'Bearer {jwt_token}',
+        'X-CSRFToken': csrf_token,
+        'X-Language': django_language,
+        'Cookie': f'csrftoken={csrf_token}',
+        'Content-Type': 'application/json',
+        'Referer': 'https://gateway:8443',
+        'Authorization': f'Bearer {jwt_token}',
     }
     response = requests.post(authentif_url, headers=headers, verify=os.getenv("CERTFILE"))
 
@@ -423,9 +408,10 @@ def verify2FA_redir(request, user_id):
 
     csrf_token = request.COOKIES.get('csrftoken')
     jwt_token = request.COOKIES.get('jwt_token')
-
+    django_language = request.COOKIES.get('django_language', 'en')
     headers = {
         'X-CSRFToken': csrf_token,
+        'X-Language': django_language,
         'Cookie': f'csrftoken={csrf_token}',
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',

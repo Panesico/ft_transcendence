@@ -124,6 +124,7 @@ async def friendRequest(content, users_connected, self):
 
   # Get username of receiver
   user_data = get_authentif_variables(self.user_id)
+  logger.debug(f'friendRequest > user_data: {pformat(user_data)}')
   receiver_username = user_data.get('username', '')
   logger.debug(f'friendRequest > receiver_username: {receiver_username}')
   if user_data is None:

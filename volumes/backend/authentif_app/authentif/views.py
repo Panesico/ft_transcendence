@@ -6,12 +6,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.utils.translation import gettext as _
+from django.utils.translation import activate, gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta, timezone
 from .forms import SignUpForm, LogInForm, EditProfileForm
 from .models import User
 from .authmiddleware import login_required, generate_guest_token, JWTAuthenticationMiddleware, generate_jwt_token, get_user_id
+
+import prettyprinter
+from prettyprinter import pformat
+prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +70,9 @@ def api_logout(request):
     
 def api_login(request):
     logger.debug("api_login")
+    # logger.debug(f"api_login > request.headers: {pformat(request.headers)}")
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     try:
         if request.method == 'POST':
             try:
@@ -135,16 +142,16 @@ def api_login(request):
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
 # Create a profile linked to user through call to profileapi service
-def createProfile(username, user_id, csrf_token, id_42):
+def createProfile(username, user_id, csrf_token, id_42, lang):
     profileapi_url = 'https://profileapi:9002/api/signup/'
     if id_42:
         profile_data = { 'user_id': user_id, 'username': username, 'id_42': id_42 }
     else:
         profile_data = { 'user_id': user_id, 'username': username }
     
-    
     headers = {
         'X-CSRFToken': csrf_token,
+        'X-Language': lang,
         'Cookie': f'csrftoken={csrf_token}',
         'Content-Type': 'application/json',
         'HTTP_HOST': 'profileapi',
@@ -173,6 +180,8 @@ def createProfile(username, user_id, csrf_token, id_42):
 
 def api_signup(request):
     logger.debug("api_signup")
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     if request.method == 'POST':
         try:
           data = json.loads(request.body)
@@ -203,7 +212,7 @@ def api_signup(request):
               
               csrf_token = request.COOKIES.get('csrftoken')
               # Create a profile through call to profileapi service
-              if not createProfile(username, user.id, csrf_token, False):
+              if not createProfile(username, user.id, csrf_token, False, language):
                     user.delete()
                     return JsonResponse({
                         'status': 'error', 
@@ -260,6 +269,8 @@ def api_signup(request):
 
 def api_check_username_exists(request):
     logger.debug("api_check_exists")
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     if request.method == 'POST':
         try:
           data = json.loads(request.body)
@@ -279,6 +290,8 @@ def api_check_username_exists(request):
 
 def api_edit_profile(request):
   logger.debug("api_edit_profile")
+  language = request.headers.get('X-Language', 'en')
+  activate(language)
   if request.method == 'POST':
     try:
       data = json.loads(request.body)
@@ -345,6 +358,8 @@ def create_or_get_user(request, user_data):
     Creates a new user or retrieves an existing one based on the 42 API data.
     Logs in the user after creation or retrieval, and calls the profile API to create the profile.
     """
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     try:
         # Try to find the user by their 42 login (username)
         user = User.objects.get(username=user_data['login'])
@@ -370,7 +385,7 @@ def create_or_get_user(request, user_data):
                 logger.error(f"SignUpForm error: {form.errors}")
         
         # Create the profile
-        createProfile(user_data['login'], user_data['id'], "", 'id' in user_data)  # True if 42 user
+        createProfile(user_data['login'], user_data['id'], "", 'id' in user_data, language)  # True if 42 user
         payload = json.dumps({'image_url': user_data['image']['link']})  # Convert the data to a JSON string
         csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
         jwt_token = request.COOKIES.get('jwt_token')
@@ -409,6 +424,8 @@ def create_or_get_user(request, user_data):
 
 @csrf_exempt
 def oauth(request):
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
 
@@ -479,7 +496,7 @@ def oauth(request):
     csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
 
     # Create the profile
-    createProfile(user_data['login'], user.id, csrf_token, 'id' in user_data)  # True if 42 user
+    createProfile(user_data['login'], user.id, csrf_token, 'id' in user_data, language)  # True if 42 user
     if user == None:
         login(request, user)
 
@@ -593,6 +610,10 @@ import base64
 
 @login_required
 def enable2FA(request):
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
+    logger.debug("enable2FA")
+    logger.debug(f"request.method: {request.method}")
     if request.method != 'POST':
         return JsonResponse({"status": 'error', 'message': _('Invalid request method. Use POST.')}, status=405)
     
@@ -637,6 +658,8 @@ from django.core.cache import cache
 
 @login_required
 def confirmEnable2FA(request):
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     # Check if the request is a POST request
     if request.method != 'POST':
         return JsonResponse({"status": "error", "message": _("Invalid request method. Use POST.")}, status=405)
@@ -684,6 +707,8 @@ def confirmEnable2FA(request):
 
 @login_required
 def disable2FA(request):
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     if request.method == 'POST':
         if request.user.id_42:
             return JsonResponse({"status": "error", "message": _("Unauthorized")}, status=401)
@@ -699,6 +724,8 @@ def disable2FA(request):
 
 
 def verify2FA(request, user_id):
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     if request.method != 'POST':
         return JsonResponse({"status": "error", "message": _("Invalid request method. Use POST.")}, status=405)
     
