@@ -28,6 +28,7 @@ function createAvatarElement(avatar_url) {
   avatar.style.borderRadius = '50%';
   avatar.style.marginRight = '10px';
   avatar.style.border = '1px solid white';
+  avatar.id = 'avatar';
 
   return avatar;
 }
@@ -257,6 +258,25 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
   });
 }
 
+function deleteResponsesButtons(notificationDropdownClass) {
+  const notifications = notificationDropdownClass.children;
+
+  for (let i = 0; i < notifications.length; i++) {
+    const notification = notifications[i];
+    const buttons = notification.querySelectorAll('img');
+
+    if (buttons.length > 0) {
+      // If the image is not the avatar, remove it
+        console.log('deleteResponsesButtons > buttons[0].id:', buttons[0].id);
+        buttons.forEach(button => {
+          if (button.id !== 'avatar') {
+            button.remove();    
+          }
+      });
+    }
+  }
+}
+
 function addRequestNotification(data) {
   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
   const notificationDropdownClass = document.getElementById('notificationClassContent');
@@ -306,6 +326,10 @@ function addRequestNotification(data) {
 
   // Add button to decline the friend request represented by decline png
   const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);
+
+  // If data type is game, delete the accept and decline buttons from other previous games notifications
+  if (data.type === 'game_request')
+    deleteResponsesButtons(notificationDropdownClass);
 
   // Append the avatar and message to the newNotification element
   appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status);
