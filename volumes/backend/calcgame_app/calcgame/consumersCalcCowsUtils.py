@@ -40,18 +40,28 @@ def check_collisions(gs, cfg, frameCount):
           cow['x'] + cfg['cowDimension'] > gs['player1X'] and
           cow['y'] < gs['player1Y'] + cfg['playerDimension'] and
           cow['y'] + cfg['cowDimension'] > gs['player1Y']):
-          gs['cows'].remove(cow)
-          gs['scorePlayer1'] -= 1
           gs['player1_hit'] = True
-          gs['player1_frame_hit'] = frameCount
-          logger.debug("CowsCalcLocal > check_collisions > cow captured by player 1")
 
       if (cow['x'] < gs['player2X'] + cfg['playerDimension'] and
           cow['x'] + cfg['cowDimension'] > gs['player2X'] and
           cow['y'] < gs['player2Y'] + cfg['playerDimension'] and
           cow['y'] + cfg['cowDimension'] > gs['player2Y']):
+          gs['player2_hit'] = True
+
+      # if both players hit the cow, randomly choose one to be hit
+      if gs['player1_hit'] == True and gs['player2_hit'] == True:
+            if random.choice([True, False]):
+              gs['player1_hit'] = False
+            else:
+              gs['player2_hit'] = False
+              
+      if gs['player1_hit'] == True:
+          gs['cows'].remove(cow)
+          gs['scorePlayer1'] -= 1
+          gs['player1_frame_hit'] = frameCount
+          logger.debug("CowsCalcLocal > check_collisions > cow hit player 1")
+      elif gs['player2_hit'] == True:
           gs['cows'].remove(cow)
           gs['scorePlayer2'] -= 1
-          gs['player2_hit'] = True
           gs['player2_frame_hit'] = frameCount
-          logger.debug("CowsCalcLocal > check_collisions > cow captured by player 2")
+          logger.debug("CowsCalcLocal > check_collisions > cow hit player 2")
