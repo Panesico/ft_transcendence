@@ -83,7 +83,7 @@
     <div class="col-md-4">
         <div class="panel panel-default">
         <div class="panel-body">
-            <h4 class="panel-title mt-4">Security</h4>
+            <h4 class="panel-title mt-4">{% trans "Security"  %}</h4>
             <form method="post" action="{% url 'edit_profile_security' %}" id="type-security" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="mb-3">

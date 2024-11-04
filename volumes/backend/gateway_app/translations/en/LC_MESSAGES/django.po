@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-03 16:41+0000\n"
+"POT-Creation-Date: 2024-11-04 15:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ENGLISH <LL@li.org>\n"
@@ -53,15 +53,17 @@ msgstr "Cancelled"
 msgid "You are already waiting for a game"
 msgstr "You are already waiting for a game"
 
-#: gateway/consumerProxyCalcGameTournament.py:115
+#: gateway/consumerProxyCalcGameTournament.py:118
 msgid "Semi-Final 1"
 msgstr "Semi-Final 1"
 
-#: gateway/consumerProxyCalcGameTournament.py:117
+#: gateway/consumerProxyCalcGameTournament.py:120
+#: gateway/consumerProxyCalcGameTournament.py:235
 msgid "Semi-Final 2"
 msgstr "Semi-Final 2"
 
-#: gateway/consumerProxyCalcGameTournament.py:119
+#: gateway/consumerProxyCalcGameTournament.py:122
+#: gateway/consumerProxyCalcGameTournament.py:237
 msgid "Final"
 msgstr "Final"
 
@@ -201,7 +203,11 @@ msgstr "French"
 msgid "Submit"
 msgstr "Submit"
 
-#: gateway/templates/fragments/edit_profile_fragment.html:103
+#: gateway/templates/fragments/edit_profile_fragment.html:86
+msgid "Security"
+msgstr ""
+
+#: gateway/templates/fragments/edit_profile_fragment.html:104
 msgid "Change Password"
 msgstr "Change Password"
 
@@ -579,40 +585,44 @@ msgstr "Logout"
 msgid "You have no notifications"
 msgstr "You have no notifications"
 
+#: gateway/templates/includes/popupMessages.html:6
+msgid "Notification"
+msgstr ""
+
 #: gateway/views.py:82
 msgid "Error retrieving friends"
 msgstr "Error retrieving friends"
 
-#: gateway/viewsAuth.py:32
+#: gateway/viewsAuth.py:34
 msgid "Logged out successfully"
 msgstr "Logged out successfully"
 
-#: gateway/viewsAuth.py:50
+#: gateway/viewsAuth.py:52
 msgid "Method not allowed"
 msgstr "Method not allowed"
 
-#: gateway/viewsAuth.py:96 gateway/viewsAuth.py:184 gateway/viewsProfile.py:211
-#: gateway/viewsProfile.py:275
+#: gateway/viewsAuth.py:100 gateway/viewsAuth.py:188
+#: gateway/viewsProfile.py:213 gateway/viewsProfile.py:279
 msgid "Invalid form data"
 msgstr "Invalid form data"
 
-#: gateway/viewsAuth.py:291
+#: gateway/viewsAuth.py:273
 msgid "No message provided"
 msgstr "No message provided"
 
-#: gateway/viewsAuth.py:319
+#: gateway/viewsAuth.py:301
 msgid "Failed to login with 42"
 msgstr "Failed to login with 42"
 
-#: gateway/viewsAuth.py:353
+#: gateway/viewsAuth.py:336
 msgid "Invalid request method. Use POST."
 msgstr "Invalid request method. Use POST."
 
-#: gateway/viewsAuth.py:360
+#: gateway/viewsAuth.py:343
 msgid "OTP code is required"
 msgstr "OTP code is required"
 
-#: gateway/viewsAuth.py:362
+#: gateway/viewsAuth.py:345
 msgid "Invalid JSON format"
 msgstr "Invalid JSON format"
 
@@ -668,6 +678,6 @@ msgstr "User unblocked"
 msgid "Error retrieving match history"
 msgstr "Error retrieving match history"
 
-#: gateway/viewsProfile.py:382
+#: gateway/viewsProfile.py:388
 msgid "Please select a file to upload"
 msgstr "Please select a file to upload"

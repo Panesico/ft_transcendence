@@ -1,3 +1,4 @@
+
 // Show modal before tournament game
 function announceGame(round, message) {
   let messageModal =
