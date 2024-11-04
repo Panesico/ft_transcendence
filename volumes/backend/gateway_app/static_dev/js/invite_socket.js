@@ -201,7 +201,11 @@ function onModalClose(modal) {
     inviteFriendSocket.close();
     console.log('Modal is closed and WebSocket is closed');
   } else {
-    console.warn('WebSocket is not open or already closed');
+    console.warn('inviteFriendWebSocket is not open or already closed');
+    // Ensure modal is closed
+    const modal = document.getElementById('inviteFriendModal');
+    const modalInstance = bootstrap.Modal.getInstance(modal);
+    modalInstance.hide();
   }
 
 }

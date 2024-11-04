@@ -19,6 +19,5 @@ Remote game:
 
   @BenjaminLarger
 - Add an href associated to the avatar displayed in notification to his profile
-- Block player -> iZaak
 - Ensure modal close after message displayed -> double notification
-- Delete friends request when accepted
+- Modal does not close if you click twice on add friend
