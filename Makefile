@@ -2,12 +2,18 @@ SHELL	= /bin/sh
 
 NAME	= transcendence
 
-all:
+all: check_certs create_volumes_dirs
+	cd srcs && docker compose up --build
+
+check_certs: # creates certificates if needed
 	@if [ ! -d "volumes/certs" ] || [ ! -f "volumes/certs/cert.pem" ] || \
 		[ ! -f "volumes/certs/key.pem" ]; then \
 		$(MAKE) certs; \
-	fi; \
-	cd srcs && docker compose up --build
+	fi
+
+create_volumes_dirs: # creates volumes directories if needed
+	mkdir -p ./volumes/postgres_db ./volumes/frontend ./volumes/backend \
+  ./volumes/certs
 
 init:
 	bash -c "mkdir -p ./volumes/{postgres_db,frontend}"
