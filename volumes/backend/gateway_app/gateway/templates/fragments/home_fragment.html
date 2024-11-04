@@ -2,8 +2,8 @@
 {% load i18n %}
 <div id="home" class="page p-4">
 
-  {% if user.is_authenticated %}
-  <h1>{% trans "Welcome," %} <span class="text-danger">{{ user.username }}</span>!</h1>
+  {% if user.username %}
+  <h1>{% trans "Welcome" %}, <span class="text-danger">{{ user.username }}</span>!</h1>
   {% else %}
   <h1>{% trans "Welcome" %}</h1>
   {% endif %}

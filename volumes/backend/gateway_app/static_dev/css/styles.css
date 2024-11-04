@@ -28,6 +28,12 @@ body {
   height: 80px;
 }
 
+.vertical-line {
+  border-left: 2px solid #000;
+  height: 100%;
+  width: 0px;
+}
+
 /**************************/
 /*** Floating animation ***/
 /**************************/
@@ -182,53 +188,15 @@ body {
 Nearby People CSS
 ==================================================*/
 
-.people-nearby .google-maps{
-background: #f8f8f8;
-border-radius: 4px;
-border: 1px solid #f1f2f2;
-padding: 20px;
-margin-bottom: 20px;
-}
-
-.people-nearby .google-maps .map{
-height: 300px;
-width: 100%;
-border: none;
-}
-
-.people-nearby .nearby-user{
-padding: 20px 0;
-border-top: 1px solid #f1f2f2;
-border-bottom: 1px solid #f1f2f2;
-margin-bottom: 20px;
-}
-
-img.profile-photo-lg{
-height: 80px;
-width: 80px;
-border-radius: 50%;
-}
-
-.hero h1 {
-  font-size: 4rem;
-  font-weight: bold;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-}
-.hero p {
-  font-size: 1.5rem;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+.online-status-chat {
+  top: 15px;
+  left: 10px;
+  padding: 6px;
+  border-radius: 50%;
 }
 
 .section h2 {
   margin-bottom: 40px;
-}
-
-.victory-border {
-  border: 2px solid #28a745 !important; /* Verde */
-}
-
-.defeat-border {
-  border: 2px solid #dc3545 !important; /* Rojo */
 }
 
 .table th.date-column,
@@ -243,12 +211,26 @@ border-radius: 50%;
   cursor: pointer;
 }
 
+#chatModal {
+  z-index: 1100;
+}
+
+#messageModal {
+  z-index: 1101;
+}
+
+.blocked-contact {
+  pointer-events: none;
+  background-color: grey;
+  opacity: 0.5;
+}
+
 .custom-contact {
   border: none;
-  padding: 15px;
   background-color: transparent;
   border-bottom: 2px solid rgba(255, 255, 255, 0.5);
   transition: background-color 0.3s ease;
+  cursor: pointer;
 }
 
 .custom-contact:hover {
@@ -270,4 +252,23 @@ border-radius: 50%;
   padding: 10px;
   margin: 0 auto;
   width: fit-content;
+}
+
+.form-check-input:checked {
+  background-color: red;
+  border-color: red;
+}
+.display-4 {
+  font-size: 2.5rem;
+}
+
+.blocked {
+    pointer-events: none;
+    opacity: 0.5;
+    background-color: #f0f0f0;
+}
+
+.blocked .form-check {
+    pointer-events: auto;
+    opacity: 1;
 }

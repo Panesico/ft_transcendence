@@ -50,6 +50,13 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
         'startNewGame > .onmessage connection_established:', data.message);
       cfg = getInitialVariables(gameType, data.initial_vars);
 
+    } else if (data.type === 'already_in_game') {  // while finding an opponent
+      // in remote
+      console.log('startNewGame > .onmessage already_in_game:', data.message);
+      // Load html waiting room
+      document.querySelector('main').innerHTML = data.html;
+      announceGame(data.title, data.message);
+
     } else if (data.type === 'waiting_room') {  // while finding an opponent
       // in remote
       console.log('startNewGame > .onmessage waiting_room:', data.message);

@@ -109,6 +109,12 @@ window.onload = () => {
     else if (data.type === 'cancel_waiting_room') {
       addResponseNotification(data);
     }
+    else if (data.type === 'user_connected' || data.type === 'user_left') {
+      updateOnlineFriends(data);
+    }
+    // else if (data.type === 'connected_friends') {
+    //   addOnlineStatusBadge(data);
+    // }
     else {
       console.log('parseSocketMessage > data.type:', data.type);
     }

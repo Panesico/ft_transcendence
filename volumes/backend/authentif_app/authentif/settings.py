@@ -32,6 +32,25 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Internationalization
+# https://docs.djangoproject.com/en/4.2/topics/i18n/
+
+TIME_ZONE = 'UTC'
+USE_TZ = True
+USE_I18N = True
+USE_L10N = True
+# Path to the translation files
+LOCALE_PATHS = [
+    BASE_DIR /'translations/',
+]
+
+# Define the languages that the application will support
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Spanish'),
+    ('fr', 'French'),
+]
+
 # Application definition
 
 INSTALLED_APPS = [

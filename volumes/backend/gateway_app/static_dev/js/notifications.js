@@ -366,7 +366,8 @@ function addResponseNotification(data) {
   else if (data.type === 'cancel_waiting_room') {
     inputMessage = data.message;
     document.querySelector('main').innerHTML = data.html;
-    console.warn('redirect to home');
+    displayMessageInModal(data.sender_username + data.message);
+    // console.warn('redirect to home');
   }
 
   const message = createMessageElement(receiver_username, inputMessage);

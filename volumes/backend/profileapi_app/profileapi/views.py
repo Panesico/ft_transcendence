@@ -136,7 +136,14 @@ def get_friends(request, user_id):
             response = requests.get(authentif_url, verify=os.getenv("CERTFILE"))
             user_data = response.json()
             logger.debug(f'get_friends > user_data: {user_data}')
-
+            if friend in user_obj.blocked_users.all():
+                is_blocked = True
+            else:
+                is_blocked = False
+            if user_obj in friend.blocked_users.all():
+                im_blocked = True
+            else:
+                im_blocked = False
             data.append({
                 'user_id': friend.user_id,
                 'display_name': friend.display_name,
@@ -148,6 +155,8 @@ def get_friends(request, user_id):
                 'defeats': friend.defeats,
                 'avatar': '/media/' + user_data['avatar_url'],
                 'username': user_data['username'],
+                'is_blocked': is_blocked,
+                'im_blocked': im_blocked,
             })
         return JsonResponse(data, status=200, safe=False)
     except Profile.DoesNotExist:
@@ -174,6 +183,7 @@ def get_profile_api(request, user_id):
               'played_games': user_obj.played_games,
               'wins': user_obj.wins,
               'defeats': user_obj.defeats,
+              'blocked_users': list(user_obj.blocked_users.values_list('id', flat=True)),
             }
         return JsonResponse(data, status=200)
     except Profile.DoesNotExist:

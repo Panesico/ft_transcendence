@@ -2,8 +2,8 @@ import os, json, logging, websockets, ssl, asyncio
 from datetime import datetime, timedelta
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest
-from django.utils.translation import gettext as _
+from .utils import getUserId, getUserData, asyncRequest, generate_unique_id, get_player_language
+from django.utils.translation import activate, gettext as _
 
 import prettyprinter
 from prettyprinter import pformat
@@ -33,10 +33,6 @@ logging.getLogger('websockets').setLevel(logging.WARNING)
 class ProxyCalcGameRemote(AsyncWebsocketConsumer):
     active_games = {} # Dictionary to store active games
     waiting = {} # Dictionary to store players waiting for a game
-    unique_id = 1
-
-    # Add check 
-    # user should not be able to play against themselves through two remote games
 
     async def connect(self):
         logger.debug("ProxyCalcGameRemote > connect")
@@ -54,8 +50,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             await self.close()
             return
         
-        # Generate a unique player ID for this connection
-        connect_id = self.channel_name
+        connect_id = self.channel_name # unique player ID for this connection
         jwt_token = self.scope['cookies']['jwt_token']
         user_id = await getUserId(jwt_token)
         user = await getUserData(user_id)
@@ -64,7 +59,13 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             'session': self.scope['session'],
             'cookies': self.scope['cookies'],
         }
+        
+        # if user is already in waiting room, close connection
+        if user_id != 0 and await self.userIsAlreadyInGame(user_id, user, context, game_type): 
+            logger.error(f"Player {user_id} already in a game, connection closed")
+            return
 
+        # Add player to waiting room
         if game_type not in self.waiting:
             self.waiting[game_type] = {}
         
@@ -74,12 +75,11 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             'player_id': 0,
             'ws': self,
             'context': context,
-        }
-        
+        }        
         logger.debug(f"Player connected and added to waiting: {connect_id}")
-
         await self.waiting_room(context)
-        
+
+        # Start a background task to check for waiting players
         self.check_waiting_task = asyncio.create_task(self.check_waiting(game_type))
     
 
@@ -106,7 +106,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                     else:
                         winrate_groups['high'].append((player_id, player_info))
 
-                    logger.debug(f"--------Player '{player_info['player_name']}', winrate groups 'low'[{len(winrate_groups['low'])}], 'mid'[{len(winrate_groups['mid'])}], 'high'[{len(winrate_groups['high'])}], 'any'[{len(winrate_groups['any'])}], waiting_time: {waiting_time}")
+                    # logger.debug(f"Player '{player_info['player_name']}', winrate groups 'low'[{len(winrate_groups['low'])}], 'mid'[{len(winrate_groups['mid'])}], 'high'[{len(winrate_groups['high'])}], 'any'[{len(winrate_groups['any'])}], waiting_time: {waiting_time}")
 
 
             # If player in 'any' queue, match them with anyone
@@ -116,20 +116,20 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                 for group in ['low', 'mid', 'high']:                    
                     if winrate_groups[group]:
                         
-                        logger.debug(f"--------Matched players in winrate group {group} with any player")
                         player2_id, player2 = winrate_groups[group].pop(0)
                         player1_id, player1 = any_player
+                        # Remove the players from the waiting queue
                         self.waiting[game_type].pop(player1_id)
                         self.waiting[game_type].pop(player2_id)
 
                         # Create a new game
-                        game_id = self.unique_id
-                        self.unique_id += 1
+                        game_id = generate_unique_id()
                         self.active_games[game_id] = {
                             "game_type": player1['game_type'],
                             "player1": player1,
                             "player2": player2,
                         }
+                        logger.debug(f"--------Matched players in winrate group {group} with any player, player1: {player1['player_name']}, player2: {player2['player_name']}, game_type[game_id]: {game_type}[{game_id}]")
 
                         await asyncio.sleep(2)
                         await self.start_game(game_id)
@@ -137,22 +137,20 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
 
             for group in ['low', 'mid', 'high']:
                 if len(winrate_groups[group]) >= 2:
-                    logger.debug(f"--------Matched players in winrate group {group}")
                     player1_id, player1 = winrate_groups[group].pop(0)
                     player2_id, player2 = winrate_groups[group].pop(0)
-
                     # Remove the players from the waiting queue
                     self.waiting[game_type].pop(player1_id)
                     self.waiting[game_type].pop(player2_id)
 
                     # Create a new game
-                    game_id = self.unique_id
-                    self.unique_id += 1
+                    game_id = generate_unique_id()
                     self.active_games[game_id] = {
                         "game_type": player1['game_type'],
                         "player1": player1,
                         "player2": player2,
                     }
+                    logger.debug(f"--------Matched players in winrate group {group}, player1: {player1['player_name']}, player2: {player2['player_name']}, game_type[game_id]: {game_type}[{game_id}]")
 
                     await asyncio.sleep(2)
                     await self.start_game(game_id)
@@ -169,9 +167,9 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
         game = self.active_games[game_id]
         player1 = game['player1']
         player2 = game['player2']
-        # logger.debug(f"ProxyCalcGameRemote > start_game game: {pformat(game)}")
-        # logger.debug(f"ProxyCalcGameRemote > start_game player1: {pformat(player1)}")
-        # logger.debug(f"ProxyCalcGameRemote > start_game player2: {pformat(player2)}")
+        logger.debug(f"ProxyCalcGameRemote > start_game game: {pformat(game)}")
+        logger.debug(f"ProxyCalcGameRemote > start_game player1: {pformat(player1)}")
+        logger.debug(f"ProxyCalcGameRemote > start_game player2: {pformat(player2)}")
 
         if player1['player_name'] == player2['player_name']:
             player1['player_name'] += "#1"
@@ -188,28 +186,37 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             'p1_avatar_url': player1['context']['user']['avatar_url'],
             'p2_avatar_url': player2['context']['user']['avatar_url'],
         }
+
+        # Get languages for each player
+        player1_language = get_player_language(player1['context'])
+        player2_language = get_player_language(player2['context'])
+
+        # Activate player1's language and render the message
+        activate(player1_language)
         html1 = render_to_string('fragments/game_remote_fragment.html', {'context': player1['context'], 'info': info})
+        message1 = {
+            'type': 'game_start',
+            'game_id': game_id,
+            'title': _('Game starting...'),
+            'message': _('You are the player on the left'),
+            'player_role': '1',
+            'html': html1,
+        }
+
+        activate(player2_language)
         html2 = render_to_string('fragments/game_remote_fragment.html', {'context': player2['context'], 'info': info})
+        message2 = {
+            'type': 'game_start',
+            'game_id': game_id,
+            'title': _('Game starting...'),
+            'message': _('You are the player on the right'),
+            'player_role': '2',
+            'html': html2,
+        }
 
-        try: # Notify players that the game is starting            
-            await player1['ws'].send(json.dumps({
-                'type': 'game_start',
-                'game_id': game_id,
-                'title': _('Game starting...'),
-                'message': _('You are the player on the left'),
-                'player_role': '1',
-                'html': html1,
-            }))
-
-            await player2['ws'].send(json.dumps({
-                'type': 'game_start',
-                'game_id': game_id,
-                'title': _('Game starting...'),
-                'message': _('You are the player on the right'),
-                'player_role': '2',
-                'html': html2,
-            }))
-            
+        try: # Notify players that the game is starting 
+            await player1['ws'].send(json.dumps(message1))
+            await player2['ws'].send(json.dumps(message2))            
         except Exception as e:
             logger.error(f"ProxyCalcGameRemote > start_game Error notifying players: {e}")
 
@@ -262,7 +269,13 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
         # Handle messages received from the client
         logger.debug(f"ProxyCalcGameRemote > receive from {self.channel_name}")
         logger.debug(f"ProxyCalcGameRemote > receive from client: {text_data}")
-        data = json.loads(text_data)
+        
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON received: {e}")
+            return
+
         connect_id = self.channel_name
 
         if data['type'] == 'opening_connection, my name is':
@@ -277,11 +290,14 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                 player['queue_date'] = datetime.now()
 
                 # Get player winrate
-                url = 'https://play:9003/api/getWinrate/' + str(player['player_id']) + '/' + game_type + '/'
-                response = await asyncRequest("GET", "", url, "")
-                player['winrate'] = response.get('winrate') or 0
+                if player['player_id'] == 0:
+                    player['winrate'] = 0
+                else:
+                  url = 'https://play:9003/api/getWinrate/' + str(player['player_id']) + '/' + game_type + '/'
+                  response = await asyncRequest("GET", "", url, "")
+                  player['winrate'] = response.get('winrate') or 0
 
-                logger.debug(f"Updated waiting[{game_type}][connect_id] with player_name: {data['p1_name']}, player_id: {self.waiting[game_type][connect_id]['player_id']}, winrate: {self.waiting[game_type][connect_id]['winrate']}")
+                logger.debug(f"______Updated waiting[{game_type}][connect_id] with player_name: {data['p1_name']}, player_id: {self.waiting[game_type][connect_id]['player_id']}, winrate: {self.waiting[game_type][connect_id]['winrate']}")
                 # logger.debug(f"ProxyCalcGameRemote > opening_connection player: {pformat(player)}")
             else:
                 logger.error(f"Player {connect_id} not found in waiting")
@@ -373,8 +389,10 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
     async def waiting_room(self, context):
         logger.debug("ProxyCalcGameRemote > player in waiting_room")
 
+        player_language = get_player_language(context)
+        activate(player_language)
         html = render_to_string('fragments/waiting_room.html', context=context)
-
+        
         await self.send(json.dumps({
             'type': 'waiting_room',
             'message': 'Waiting for another player to join...',
@@ -399,18 +417,22 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
         await self.save_game_to_database(game_id, game, player1, player2, game_result)
 
         # Notify players that the game has ended and send game_end html
+        player1_language = get_player_language(player1['context'])
+        player2_language = get_player_language(player2['context'])
+
+        activate(player1_language)
         html1 = render_to_string('fragments/game_end_fragment.html', {
               'context': player1['context'],
               'game_result': game_result
             })
+        dataCalcgame['html'] = html1
+        await player1['ws'].send(json.dumps(dataCalcgame))
+
+        activate(player2_language)
         html2 = render_to_string('fragments/game_end_fragment.html', {
               'context': player2['context'],
               'game_result': game_result
             })
-
-        dataCalcgame['html'] = html1
-        await player1['ws'].send(json.dumps(dataCalcgame))
-
         dataCalcgame['html'] = html2
         await player2['ws'].send(json.dumps(dataCalcgame))
 
@@ -425,7 +447,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             player1['player_name'] = player1['player_name'][:-2]
         if player2['player_name'].endswith("#2"):
             player2['player_name'] = player2['player_name'][:-2]
-
+                     
         data = {
             'game_type': game['game_type'],
             'game_round': 'single',
@@ -436,7 +458,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             'p1_score': game_result.get('p1_score'),
             'p2_score': game_result.get('p2_score'),
             'game_winner_name': player1['player_name'] if game_result.get('game_winner_name') == player1['player_name'] else player2['player_name'],
-            'game_winner_id': player1['player_id'] if game_result.get('game_winner_name') == player1['player_id'] else player2['player_id'],
+            'game_winner_id': player1['player_id'] if game_result.get('game_winner_name') == player1['player_name'] else player2['player_id'],
         }
         
         await asyncRequest("POST", csrf_token, play_url, data)
@@ -476,11 +498,13 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
 
         game_result['game_id'] = game_id
         game_result['game_winner_name'] = remaining_player['player_name']
-
+        
         # Save game to database
         await self.save_game_to_database(game_id, game, player1, player2, game_result)
 
         # Notify the remaining player that the game has ended
+        player_language = get_player_language(remaining_player['context'])
+        activate(player_language)
         html = render_to_string('fragments/game_end_fragment.html', {
               'context': remaining_player['context'],
               'game_result': game_result
@@ -493,3 +517,38 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             'title': _('Forfeit'),
             'message': _('Your opponent has disconnected'),
         }))
+        
+
+    async def userIsAlreadyInGame(self, user_id, user, context, game_type):
+        is_in_game = False
+        if game_type not in self.waiting:
+            return False
+        
+        # check if user_id is in waiting room
+        for player_id, player_info in self.waiting[game_type].items():
+            if player_info['player_id'] == user_id:
+                is_in_game = True
+                break
+                    
+        if not is_in_game:
+            return False
+        
+        info = {
+            'p1_label': user['username'],
+            'p1_value': user['profile']['display_name'],
+        }
+
+        player_language = get_player_language(context)
+        activate(player_language)
+        html = render_to_string('fragments/play_fragment.html', {'info': info, 'context': context})
+        
+        await self.send(json.dumps({
+            'type': 'already_in_game',
+            'html': html,
+            'title': _('Cancelled'),
+            'message': _('You are already waiting for a game'),
+        }))
+
+        await self.close()
+
+        return True

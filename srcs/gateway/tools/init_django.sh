@@ -51,17 +51,16 @@ else
     echo "--STATIC_ROOT is already present in $SETTINGS_FILE."
 fi
 
-# Collect static files and apply migrations
-echo "--Collecting static files..."
-python manage.py collectstatic --noinput
-
+# Migrate the database
 echo "--Making migrations..."
 python manage.py makemigrations
 
 echo "--Applying migrations..."
 python manage.py migrate
 
-# sleep 1
+# Collect static files
+echo "--Collecting static files..."
+python manage.py collectstatic --noinput
 
 echo "Django initialised successfully. Executing "$@""
 exec "$@"

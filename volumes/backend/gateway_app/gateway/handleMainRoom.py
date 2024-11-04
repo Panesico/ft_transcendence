@@ -3,6 +3,10 @@ from datetime import datetime
 from .handleInvite import get_authentif_variables
 from django.utils.translation import gettext as _
 from django.template.loader import render_to_string
+import prettyprinter
+from prettyprinter import pformat
+prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +34,13 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
     message = _(' is waiting to play ') + game_type.capitalize()
   elif type == 'cancel_waiting_room':
     message = _(' has canceled the game request.')
-    html = render_to_string('fragments/home_fragment.html')
+    user = { 'username': receiver_username }
+    context = {
+        'user': user,
+        'session': self.scope['session'],
+        'cookies': self.scope['cookies'],
+    }
+    html = render_to_string('fragments/home_fragment.html', context=context)
   logger.debug(f'requestResponse > message: {message}')
 
   # Send response to frontend sender
@@ -199,7 +209,9 @@ async def handleNewConnection(self, users_connected):
     # Broadcast message to room group
     for user, connection in users_connected.items():
       await connection.send_json({
-        'message': f'{self.user_id} has joined the main room.'
+        'message': f'{self.user_id} has joined the main room.',
+        'type': 'user_connected',
+        'user_id': self.user_id,
       })
   else:
     logger.debug(f'mainRoom > self.user_id: {self.user_id} closed connection')
@@ -280,4 +292,26 @@ async def markNotificationAsRead(self, content, user_id):
   else:
     logger.debug(f'markNotificationAsRead > Error marking notification as read')
     return
-  
+
+
+# async def getConnectedFriends(self, content, users_connected):  
+#   # Get friends
+#   logger.debug(f"getConnectedFriends > content: {content}")
+
+#   profile_api_url = 'https://profileapi:9002/api/getfriends/' + content.get('sender_id', '') + '/'
+#   response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+#   friends = response.json()
+#   logger.debug(f"getConnectedFriends > friends: {friends}")
+#   logger.debug(f"getConnectedFriends > users_connected: {users_connected}")
+
+#   if response.ok:
+#     connected_friends_ids = [friend['user_id'] for friend in friends if friend['user_id'] in users_connected]
+#     logger.debug(f"getConnectedFriends > connected_friends_ids: {connected_friends_ids}")
+
+#     await self.send_json({
+#       'type': 'connected_friends',
+#       'sender_id': self.user_id,
+#       'connected_friends_ids': connected_friends_ids,
+#     })
+#   else:
+#     logger.error(f"getConnectedFriends > Error retrieving friends")

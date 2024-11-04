@@ -1,7 +1,8 @@
 import os, json, logging, websockets, ssl, asyncio, aiohttp
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest
+from .utils import getUserId, getUserData, asyncRequest, get_player_language
+from django.utils.translation import activate, gettext as _
 
 import prettyprinter
 from prettyprinter import pformat
@@ -53,7 +54,13 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         # Handle messages received from the client
         logger.debug("ProxyCalcGameTournament > receive from client")
-        data = json.loads(text_data)
+        
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON received: {e}")
+            return
+    
         # save the player names and context to build html later
         if data['type'] == 'opening_connection, game details':
             
@@ -103,12 +110,23 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
             
             self.trmt_info['tournament_id'] = next_game_info['info']['tournament_id']
 
+            player_language = get_player_language(self.context)
+            activate(player_language)
+
             logger.debug(f"ProxyCalcGameTournament > tournament_id: {self.trmt_info['tournament_id']}")
+            if next_game_info['info']['game_round_title'] == 'Semi-Final 1':
+                game_round_title = _('Semi-Final 1')
+            if next_game_info['info']['game_round_title'] == 'Semi-Final 2':
+                game_round_title = _('Semi-Final 2')
+            if next_game_info['info']['game_round_title'] == 'Final':
+                game_round_title = _('Final')
             
+            logger.debug(f"ProxyCalcGameTournament > next_game_info['info']['game_round_title']: {next_game_info['info']['game_round_title']}, game_round_title: {game_round_title}")
+
             self.game_info = {
                 'tournament_id': self.trmt_info['tournament_id'],
                 'game_round': next_game_info['info']['game_round'],
-                'game_round_title': next_game_info['info']['game_round_title'],
+                'game_round_title': game_round_title,
                 'game_type': self.trmt_info['game_type'],
                 'p1_name': next_game_info['info']['p1_name'],
                 'p2_name': next_game_info['info']['p2_name'],
@@ -209,8 +227,19 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
         response['info']['previous_p1_name'] = self.game_info['p1_name']
         response['info']['previous_p2_name'] = self.game_info['p2_name']
 
+        player_language = get_player_language(self.context)
+        activate(player_language)
+
+        logger.debug(f"ProxyCalcGameTournament > tournament_id: {self.trmt_info['tournament_id']}")
+        if response['info']['game_round'] == 'Semi-Final 2':
+            game_round_title = _('Semi-Final 2')
+        if response['info']['game_round'] == 'Final':
+            game_round_title = _('Final')
+        response['info']['game_round_title'] = game_round_title
+
         # Update game_info with next game info
         self.game_info['game_round'] = response['info']['game_round']
+        self.game_info['game_round_title'] = game_round_title,
         self.game_info['p1_name'] = response['info']['p1_name']
         self.game_info['p2_name'] = response['info']['p2_name']
         self.game_info['p1_id'] = response['info']['p1_id']
@@ -270,6 +299,8 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
         # Notify player that tournament has ended and send tournament_end html
         logger.debug(f"ProxyCalcGameTournament > tournament_end response: {pformat(response)}")
 
+        player_language = get_player_language(self.context)
+        activate(player_language)
         html = render_to_string('fragments/tournament_end_fragment.html',
                                 {
                                     'context': self.context,

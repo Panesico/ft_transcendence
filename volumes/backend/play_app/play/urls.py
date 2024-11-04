@@ -17,4 +17,7 @@ urlpatterns = [
   
   # Get winrate of a user for a given game type
   path('api/getWinrate/<str:user_id>/<str:game_type>/', views.api_getWinrate, name='getWinrate'),
+
+  # Get games stats of a user
+  path('api/userGames/<str:user_id>/', views.api_user_games, name='user_games'),
 ]

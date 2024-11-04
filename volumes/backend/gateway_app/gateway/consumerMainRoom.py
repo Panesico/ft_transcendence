@@ -32,7 +32,9 @@ class mainRoom(AsyncJsonWebsocketConsumer):
       # Broadcast message to room group
       for user, connection in users_connected.items():
         await connection.send_json({
-          'message': f'{self.user_id} has left the main room.'
+          'message': f'{self.user_id} has left the main room.',
+          'type': 'user_left',
+          'user_id': self.user_id,
         })
     
     # Leave room group on disconnect
@@ -74,3 +76,5 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     elif typeMessage == 'cancel_waiting_room':
       logger.debug(f'mainRoom > cancel_waiting_room, username: {self.username}')
       await requestResponse(content, users_connected, self.avatar_url, self)
+    # elif typeMessage == 'get_connected_friends':
+    #   await getConnectedFriends(self, content, users_connected)

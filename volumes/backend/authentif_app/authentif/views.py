@@ -1,33 +1,19 @@
 import os, json, requests, logging, jwt
 from django.conf import settings
-from django.contrib.auth import login
 from django.http import JsonResponse
-from django.contrib.auth.hashers import make_password
-from authentif.forms import SignUpForm, LogInForm, EditProfileForm
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
-from authentif.models import User
 from datetime import datetime, timedelta, timezone
-from .authmiddleware import login_required, generate_guest_token, JWTAuthenticationMiddleware
+from .forms import SignUpForm, LogInForm, EditProfileForm
+from .models import User
+from .authmiddleware import login_required, generate_guest_token, JWTAuthenticationMiddleware, generate_jwt_token, get_user_id
 
 logger = logging.getLogger(__name__)
-
-def generate_jwt_token(user):
-    secret_key = os.environ.get('DJANGO_SECRET_KEY')  # Load the secret key from env variable
-    if not secret_key:
-        raise Exception("JWT_SECRET_KEY environment variable is missing")
-    
-    payload = {
-        'user_id': user.id,
-        'exp': datetime.now(timezone.utc) + timedelta(hours=1),  # Token expiration time
-        'iat': datetime.now(timezone.utc),  # Issued at time
-    }
-
-    # Ensure you're using a secure algorithm, like HS256
-    token = jwt.encode(payload, secret_key, algorithm='HS256')
-    
-    return token
 
 
 def api_get_user_info(request, user_id):
@@ -59,7 +45,7 @@ def api_logout(request):
 
     if token:
         # Blacklist the current JWT token
-        JWTAuthenticationMiddleware.blacklist_token(token)
+        JWTAuthenticationMiddleware.blacklist_token(token, 25200)
 
         # Generate a new guest token
         guest_token = generate_guest_token()
@@ -80,53 +66,71 @@ def api_logout(request):
     
 def api_login(request):
     logger.debug("api_login")
+    try:
+        if request.method == 'POST':
+            try:
+                data = json.loads(request.body)
+                form = LogInForm(request, data=data)
+                try:
+                    if form.is_valid():
+                        user = form.get_user()
+                        try:
+                            login(request, user)
+                        except Exception as e:
+                            logger.error(f'api_login > Failed to log in user: {e}')
+                            return JsonResponse({'status': 'error', 'message': _('Wrong credentials')}, status=401)
+                        
+                        logger.debug(f"api_login > User.id: {user.id}")
 
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            form = LogInForm(request, data=data)
+                        if user.two_factor_token:
+                            auth_header = request.META.get('HTTP_AUTHORIZATION')
 
-            if form.is_valid():
-                user = form.get_user()
-                login(request, user)
-                logger.debug(f"api_login > User.id: {user.id}")
+                            if auth_header and auth_header.startswith('Bearer '):
+                                token = auth_header.split(' ')[1]  # Get the token part after 'Bearer '
+                                
+                                # Set the token in the cache
+                                cache_key = f"2fa_user_{user.id}"
+                                cache.set(cache_key, token, timeout=60*5)  # Cache for 5 minutes
+                            return JsonResponse({'status': 'success', 'message': _('2FA required'), 'user_id': user.id, 'type': '2FA'}, status=200)
 
-                # Generate a JWT token for the authenticated user
-                jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
-                logger.debug(f"token >>>>>>>>>>>: {jwt_token}")
-				
-                # Create response object
-                response = JsonResponse({
-                    'status': 'success',
-                    'type': 'login_successful',
-                    'message': _('Login successful'),
-                    'token': jwt_token,
-                    'user_id': user.id
-                })
+                        # Generate a JWT token for the authenticated user
+                        jwt_token = generate_jwt_token(user)
+                        logger.debug(f"token >>>>>>>>>>>: {jwt_token}")
 
-                # Set the JWT token in the headers
-                response['Authorization'] = f'Bearer {jwt_token}'
+                        # Create response object
+                        response = JsonResponse({
+                            'status': 'success',
+                            'type': 'login_successful',
+                            'message': _('Login successful'),
+                            'token': jwt_token,
+                            'user_id': user.id
+                        })
 
-                # Set the JWT token in a cookie (with security options)
-                response.set_cookie(
-                    key='jwt_token',
-                    value=jwt_token,
-                    httponly=True,  # Prevent JavaScript access to the cookie (for security)
-                    secure=True,  # Only send the cookie over HTTPS (ensure your environment supports this)
-                    samesite='Lax',  # Control cross-site request behavior
-                    max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
-                )
-                
-                return response
+                        # Set the JWT token in the headers and a secure cookie
+                        response['Authorization'] = f'Bearer {jwt_token}'
+                        response.set_cookie(
+                            key='jwt_token',
+                            value=jwt_token,
+                            httponly=True,
+                            secure=True,
+                            samesite='Lax',
+                            max_age=60 * 60 * 24 * 7,
+                        )
+                        
+                        return response
 
-            else:
-                logger.debug('api_login > Invalid username or password')
-                return JsonResponse({'status': 'error', 'message': _('Invalid username or password')}, status=401)
-
-        except json.JSONDecodeError:
-            logger.debug('api_login > Invalid JSON')
-            return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
-
+                    else:
+                        logger.debug('api_login > Invalid username or password')
+                        return JsonResponse({'status': 'error', 'message': _('Invalid username or password')}, status=401)
+                except:
+                    logger.debug(f'Password validation error: {e.messages}')
+                    return JsonResponse({'status': 'error', 'message': _('Wrong credentials')}, status=401)
+            except json.JSONDecodeError:
+                logger.debug('api_login > Invalid JSON')
+                return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
+    except:
+        logger.debug('api_login > Wrong or invalid password')
+        return JsonResponse({'status': 'error', 'message': _('Wrong or invalid password')}, status=400)
     logger.debug('api_login > Method not allowed')
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
@@ -176,22 +180,17 @@ def api_signup(request):
           form = SignUpForm(data=data)
           if form.is_valid():
               user = form.save(commit=False)
-              user.password = make_password(data['password'])
-              user = form.save()
 
+              # Password validation
+              password = data.get('password') # clear text password
+              # validate_password(password, user)
+              
+              user.password = make_password(data['password']) # hashed password
+              user = form.save()
               username = data.get('username')
-              password = data.get('password')
               logger.info(f'api_signup > User.username: {user.username}, hased pwd {user.password}')
 
-              try:
-                  user_obj = User.objects.get(username=username)
-              except User.DoesNotExist:
-                  logger.debug(f'api_signup > User not found: {username}')
-                  user.delete()
-                  return JsonResponse({
-                      'status': 'error', 
-                      'message': _('User not found')
-                  }, status=400)
+              user_obj = User.objects.get(username=username)
 
               # Check if the user is active
               if not user_obj.is_active:
@@ -210,8 +209,8 @@ def api_signup(request):
                         'status': 'error', 
                         'message': _('Failed to create profile')
                     }, status=500)
-              jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
-              logger.debug(f"token >>>>>>>>>>>: {jwt_token}")
+              logger.debug(f"BEFORE TOKEN BABY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+              jwt_token = generate_jwt_token(user)
       
               # Create response object
               response = JsonResponse({
@@ -233,8 +232,7 @@ def api_signup(request):
                   secure=True,  # Only send the cookie over HTTPS (ensure your environment supports this)
                   samesite='Lax',  # Control cross-site request behavior
                   max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
-              )
-              
+              )              
               return response
 
               
@@ -251,12 +249,12 @@ def api_signup(request):
         except json.JSONDecodeError:
             logger.debug('api_signup > Invalid JSON')
             return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
+        except DjangoValidationError as e:
+                  logger.debug(f'Password validation error: {e.messages}')
+                  return JsonResponse({'status': 'error', 'message': _('Not a valid password')}, status=400)
         except Exception as e:
             logger.error(f'api_signup > Unexpected error: {e}')
-            return JsonResponse({
-                'status': 'error', 
-                'message': _('An unexpected error occurred')
-            }, status=500)
+            return JsonResponse({'status': 'error','message': _('An unexpected error occurred')}, status=500)
     logger.debug('api_signup > Method not allowed')
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
@@ -286,17 +284,17 @@ def api_edit_profile(request):
       data = json.loads(request.body)
       logger.debug(f'data: {data}')
       user_id = data.get('user_id')
-      logger.debug(f'user_id: {user_id}')
-      try :
-        logger.debug(f'api_edit_profile > extract user_obj')
-        user_obj = User.objects.get(id=user_id)
-        #user_obj = User.objects.filter(id=user_id).first()
-        logger.debug(f'user_obj username: {user_obj.username}')
-        form = EditProfileForm(data, instance=user_obj)
-        # logger.debug(f'form: {form}')
-      except User.DoesNotExist:
-        logger.debug('api_edit_profile > User not found')
-        return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
+      user_obj = User.objects.get(id=user_id)
+      #user_obj = User.objects.filter(id=user_id).first()
+      logger.debug(f'user_obj username: {user_obj.username}, user_obj id: {user_obj.id}')
+
+      # Password validation
+      new_password = data.get('new_password')
+      # validate_password(new_password)
+      
+      form = EditProfileForm(data, instance=user_obj)
+      # logger.debug(f'form: {form}')
+      
       if form.is_valid():
         logger.debug('api_edit_profile > Form is valid')
         form.save()
@@ -311,7 +309,13 @@ def api_edit_profile(request):
         return JsonResponse({'status': 'error', 'message': _('Invalid profile update')}, status=400)
     except json.JSONDecodeError:
       logger.debug('api_edit_profile > Invalid JSON')
-      return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
+      return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)    
+    except User.DoesNotExist:
+      logger.debug('api_edit_profile > User not found')
+      return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
+    except DjangoValidationError as e:
+          logger.debug(f'Password validation error: {e.messages}')
+          return JsonResponse({'status': 'error', 'message': _('Not a valid password')}, status=400)
   else:
     logger.debug('api_edit_profile > Method not allowed')
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
@@ -580,3 +584,169 @@ def oauth(request):
     response.set_cookie('django_language', language, samesite='Lax', httponly=True, secure=True)
     
     return response
+
+
+import pyotp
+import qrcode
+from io import BytesIO
+import base64
+
+@login_required
+def enable2FA(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": 'error', 'message': _('Invalid request method. Use POST.')}, status=405)
+    
+    if request.user.id_42:
+        return JsonResponse({"status": 'error', 'message': _('Unauthorized')}, status=401)
+    
+    if request.user.id is None or request.user.id == 0:
+        return JsonResponse({"status": 'error', 'message': _('Unauthorized'), 'qr_code': "", 'two_fa_enabled': False}, status=401)
+    
+    user = User.objects.get(pk=request.user.id)
+
+    if user.two_factor_token:
+        # 2FA is already enabled for the user
+        return JsonResponse({'status': 'error', 'message': _('2FA is already enabled'), 'qr_code': "", 'two_fa_enabled': True}, status=200)
+
+    # Generate a new TOTP secret and QR code
+    totp = pyotp.TOTP(pyotp.random_base32())
+    secret = totp.secret
+
+    # Store the secret temporarily in the cache with a short expiration time
+    cache_key = f"2fa_setup_{user.id}"
+    cache.set(cache_key, secret, timeout=300)  # Cache for 5 minutes
+
+    # Generate QR code for authenticator app
+    qr = qrcode.make(totp.provisioning_uri(name=str(user.id), issuer_name="Pongscendence"))
+    qr_io = BytesIO()
+    qr.save(qr_io, format="PNG")
+    qr_io.seek(0)
+
+    # Encode QR code in base64
+    qr_code_base64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
+    qr_code_url = f"data:image/png;base64,{qr_code_base64}"
+    
+    return JsonResponse({
+        'status': 'success',
+        'message': _('Scan the QR code, then enter the OTP below to confirm'),
+        'qr_code': qr_code_url,
+        'two_fa_enabled': False
+    }, status=200)
+
+from django.core.cache import cache
+
+@login_required
+def confirmEnable2FA(request):
+    # Check if the request is a POST request
+    if request.method != 'POST':
+        return JsonResponse({"status": "error", "message": _("Invalid request method. Use POST.")}, status=405)
+
+    if request.user.id_42:
+        return JsonResponse({"status": "error", "message": _("Unauthorized")}, status=401)
+
+
+    if request.user.id is None or request.user.id == 0:
+        return JsonResponse({"status": "error", "message": _("Unauthorized")}, status=401)
+
+    # Get OTP code from request body
+    try:
+        body = json.loads(request.body)
+        otp_code = body.get("otp_code")
+        if not otp_code:
+            return JsonResponse({"status": "error", "message": _("OTP code is required")}, status=400)
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": _("Invalid JSON format")}, status=400)
+
+    # Retrieve temporary TOTP secret from cache
+    cache_key = f"2fa_setup_{request.user.id}"
+    temp_secret = cache.get(cache_key)
+    if not temp_secret:
+        return JsonResponse({"status": "error", "message": _("No 2FA setup in progress or setup expired")}, status=400)
+
+    # Verify OTP using the TOTP secret
+    totp = pyotp.TOTP(temp_secret)
+    if totp.verify(otp_code):
+        # OTP is correct, enable 2FA by saving the token to the user's profile
+        user = request.user
+        user.two_factor_token = temp_secret
+        user.save()
+
+        # Remove the temporary token from cache
+        cache.delete(cache_key)
+
+        return JsonResponse({
+            "status": "success",
+            "message": _("2FA is now enabled"),
+            "two_fa_enabled": True
+        }, status=200)
+    else:
+        return JsonResponse({"status": "error", "message": _("Invalid OTP code")}, status=400)
+
+@login_required
+def disable2FA(request):
+    if request.method == 'POST':
+        if request.user.id_42:
+            return JsonResponse({"status": "error", "message": _("Unauthorized")}, status=401)
+
+        user = User.objects.get(pk=request.user.id)
+        if user.two_factor_token:
+            user.two_factor_token = None
+            user.save()
+            return JsonResponse({"status": "success", "message": _("2FA disabled successfully")})
+        else:
+            return JsonResponse({"status": "error", "message": _("2FA is not enabled")}, status=400)
+    return JsonResponse({"status": "error", "message": _("Invalid request")}, status=400)
+
+
+def verify2FA(request, user_id):
+    if request.method != 'POST':
+        return JsonResponse({"status": "error", "message": _("Invalid request method. Use POST.")}, status=405)
+    
+    if request.user.id_42:
+        return JsonResponse({"status": "error", "message": _("Unauthorized")}, status=401)
+
+    # Ensure user_id is provided
+    if not user_id:
+        return JsonResponse({"status": "error", "message": _("User ID is required")}, status=400)
+
+    # Generate the cache key for the user and attempt to retrieve the cached JWT token
+    cache_key = f"2fa_user_{user_id}"
+    cached_jwt = cache.get(cache_key)
+
+    logger.debug(f"verify2FA > cache_key: {cache_key}, cached_jwt: {cached_jwt}")
+
+    # Retrieve the current JWT from the request headers or cookies
+    current_jwt = request.COOKIES.get('jwt_token') or request.headers.get('Authorization', '').replace('Bearer ', '')
+
+    # Verify the JWT token and user ID are in cache
+    if not cached_jwt or cached_jwt != current_jwt:
+        return JsonResponse({"status": "error", "message": _("Token or user mismatch")}, status=401)
+
+    # Attempt to retrieve the user and check if they have 2FA enabled
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({"status": "error", "message": _("User not found")}, status=404)
+
+    if not user.two_factor_token:
+        return JsonResponse({"status": "error", "message": _("2FA is not enabled for this user")}, status=400)
+
+    # Retrieve and verify the OTP code
+    payload = json.loads(request.body)  # Decode the JSON request body
+    otp_code = payload.get('otp_code')  # Extract the otp_code
+
+    if not otp_code:
+        return JsonResponse({"status": "error", "message": _("OTP code is required")}, status=400)
+
+    # Use pyotp to verify the provided OTP code
+    totp = pyotp.TOTP(user.two_factor_token)
+    if totp.verify(otp_code):
+        new_token = generate_jwt_token(user)
+
+        # Respond with success and set the new JWT as a secure cookie
+        response = JsonResponse({"status": "success", "message": _("2FA verified")})
+        response.set_cookie('jwt_token', new_token, httponly=True, secure=True, samesite='Lax')
+
+        return response
+    else:
+        return JsonResponse({"status": "error", "message": _("Invalid OTP code")}, status=400)

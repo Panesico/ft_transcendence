@@ -16,3 +16,5 @@ pyjwt
 web3
 # For pretty logs
 prettyprinter
+# 2FA
+pyotp

@@ -1,4 +1,4 @@
-import os, json, logging, websockets, ssl, asyncio, aiohttp, jwt
+import os, json, logging, websockets, ssl, asyncio, aiohttp, jwt, random
 from django.conf import settings
 
 import prettyprinter
@@ -7,6 +7,15 @@ prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
 
 logger = logging.getLogger(__name__)
 logging.getLogger('websockets').setLevel(logging.WARNING)
+
+used_ids = set()
+def generate_unique_id():
+    while True:
+        id = random.randint(1, 1000000)
+        if id not in used_ids:
+            used_ids.add(id)
+            return id
+
 
 async def getDecodedJWT(jwt_token):
     decoded_data = jwt.decode(
@@ -87,3 +96,20 @@ async def asyncRequest(method, csrf_token, url, data):
         return None
     
     return response_json
+
+
+def get_player_language(context):
+    cookies = context.get('cookies', {})
+    user = context.get('user', {})
+    profile = user.get('profile', {})
+    
+    # Check for language in cookies
+    if 'django_language' in cookies:
+        return cookies['django_language']
+    
+    # Check for preferred language in profile
+    if 'preferred_language' in profile:
+        return profile['preferred_language']
+    
+    # Default to 'en'
+    return 'en'

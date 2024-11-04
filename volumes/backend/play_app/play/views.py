@@ -5,12 +5,12 @@ from django.db import DatabaseError
 from django.forms.models import model_to_dict
 from asgiref.sync import sync_to_async
 from .models import Game, Tournament
+from .viewsBlockchain import save_tournament_results_in_blockchain, create_tournament_in_blockchain
 from django.utils.translation import gettext as _
-from web3 import Web3
+
 logger = logging.getLogger(__name__)
 import prettyprinter
 from prettyprinter import pformat
-from .viewsBlockchain import save_tournament_results_in_blockchain, create_tournament_in_blockchain
 prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
 
 def api_saveGame(request):
@@ -82,7 +82,7 @@ def api_createTournament(request):
           info = {
               'tournament_id': tournament.id,
               'game_round': 'Semi-Final 1',
-              'game_round_title': _('Semi-Final 1'),
+              'game_round_title': 'Semi-Final 1', # don't translate
               'p1_name': Game.objects.get(id=tournament.semifinal1.id).p1_name, 
               'p2_name': Game.objects.get(id=tournament.semifinal1.id).p2_name,
               'p1_id': Game.objects.get(id=tournament.semifinal1.id).p1_id,
@@ -146,7 +146,7 @@ def api_updateTournament(request):
               info = {
                   'tournament_id': tournament.id,
                   'game_round': game_round,
-                  'game_round_title': _('Semi-Final 2'),
+                  'game_round_title': 'Semi-Final 2', # don't translate
                   'p1_name': Game.objects.get(id=tournament.semifinal2.id).p1_name,
                   'p2_name': Game.objects.get(id=tournament.semifinal2.id).p2_name,
                   'p1_id': Game.objects.get(id=tournament.semifinal2.id).p1_id,
@@ -166,7 +166,7 @@ def api_updateTournament(request):
               info = {
                   'tournament_id': tournament.id,
                   'game_round': game_round,
-                  'game_round_title': _('Final'),
+                  'game_round_title': 'Final', # don't translate
                   'p1_name': tournament.semifinal1.game_winner_name,
                   'p2_name': tournament.semifinal2.game_winner_name,
                   'p1_id': tournament.semifinal1.game_winner_id,
@@ -226,22 +226,24 @@ def api_getUserStats(request, user_id, raw=False):
     wins = 0
     game_registry = []
     for game in games_list:
-        total_games += 1
-        game_winner_id = int(game['game_winner_id'])
-        user_id_int = int(user_id)
-        if game_winner_id == user_id_int:
-            wins += 1
-        game_registry.append({
-            'game_type': game['game_type'],
-            'game_round': game['game_round'],
-            'p1_name': game['p1_name'],
-            'p2_name': game['p2_name'],
-            'p1_score': game['p1_score'],
-            'p2_score': game['p2_score'],
-            'game_winner_name': game['game_winner_name'],
-            'game_winner_id': game['game_winner_id'],
-            'date': game['date']
-        })
+        game_winner_id = game.get('game_winner_id')
+        if game_winner_id is not None:
+            total_games += 1
+            game_winner_id = int(game_winner_id)
+            user_id_int = int(user_id)
+            if game_winner_id == user_id_int:
+                wins += 1
+            game_registry.append({
+                'game_type': game['game_type'],
+                'game_round': game['game_round'],
+                'p1_name': game['p1_name'],
+                'p2_name': game['p2_name'],
+                'p1_score': game['p1_score'],
+                'p2_score': game['p2_score'],
+                'game_winner_name': game['game_winner_name'],
+                'game_winner_id': game['game_winner_id'],
+                'date': game['date']
+            })
 
     defeats = total_games - wins
     total_score = wins * 50
@@ -312,7 +314,57 @@ async def api_getWinrate(request, user_id, game_type):
 
     winrate = round((wins / total_games) * 100, 2) if total_games > 0 else 0
     logger.debug(f"api_getWinrate > wins: {wins}, total_games: {total_games}, winrate: {winrate}")
+    return JsonResponse({'status': 'success', 'winrate': winrate})
 
   except (json.JSONDecodeError, DatabaseError) as e:
     return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
-  return JsonResponse({'status': 'success', 'winrate': winrate})
+
+
+def api_user_games(request, user_id):
+    logger.debug("api_user_games")
+    if request.method != 'GET':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+    try:
+        games = Game.objects.filter(p1_id=user_id) | Game.objects.filter(p2_id=user_id)
+        games = games.filter(game_winner_name__isnull=False).order_by('-date')
+        games_list = []
+        for game in games:
+            game_dict = (model_to_dict(game))
+            game_dict['date'] = game.date.strftime('%Y-%m-%d %H:%M:%S')
+            games_list.append(game_dict)
+        
+        tournaments = Tournament.objects.filter(t_p1_id=user_id) | Tournament.objects.filter(t_p2_id=user_id) | Tournament.objects.filter(t_p3_id=user_id) | Tournament.objects.filter(t_p4_id=user_id)
+        tournaments = tournaments.filter(t_winner_name__isnull=False)
+        # logger.debug(f"api_user_games > games_list: {pformat(games_list)}")
+    except (json.JSONDecodeError, DatabaseError) as e:
+        return JsonResponse({'status': 'error', 'message': 'Error: ' + str(e)}, status=400)
+    
+    pong_games = games.filter(game_type='pong')
+    cows_games = games.filter(game_type='cows')
+    data = {
+      'pong': {
+        'count': pong_games.count(),
+        'wins': pong_games.filter(game_winner_id=user_id).count(),
+        'losses': pong_games.exclude(game_winner_id=user_id).count(),
+        'list': [game for game in games_list if game['game_type'] == 'pong'],
+        't_count': tournaments.filter(game_type='pong').count(),
+        't_wins': tournaments.filter(game_type='pong').filter(t_winner_id=user_id).count()
+      },
+      'cows': {
+        'count': cows_games.count(),
+        'wins': cows_games.filter(game_winner_id=user_id).count(),
+        'losses': cows_games.exclude(game_winner_id=user_id).count(),
+        'list': [game for game in games_list if game['game_type'] == 'cows'],
+        't_count': tournaments.filter(game_type='cows').count(),
+        't_wins': tournaments.filter(game_type='cows').filter(t_winner_id=user_id).count()
+      },
+      'games_list': games_list
+    }
+    
+    data['pong']['winrate'] = round((data['pong']['wins'] / data['pong']['count']) * 100, 2) if data['pong']['count'] > 0 else 0
+
+    data['cows']['winrate'] = round((data['cows']['wins'] / data['cows']['count']) * 100, 2) if data['cows']['count'] > 0 else 0
+
+    # logger.debug(f"api_user_games > games_list: {pformat(data)}")
+    return JsonResponse({'status': 'success', 'data': data})

@@ -9,9 +9,12 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+# from .utils import getUserData
+import prettyprinter
+from prettyprinter import pformat
+prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
 
 User = get_user_model()
-
 logger = logging.getLogger(__name__)
 
 def get_profileapi_variables(request):
@@ -63,9 +66,9 @@ def get_edit_profile(request):
     # logger.debug(f"get_edit_profile > form: {form}")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_edit_profile > XMLHttpRequest")
-        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
         return JsonResponse({'html': html})
-    return render(request, 'partials/edit_profile.html', {'form': form, 'profile_data': profile_data})
+    return render(request, 'partials/edit_profile.html', {'form': form, 'profile_data': profile_data, 'user': request.user})
 
 @login_required
 def get_friend_profile(request, friend_id):
@@ -98,18 +101,19 @@ def get_friend_profile(request, friend_id):
     
     # Verificar si el amigo está en la lista de usuarios bloqueados
     is_blocked = friend_id in user_profile_data.get('blocked_users', [])
+    im_blocked = request.user.id in profile_data.get('blocked_users', [])
     logger.debug(f"get_friend_profile > is_blocked: {is_blocked}")
     # Pasar la información al contexto de la plantilla
     context = {
         'form': form,
         'profile_data': profile_data,
         'is_blocked': is_blocked,
+        'im_blocked': im_blocked,
     }
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string('fragments/friend_profile_fragment.html', context, request=request)
-        return JsonResponse({'html': html, 'status': 'success'})
-    
+        return JsonResponse({'html': html, 'status': 'success', 'is_blocked': is_blocked, 'im_blocked': im_blocked})
     return render(request, 'partials/friend_profile.html', context)
 
 @login_required
@@ -132,6 +136,51 @@ def get_match_history(request, username):
     else:
         logger.debug(f"-------> get_match_history > Response: {response.status_code}")
         return JsonResponse({'status': 'error', 'message': 'Error retrieving match history'})
+    
+@login_required
+def view_user_profile(request, user_id):
+    logger.debug("view_user_profile")
+    if request.method != 'GET':
+        return redirect('405')
+    
+    try:
+        user = User.objects.get(id=user_id)
+        profile = get_profileapi_variables(request)
+        # logger.debug(f"view_user_profile > user: {pformat(user.__dict__)}")
+        # logger.debug(f"view_user_profile > profile: {pformat(profile)}")
+    except:
+        return redirect('404')
+    
+    get_history_url = 'https://play:9003/api/userGames/' + str(user_id) + '/'
+    response = requests.get(get_history_url, verify=os.getenv("CERTFILE"))
+
+    if response.ok:
+        data = response.json().get('data')
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            html = render_to_string('fragments/userprofile_fragment.html',
+                                    {
+                                       'data': data,
+                                       'target': {
+                                          'user_id': user_id,
+                                          'username': user.username,
+                                          'avatar': user.avatar,
+                                          'profile': profile
+                                        }
+                                    }, request=request)
+            return JsonResponse({'html': html, 'status': 'success'})
+        
+        return render(request, 'partials/userprofile.html', {
+                                       'data': data,
+                                       'target': {
+                                          'user_id': user_id,
+                                          'username': user.username,
+                                          'avatar': user.avatar,
+                                          'profile': profile
+                                        }
+                                    })
+    else:
+        logger.debug(f"view_user_profile > Response: {response.status_code}")
+        return JsonResponse({'status': 'error', 'message': _('Error retrieving match history')})
 
 @login_required
 def post_edit_profile_security(request):
@@ -161,7 +210,7 @@ def post_edit_profile_security(request):
     if not form.is_valid():
         message = _("Invalid form data")
         form.add_error(None, message)
-        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
         return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
 
     # Send and recover response from the profileapi service
@@ -191,7 +240,7 @@ def post_edit_profile_security(request):
       form.add_error(None, message)
       logger.debug('post_edit_profile_security > Response KO')
 
-      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
       #return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})#change this line to return only the fragment
       
@@ -225,7 +274,7 @@ def post_edit_profile_general(request):
     if not form.is_valid():
         message = _("Invalid form data")
         form.add_error(None, message)
-        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
         return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
 
     # Send and recover response from the profileapi service
@@ -260,7 +309,7 @@ def post_edit_profile_general(request):
       logger.debug('post_edit_profile_general > Response KO')
       logger.debug(f"post_edit_profile > data: {data}")
       logger.debug(f"post_edit_profile > response: {response.json()}")
-      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
 
 @login_required
@@ -310,7 +359,7 @@ def post_edit_profile_avatar(request):
     message = response.json().get("message")
     type = response.json().get("type")
     logger.debug(f"post_edit_profile > response.json from authentif editprofile: {response.json()}")
-    html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+    html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
 
     if  response.ok:
         logger.debug('post_edit_profile_avatar > Response OK')
@@ -321,7 +370,7 @@ def post_edit_profile_avatar(request):
       form = EditProfileFormFrontend()
       profile_data = get_profileapi_variables(request=request)
       logger.debug('post_edit_profile > Response KO')
-      html = render_to_string('fragments/edit_profile_fragment.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data}, request=request)
+      html = render_to_string('fragments/edit_profile_fragment.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message})
   
   # Handle the case where no file is uploaded
@@ -331,7 +380,7 @@ def post_edit_profile_avatar(request):
     logger.debug('profile_data: %s', profile_data)
     form = EditProfileFormFrontend(data)
     form.add_error(None, _('Please select a file to upload'))
-    html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+    html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
     return JsonResponse({'html': html, 'status': 'error'}, status=400)
 
 

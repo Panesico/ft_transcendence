@@ -15,21 +15,47 @@ def check_ball_border_collision(gs, cfg):
       gs['ballSpeedY'] = -gs['ballSpeedY']
 
 def check_ball_paddle_collision(gs, cfg, frameCount, lastContactFrame):
-  # Check if the ball hits the left paddle
-  if gs['ballX'] <= cfg['borderWidth'] + cfg['paddleWidth'] \
-      and gs['ballY'] >= gs['leftPaddleY'] \
-      and gs['ballY'] <= gs['leftPaddleY'] + cfg['paddleHeight']:
-    logger.debug("PongCalcLocal > Ball hits the left paddle")
-    gs['ballSpeedX'] = -gs['ballSpeedX']
+  if ( # Ball collision with left paddle
+      (lastContactFrame < frameCount - 10
+        and gs['ballX'] <= 3 * cfg['paddleWidth']
+        and gs['ballX'] > 2 * cfg['paddleWidth']
+        and gs['ballY'] + cfg['ballSize'] >= gs['leftPaddleY']
+        and gs['ballY'] <= gs['leftPaddleY'] + cfg['paddleHeight']
+        and gs['ballSpeedX'] < 0)
+      or # Ball collision with right paddle
+      (lastContactFrame < frameCount - 10
+        and gs['ballX'] >= cfg['canvas']['width'] - 3 * cfg['paddleWidth'] - cfg['ballSize']
+        and gs['ballX'] < cfg['canvas']['width'] - 2 * cfg['paddleWidth'] - cfg['ballSize']
+        and gs['ballY'] + cfg['ballSize'] >= gs['rightPaddleY']
+        and gs['ballY'] <= gs['rightPaddleY'] + cfg['paddleHeight']
+        and gs['ballSpeedX'] > 0)
+    ):
+    logger.debug("PongCalcLocal > Ball hits paddle")
     lastContactFrame = frameCount
+    gs['ballSpeedX'] = -getRandomInt(11, 14) if gs['ballSpeedX'] > 0 else getRandomInt(11, 14)
+    gs['ballSpeedY'] = getRandomInt(1, 8) if gs['ballSpeedY'] > 0 else -getRandomInt(1, 8)
+  elif (
+        # Ball collision with sides of left paddle
+        (lastContactFrame < frameCount - 50
+         and gs['ballX'] <= 3 * cfg['paddleWidth']
+         and gs['ballX'] > 2 * cfg['paddleWidth']
+         and gs['ballY'] + cfg['ballSize'] >= gs['leftPaddleY']
+         and gs['ballY'] <= gs['leftPaddleY'] + cfg['paddleHeight']
+         and gs['ballSpeedX'] < 0)
+        or  # Ball collision with sides of right paddle
+        (lastContactFrame < frameCount - 50
+         and gs['ballX'] >= cfg['canvas']['width'] - 3 * cfg['paddleWidth'] - cfg['ballSize']
+         and gs['ballX'] < cfg['canvas']['width'] - 2 * cfg['paddleWidth'] - cfg['ballSize']
+         and gs['ballY'] + cfg['ballSize'] >= gs['rightPaddleY']
+         and gs['ballY'] <= gs['rightPaddleY'] + cfg['paddleHeight']
+         and gs['ballSpeedX'] > 0)
+    ):
+      # check correct ball direction
+      if ((gs['ballSpeedY'] > 0 and gs['ballY'] < gs['leftPaddleY'] + cfg['paddleHeight'] / 2) or
+          (gs['ballSpeedY'] < 0 and gs['ballY'] > gs['leftPaddleY'] + cfg['paddleHeight'] / 2)):
+        lastContactFrame = frameCount
+        gs['ballSpeedY'] = -getRandomInt(4, 8) if gs['ballSpeedY'] > 0 else getRandomInt(4, 8)
 
-  # Check if the ball hits the right
-  if gs['ballX'] >= cfg['canvas']['width'] - cfg['borderWidth'] - cfg['paddleWidth'] - cfg['ballSize'] \
-      and gs['ballY'] >= gs['rightPaddleY'] \
-      and gs['ballY'] <= gs['rightPaddleY'] + cfg['paddleHeight']:
-    logger.debug("PongCalcLocal > Ball hits the right paddle")
-    gs['ballSpeedX'] = -gs['ballSpeedX']
-    lastContactFrame = frameCount
 
 def check_ball_outofbounds(gs, cfg):
   # Check if the ball is out of bounds

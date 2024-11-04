@@ -8,14 +8,17 @@ function innit_listening() {
   const sendButton = document.getElementById('sendButton');
   const unreadCount = document.getElementById('unreadChatsCount');
   const currentChatId = document.getElementById('currentChatId');
+  const blockSwitchContainer = document.getElementById('blockSwitchContainer');
   const dateElement = document.getElementById('date');
+
   if (!dateElement) {
     console.error('dateElement not found');
   } else {
     console.log('dateElement:', dateElement);
-  }
-  let date = new Date();
 
+  }
+
+  let date = new Date();
   dateElement.textContent = date.toDateString();
 
   // Listen for the chat button click
@@ -23,17 +26,25 @@ function innit_listening() {
     const request = new Request('/getFriends/', {
       method: 'GET',
       headers: {
-        'X-CSRFToken': getCookie('csrftoken')
+        'X-CSRFToken': getCookie('csrftoken'),
       },
-      credentials: 'include'
+      credentials: 'include',
     });
+
     // Reset header
+    document.getElementById('contactContainer').style.display = 'none';
     contactDisplayName.textContent = selectFriendmsg;
     contactAvatar.src = contactAvatarSrc;
+    currentChatId.value = '';
+    blockSwitchContainer.style.display = 'none';
+
+    // Reset conversation
+    document.getElementById('conversation').innerHTML = '';
+
     // Fetch the friends
     fetch(request)
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         const contactList = document.getElementById('contactList');
         console.log('data:', data);
         friendsData = data.friends;
@@ -47,107 +58,184 @@ function innit_listening() {
           contactList.appendChild(noFriends);
           return;
         }
-        friendsData.forEach(friend => {
-          const contactItem = document.createElement('a');
-          contactItem.href = '#';
-          contactItem.classList.add('list-group-item', 'bg-transparent', 'text-white', 'custom-contact', 'd-flex', 'align-items-center');
-          contactItem.dataset.contactId = friend.user_id;
 
-          // Create avatar element
-          const avatar = document.createElement('img');
-          avatar.src = friend.avatar || "{% static 'images/default_avatar.png' %}";
-          avatar.classList.add('rounded-circle', 'me-2');
-          avatar.style.height = '2rem';
-          avatar.style.width = '2rem';
-          avatar.alt = 'avatar';
+        friendsData.forEach((friend) => {
+          checkIfImBlocked(friend.user_id).then((imBlocked) => {
+            const contactItem = document.createElement('li');
+            contactItem.classList.add(
+              'list-group-item',
+              'bg-transparent',
+              'text-white',
+              'custom-contact',
+              'd-flex',
+              'align-items-center',
+              'p-3',
+              'position-relative',
+            );
+            contactItem.dataset.contactId = friend.user_id;
 
-          // Create display name element
-          const displayName = document.createElement('span');
-          displayName.textContent = friend.display_name;
+            // Create avatar element
+            const avatar = document.createElement('img');
+            avatar.src = friend.avatar || "{% static 'images/default_avatar.png' %}";
+            avatar.classList.add('rounded-circle', 'me-2');
+            avatar.style.height = '2rem';
+            avatar.style.width = '2rem';
+            avatar.alt = 'avatar';
 
-          // Add the avatar and display name to the contact item
-          contactItem.appendChild(avatar);
-          contactItem.appendChild(displayName);
+            // Create online status element
+            const onlineStatus = document.createElement('span');
+            onlineStatus.classList.add('position-absolute', 'translate-middle', 'bg-success', 'online-status-chat');
+            onlineStatus.dataset.online = friend.user_id;
+            if (friend.online)
+              onlineStatus.style.display = 'block';
+            else
+              onlineStatus.style.display = 'none';
 
-          // Add the contact item to the contact list
-          contactList.appendChild(contactItem);
+            // Create display name element
+            const displayName = document.createElement('span');
+            displayName.textContent = friend.display_name;
 
-          // Listen to the click event on the contact item
-          contactItem.addEventListener('click', function (event) {
-            // Remove the 'selected-contact' class from all contacts
-            const contacts = contactList.getElementsByClassName('list-group-item');
-            for (let c of contacts) {
-              c.classList.remove('selected-contact');
+            // Add the avatar and display name to the contact item
+            contactItem.appendChild(avatar);
+            contactItem.appendChild(displayName);
+            contactItem.appendChild(onlineStatus);
+
+            // Add the contact item to the contact list
+            contactList.appendChild(contactItem);
+
+            if (imBlocked) {
+              contactItem.classList.add('blocked-contact');
+            } else {
+              // Listen to the click event on the contact item
+              contactItem.addEventListener('click', function (event) {
+                // Remove the 'selected-contact' class from all contacts
+                const contacts = contactList.getElementsByClassName('list-group-item');
+                for (let c of contacts) {
+                  c.classList.remove('selected-contact');
+                }
+                // Add the 'selected-contact' class to the clicked contact
+                contactItem.classList.add('selected-contact');
+
+                // Update the avatar and display name
+                document.getElementById('contactContainer').style.display = 'flex';
+                const contactAvatarAndName = document.getElementById('contactAvatarAndName');
+                const contactAvatarLink = document.getElementById('contactAvatarLink');
+                const contactDisplayNameLink = document.getElementById('contactDisplayNameLink');
+
+                contactAvatarLink.href = '/userprofile/' + friend.user_id + '/';
+                contactDisplayNameLink.href = '/userprofile/' + friend.user_id + '/';
+
+                const newContactAvatarLink = contactAvatarLink.cloneNode(true);
+                contactAvatarAndName.replaceChild(newContactAvatarLink, contactAvatarLink);
+                const newContactDisplayNameLink = contactDisplayNameLink.cloneNode(true);
+                contactAvatarAndName.replaceChild(newContactDisplayNameLink, contactDisplayNameLink);
+                document.getElementById('contactDisplayName').textContent = friend.display_name;
+                document.getElementById('contactAvatar').src = friend.avatar;
+
+                newContactAvatarLink.addEventListener('click', function (event) {
+                  navigate(event, `/userprofile/${friend.user_id}`);
+                });
+                newContactDisplayNameLink.addEventListener('click', function (event) {
+                  navigate(event, `/userprofile/${friend.user_id}`);
+                });
+
+                currentChatId.value = friend.user_id;
+
+                // update gameInvitePopup with friend.user_id
+                const gameInvitePopup = document.getElementById('gameInvitePopup');
+                const gameInviteForm = gameInvitePopup.querySelector('form');
+                // console.log('gameInviteForm:', gameInviteForm);
+                gameInviteForm.id = `chat-invite-play-${friend.user_id}`;
+                gameInviteForm.action = `/invite_to_play/${friend.user_id}/`;
+                const newGameInviteForm = gameInviteForm.cloneNode(true);
+                gameInvitePopup.replaceChild(newGameInviteForm, gameInviteForm);
+                listenForm(newGameInviteForm);
+
+                // Add block switch
+                blockSwitchContainer.style.display = 'block';
+                const blockSwitch = blockSwitchContainer.querySelector('input');
+                blockSwitch.setAttribute('data-user-id', friend.user_id);
+                blockSwitch.setAttribute('id', `blockSwitch-${friend.user_id}`);
+                blockSwitch.addEventListener('change', function () {
+                  blockFriend(friend.user_id);
+                });
+                checkIfBlocked(friend.user_id).then((isBlocked) => {
+                  console.log('isBlocked:', isBlocked);
+                  blockSwitch.checked = isBlocked;
+                  messageInput.placeholder = isBlocked
+                    ? 'You cannot send messages to blocked users'
+                    : 'Type a message to send';
+                });
+
+                // Get all the messages between the user and the selected friend
+                const messageData = {
+                  type: 'chat',
+                  subtype: 'get_conversation',
+                  sender_id: userID,
+                  receiver_id: friend.user_id,
+                };
+                sendMessagesBySocket(messageData, mainRoomSocket);
+              });
             }
-            // Add the 'selected-contact' class to the clicked contact
-            contactItem.classList.add('selected-contact');
-
-            // Update the avatar and display name
-            const contactAvatarLink = document.getElementById('contactAvatarLink');
-            const contactDisplayNameLink = document.getElementById('contactDisplayNameLink');
-            contactAvatarLink.href = '/friend_profile/' + friend.user_id;
-            contactAvatar.src = friend.avatar;
-            contactDisplayName.textContent = friend.display_name;
-            contactDisplayNameLink.href = '/friend_profile/' + friend.user_id;
-            currentChatId.value = friend.user_id;
-
-            // Get all the messages between the user and the selected friend
-            data = {
-              'type': 'chat',
-              'subtype': 'get_conversation',
-              'sender_id': userID,
-              'receiver_id': friend.user_id,
-            };
-            sendMessagesBySocket(data, mainRoomSocket);
-            // Do scroll to the bottom of the chat
-            const chatMessages = document.getElementById('conversation');
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            console.log('chatMessages.scrollHeight:', chatMessages.scrollHeight);
-            console.log('chatMessages.scrollTop:', chatMessages.scrollTop);
+            // // addOnlineStatusBadge on friends from contact list
+            // sendMessagesBySocket({ 'type': 'get_connected_friends', 'sender_id': userID, }, mainRoomSocket);
           });
         });
+
         // Update unread messages count
-        data = {
-          'type': 'chat',
-          'subtype': 'delete_unread_messages',
-          'user_id': userID,
+        const unreadMessagesData = {
+          type: 'chat',
+          subtype: 'delete_unread_messages',
+          user_id: userID,
         };
-        sendMessagesBySocket(data, mainRoomSocket);
+        sendMessagesBySocket(unreadMessagesData, mainRoomSocket);
       })
-      .catch(error => console.error('Error fetching friends:', error));
+      .catch((error) => console.error('Error fetching friends:', error));
   });
 
   // Send message
   sendButton.addEventListener('click', function () {
     const selectedContact = document.querySelector('.list-group-item.selected-contact');
+    const blockSwitch = document.querySelector('input[data-user-id]');
+
     if (!selectedContact) {
       console.error('No contact selected');
+      messageInput.placeholder = 'Select a contact to send a message';
       return;
     } else if (!messageInput.value) {
+      messageInput.placeholder = 'Type a message to send';
       console.error('No message to send');
+      return;
+    } else if (blockSwitch.checked) {
+      messageInput.placeholder = 'You cannot send messages to blocked users';
+      console.error('Cannot send messages to blocked users');
       return;
     }
 
-    const selectedFriend = friendsData.find(friend => friend.user_id == selectedContact.dataset.contactId);
+    const selectedFriend = friendsData.find(
+      (friend) => friend.user_id == selectedContact.dataset.contactId
+    );
     const message = messageInput.value;
     const receiverId = selectedFriend.user_id;
     const receiverDisplayName = selectedFriend.display_name;
     const receiverAvatar = selectedFriend.avatar;
     const data = {
-      'type': 'chat',
-      'subtype': 'chat_message',
-      'sender_id': userID,
-      'receiver_id': receiverId,
-      'receiver_display_name': receiverDisplayName,
-      'receiver_avatar': receiverAvatar,
-      'message': message,
+      type: 'chat',
+      subtype: 'chat_message',
+      sender_id: userID,
+      receiver_id: receiverId,
+      receiver_display_name: receiverDisplayName,
+      receiver_avatar: receiverAvatar,
+      message: message,
     };
+
     addSentChatMessage(message);
     sendMessagesBySocket(data, mainRoomSocket);
     console.log('data:', data);
     messageInput.value = '';
   });
 }
+
 
 function checkUnreadMessages() {
   const data = {

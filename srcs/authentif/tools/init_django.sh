@@ -52,13 +52,10 @@ else
 fi
 
 # Create super user with env variables
-echo "--Creating super user..."
-python manage.py createsuperuser --noinput
+# echo "--Creating super user..."
+# python manage.py createsuperuser --noinput
 
-# Collect static files and apply migrations
-echo "--Collecting static files..."
-python manage.py collectstatic --noinput
-
+# Migrate the database
 echo "--Making migrations..."
 python manage.py makemigrations authentif
 python manage.py makemigrations
@@ -66,7 +63,9 @@ python manage.py makemigrations
 echo "--Applying migrations..."
 python manage.py migrate
 
-# sleep 1
+# # Collect static files
+# echo "--Collecting static files..."
+# python manage.py collectstatic --noinput
 
 echo "Django initialised successfully. Executing "$@""
 exec "$@"

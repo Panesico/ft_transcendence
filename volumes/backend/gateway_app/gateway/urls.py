@@ -23,14 +23,21 @@ urlpatterns = [
     path('logout/', viewsAuth.get_logout, name='logout'),
     path('oauth', viewsAuth.oauth, name='oauth'),
     path('oauth_callback', viewsAuth.oauth_callback, name='oauth_callback'),
+    path('enable2FA/', viewsAuth.enable2FA_redir, name='enable2FA'),
+    path('disable2FA/', viewsAuth.disable2FA_redir, name='disable2FA'),
+    path('confirm2FA/', viewsAuth.confirm2FA_redir, name='confirm2FA'),
+    path('verify2FA/<int:user_id>/', viewsAuth.verify2FA_redir, name='verify2FA'),
 
     # profile api
     path('profile/', viewsProfile.get_profile, name='profile'),
     path('profile/match_history/<str:username>/', viewsProfile.get_match_history, name='match_history'),
+    path('userprofile/<int:user_id>/', viewsProfile.view_user_profile, name='user_profile'),
+
     path('edit_profile/', viewsProfile.get_edit_profile, name='edit_profile'),
     path('edit_profile_general/', viewsProfile.post_edit_profile_general, name='edit_profile_general'),
     path('edit_profile_security/', viewsProfile.post_edit_profile_security, name='edit_profile_security'),
     path('edit_profile_avatar/', viewsProfile.post_edit_profile_avatar, name='edit_profile_avatar'),
+    
     path('friend_profile/<int:friend_id>/', viewsProfile.get_friend_profile, name='friend_profile'),
     path('download_42_avatar/', viewsProfile.download_42_avatar, name='download_42_avatar'),
     path('play/checkNameExists/', viewsProfile.checkNameExists, name='checkNameExists'),
