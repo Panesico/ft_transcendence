@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSIÓN DEL PAQUETE\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-03 16:41+0000\n"
+"POT-Creation-Date: 2024-11-04 14:25+0000\n"
 "PO-Revision-Date: AÑO-MO-DA HO:MI+ZONA\n"
 "Last-Translator: NOMBRE COMPLETO <EMAIL@DIRECCIÓN>\n"
 "Language-Team: ESPAÑOL <ES@li.org>\n"
@@ -53,17 +53,26 @@ msgstr "Cancelado"
 msgid "You are already waiting for a game"
 msgstr "Ya estás esperando un juego"
 
-#: gateway/consumerProxyCalcGameTournament.py:115
+#: gateway/consumerProxyCalcGameTournament.py:118
 msgid "Semi-Final 1"
 msgstr "Semifinal 1"
 
-#: gateway/consumerProxyCalcGameTournament.py:117
+#: gateway/consumerProxyCalcGameTournament.py:120
+#: gateway/consumerProxyCalcGameTournament.py:240
 msgid "Semi-Final 2"
 msgstr "Semifinal 2"
 
-#: gateway/consumerProxyCalcGameTournament.py:119
+#: gateway/consumerProxyCalcGameTournament.py:122
+#: gateway/consumerProxyCalcGameTournament.py:242
 msgid "Final"
 msgstr "Final"
+
+#: gateway/consumerProxyCalcGameTournament.py:137
+#: gateway/consumerProxyCalcGameTournament.py:139
+#: gateway/consumerProxyCalcGameTournament.py:255
+#: gateway/consumerProxyCalcGameTournament.py:258
+msgid "you play next in the tournament"
+msgstr "juegas el siguiente en el torneo"
 
 #: gateway/forms.py:9
 msgid ""
@@ -202,7 +211,7 @@ msgstr "Francés"
 msgid "Submit"
 msgstr "Enviar"
 
-#: gateway/templates/fragments/edit_profile_fragment.html:103
+#: gateway/templates/fragments/edit_profile_fragment.html:104
 msgid "Change Password"
 msgstr "Cambiar contraseña"
 
@@ -584,36 +593,36 @@ msgstr "No tienes notificaciones"
 msgid "Error retrieving friends"
 msgstr "Error al recuperar amigos"
 
-#: gateway/viewsAuth.py:32
+#: gateway/viewsAuth.py:34
 msgid "Logged out successfully"
 msgstr "Cierre de sesión exitoso"
 
-#: gateway/viewsAuth.py:50
+#: gateway/viewsAuth.py:52
 msgid "Method not allowed"
 msgstr "Método no permitido"
 
-#: gateway/viewsAuth.py:96 gateway/viewsAuth.py:184 gateway/viewsProfile.py:211
-#: gateway/viewsProfile.py:275
+#: gateway/viewsAuth.py:100 gateway/viewsAuth.py:188
+#: gateway/viewsProfile.py:213 gateway/viewsProfile.py:279
 msgid "Invalid form data"
 msgstr "Datos del formulario inválidos"
 
-#: gateway/viewsAuth.py:291
+#: gateway/viewsAuth.py:273
 msgid "No message provided"
 msgstr "No se proporcionó mensaje"
 
-#: gateway/viewsAuth.py:319
+#: gateway/viewsAuth.py:301
 msgid "Failed to login with 42"
 msgstr "Error al iniciar sesión con 42"
 
-#: gateway/viewsAuth.py:353
+#: gateway/viewsAuth.py:336
 msgid "Invalid request method. Use POST."
 msgstr "Método de solicitud inválido. Use POST."
 
-#: gateway/viewsAuth.py:360
+#: gateway/viewsAuth.py:343
 msgid "OTP code is required"
 msgstr "Se requiere código OTP"
 
-#: gateway/viewsAuth.py:362
+#: gateway/viewsAuth.py:345
 msgid "Invalid JSON format"
 msgstr "Formato JSON inválido"
 
@@ -669,6 +678,6 @@ msgstr "Usuario desbloqueado"
 msgid "Error retrieving match history"
 msgstr "Error al recuperar el historial de partidas"
 
-#: gateway/viewsProfile.py:382
+#: gateway/viewsProfile.py:388
 msgid "Please select a file to upload"
 msgstr "Por favor, seleccione un archivo para subir"
