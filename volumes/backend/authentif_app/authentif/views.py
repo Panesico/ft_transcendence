@@ -66,67 +66,71 @@ def api_logout(request):
     
 def api_login(request):
     logger.debug("api_login")
-
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            form = LogInForm(request, data=data)
-
-            if form.is_valid():
-                user = form.get_user()
+    try:
+        if request.method == 'POST':
+            try:
+                data = json.loads(request.body)
+                form = LogInForm(request, data=data)
                 try:
-                    login(request, user)
-                except Exception as e:
-                    logger.error(f'api_login > Failed to log in user: {e}')
-                    return JsonResponse({'status': 'error', 'message': _('Wrong credentials')}, status=401)
-                
-                logger.debug(f"api_login > User.id: {user.id}")
-
-                if user.two_factor_token:
-                    auth_header = request.META.get('HTTP_AUTHORIZATION')
-
-                    if auth_header and auth_header.startswith('Bearer '):
-                        token = auth_header.split(' ')[1]  # Get the token part after 'Bearer '
+                    if form.is_valid():
+                        user = form.get_user()
+                        try:
+                            login(request, user)
+                        except Exception as e:
+                            logger.error(f'api_login > Failed to log in user: {e}')
+                            return JsonResponse({'status': 'error', 'message': _('Wrong credentials')}, status=401)
                         
-                        # Set the token in the cache
-                        cache_key = f"2fa_user_{user.id}"
-                        cache.set(cache_key, token, timeout=60*5)  # Cache for 5 minutes
-                    return JsonResponse({'status': 'success', 'message': _('2FA required'), 'user_id': user.id, 'type': '2FA'}, status=200)
+                        logger.debug(f"api_login > User.id: {user.id}")
 
-                # Generate a JWT token for the authenticated user
-                jwt_token = generate_jwt_token(user)
-                logger.debug(f"token >>>>>>>>>>>: {jwt_token}")
+                        if user.two_factor_token:
+                            auth_header = request.META.get('HTTP_AUTHORIZATION')
 
-                # Create response object
-                response = JsonResponse({
-                    'status': 'success',
-                    'type': 'login_successful',
-                    'message': _('Login successful'),
-                    'token': jwt_token,
-                    'user_id': user.id
-                })
+                            if auth_header and auth_header.startswith('Bearer '):
+                                token = auth_header.split(' ')[1]  # Get the token part after 'Bearer '
+                                
+                                # Set the token in the cache
+                                cache_key = f"2fa_user_{user.id}"
+                                cache.set(cache_key, token, timeout=60*5)  # Cache for 5 minutes
+                            return JsonResponse({'status': 'success', 'message': _('2FA required'), 'user_id': user.id, 'type': '2FA'}, status=200)
 
-                # Set the JWT token in the headers and a secure cookie
-                response['Authorization'] = f'Bearer {jwt_token}'
-                response.set_cookie(
-                    key='jwt_token',
-                    value=jwt_token,
-                    httponly=True,
-                    secure=True,
-                    samesite='Lax',
-                    max_age=60 * 60 * 24 * 7,
-                )
-                
-                return response
+                        # Generate a JWT token for the authenticated user
+                        jwt_token = generate_jwt_token(user)
+                        logger.debug(f"token >>>>>>>>>>>: {jwt_token}")
 
-            else:
-                logger.debug('api_login > Invalid username or password')
-                return JsonResponse({'status': 'error', 'message': _('Invalid username or password')}, status=401)
+                        # Create response object
+                        response = JsonResponse({
+                            'status': 'success',
+                            'type': 'login_successful',
+                            'message': _('Login successful'),
+                            'token': jwt_token,
+                            'user_id': user.id
+                        })
 
-        except json.JSONDecodeError:
-            logger.debug('api_login > Invalid JSON')
-            return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
+                        # Set the JWT token in the headers and a secure cookie
+                        response['Authorization'] = f'Bearer {jwt_token}'
+                        response.set_cookie(
+                            key='jwt_token',
+                            value=jwt_token,
+                            httponly=True,
+                            secure=True,
+                            samesite='Lax',
+                            max_age=60 * 60 * 24 * 7,
+                        )
+                        
+                        return response
 
+                    else:
+                        logger.debug('api_login > Invalid username or password')
+                        return JsonResponse({'status': 'error', 'message': _('Invalid username or password')}, status=401)
+                except:
+                    logger.debug(f'Password validation error: {e.messages}')
+                    return JsonResponse({'status': 'error', 'message': _('Wrong credentials')}, status=401)
+            except json.JSONDecodeError:
+                logger.debug('api_login > Invalid JSON')
+                return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)
+    except:
+        logger.debug('api_login > Wrong or invalid password')
+        return JsonResponse({'status': 'error', 'message': _('Wrong or invalid password')}, status=400)
     logger.debug('api_login > Method not allowed')
     return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
@@ -589,6 +593,12 @@ import base64
 
 @login_required
 def enable2FA(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": 'error', 'message': _('Invalid request method. Use POST.')}, status=405)
+    
+    if request.user.id_42:
+        return JsonResponse({"status": 'error', 'message': _('Unauthorized')}, status=401)
+    
     if request.user.id is None or request.user.id == 0:
         return JsonResponse({"status": 'error', 'message': _('Unauthorized'), 'qr_code': "", 'two_fa_enabled': False}, status=401)
     
@@ -631,6 +641,10 @@ def confirmEnable2FA(request):
     if request.method != 'POST':
         return JsonResponse({"status": "error", "message": _("Invalid request method. Use POST.")}, status=405)
 
+    if request.user.id_42:
+        return JsonResponse({"status": "error", "message": _("Unauthorized")}, status=401)
+
+
     if request.user.id is None or request.user.id == 0:
         return JsonResponse({"status": "error", "message": _("Unauthorized")}, status=401)
 
@@ -671,6 +685,9 @@ def confirmEnable2FA(request):
 @login_required
 def disable2FA(request):
     if request.method == 'POST':
+        if request.user.id_42:
+            return JsonResponse({"status": "error", "message": _("Unauthorized")}, status=401)
+
         user = User.objects.get(pk=request.user.id)
         if user.two_factor_token:
             user.two_factor_token = None
@@ -682,6 +699,12 @@ def disable2FA(request):
 
 
 def verify2FA(request, user_id):
+    if request.method != 'POST':
+        return JsonResponse({"status": "error", "message": _("Invalid request method. Use POST.")}, status=405)
+    
+    if request.user.id_42:
+        return JsonResponse({"status": "error", "message": _("Unauthorized")}, status=401)
+
     # Ensure user_id is provided
     if not user_id:
         return JsonResponse({"status": "error", "message": _("User ID is required")}, status=400)

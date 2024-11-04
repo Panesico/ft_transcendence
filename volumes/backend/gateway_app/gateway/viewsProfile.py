@@ -66,9 +66,9 @@ def get_edit_profile(request):
     # logger.debug(f"get_edit_profile > form: {form}")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_edit_profile > XMLHttpRequest")
-        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
         return JsonResponse({'html': html})
-    return render(request, 'partials/edit_profile.html', {'form': form, 'profile_data': profile_data})
+    return render(request, 'partials/edit_profile.html', {'form': form, 'profile_data': profile_data, 'user': request.user})
 
 @login_required
 def get_friend_profile(request, friend_id):
@@ -210,7 +210,7 @@ def post_edit_profile_security(request):
     if not form.is_valid():
         message = _("Invalid form data")
         form.add_error(None, message)
-        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
         return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
 
     # Send and recover response from the profileapi service
@@ -240,7 +240,7 @@ def post_edit_profile_security(request):
       form.add_error(None, message)
       logger.debug('post_edit_profile_security > Response KO')
 
-      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
       #return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})#change this line to return only the fragment
       
@@ -274,7 +274,7 @@ def post_edit_profile_general(request):
     if not form.is_valid():
         message = _("Invalid form data")
         form.add_error(None, message)
-        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
         return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
 
     # Send and recover response from the profileapi service
@@ -309,7 +309,7 @@ def post_edit_profile_general(request):
       logger.debug('post_edit_profile_general > Response KO')
       logger.debug(f"post_edit_profile > data: {data}")
       logger.debug(f"post_edit_profile > response: {response.json()}")
-      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+      html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
 
 @login_required
@@ -359,7 +359,7 @@ def post_edit_profile_avatar(request):
     message = response.json().get("message")
     type = response.json().get("type")
     logger.debug(f"post_edit_profile > response.json from authentif editprofile: {response.json()}")
-    html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+    html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
 
     if  response.ok:
         logger.debug('post_edit_profile_avatar > Response OK')
@@ -370,7 +370,7 @@ def post_edit_profile_avatar(request):
       form = EditProfileFormFrontend()
       profile_data = get_profileapi_variables(request=request)
       logger.debug('post_edit_profile > Response KO')
-      html = render_to_string('fragments/edit_profile_fragment.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data}, request=request)
+      html = render_to_string('fragments/edit_profile_fragment.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message})
   
   # Handle the case where no file is uploaded
@@ -380,7 +380,7 @@ def post_edit_profile_avatar(request):
     logger.debug('profile_data: %s', profile_data)
     form = EditProfileFormFrontend(data)
     form.add_error(None, _('Please select a file to upload'))
-    html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
+    html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
     return JsonResponse({'html': html, 'status': 'error'}, status=400)
 
 
