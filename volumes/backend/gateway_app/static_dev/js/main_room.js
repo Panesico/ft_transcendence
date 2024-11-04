@@ -5,13 +5,12 @@ unreadNotifications = false;
 // Safe way to send messages by socket
 function sendMessagesBySocket(message, socket) {
   console.log('sendMessagesBySocket > message:', message);
-  console.log('sendMessagesBySocket > socket.readyState:', socket.readyState);
   if (socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(message));
     return true;
   }
   else {
-    console.warn('sendMessagesBySocket > socket.readyState:', socket.readyState);
+    console.error('sendMessagesBySocket > socker not ready > socket.readyState:', socket.readyState, 'socker.OPEN:', WebSocket.OPEN);
     return false;
   }
 }

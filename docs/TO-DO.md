@@ -15,4 +15,4 @@ Auth:
   @BenjaminLarger
 - Add an href associated to the avatar displayed in notification to his profile
 - Ensure modal close after message displayed -> double notification
-- Modal does not close if you click twice on add friend
+- translation in web scocket

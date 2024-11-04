@@ -23,6 +23,8 @@ function sendFriendRequest(sender_username, sender_id, sender_avatar_url, receiv
   //  mainRoomSocket.send(JSON.stringify({'type': 'friend_request', 'sender_username': sender_username, 'sender_id': sender_id, 'sender_avatar_url': sender_avatar_url, 'receiver_username': receiver_username, 'receiver_id': receiver_id}));
 }
 
+//--------------------------------------------------------------//
+
 // Function to get the CSRF token
 function listenSubmit(form) {
   console.log('form: ', form);
@@ -54,7 +56,7 @@ function listenSubmit(form) {
       // Send the request and wait a response
       const response = await fetch(request);
       const data = await response.json();
-
+      console.log('handleFormSubmission > data.message: ', data.message);
       console.log('handleFormSubmission > response: ', response);
 
 
@@ -62,6 +64,10 @@ function listenSubmit(form) {
         console.error('HTTP error - status:', response.status);
         throw new Error(`HTTP error - status: ${response.status}`);
       }
+
+      // if (data.message === 'Invitation already sent') {
+      //   window.location.reload();
+      // }
 
       if (!data?.html?.includes('class="errorlist nonfield')) {
         displayMessageInModal(data.message);
@@ -114,28 +120,33 @@ function update_dropdown(matching_usernames) {
     suggestionItem.textContent = username;
 
     // Click handler to fill the input field with the selected suggestion
-    suggestionItem.addEventListener('click', () => {
-      usernameInput.value = username;
-      dropdown.style.display = 'none';
+    if (!suggestionItem.hasEventListener) {
+      suggestionItem.addEventListener('click', () => {
+        usernameInput.value = username;
+        dropdown.style.display = 'none';
 
-      //Click on submit button
-      const submitButton = document.getElementById('submit-invite-friend');
-      if (submitButton) {
-        submitButton.click();
-      }
-    });
+        //Click on submit button
+        const submitButton = document.getElementById('submit-invite-friend');
+        if (submitButton) {
+          submitButton.click();
+        }
+      });
+      suggestionItem.hasEventListener = true;
+    }
 
     // Append the suggestion item to the dropdown
     dropdown.appendChild(suggestionItem);
   });
 
   // Close the dropdown when clicking outside
-  document.addEventListener('click', (event) => {
-    if (!dropdown.contains(event.target) && event.target !== usernameInput) {
-      dropdown.style.display = 'none';
-    }
-  });
-
+  if (!document.hasEventListener) {
+    document.addEventListener('click', (event) => {
+      if (!dropdown.contains(event.target) && event.target !== usernameInput) {
+        dropdown.style.display = 'none';
+      }
+    });
+    document.hasEventListener = true;
+  }
 }
 
 // We open the websocket only when the modal is open
@@ -179,9 +190,13 @@ function onModalOpen(userID, modal) {
     console.error('inviteFriendSocket is not defined');
   }
 
+  // Listen for modal close
+  if (!modal.hasClosingListener) {
   modal.addEventListener('hidden.bs.modal', () => {
     onModalClose(modal);
   });
+  modal.hasClosingListener = true;
+  }
 }
 
 function onModalClose(modal) {
@@ -222,36 +237,50 @@ function listenFriendInvitation(modal, form) {
   }
 
   // Listen for modal open
-  modal.addEventListener('show.bs.modal', () => {
-    onModalOpen(userID, modal);
-
-  })
-
+  if (!modal.hasOpeningListener) {
+    modal.addEventListener('show.bs.modal', () => {
+      onModalOpen(userID, modal);
+    });
+    modal.hasOpeningListener = true;
+  }
   // Listen for focus on the input field
-  modal.addEventListener('focus', () => {
-    isFocused = false;  // Mark input as not focused
-  });
-
-  // Listen for blur (when user leaves the input field)
-  modal.addEventListener('blur', () => {
-    isFocused = true;
-  });
+  if (inputField) {
+    if (!inputField.hasFocusListener) {
+      inputField.addEventListener('focus', () => {
+        isFocused = true;  // Mark input as focused
+      });
+      inputField.hasFocusListener = true;
+    }
+    // Listen for blur (when user leaves the input field)
+    if (!inputField.hasBlurListener) {
+      inputField.addEventListener('blur', () => {
+        isFocused = false;  // Mark input as not focused
+      });
+      inputField.hasBlurListener = true;
+    }
+  }
 
   // Event listen for key press
   console.log('inputField.addEventListene:');
-  window.addEventListener('keydown', (e) => {
+  if (!window.hasKeydownListener) {
+    window.addEventListener('keydown', (e) => {
 
-    // get the key pressed
-    if (isFocused && inviteFriendSocket.readyState === WebSocket.OPEN) {
-      const pressedKey = e.key;
-      //      inviteFriendSocket.send(JSON.stringify({type: 'input', 'key': pressedKey}));
-      sendMessagesBySocket({ type: 'input', 'key': pressedKey }, inviteFriendSocket);
-    }
-  });
+      // get the key pressed
+      if (isFocused && inviteFriendSocket.readyState === WebSocket.OPEN) {
+        const pressedKey = e.key;
+        //      inviteFriendSocket.send(JSON.stringify({type: 'input', 'key': pressedKey}));
+        sendMessagesBySocket({ type: 'input', 'key': pressedKey }, inviteFriendSocket);
+      }
+    });
+    window.hasKeydownListener = true;
+  }
 
   // Listen for form submission
-  if (form)
+  if (form && !form.hasEventListener) {
+    console.log('form has no event listener');
     listenSubmit(form);
+    form.hasEventListener = true;
+  }
 }
 
 function inviteFriendToPlay(sender_username, sender_id, sender_avatar_url, receiver_id, game_type, game_mode) {
