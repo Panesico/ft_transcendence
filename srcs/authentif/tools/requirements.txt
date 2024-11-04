@@ -15,3 +15,5 @@ pyjwt
 # 2FA
 pyotp
 qrcode[pil]
+# For pretty logs
+prettyprinter
