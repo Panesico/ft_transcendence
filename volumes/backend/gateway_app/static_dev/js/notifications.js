@@ -369,6 +369,9 @@ function addResponseNotification(data) {
     displayMessageInModal(data.sender_username + data.message);
     // console.warn('redirect to home');
   }
+  else if (data.type === 'next_in_tournament') {
+    inputMessage = data.message;
+  }
 
   const message = createMessageElement(receiver_username, inputMessage);
   if (data.response === 'accept' && data.type === 'game_request_response') {

@@ -111,6 +111,9 @@ window.onload = () => {
     else if (data.type === 'user_connected' || data.type === 'user_left') {
       updateOnlineFriends(data);
     }
+    else if (data.type === 'next_in_tournament') {
+      addResponseNotification(data);
+    }
     // else if (data.type === 'connected_friends') {
     //   addOnlineStatusBadge(data);
     // }

@@ -41,6 +41,10 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
         'cookies': self.scope['cookies'],
     }
     html = render_to_string('fragments/home_fragment.html', context=context)
+  elif type == 'next_in_tournament':
+    message = content.get('notify_player', '')
+    receiver_id = sender_id
+    receiver_username = sender_username
   logger.debug(f'requestResponse > message: {message}')
 
   # Send response to frontend sender
