@@ -76,5 +76,8 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     elif typeMessage == 'cancel_waiting_room':
       logger.debug(f'mainRoom > cancel_waiting_room, username: {self.username}')
       await requestResponse(content, users_connected, self.avatar_url, self)
+    elif typeMessage == 'next_in_tournament':
+      logger.debug(f'mainRoom > next_in_tournament, username: {self.username}')
+      await requestResponse(content, users_connected, self.avatar_url, self)
     # elif typeMessage == 'get_connected_friends':
     #   await getConnectedFriends(self, content, users_connected)

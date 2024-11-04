@@ -61,19 +61,12 @@ async function startNewTournament(
       if (gameRound == 'Semi-Final 1') { // start of tournament
         announceGame(data.info.game_round_title,
           `${data.info.p1_name} vs ${data.info.p2_name}`);
-      }
-      // else if (gameMode === 'remote') {
-      //   game_id = data.game_id;
-      //   player_role = data.player_role;
-      //   addIndicatorToThisPlayer(player_role);
-      //   announceGame(data.title, data.message);
-      //   setPlayerReadyCheckBoxes(player_role, calcGameSocket, game_id);
-      // }
 
-      // }  // updates oppenent's ready checkbox in remote
-      // else if (data.type === 'opponent_ready') {
-      //   console.log('startNewTournament > .onmessage opponent_ready:', data.message);
-      //   updateOpponentReadyCheckBoxes(data.opponent)
+        // Send notification, player is next in tournament
+        userID = (data.info.p1_id != 0) ? data.info.p1_id : data.info.p2_id;
+        username = (data.info.p1_id != 0) ? data.info.p1_name : data.info.p2_name;
+        sendMessagesBySocket({ 'type': 'next_in_tournament', 'response': '', 'sender_id': userID, 'receiver_id': userID, 'sender_username': username, 'receiver_username': username, 'notify_player': data.info.notify_player }, mainRoomSocket);
+      }
 
     } else if (data.type === 'game_countdown') {
       console.log('startNewTournament > .onmessage game_countdown:', data.message);
@@ -189,6 +182,10 @@ async function startNewTournament(
         else if (info.p2_avatar_url)
           document.getElementById('photoPlayer2').src = origin + '/media' + info.p2_avatar_url;
 
+        // Send notification, player is next in tournament
+        userID = (info.p1_id != 0) ? info.p1_id : info.p2_id;
+        username = (info.p1_id != 0) ? info.p1_name : info.p2_name;
+        sendMessagesBySocket({ 'type': 'next_in_tournament', 'response': '', 'sender_id': userID, 'receiver_id': userID, 'sender_username': username, 'receiver_username': username, 'notify_player': info.notify_player }, mainRoomSocket);
 
         addStartButtonListener();
 

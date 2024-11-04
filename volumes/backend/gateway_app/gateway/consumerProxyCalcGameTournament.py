@@ -133,6 +133,9 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
                 'p1_id': next_game_info['info']['p1_id'],
                 'p2_id': next_game_info['info']['p2_id'],
             }
+            if next_game_info['info']['p1_id'] != 0 or next_game_info['info']['p2_id'] != 0:
+                self.game_info['notify_player'] = ", " + _("you play next in the tournament")
+            
             if next_game_info['info']['p1_id'] != 0:
                 self.game_info['p1_avatar_url'] = self.trmt_info['p1_avatar_url']
             if next_game_info['info']['p2_id'] != 0:
@@ -247,8 +250,10 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
 
         if response['info']['p1_id'] != 0:
             response['info']['p1_avatar_url'] = self.trmt_info['p1_avatar_url']
-        if response['info']['p2_id'] != 0:
+            response['info']['notify_player'] = ", " + _("you play next in the tournament")
+        elif response['info']['p2_id'] != 0:
             response['info']['p2_avatar_url'] = self.trmt_info['p1_avatar_url']
+            response['info']['notify_player'] = ", " + _("you play next in the tournament")        
 
         html = render_to_string('fragments/tournament_next_game_fragment.html',
                                 {

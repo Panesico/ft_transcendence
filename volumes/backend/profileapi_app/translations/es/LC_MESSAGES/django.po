@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-03 14:40+0000\n"
+"POT-Creation-Date: 2024-11-04 14:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,81 +18,81 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: profileapi/views.py:40
+#: profileapi/views.py:42
 msgid "Signup successful"
 msgstr "Registro exitoso"
 
-#: profileapi/views.py:78
+#: profileapi/views.py:82
 msgid "Profile updated"
 msgstr "Perfil actualizado"
 
-#: profileapi/views.py:82
+#: profileapi/views.py:86
 msgid "Invalid profile data"
 msgstr "Datos de perfil inválidos"
 
-#: profileapi/views.py:85
+#: profileapi/views.py:89
 msgid "Error: "
 msgstr "Error: "
 
-#: profileapi/views.py:88 profileapi/views.py:284 profileapi/views.py:408
-#: profileapi/views.py:415 profileapi/views.py:436
+#: profileapi/views.py:92 profileapi/views.py:288 profileapi/views.py:412
+#: profileapi/views.py:419 profileapi/views.py:440
 msgid "Method not allowed"
 msgstr "Método no permitido"
 
-#: profileapi/views.py:118 profileapi/views.py:164 profileapi/views.py:191
-#: profileapi/views.py:308 profileapi/views.py:356 profileapi/views.py:373
-#: profileapi/views.py:390 profileapi/views.py:429 profileapi/views.py:450
+#: profileapi/views.py:122 profileapi/views.py:168 profileapi/views.py:195
+#: profileapi/views.py:312 profileapi/views.py:360 profileapi/views.py:377
+#: profileapi/views.py:394 profileapi/views.py:433 profileapi/views.py:454
 msgid "User not found"
 msgstr "Usuario no encontrado"
 
-#: profileapi/views.py:233 profileapi/views.py:263
+#: profileapi/views.py:237 profileapi/views.py:267
 msgid "You have already sent an unresponded request to this user"
 msgstr "Ya has enviado una solicitud no respondida a este usuario"
 
-#: profileapi/views.py:235
+#: profileapi/views.py:239
 msgid "Request does not exist"
 msgstr "La solicitud no existe"
 
-#: profileapi/views.py:256
+#: profileapi/views.py:260
 msgid "You cannot send a notification to yourself"
 msgstr "No puedes enviarte una notificación a ti mismo"
 
-#: profileapi/views.py:278
+#: profileapi/views.py:282
 msgid "Notification created"
 msgstr "Notificación creada"
 
-#: profileapi/views.py:357
+#: profileapi/views.py:361
 msgid "Notification marked as read"
 msgstr "Notificación marcada como leída"
 
-#: profileapi/views.py:374
+#: profileapi/views.py:378
 msgid "All notifications marked as read"
 msgstr "Todas las notificaciones marcadas como leídas"
 
-#: profileapi/views.py:384
+#: profileapi/views.py:388
 msgid "Friendship exists"
 msgstr "La amistad existe"
 
-#: profileapi/views.py:387
+#: profileapi/views.py:391
 msgid "Friendship does not exist"
 msgstr "La amistad no existe"
 
-#: profileapi/views.py:400
+#: profileapi/views.py:404
 msgid "User exists"
 msgstr "El usuario existe"
 
-#: profileapi/views.py:403
+#: profileapi/views.py:407
 msgid "User does not exist"
 msgstr "El usuario no existe"
 
-#: profileapi/views.py:406
+#: profileapi/views.py:410
 msgid "Invalid JSON"
 msgstr "JSON inválido"
 
-#: profileapi/views.py:426
+#: profileapi/views.py:430
 msgid "Friend blocked"
 msgstr "Amigo bloqueado"
 
-#: profileapi/views.py:447
+#: profileapi/views.py:451
 msgid "Friend unblocked"
 msgstr "Amigo desbloqueado"

@@ -67,6 +67,13 @@ msgstr "Semi-Final 2"
 msgid "Final"
 msgstr "Final"
 
+#: gateway/consumerProxyCalcGameTournament.py:137
+#: gateway/consumerProxyCalcGameTournament.py:139
+#: gateway/consumerProxyCalcGameTournament.py:255
+#: gateway/consumerProxyCalcGameTournament.py:258
+msgid "you play next in the tournament"
+msgstr "you play next in the tournament"
+
 #: gateway/forms.py:9
 msgid ""
 "Username can only contain alphanumeric characters, underscores and hyphens."

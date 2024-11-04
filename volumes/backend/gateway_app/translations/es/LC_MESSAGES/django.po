@@ -54,6 +54,7 @@ msgid "You are already waiting for a game"
 msgstr "Ya estás esperando un juego"
 
 #: gateway/consumerProxyCalcGameTournament.py:118
+#: gateway/consumerProxyCalcGameTournament.py:118
 msgid "Semi-Final 1"
 msgstr "Semifinal 1"
 
@@ -66,6 +67,13 @@ msgstr "Semifinal 2"
 #: gateway/consumerProxyCalcGameTournament.py:237
 msgid "Final"
 msgstr "Final"
+
+#: gateway/consumerProxyCalcGameTournament.py:137
+#: gateway/consumerProxyCalcGameTournament.py:139
+#: gateway/consumerProxyCalcGameTournament.py:255
+#: gateway/consumerProxyCalcGameTournament.py:258
+msgid "you play next in the tournament"
+msgstr "juegas el siguiente en el torneo"
 
 #: gateway/forms.py:9
 msgid ""
@@ -595,34 +603,43 @@ msgid "Error retrieving friends"
 msgstr "Error al recuperar amigos"
 
 #: gateway/viewsAuth.py:34
+#: gateway/viewsAuth.py:34
 msgid "Logged out successfully"
 msgstr "Cierre de sesión exitoso"
 
+#: gateway/viewsAuth.py:52
 #: gateway/viewsAuth.py:52
 msgid "Method not allowed"
 msgstr "Método no permitido"
 
 #: gateway/viewsAuth.py:100 gateway/viewsAuth.py:188
 #: gateway/viewsProfile.py:213 gateway/viewsProfile.py:279
+#: gateway/viewsAuth.py:100 gateway/viewsAuth.py:188
+#: gateway/viewsProfile.py:213 gateway/viewsProfile.py:279
 msgid "Invalid form data"
 msgstr "Datos del formulario inválidos"
 
+#: gateway/viewsAuth.py:273
 #: gateway/viewsAuth.py:273
 msgid "No message provided"
 msgstr "No se proporcionó mensaje"
 
 #: gateway/viewsAuth.py:301
+#: gateway/viewsAuth.py:301
 msgid "Failed to login with 42"
 msgstr "Error al iniciar sesión con 42"
 
+#: gateway/viewsAuth.py:336
 #: gateway/viewsAuth.py:336
 msgid "Invalid request method. Use POST."
 msgstr "Método de solicitud inválido. Use POST."
 
 #: gateway/viewsAuth.py:343
+#: gateway/viewsAuth.py:343
 msgid "OTP code is required"
 msgstr "Se requiere código OTP"
 
+#: gateway/viewsAuth.py:345
 #: gateway/viewsAuth.py:345
 msgid "Invalid JSON format"
 msgstr "Formato JSON inválido"
@@ -679,6 +696,7 @@ msgstr "Usuario desbloqueado"
 msgid "Error retrieving match history"
 msgstr "Error al recuperar el historial de partidas"
 
+#: gateway/viewsProfile.py:388
 #: gateway/viewsProfile.py:388
 msgid "Please select a file to upload"
 msgstr "Por favor, seleccione un archivo para subir"
