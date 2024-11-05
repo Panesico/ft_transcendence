@@ -14,5 +14,6 @@ Auth:
 
   @BenjaminLarger
 - Add an href associated to the avatar displayed in notification to his profile
-- Ensure modal close after message displayed -> double notification
 - translation in web scocket
+- Use a username that has already been used before
+- Cannot connect two players to two different windows at the same time
