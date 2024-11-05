@@ -250,6 +250,7 @@ def create_notifications(request):
             receiver_id = data.get('receiver_id')
             message = data.get('message')
             type = data.get('type')
+            game_type = data.get('game_type')
 
             logger.debug(f'sender: {sender_id}')
             logger.debug(f'receiver: {receiver_id}')
@@ -275,7 +276,8 @@ def create_notifications(request):
                 sender=sender_obj,
                 receiver=receiver_obj,
                 message=message,
-                type=type
+                type=type,
+                game_type=game_type,
             )
             notification.save()
 
@@ -305,6 +307,7 @@ def get_notifications(request, user_id):
                 'type': notification.type,
                 'date': notification.date,
                 'status': notification.status,
+                'game_type': notification.game_type,
             })
         return JsonResponse(data, status=200, safe=False)
     except Profile.DoesNotExist:

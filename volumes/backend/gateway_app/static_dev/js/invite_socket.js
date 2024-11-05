@@ -71,7 +71,8 @@ function listenSubmit(form) {
 
       if (!data?.html?.includes('class="errorlist nonfield')) {
         displayMessageInModal(data.message);
-        if (data.message === 'Invitation sent!') {
+        console.log('handleFormSubmission > data: ', data);
+        if (data.message === 'Invitation sent!' || data.message === '¡Invitación enviada!' || data.message === 'Invitation envoyée !') {
           console.warn('Send invitation to ', data.username);
           // send invitation to the user
           sendFriendRequest(data.sender_username, data.sender_id, data.sender_avatar_url,

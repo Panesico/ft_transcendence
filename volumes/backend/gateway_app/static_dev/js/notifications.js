@@ -3,7 +3,7 @@
 function removeEmptyMessage() {
   const emptyMessage = document.getElementById('notificationContent');
   if (emptyMessage) {
-    if (emptyMessage.innerHTML.trim() === 'You have no notifications') {
+    if (emptyMessage.innerHTML.trim() === 'You have no notifications' || emptyMessage.innerHTML.trim() === 'No tienes notificaciones' || emptyMessage.innerHTML.trim() === 'Vous n\'avez pas de notifications') {
       console.log('addRequestNotification > Removing empty message');
       emptyMessage.remove();
       unreadNotifications = false;
@@ -35,7 +35,7 @@ function createAvatarElement(avatar_url) {
 
 function createMessageElement(sender_username, response) {
   const message = document.createElement('span');
-  message.textContent = `${sender_username} ${response}`;
+  message.textContent = `${sender_username} ${friendRequestReceived}`;
   //  message.textContent = `${sender_username} sent you a friend request.`;
   message.style.marginLeft = '10px';
   return message;
@@ -315,10 +315,11 @@ function addRequestNotification(data) {
   const avatar = createAvatarElement(sender_avatar_url);
 
   // Create a span element for the message
-  const message = createMessageElement(sender_username, ' sent you a friend request.');
+  const message = createMessageElement(sender_username, friendRequestReceived);
   if (data.type === 'game_request') {
     // message.textContent = `${sender_username} invited you to play a game.`;
-    message.textContent = data.message;
+    console.log('addRequestNotification > data', data);
+    message.textContent =  sender_username + gameRequestReceived + data.game_type;
   }
 
   // Add button to accept the friend request represented by accept png
