@@ -12,6 +12,19 @@ from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger(__name__)
 
+def getDisplayNameUnused(data):
+    logger.debug("setDisplayNameUnused")
+    profiles = Profile.objects.all()
+    index = 1
+    for profile in profiles:
+        if profile.display_name == data['username']:
+            displayname = data['username'] + str(index)
+            while Profile.objects.filter(display_name=displayname).exists():
+                index += 1
+                displayname = displayname + str(index)
+            return displayname
+    return data['username']
+
 @csrf_exempt
 def api_signup(request):
     logger.debug("--> hello from api_signup")
@@ -22,11 +35,7 @@ def api_signup(request):
         return HttpResponse('Method not allowed', status=405)
     logger.debug("--> POST method")
     data = json.loads(request.body)
-    try:
-        if data['id_42']:
-            display_name = data['username']
-    except:
-        display_name = data['username']
+    display_name = getDisplayNameUnused(data)
     logger.debug(f"data : {data}")
     try:
       profile = Profile(
