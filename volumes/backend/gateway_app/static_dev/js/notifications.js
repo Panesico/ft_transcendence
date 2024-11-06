@@ -35,7 +35,7 @@ function createAvatarElement(avatar_url) {
 
 function createMessageElement(sender_username, response) {
   const message = document.createElement('span');
-  message.textContent = `${sender_username} ${friendRequestReceived}`;
+  message.textContent = `${sender_username} ${response}`;
   //  message.textContent = `${sender_username} sent you a friend request.`;
   message.style.marginLeft = '10px';
   return message;
@@ -379,24 +379,24 @@ function addResponseNotification(data) {
   const avatar = createAvatarElement(receiver_avatar_url);
 
   // Create a span element for the message
-  inputMessage = ' declined your game request.'
+  inputMessage = gameRequestCancelled;
   if (data.response === 'accept' && data.type === 'friend_request_response') {
-    inputMessage = ' accepted your friend request.';
+    inputMessage = friendRequestAccepted;
   }
   else if (data.response === 'decline' && data.type === 'friend_request_response') {
-    inputMessage = ' declined your friend request.';
+    inputMessage = friendRequestDeclined;
   }
   else if (data.response === 'accept' && data.type === 'game_request_response') {
-    inputMessage = data.message;
+    inputMessage = gameWaitingToPlay;
   }
   else if (data.type === 'cancel_waiting_room') {
-    inputMessage = data.message;
+    inputMessage = gameRequestCancelled;
     document.querySelector('main').innerHTML = data.html;
-    displayMessageInModal(data.sender_username + data.message);
+    displayMessageInModal(data.sender_username + gameRequestCancelled);
     // console.warn('redirect to home');
   }
   else if (data.type === 'next_in_tournament') {
-    inputMessage = data.message;
+    inputMessage = gamePlayNextTournament;
   }
 
   const message = createMessageElement(receiver_username, inputMessage);

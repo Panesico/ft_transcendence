@@ -213,8 +213,8 @@ CHANNEL_LAYERS = {
 # SSL - HTTPS - Security
 
 # Defines a set of host/domain names that Django will accept requests from
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcgame', 'gateway', 'authentif', 'profileapi', 'play']
-
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcgame', 'gateway', 'authentif', 'profileapi', 'play']
+ALLOWED_HOSTS = ['*']
 
 # Redirect all HTTP traffic to HTTPS
 SECURE_SSL_REDIRECT = True

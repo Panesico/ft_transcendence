@@ -77,7 +77,7 @@ async function blockFriend(friendId) {
 			// Mostrar el modal en caso de éxito
 			if (data.status === 'success') {
 				sessionStorage.setItem('afterBlock', 'true');
-				sessionStorage.setItem('afterBlockMessage', 'Friend blocked successfully.');
+				sessionStorage.setItem('afterBlockMessage', afterBlockMsg);
 				location.reload();
 			}
 		} catch (error) {
@@ -102,7 +102,7 @@ async function blockFriend(friendId) {
 			// Mostrar el modal en caso de éxito
 			if (data.status === 'success') {
 				sessionStorage.setItem('afterUnblock', 'true');
-				sessionStorage.setItem('afterUnblockMessage', 'Friend unblocked successfully.');
+				sessionStorage.setItem('afterUnblockMessage', afterUnblockMsg);
 				location.reload();
 			}
 		} catch (error) {

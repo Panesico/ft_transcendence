@@ -259,7 +259,7 @@ def create_notifications(request):
             receiver_id = data.get('receiver_id')
             message = data.get('message')
             type = data.get('type')
-            game_type = data.get('game_type')
+            game_type = data.get('game_type', None)
 
             logger.debug(f'sender: {sender_id}')
             logger.debug(f'receiver: {receiver_id}')

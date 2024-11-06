@@ -46,6 +46,20 @@ certs:
 		-addext "subjectAltName=DNS:localhost,DNS:gateway,DNS:authentif,\
 		DNS:profileapi,DNS:play,DNS:calcgame,DNS:blockchain"
 
+clean_database:
+	docker exec -it gateway sh \
+		-c "python manage.py flush"
+
+create_translations:
+	docker exec -it gateway sh \
+		-c "python manage.py makemessages -l en && \
+		python manage.py makemessages -l fr && \
+		python manage.py makemessages -l es"
+
+compile_translations:
+	docker exec -it gateway sh \
+		-c "python manage.py compilemessages"
+
 postgres:
 	docker exec -it postgres sh \
 		-c "psql -U postgres_main_user -d transcendence_db"
