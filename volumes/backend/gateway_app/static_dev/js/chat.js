@@ -9,17 +9,6 @@ function innit_listening() {
   const unreadCount = document.getElementById('unreadChatsCount');
   const currentChatId = document.getElementById('currentChatId');
   const blockSwitchContainer = document.getElementById('blockSwitchContainer');
-  const dateElement = document.getElementById('date');
-
-  if (!dateElement) {
-    console.error('dateElement not found');
-  } else {
-    console.log('dateElement:', dateElement);
-
-  }
-
-  let date = new Date();
-  dateElement.textContent = date.toDateString();
 
   // Listen for the chat button click
   chatButton.addEventListener('click', function () {

@@ -272,3 +272,33 @@ Nearby People CSS
     pointer-events: auto;
     opacity: 1;
 }
+
+.invite-button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.game-controller-icon {
+  width: 4vw;
+  height: 10vh;
+  position: absolute;
+  top: -1.5vh;
+  right: 5.5vw;
+  cursor: pointer;
+}
+
+#gameInvitePopup {
+  top: 60px;
+  right: 20px;
+  z-index: 2;
+}
+
+#contactContainer {
+  height: auto;
+  padding-top: 0rem;
+  padding-bottom: 0rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}

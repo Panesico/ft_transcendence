@@ -34,7 +34,7 @@
 							<!-- Chat Content (Right Column) -->
 							<div class="col-8">
 								<!-- Sticky header with contact name and avatar -->
-								<div id="contactContainer" class="sticky-top bg-dark justify-content-between align-items-center p-2 rounded-3 " style="z-index: 1; top: 0; background-color: #333; display: none;">
+								<div id="contactContainer" class="sticky-top bg-dark justify-content-between align-items-center rounded-3 " style="z-index: 1; top: 0; background-color: #333; display: none;">
 									<div id="contactAvatarAndName" class="d-flex align-items-center">
 										<a id="contactAvatarLink" href="#">
 											<img id="contactAvatar" src="{% static 'images/game/cow400.png' %}" style="height: 3rem; width: 3rem; object-fit: cover; border-radius: 50%; border: 2px solid #fff;" class="me-2" alt="{% trans "avatar" %} 1">
@@ -43,32 +43,28 @@
 											<p id="contactDisplayName" class="m-0" style="color: white;">{% trans "Select a contact" %}</p>
 										</a>
 									</div>
+									<div class="d-flex align-items-center position-relative">
+										<img src="/media/utils_icons/game_controller.png" onclick="toggleGameInvitePopup()" class="me-2" style="cursor: pointer; width: 5rem; height: 5rem;" alt="{% trans 'Invite to play' %}">
+							
+										<!-- Popup de Invitación -->
+										<div id="gameInvitePopup" style="display: none; position: absolute; top: 3.5rem; left: 0; background-color: #333; border-radius: 8px; padding: 10px; width: 200px;">
+											<form method="post" action="{% url 'invite_to_play' 0 %}">
+												{% csrf_token %}
+												<div class="btn-group d-flex justify-content-between mb-2" role="group">
+													<input type="radio" class="btn-check" name="chosenGame" id="chat-pong" autocomplete="off" checked>
+													<label class="btn btn-outline-success" for="chat-pong" style="width: 80px;">
+														<img src="{% static 'images/cover-pong-8bits.jpg' %}" alt="Space Pong" class="img-fluid rounded">
+													</label>
+													<input type="radio" class="btn-check" name="chosenGame" id="chat-cows" autocomplete="off">
+													<label class="btn btn-outline-success" for="chat-cows" style="width: 80px;">
+														<img src="{% static 'images/cover-cows.jpg' %}" alt="Space Cows" class="img-fluid rounded">
+													</label>
+												</div>
+												<button type="submit" class="btn btn-success w-100">{% trans "Invite to play" %}</button>
+											</form>
+										</div>
+									</div>
 
-                  <div class="position-relative">
-                    <button onclick="toggleGameInvitePopup()" class="btn btn-secondary">{% trans "Invite to play" %}</button>
-                    <div id="gameInvitePopup" style="display: none;" class="position-absolute start-0" style="bottom: -20px">
-                      <form method="post" id="chat-invite-play-0" action="{% url 'invite_to_play' 0 %}" class="d-flex flex-column justify-content-center relative" style="background-color: #333; border-radius: 10px;">
-                        {% csrf_token %}
-
-                        <div class="btn-group mx-auto" role="group" aria-label="{% trans 'Game selection' %}">
-
-                          <input type="radio" class="btn-check" name="chosenGame" id="chat-pong-0" autocomplete="off" checked data-gametype="pong">
-                          <label class="btn btn-outline-success d-flex flex-column justify-content-between align-items-center p-2" for="chat-pong-0" style="width: 80px; border-bottom-left-radius: 0;">
-                            <img src="{% static 'images/cover-pong-8bits.jpg' %}" alt="Space Pong" title="Space Pong" class="img-fluid">
-                          </label>
-                        
-                          <input type="radio" class="btn-check" name="chosenGame" id="chat-cows-0" autocomplete="off" data-gametype="cows">
-                          <label class="btn btn-outline-success d-flex flex-column justify-content-between align-items-center p-2" for="chat-cows-0" style="width: 80px; border-bottom-right-radius: 0;">
-                            <img src="{% static 'images/cover-cows.jpg' %}" alt="Space Cows" title="Space Cows" class="img-fluid">
-                          </label>
-                        
-                        </div>
-                        <button type="submit" class="btn btn-success" style="border-top-right-radius: 0; border-top-left-radius: 0;">{% trans "Invite to play" %}</button>
-
-                      </form>
-                    </div>
-                  </div>
-									<p id="date" class="small mb-0" style="color: white;">23 Jan 2:00 pm</p>
 									<div id="blockSwitchContainer" style="display: none;">
 										<div class="form-check form-switch">
 											<input id="blockSwitch" data-user-id="" class="form-check-input" type="checkbox" {% if is_blocked %}checked{% endif %}>
