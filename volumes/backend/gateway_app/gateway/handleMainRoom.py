@@ -30,11 +30,11 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
   response = content.get('response', '')
   type = content.get('type', '')
   logger.debug(f'requestResponse > type: {type}')
-  message = f'{sender_username} has accepted your friend request.'
+  message = _('has accepted your friend request.')
   if type == 'game_request_response':
-    message = _(' is waiting to play ') + game_type.capitalize()
+    message = _('is waiting to play ') + game_type.capitalize()
   elif type == 'cancel_waiting_room':
-    message = _(' has canceled the game request.')
+    message = _('has canceled the game request.')
     user = { 'username': receiver_username }
     context = {
         'user': user,
@@ -64,7 +64,7 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
       'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
       'game_mode': game_mode,
       'game_type': game_type,
-      'html': html
+      'html': html,
     })
   
   # Set the notification as read
@@ -77,6 +77,7 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
           'HTTP_HOST': 'profileapi',
           'Referer': 'https://gateway:8443',
       }
+  
   try:
     response = requests.get(profileapi_url, headers=headers, verify=os.getenv("CERTFILE"))
     logger.debug(f'requestResponse > response: {response}')
@@ -87,8 +88,28 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
       logger.debug(f'requestResponse > Notification marked as read')
     else:
       logger.debug(f'requestResponse > Error marking notification as read')
+  
+
   except Exception as e:
     logger.debug(f'requestResponse > Error marking notification as read: {e}')
+    return
+
+   # Save the notification in database
+  message = receiver_username + ' ' + message
+  logger.debug(f'requestResponse > message: {message}')
+  profileapi_url = 'https://profileapi:9002/api/createnotif/'
+  notification_data = { 'sender_id': receiver_id, 'receiver_id': sender_id, 'message': message, 'type': type, 'game_type': game_type }
+  try:
+    response = requests.post(
+          profileapi_url, json=notification_data, headers=headers, verify=os.getenv("CERTFILE"))
+
+    response.raise_for_status()
+    if response.status_code == 201:
+      logger.debug(f'requestResponse > Notification saved in database')
+    else:
+      logger.debug(f'requestResponse > Error saving notification')
+  except Exception as e:
+    logger.debug(f'requestResponse > Error saving notification: {e}')
     return
 
 # async def cancelGameRequest(content, users_connected, receiver_avatar_url, self):
@@ -127,10 +148,10 @@ async def friendRequest(content, users_connected, self):
   sender_avatar_url = content.get('sender_avatar_url', '')
   msg_body = _('sent you a friend request')
   message = sender_username + ' ' + msg_body
+  game_type = content.get('game_type', '')
 
   # Get username of receiver
-  user_data = get_authentif_variables(self.user_id)
-  logger.debug(f'friendRequest > user_data: {pformat(user_data)}')
+  user_data = get_authentif_variables(receiver_id)
   receiver_username = user_data.get('username', '')
   logger.debug(f'friendRequest > receiver_username: {receiver_username}')
   if user_data is None:
@@ -139,13 +160,12 @@ async def friendRequest(content, users_connected, self):
   logger.debug(f'friendRequest > sender_id: {sender_id}')
   logger.debug(f'friendRequest > Friend request: {content}')
   logger.debug(f'friendRequest > sender_username: {sender_username}')
-  logger.debug(f'friendRequest > receiver_username: {receiver_username}')
   logger.debug(f'friendRequest > receiver_id: {receiver_id}')
 
   # Save friend request in database
   logger.debug(f'friendRequest > Save friend request in database')
   profileapi_url = 'https://profileapi:9002/api/createnotif/'
-  notification_data = { 'sender_id': sender_id, 'receiver_id': receiver_id, 'message': message, 'type': 'friend_request' }
+  notification_data = { 'sender_id': sender_id, 'receiver_id': receiver_id, 'message': message, 'type': 'friend_request', 'game_type': game_type }
   csrf_token = self.scope['cookies']['csrftoken']
   headers = {
       'X-CSRFToken': csrf_token,
@@ -268,7 +288,6 @@ async def checkForNotifications(self):
         receiver_data = get_authentif_variables(notification['receiver'])
         receiver_username = receiver_data.get('username', '')
         receiver_avatar_url = '/media/' + receiver_data.get('avatar_url', '')
-        logger.debug(f'checkForNotifications > before send_json')
         # Send notification to frontend
         await self.send_json({
           'type': notification['type'],

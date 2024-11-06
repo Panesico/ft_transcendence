@@ -20,7 +20,7 @@ class Profile(models.Model):
 class Notification(models.Model):
     sender = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='sender')
     receiver = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='receiver')
-    type = models.CharField(max_length=16) # friend_request, friend_request_response, message
+    type = models.CharField(max_length=23) # friend_request, friend_request_response, message
     message = models.CharField(max_length=256)
     date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=16, default='unread') # unread, read

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 12:11+0000\n"
+"POT-Creation-Date: 2024-11-06 16:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ENGLISH <LL@li.org>\n"
@@ -123,19 +123,29 @@ msgstr "New password"
 msgid "Confirm new Password"
 msgstr "Confirm new Password"
 
-#: gateway/handleInvite.py:52 gateway/templates/base_index.html:94
+#: gateway/handleInvite.py:54 gateway/templates/base_index.html:94
 msgid " has invited you to play: "
 msgstr " has invited you to play: "
 
-#: gateway/handleMainRoom.py:34
-msgid " is waiting to play "
+#: gateway/handleMainRoom.py:33
+#, fuzzy
+#| msgid " accepted your friend request."
+msgid "has accepted your friend request."
+msgstr " accepted your friend request."
+
+#: gateway/handleMainRoom.py:35
+#, fuzzy
+#| msgid " is waiting to play "
+msgid "is waiting to play "
 msgstr " is waiting to play "
 
-#: gateway/handleMainRoom.py:36
-msgid " has canceled the game request."
+#: gateway/handleMainRoom.py:37
+#, fuzzy
+#| msgid " has canceled the game request."
+msgid "has canceled the game request."
 msgstr " has canceled the game request."
 
-#: gateway/handleMainRoom.py:127
+#: gateway/handleMainRoom.py:149
 msgid "sent you a friend request"
 msgstr " sent you a friend request"
 
@@ -161,22 +171,34 @@ msgid " declined your friend request."
 msgstr " declined your friend request."
 
 #: gateway/templates/base_index.html:95
+#, fuzzy
+#| msgid " accepted your friend request."
+msgid " has accepted your game request."
+msgstr " accepted your friend request."
+
+#: gateway/templates/base_index.html:96
+#, fuzzy
+#| msgid " declined your friend request."
+msgid " has declined your game request."
+msgstr " declined your friend request."
+
+#: gateway/templates/base_index.html:97
 msgid " has cancelled the game request."
 msgstr " has canceled the game request."
 
-#: gateway/templates/base_index.html:96
+#: gateway/templates/base_index.html:98
 msgid " is waiting to play."
 msgstr " is waiting to play."
 
-#: gateway/templates/base_index.html:97
+#: gateway/templates/base_index.html:99
 msgid " you play next in the tournament."
 msgstr "you play next in the tournament."
 
-#: gateway/templates/base_index.html:98
+#: gateway/templates/base_index.html:100
 msgid "Friend blocked successfully."
 msgstr "Friend blocked successfully."
 
-#: gateway/templates/base_index.html:99
+#: gateway/templates/base_index.html:101
 msgid "Friend unblocked successfully."
 msgstr "Friend unblocked successfully."
 
@@ -645,7 +667,7 @@ msgid "Method not allowed"
 msgstr "Method not allowed"
 
 #: gateway/viewsAuth.py:100 gateway/viewsAuth.py:188
-#: gateway/viewsProfile.py:213 gateway/viewsProfile.py:279
+#: gateway/viewsProfile.py:215 gateway/viewsProfile.py:283
 msgid "Invalid form data"
 msgstr "Invalid form data"
 
@@ -721,6 +743,6 @@ msgstr "User unblocked"
 msgid "Error retrieving match history"
 msgstr "Error retrieving match history"
 
-#: gateway/viewsProfile.py:388
+#: gateway/viewsProfile.py:392
 msgid "Please select a file to upload"
 msgstr "Please select a file to upload"

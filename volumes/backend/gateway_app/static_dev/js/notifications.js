@@ -163,6 +163,8 @@ function createAcceptButton(sender_id, receiver_id, newNotification) {
 }
 
 function changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id, status) {
+  // if there is not unread notifications, change the bell icon to down
+
   if (notificationDropdownClass) {
     //notificationDropdown.insertBefore(newNotification, notificationDropdown.firstChild);
     console.log('addRequestNotification > notificationDropdown:', notificationDropdown);
@@ -389,15 +391,22 @@ function addResponseNotification(data) {
   else if (data.response === 'accept' && data.type === 'game_request_response') {
     inputMessage = gameWaitingToPlay;
   }
+  else if (data.response === 'decline' && data.type === 'game_request_response') {
+    inputMessage = gameRequestDeclined;
+  }
   else if (data.type === 'cancel_waiting_room') {
     inputMessage = gameRequestCancelled;
     document.querySelector('main').innerHTML = data.html;
     displayMessageInModal(data.sender_username + gameRequestCancelled);
     // console.warn('redirect to home');
   }
-  else if (data.type === 'next_in_tournament') {
-    inputMessage = gamePlayNextTournament;
-  }
+
+  // else if (data.type === 'next_in_tournament') {
+  //   inputMessage = gamePlayNextTournament;
+  // }
+  // else if (data.type === 'game_request_response') {
+  //   inputMessage = gameRequestAccepted;
+  // }
 
   const message = createMessageElement(receiver_username, inputMessage);
   if (data.response === 'accept' && data.type === 'game_request_response') {
@@ -418,7 +427,9 @@ function addResponseNotification(data) {
     appendAvatarAndMessage(avatar, message, newNotification);
 
   // Change default down icon notification to the new notification icon
-  changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id, data.status);
+  if (data.status !== 'read') {
+    changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id, data.status);
+  }
 
   // Set last notification on top
   if (notificationDropdownClass.childElementCount === 0) {
