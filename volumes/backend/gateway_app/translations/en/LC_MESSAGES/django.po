@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-04 15:37+0000\n"
+"POT-Creation-Date: 2024-11-05 17:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ENGLISH <LL@li.org>\n"
@@ -58,19 +58,18 @@ msgid "Semi-Final 1"
 msgstr "Semi-Final 1"
 
 #: gateway/consumerProxyCalcGameTournament.py:120
-#: gateway/consumerProxyCalcGameTournament.py:235
+#: gateway/consumerProxyCalcGameTournament.py:238
 msgid "Semi-Final 2"
 msgstr "Semi-Final 2"
 
 #: gateway/consumerProxyCalcGameTournament.py:122
-#: gateway/consumerProxyCalcGameTournament.py:237
+#: gateway/consumerProxyCalcGameTournament.py:240
 msgid "Final"
 msgstr "Final"
 
 #: gateway/consumerProxyCalcGameTournament.py:137
-#: gateway/consumerProxyCalcGameTournament.py:139
-#: gateway/consumerProxyCalcGameTournament.py:255
-#: gateway/consumerProxyCalcGameTournament.py:258
+#: gateway/consumerProxyCalcGameTournament.py:253
+#: gateway/consumerProxyCalcGameTournament.py:256
 msgid "you play next in the tournament"
 msgstr "you play next in the tournament"
 
@@ -124,7 +123,7 @@ msgstr "New password"
 msgid "Confirm new Password"
 msgstr "Confirm new Password"
 
-#: gateway/handleInvite.py:52
+#: gateway/handleInvite.py:52 gateway/templates/base_index.html:92
 msgid " has invited you to play: "
 msgstr " has invited you to play: "
 
@@ -136,9 +135,24 @@ msgstr " is waiting to play "
 msgid " has canceled the game request."
 msgstr " has canceled the game request."
 
+#: gateway/handleMainRoom.py:129
+#, fuzzy
+#| msgid "Send friend request"
+msgid "sent you a friend request"
+msgstr "Send friend request"
+
 #: gateway/templates/base_index.html:83
 msgid "Choose..."
 msgstr "Choose..."
+
+#: gateway/templates/base_index.html:90
+#: gateway/templates/includes/popupMessages.html:8
+msgid "Notification"
+msgstr ""
+
+#: gateway/templates/base_index.html:91
+msgid " sent you a friend request."
+msgstr " sent you a friend request."
 
 #: gateway/templates/fragments/2FA_enable_fragment.html:5
 msgid "Enter OTP"
@@ -226,56 +240,6 @@ msgstr "Disable"
 msgid "Enable"
 msgstr "Enable"
 
-#: gateway/templates/fragments/friend_profile_fragment.html:13
-#: gateway/templates/fragments/myfriends_fragment.html:70
-#: gateway/templates/includes/chat_modal.html:76
-msgid "Block"
-msgstr "Block"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:23
-msgid "Send friend request"
-msgstr "Send friend request"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:24
-#: gateway/templates/fragments/myfriends_fragment.html:62
-#: gateway/templates/includes/chat_modal.html:49
-#: gateway/templates/includes/chat_modal.html:67
-msgid "Invite to play"
-msgstr "Invite to play"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:63
-#: gateway/templates/fragments/match_history_fragment.html:5
-msgid "Game statistics"
-msgstr "Game statistics"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:66
-#: gateway/templates/fragments/match_history_fragment.html:10
-#: gateway/templates/fragments/userprofile_fragment.html:47
-msgid "Games"
-msgstr "Games"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:70
-#: gateway/templates/fragments/match_history_fragment.html:14
-#: gateway/templates/fragments/userprofile_fragment.html:48
-msgid "Wins"
-msgstr "Wins"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:74
-#: gateway/templates/fragments/match_history_fragment.html:18
-msgid "Loses"
-msgstr "Loses"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:81
-#: gateway/templates/fragments/match_history_fragment.html:25
-msgid "Total score"
-msgstr "Total score"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:85
-#: gateway/templates/fragments/match_history_fragment.html:29
-#: gateway/templates/fragments/userprofile_fragment.html:50
-msgid "Winrate"
-msgstr "Winrate"
-
 #: gateway/templates/fragments/game_end_fragment.html:4
 #: gateway/templates/fragments/tournament_next_game_fragment.html:4
 msgid "won"
@@ -339,6 +303,33 @@ msgstr "Login with 42"
 msgid "Don't have an account?"
 msgstr "Don't have an account?"
 
+#: gateway/templates/fragments/match_history_fragment.html:5
+msgid "Game statistics"
+msgstr "Game statistics"
+
+#: gateway/templates/fragments/match_history_fragment.html:10
+#: gateway/templates/fragments/userprofile_fragment.html:47
+msgid "Games"
+msgstr "Games"
+
+#: gateway/templates/fragments/match_history_fragment.html:14
+#: gateway/templates/fragments/userprofile_fragment.html:48
+msgid "Wins"
+msgstr "Wins"
+
+#: gateway/templates/fragments/match_history_fragment.html:18
+msgid "Loses"
+msgstr "Loses"
+
+#: gateway/templates/fragments/match_history_fragment.html:25
+msgid "Total score"
+msgstr "Total score"
+
+#: gateway/templates/fragments/match_history_fragment.html:29
+#: gateway/templates/fragments/userprofile_fragment.html:50
+msgid "Winrate"
+msgstr "Winrate"
+
 #: gateway/templates/fragments/match_history_fragment.html:42
 msgid "Game History"
 msgstr "Game History"
@@ -388,9 +379,20 @@ msgstr "This user has blocked you."
 msgid "Game selection"
 msgstr "Game selection"
 
+#: gateway/templates/fragments/myfriends_fragment.html:62
+#: gateway/templates/includes/chat_modal.html:49
+#: gateway/templates/includes/chat_modal.html:67
+msgid "Invite to play"
+msgstr "Invite to play"
+
 #: gateway/templates/fragments/myfriends_fragment.html:66
 msgid "This user is blocked and cannot be invited to play."
 msgstr "This user is blocked and cannot be invited to play."
+
+#: gateway/templates/fragments/myfriends_fragment.html:70
+#: gateway/templates/includes/chat_modal.html:76
+msgid "Block"
+msgstr "Block"
 
 #: gateway/templates/fragments/myfriends_fragment.html:82
 msgid "Let's make some "
@@ -592,10 +594,6 @@ msgstr "Logout"
 msgid "You have no notifications"
 msgstr "You have no notifications"
 
-#: gateway/templates/includes/popupMessages.html:6
-msgid "Notification"
-msgstr ""
-
 #: gateway/views.py:82
 msgid "Error retrieving friends"
 msgstr "Error retrieving friends"
@@ -688,3 +686,11 @@ msgstr "Error retrieving match history"
 #: gateway/viewsProfile.py:388
 msgid "Please select a file to upload"
 msgstr "Please select a file to upload"
+
+#~ msgid "Send friend request"
+#~ msgstr "Send friend request"
+
+#, fuzzy, python-format
+#~| msgid "Send friend request"
+#~ msgid "%(sender_username)s sent you a friend request."
+#~ msgstr "Send friend request"

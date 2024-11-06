@@ -744,9 +744,6 @@ def verify2FA(request, user_id):
     activate(language)
     if request.method != 'POST':
         return JsonResponse({"status": "error", "message": _("Invalid request method. Use POST.")}, status=405)
-    
-    if request.user.id_42:
-        return JsonResponse({"status": "error", "message": _("Unauthorized")}, status=401)
 
     # Ensure user_id is provided
     if not user_id:

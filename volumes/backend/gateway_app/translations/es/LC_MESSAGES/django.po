@@ -2,13 +2,13 @@
 # Copyright (C) AÑO DEL TITULAR DE LOS DERECHOS DE AUTOR DEL PAQUETE
 # Este archivo se distribuye bajo la misma licencia que el paquete PACKAGE.
 # PRIMER AUTOR <EMAIL@DIRECCIÓN>, AÑO.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: VERSIÓN DEL PAQUETE\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-04 15:37+0000\n"
+"POT-Creation-Date: 2024-11-05 17:18+0000\n"
 "PO-Revision-Date: AÑO-MO-DA HO:MI+ZONA\n"
 "Last-Translator: NOMBRE COMPLETO <EMAIL@DIRECCIÓN>\n"
 "Language-Team: ESPAÑOL <ES@li.org>\n"
@@ -54,24 +54,22 @@ msgid "You are already waiting for a game"
 msgstr "Ya estás esperando un juego"
 
 #: gateway/consumerProxyCalcGameTournament.py:118
-#: gateway/consumerProxyCalcGameTournament.py:118
 msgid "Semi-Final 1"
 msgstr "Semifinal 1"
 
 #: gateway/consumerProxyCalcGameTournament.py:120
-#: gateway/consumerProxyCalcGameTournament.py:235
+#: gateway/consumerProxyCalcGameTournament.py:238
 msgid "Semi-Final 2"
 msgstr "Semifinal 2"
 
 #: gateway/consumerProxyCalcGameTournament.py:122
-#: gateway/consumerProxyCalcGameTournament.py:237
+#: gateway/consumerProxyCalcGameTournament.py:240
 msgid "Final"
 msgstr "Final"
 
 #: gateway/consumerProxyCalcGameTournament.py:137
-#: gateway/consumerProxyCalcGameTournament.py:139
-#: gateway/consumerProxyCalcGameTournament.py:255
-#: gateway/consumerProxyCalcGameTournament.py:258
+#: gateway/consumerProxyCalcGameTournament.py:253
+#: gateway/consumerProxyCalcGameTournament.py:256
 msgid "you play next in the tournament"
 msgstr "juegas el siguiente en el torneo"
 
@@ -126,7 +124,7 @@ msgstr "Nueva contraseña"
 msgid "Confirm new Password"
 msgstr "Confirmar nueva contraseña"
 
-#: gateway/handleInvite.py:52
+#: gateway/handleInvite.py:52 gateway/templates/base_index.html:92
 msgid " has invited you to play: "
 msgstr " te ha invitado a jugar: "
 
@@ -138,9 +136,24 @@ msgstr " está esperando para jugar "
 msgid " has canceled the game request."
 msgstr " ha cancelado la solicitud de juego."
 
+#: gateway/handleMainRoom.py:129
+#, fuzzy
+#| msgid "Send friend request"
+msgid "sent you a friend request"
+msgstr "te enviño una solicitud de amistad"
+
 #: gateway/templates/base_index.html:83
 msgid "Choose..."
 msgstr "Elige..."
+
+#: gateway/templates/base_index.html:90
+#: gateway/templates/includes/popupMessages.html:8
+msgid "Notification"
+msgstr "Notificación"
+
+#: gateway/templates/base_index.html:91
+msgid " sent you a friend request."
+msgstr "te envió una solicitud de amistad"
 
 #: gateway/templates/fragments/2FA_enable_fragment.html:5
 msgid "Enter OTP"
@@ -228,56 +241,6 @@ msgstr "Desactivar"
 msgid "Enable"
 msgstr "Activar"
 
-#: gateway/templates/fragments/friend_profile_fragment.html:13
-#: gateway/templates/fragments/myfriends_fragment.html:70
-#: gateway/templates/includes/chat_modal.html:76
-msgid "Block"
-msgstr "Bloquear"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:23
-msgid "Send friend request"
-msgstr "Enviar solicitud de amistad"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:24
-#: gateway/templates/fragments/myfriends_fragment.html:62
-#: gateway/templates/includes/chat_modal.html:49
-#: gateway/templates/includes/chat_modal.html:67
-msgid "Invite to play"
-msgstr "Invitar a jugar"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:63
-#: gateway/templates/fragments/match_history_fragment.html:5
-msgid "Game statistics"
-msgstr "Estadísticas del juego"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:66
-#: gateway/templates/fragments/match_history_fragment.html:10
-#: gateway/templates/fragments/userprofile_fragment.html:47
-msgid "Games"
-msgstr "Juegos"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:70
-#: gateway/templates/fragments/match_history_fragment.html:14
-#: gateway/templates/fragments/userprofile_fragment.html:48
-msgid "Wins"
-msgstr "Victorias"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:74
-#: gateway/templates/fragments/match_history_fragment.html:18
-msgid "Loses"
-msgstr "Derrotas"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:81
-#: gateway/templates/fragments/match_history_fragment.html:25
-msgid "Total score"
-msgstr "Puntuación total"
-
-#: gateway/templates/fragments/friend_profile_fragment.html:85
-#: gateway/templates/fragments/match_history_fragment.html:29
-#: gateway/templates/fragments/userprofile_fragment.html:50
-msgid "Winrate"
-msgstr "Tasa de victorias"
-
 #: gateway/templates/fragments/game_end_fragment.html:4
 #: gateway/templates/fragments/tournament_next_game_fragment.html:4
 msgid "won"
@@ -341,6 +304,33 @@ msgstr "Iniciar sesión con 42"
 msgid "Don't have an account?"
 msgstr "¿No tienes una cuenta?"
 
+#: gateway/templates/fragments/match_history_fragment.html:5
+msgid "Game statistics"
+msgstr "Estadísticas del juego"
+
+#: gateway/templates/fragments/match_history_fragment.html:10
+#: gateway/templates/fragments/userprofile_fragment.html:47
+msgid "Games"
+msgstr "Juegos"
+
+#: gateway/templates/fragments/match_history_fragment.html:14
+#: gateway/templates/fragments/userprofile_fragment.html:48
+msgid "Wins"
+msgstr "Victorias"
+
+#: gateway/templates/fragments/match_history_fragment.html:18
+msgid "Loses"
+msgstr "Derrotas"
+
+#: gateway/templates/fragments/match_history_fragment.html:25
+msgid "Total score"
+msgstr "Puntuación total"
+
+#: gateway/templates/fragments/match_history_fragment.html:29
+#: gateway/templates/fragments/userprofile_fragment.html:50
+msgid "Winrate"
+msgstr "Tasa de victorias"
+
 #: gateway/templates/fragments/match_history_fragment.html:42
 msgid "Game History"
 msgstr "Historial de Juegos"
@@ -390,9 +380,20 @@ msgstr "Este usuario te ha bloqueado."
 msgid "Game selection"
 msgstr "Selección de juego"
 
+#: gateway/templates/fragments/myfriends_fragment.html:62
+#: gateway/templates/includes/chat_modal.html:49
+#: gateway/templates/includes/chat_modal.html:67
+msgid "Invite to play"
+msgstr "Invitar a jugar"
+
 #: gateway/templates/fragments/myfriends_fragment.html:66
 msgid "This user is blocked and cannot be invited to play."
 msgstr "Este usuario está bloqueado y no puede ser invitado a jugar."
+
+#: gateway/templates/fragments/myfriends_fragment.html:70
+#: gateway/templates/includes/chat_modal.html:76
+msgid "Block"
+msgstr "Bloquear"
 
 #: gateway/templates/fragments/myfriends_fragment.html:82
 msgid "Let's make some "
@@ -594,52 +595,39 @@ msgstr "Cerrar sesión"
 msgid "You have no notifications"
 msgstr "No tienes notificaciones"
 
-#: gateway/templates/includes/popupMessages.html:6
-msgid "Notification"
-msgstr "Notificación"
-
 #: gateway/views.py:82
 msgid "Error retrieving friends"
 msgstr "Error al recuperar amigos"
 
 #: gateway/viewsAuth.py:34
-#: gateway/viewsAuth.py:34
 msgid "Logged out successfully"
 msgstr "Cierre de sesión exitoso"
 
-#: gateway/viewsAuth.py:52
 #: gateway/viewsAuth.py:52
 msgid "Method not allowed"
 msgstr "Método no permitido"
 
 #: gateway/viewsAuth.py:100 gateway/viewsAuth.py:188
 #: gateway/viewsProfile.py:213 gateway/viewsProfile.py:279
-#: gateway/viewsAuth.py:100 gateway/viewsAuth.py:188
-#: gateway/viewsProfile.py:213 gateway/viewsProfile.py:279
 msgid "Invalid form data"
 msgstr "Datos del formulario inválidos"
 
-#: gateway/viewsAuth.py:273
 #: gateway/viewsAuth.py:273
 msgid "No message provided"
 msgstr "No se proporcionó mensaje"
 
 #: gateway/viewsAuth.py:301
-#: gateway/viewsAuth.py:301
 msgid "Failed to login with 42"
 msgstr "Error al iniciar sesión con 42"
 
-#: gateway/viewsAuth.py:336
 #: gateway/viewsAuth.py:336
 msgid "Invalid request method. Use POST."
 msgstr "Método de solicitud inválido. Use POST."
 
 #: gateway/viewsAuth.py:343
-#: gateway/viewsAuth.py:343
 msgid "OTP code is required"
 msgstr "Se requiere código OTP"
 
-#: gateway/viewsAuth.py:345
 #: gateway/viewsAuth.py:345
 msgid "Invalid JSON format"
 msgstr "Formato JSON inválido"
@@ -697,6 +685,13 @@ msgid "Error retrieving match history"
 msgstr "Error al recuperar el historial de partidas"
 
 #: gateway/viewsProfile.py:388
-#: gateway/viewsProfile.py:388
 msgid "Please select a file to upload"
 msgstr "Por favor, seleccione un archivo para subir"
+
+#~ msgid "Send friend request"
+#~ msgstr "Enviar solicitud de amistad"
+
+#, fuzzy, python-format
+#~| msgid "Send friend request"
+#~ msgid "%(sender_username)s sent you a friend request."
+#~ msgstr "te envió una solicitud de amistad"

@@ -16,7 +16,7 @@ function displayMessageInModal(message) {
     let messageModal =
         new bootstrap.Modal(document.getElementById('messageModal'));
     messageModal.show();
-    document.getElementById('messageModalLabel').innerText = 'Notification';
+    document.getElementById('messageModalLabel').innerText = notificationMsg;
     document.getElementById('messageContent').innerText = message;
     document.getElementById('messageContent').classList.remove('text-center');
     document.getElementById('messageContent').classList.add('text-end');

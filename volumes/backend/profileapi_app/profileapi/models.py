@@ -24,6 +24,7 @@ class Notification(models.Model):
     message = models.CharField(max_length=256)
     date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=16, default='unread') # unread, read
+    game_type = models.CharField(max_length=16, blank=True, default='')
 
     def __str__(self):
         return f'{self.sender.user_id} to {self.receiver.user_id}'

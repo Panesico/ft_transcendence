@@ -125,7 +125,8 @@ async def friendRequest(content, users_connected, self):
   sender_username = content.get('sender_username', '')
   receiver_id = content.get('receiver_id', '')
   sender_avatar_url = content.get('sender_avatar_url', '')
-  message = f'{sender_username} sent you a friend request.'
+  msg_body = _('sent you a friend request')
+  message = sender_username + ' ' + msg_body
 
   # Get username of receiver
   user_data = get_authentif_variables(self.user_id)
@@ -279,7 +280,8 @@ async def checkForNotifications(self):
           'receiver_username': receiver_username,
           'receiver_avatar_url': receiver_avatar_url,
           'status': notification['status'],
-          'date': notification['date']
+          'date': notification['date'],
+          'game_type': notification['game_type']
         })
   else:
     logger.debug(f'checkForNotifications > Error retrieving notifications from database')

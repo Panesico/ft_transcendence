@@ -54,7 +54,7 @@ async def invite_to_game(self, content, users_connected):
   message = sender_username + _(' has invited you to play: ') + game_type.capitalize()
   date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
   logger.debug(f'invite_to_game > message: {message}, {date}')
-
+  logger.debug(f'game_type: {game_type}')
   if receiver_id in users_connected:
     await users_connected[receiver_id].send_json({
       'type': 'game_request',
@@ -72,7 +72,7 @@ async def invite_to_game(self, content, users_connected):
 
   # Save notification in database
   profileapi_url = 'https://profileapi:9002/api/createnotif/'
-  notification_data = { 'sender_id': sender_id, 'receiver_id': receiver_id, 'type': 'game_request', 'message': message }
+  notification_data = { 'sender_id': sender_id, 'receiver_id': receiver_id, 'type': 'game_request', 'message': message, 'game_type': game_type, 'date': date }
   try:
     response = requests.post(profileapi_url, json=notification_data, headers=headers, verify=os.getenv("CERTFILE"))
     logger.debug(f'invite_to_game > response: {response}')

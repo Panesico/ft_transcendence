@@ -76,13 +76,14 @@ async function blockFriend(friendId) {
 			console.log('data:', data);
 			// Mostrar el modal en caso de éxito
 			if (data.status === 'success') {
-				//Recargar solo la parte necesaria y mostrar el modal
+				sessionStorage.setItem('afterBlock', 'true');
+				sessionStorage.setItem('afterBlockMessage', 'Friend blocked successfully.');
+				location.reload();
 			}
 		} catch (error) {
 			console.error('Error:', error);
 		}
-	}
-	else {
+	} else {
 		blockSwitch.nextElementSibling.style.color = 'black';
 		const request = new Request(`/unblockFriend/${userId}/`, {
 			method: 'POST',
