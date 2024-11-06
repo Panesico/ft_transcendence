@@ -449,12 +449,14 @@ async def checkNameExists(request):
 
     csrf_token = request.COOKIES.get('csrftoken')
     django_language = request.COOKIES.get('django_language', 'en')
+    jwt_token = request.COOKIES.get('jwt_token')
     headers = {
         'X-CSRFToken': csrf_token,
         'X-Language': django_language,
         'Cookie': f'csrftoken={csrf_token}',
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
+        'Authorization': f'Bearer {jwt_token}',
     }
 
     # Check if the display name already exists

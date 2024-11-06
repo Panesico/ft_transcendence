@@ -119,6 +119,8 @@ def post_login(request):
         user_id = response_data.get("user_id")
         message = response_data.get("message")
         type = response_data.get("type")
+        # get refresh token cookie from response
+        refresh_jwt_token = response.cookies.get('refresh_jwt_token')
 
         if type == "2FA":
             return JsonResponse(response.json())
@@ -132,6 +134,7 @@ def post_login(request):
             user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
             # Set the JWT token in a secure, HTTP-only cookie
             user_response.set_cookie('jwt_token', jwt_token, httponly=True, secure=True, samesite='Lax')
+            user_response.set_cookie('refresh_jwt_token', refresh_jwt_token, httponly=True, secure=True, samesite='Lax')            
             return user_response
         else:
             logger.error("post_login > No JWT token returned from auth service")
@@ -212,11 +215,14 @@ def post_signup(request):
     jwt_token = response_data.get("token")
     user_id = response_data.get("user_id")
     type = response_data.get("type")
+    refresh_jwt_token = response.cookies.get('refresh_jwt_token')
+
 
     if jwt_token:
         user_response = JsonResponse({'status': 'success', 'type': type, 'message': message, 'user_id': user_id})
         # Set the JWT token in a secure, HTTP-only cookie
         user_response.set_cookie('jwt_token', jwt_token, httponly=True, secure=True, samesite='Lax')
+        user_response.set_cookie('refresh_jwt_token', refresh_jwt_token, httponly=True, secure=True, samesite='Lax')
         return user_response
     else:
         # logger.debug('post_signup > Response NOT OK')
@@ -443,6 +449,24 @@ def verify2FA_redir(request, user_id):
             httponly=True,
             secure=True,
             samesite='Lax',
+        )
+
+    return json_response
+
+def refresh_token(request):
+    # Create the base JSON response
+    json_response = JsonResponse({'status': 'success', 'message': 'Token refreshed successfully'})
+
+    # Filter and copy relevant cookies from the request to the response
+    # This example assumes you are only setting an 'auth_token' cookie.
+    cookie_name = 'jwt_token'
+    if cookie_name in request.COOKIES:
+        json_response.set_cookie(
+            key=cookie_name,
+            value=request.COOKIES[cookie_name],
+            httponly=True,  # Helps mitigate XSS
+            secure=True,    # Requires HTTPS
+            samesite='Lax', # Helps mitigate CSRF
         )
 
     return json_response

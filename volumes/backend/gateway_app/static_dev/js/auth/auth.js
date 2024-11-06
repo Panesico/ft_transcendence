@@ -187,3 +187,43 @@ function disable2FA() {
       document.getElementById('2fa-qr-code').innerHTML = '<p class="text-danger">Failed to disable 2FA. Please try again later.</p>';
     });
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await refreshToken();
+    // Set interval to refresh token every 50 seconds
+    setInterval(async () => {
+        try {
+            const newToken = await refreshToken();
+            console.log("Token refreshed");
+        } catch (error) {
+            console.error("Failed to refresh token:", error);
+            // Handle token refresh failure (e.g., redirect to login)
+        }
+    }, 20 * 1000); // 20 seconds
+});
+
+async function refreshToken() {
+    try {
+        const response = await fetch('/api/refresh-token/', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+              },
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to refresh token");
+        }
+
+        const data = await response.json();
+        
+        // Assuming the new token is in data.token
+        return data.token;
+    } catch (error) {
+        console.error("Error refreshing token:", error);
+        throw error;
+    }
+}

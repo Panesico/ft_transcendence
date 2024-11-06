@@ -174,11 +174,13 @@ def block_friends(request, user_id):
     return redirect('405')
   
   csrf_token = request.COOKIES.get('csrftoken')
+  jwt_token = request.COOKIES.get('jwt_token')
   headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
+        'Authorization': f'Bearer {jwt_token}',
     }
 
   if request.user.id == user_id:
@@ -210,11 +212,15 @@ def unblock_friends(request, user_id):
     return redirect('405')
   
   csrf_token = request.COOKIES.get('csrftoken')
+  jwt_token = request.COOKIES.get('jwt_token')
+  django_language = request.COOKIES.get('django_language')
   headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',
+        'X-Language': django_language,
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
+        'Authorization': f'Bearer {jwt_token}',
     }
 
   if request.user.id == user_id:

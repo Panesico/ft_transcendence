@@ -46,10 +46,12 @@ def api_get_user_info(request, user_id):
 def api_logout(request):
     """Logs out the user by blacklisting their JWT token and sending a guest token."""
     token = request.COOKIES.get('jwt_token')
+    refresh_token = request.COOKIES.get('refresh_jwt_token')
 
     if token:
         # Blacklist the current JWT token
-        JWTAuthenticationMiddleware.blacklist_token(token, 25200)
+        JWTAuthenticationMiddleware.blacklist_token(token)
+        JWTAuthenticationMiddleware.blacklist_token(refresh_token)
 
         # Generate a new guest token
         guest_token = ""
@@ -63,6 +65,7 @@ def api_logout(request):
 
         # Set the new guest JWT token as a cookie in the response
         response.set_cookie('jwt_token', guest_token, httponly=True, secure=True, samesite='Lax')
+        response.set_cookie('refresh_jwt_token', guest_token, httponly=True, secure=True, samesite='Lax')
 
         return response
     else:
@@ -101,7 +104,7 @@ def api_login(request):
                             return JsonResponse({'status': 'success', 'message': _('2FA required'), 'user_id': user.id, 'type': '2FA'}, status=200)
 
                         # Generate a JWT token for the authenticated user
-                        jwt_token = generate_jwt_token(user)
+                        jwt_token, refresh_jwt_token = generate_jwt_token(user)
                         logger.debug(f"token >>>>>>>>>>>: {jwt_token}")
 
                         # Create response object
@@ -118,6 +121,14 @@ def api_login(request):
                         response.set_cookie(
                             key='jwt_token',
                             value=jwt_token,
+                            httponly=True,
+                            secure=True,
+                            samesite='Lax',
+                            max_age=60 * 60 * 24 * 7,
+                        )
+                        response.set_cookie(
+                            key='refresh_jwt_token',
+                            value=refresh_jwt_token,
                             httponly=True,
                             secure=True,
                             samesite='Lax',
@@ -194,66 +205,71 @@ def api_signup(request):
           # logger.debug(f'Received data: {data}')
           form = SignUpForm(data=data)
           if form.is_valid():
-              user = form.save(commit=False)
+                user = form.save(commit=False)
 
-              # Password validation
-              password = data.get('password') # clear text password
-              
-              user.password = make_password(data['password']) # hashed password
-              user = form.save()
-              username = data.get('username')
-              logger.info(f'api_signup > User.username: {user.username}, hased pwd {user.password}')
+                # Password validation
+                password = data.get('password') # clear text password
+                
+                user.password = make_password(data['password']) # hashed password
+                user = form.save()
+                username = data.get('username')
+                logger.info(f'api_signup > User.username: {user.username}, hased pwd {user.password}')
 
-              user_obj = User.objects.get(username=username)
+                user_obj = User.objects.get(username=username)
 
-              # Check if the user is active
-              if not user_obj.is_active:
-                  logger.debug('api_signup > User is inactive')
-                  user.delete()
-                  return JsonResponse({
-                      'status': 'error', 
-                      'message': _('User is inactive')
-                  }, status=400)
-              
-              csrf_token = request.COOKIES.get('csrftoken')
-              # Create a profile through call to profileapi service
-              if not createProfile(username, user.id, csrf_token, False, language):
+                # Check if the user is active
+                if not user_obj.is_active:
+                    logger.debug('api_signup > User is inactive')
                     user.delete()
                     return JsonResponse({
                         'status': 'error', 
-                        'message': _('Failed to create profile')
-                    }, status=500)
+                        'message': _('User is inactive')
+                    }, status=400)
+                
+                csrf_token = request.COOKIES.get('csrftoken')
+                # Create a profile through call to profileapi service
+                if not createProfile(username, user.id, csrf_token, False, language):
+                        user.delete()
+                        return JsonResponse({
+                            'status': 'error', 
+                            'message': _('Failed to create profile')
+                        }, status=500)
 
-              # Ensure the password meets the minimum requirements
-              # if validate_password(password) == None:
-              #   raise DjangoValidationError(['Not a valid password'])
+                # Ensure the password meets the minimum requirements
+                # if validate_password(password) == None:
+                #   raise DjangoValidationError(['Not a valid password'])
 
-              logger.debug(f"BEFORE TOKEN BABY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-              jwt_token = generate_jwt_token(user)
-      
-              # Create response object
-              response = JsonResponse({
-                  'status': 'success',
-                  'type': 'login_successful',
-                  'message': _('Login successful'),
-                  'token': jwt_token,
-                  'user_id': user.id
-              })
+                logger.debug(f"BEFORE TOKEN BABY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                jwt_token, refresh_jwt_token = generate_jwt_token(user)
+        
+                # Create response object
+                response = JsonResponse({
+                    'status': 'success',
+                    'type': 'login_successful',
+                    'message': _('Login successful'),
+                    'token': jwt_token,
+                    'user_id': user.id
+                })
 
-              # Set the JWT token in the headers
-              response['Authorization'] = f'Bearer {jwt_token}'
-
-              # Set the JWT token in a cookie (with security options)
-              response.set_cookie(
-                  key='jwt_token',
-                  value=jwt_token,
-                  httponly=True,  # Prevent JavaScript access to the cookie (for security)
-                  secure=True,  # Only send the cookie over HTTPS (ensure your environment supports this)
-                  samesite='Lax',  # Control cross-site request behavior
-                  max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
-              )              
-              return response
-
+                # Set the JWT token in the headers and a secure cookie
+                response['Authorization'] = f'Bearer {jwt_token}'
+                response.set_cookie(
+                    key='jwt_token',
+                    value=jwt_token,
+                    httponly=True,
+                    secure=True,
+                    samesite='Lax',
+                    max_age=60 * 60 * 24 * 7,
+                )
+                response.set_cookie(
+                    key='refresh_jwt_token',
+                    value=refresh_jwt_token,
+                    httponly=True,
+                    secure=True,
+                    samesite='Lax',
+                    max_age=60 * 60 * 24 * 7,
+                )       
+                return response
               
           else:
               logger.debug('api_signup > Invalid form')
@@ -478,7 +494,7 @@ def oauth(request):
         # Try to find the user by their 42 login (username)
         user = User.objects.get(username=user_data['login'])
         logger.info(f"User found: {user.username}")
-        jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
+        jwt_token, refresh_jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
         response = JsonResponse({
           'status': 'success',
           'type': 'login_successful',
@@ -507,7 +523,7 @@ def oauth(request):
                 user = form.save()
             else:
                 logger.error(f"SignUpForm error: {form.errors}")
-        
+
     csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
 
     # Create the profile
@@ -518,7 +534,6 @@ def oauth(request):
     jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
     payload = json.dumps({'image_url': user_data['image']['link']})  # Convert the data to a JSON string
     
-
     headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',
@@ -526,7 +541,7 @@ def oauth(request):
         'Referer': 'https://authentif:9001',
         'Authorization': f'Bearer {jwt_token}',
     }
-    
+
     # Make the POST request to the external authentif service
     response = requests.post("https://gateway:8443/download_42_avatar/",cookies=request.COOKIES,data=payload,headers=headers,verify=os.getenv("CERTFILE"))
 
@@ -566,7 +581,6 @@ def oauth(request):
     else:
         print(f"Failed to download avatar: {response.content}")
 
-    
     headers = {
             'X-CSRFToken': csrf_token,
             'Cookie': f'csrftoken={csrf_token}',

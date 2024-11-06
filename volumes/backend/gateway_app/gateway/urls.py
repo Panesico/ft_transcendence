@@ -27,6 +27,8 @@ urlpatterns = [
     path('disable2FA/', viewsAuth.disable2FA_redir, name='disable2FA'),
     path('confirm2FA/', viewsAuth.confirm2FA_redir, name='confirm2FA'),
     path('verify2FA/<int:user_id>/', viewsAuth.verify2FA_redir, name='verify2FA'),
+    # api refresh token
+    path('api/refresh-token/', viewsAuth.refresh_token, name='refresh_token'),
 
     # profile api
     path('profile/', viewsProfile.get_profile, name='profile'),
