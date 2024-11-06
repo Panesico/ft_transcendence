@@ -51,8 +51,8 @@ function listenForm(form) {
       if (data.type === 'invite_sent') {
         console.log('Invitation to play sent, data: ', data);
         inviteFriendToPlay(data.sender_username, data.sender_id, data.sender_avatar_url, data.receiver_id, data.game_type, data.game_mode);
+        displayMessageInModal(data.message);
         return;
-
       }
       else if (data.status != 'error' && data.type && data.message && !data.html) {
         console.log('data.type: ', data.type, 'data.message: ', data.message);
