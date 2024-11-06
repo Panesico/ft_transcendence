@@ -48,14 +48,14 @@
 							
 										<!-- Popup de Invitación -->
 										<div id="gameInvitePopup" style="display: none; position: absolute; top: 3.5rem; left: 0; background-color: #333; border-radius: 8px; padding: 10px; width: 200px;">
-											<form method="post" action="{% url 'invite_to_play' 0 %}">
+											<form method="post" id="chat-invite-play-0" action="{% url 'invite_to_play' 0 %}">
 												{% csrf_token %}
 												<div class="btn-group d-flex justify-content-between mb-2" role="group">
-													<input type="radio" class="btn-check" name="chosenGame" id="chat-pong" autocomplete="off" checked>
-													<label class="btn btn-outline-success" for="chat-pong" style="width: 80px;">
+													<input type="radio" class="btn-check" name="chosenGame" id="chat-pong-0" autocomplete="off" checked data-gametype="pong">
+													<label class="btn btn-outline-success" for="chat-pong-0" style="width: 80px;">
 														<img src="{% static 'images/cover-pong-8bits.jpg' %}" alt="Space Pong" class="img-fluid rounded">
 													</label>
-													<input type="radio" class="btn-check" name="chosenGame" id="chat-cows" autocomplete="off">
+													<input type="radio" class="btn-check" name="chosenGame" id="chat-cows-0" autocomplete="off" data-gametype="cows">
 													<label class="btn btn-outline-success" for="chat-cows" style="width: 80px;">
 														<img src="{% static 'images/cover-cows.jpg' %}" alt="Space Cows" class="img-fluid rounded">
 													</label>
@@ -65,7 +65,7 @@
 										</div>
 									</div>
 
-									<div id="blockSwitchContainer" style="display: none;">
+									<div id="blockSwitchContainer" class="d-flex align-items-center position-relative" style="display: none;">
 										<div class="form-check form-switch">
 											<input id="blockSwitch" data-user-id="" class="form-check-input" type="checkbox" {% if is_blocked %}checked{% endif %}>
 											<label class="form-check-label text-white" for="blockSwitch">{% trans "Block" %}</label>
