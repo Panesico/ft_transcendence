@@ -52,7 +52,7 @@ def api_logout(request):
         JWTAuthenticationMiddleware.blacklist_token(token, 25200)
 
         # Generate a new guest token
-        guest_token = generate_guest_token()
+        guest_token = ""
 
         # Create a response indicating logout success
         response = JsonResponse({
@@ -178,6 +178,12 @@ def createProfile(username, user_id, csrf_token, id_42, lang):
         logger.error(f'api_signup > createProfile > Failed to create profile: {e}')
         return False
 
+# def validate_password(password):
+#     # Ensure the password meets the minimum requirements
+#     if not validate_password(password):
+#         raise DjangoValidationError(['Not a valid password'])
+#     return None
+
 def api_signup(request):
     logger.debug("api_signup")
     language = request.headers.get('X-Language', 'en')
@@ -192,7 +198,6 @@ def api_signup(request):
 
               # Password validation
               password = data.get('password') # clear text password
-              # validate_password(password, user)
               
               user.password = make_password(data['password']) # hashed password
               user = form.save()
@@ -218,6 +223,11 @@ def api_signup(request):
                         'status': 'error', 
                         'message': _('Failed to create profile')
                     }, status=500)
+
+              # Ensure the password meets the minimum requirements
+              # if validate_password(password) == None:
+              #   raise DjangoValidationError(['Not a valid password'])
+
               logger.debug(f"BEFORE TOKEN BABY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
               jwt_token = generate_jwt_token(user)
       
@@ -296,6 +306,11 @@ def api_edit_profile(request):
     try:
       data = json.loads(request.body)
       logger.debug(f'data: {data}')
+
+      # Check the user id changed is the same as the user id in the token
+      if request.user.id_42:
+        return JsonResponse({'status': 'error', 'message': _('Unauthorized')}, status=401)
+
       user_id = data.get('user_id')
       user_obj = User.objects.get(id=user_id)
       #user_obj = User.objects.filter(id=user_id).first()
@@ -614,6 +629,7 @@ def enable2FA(request):
     activate(language)
     logger.debug("enable2FA")
     logger.debug(f"request.method: {request.method}")
+
     if request.method != 'POST':
         return JsonResponse({"status": 'error', 'message': _('Invalid request method. Use POST.')}, status=405)
     

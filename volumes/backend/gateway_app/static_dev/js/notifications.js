@@ -258,7 +258,7 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
   });
 }
 
-function deleteResponsesButtons(notificationDropdownClass, sender_username) {
+function deleteResponsesButtons(notificationDropdownClass, username) {
   const notifications = notificationDropdownClass.children;
 
   for (let i = 0; i < notifications.length; i++) {
@@ -266,9 +266,8 @@ function deleteResponsesButtons(notificationDropdownClass, sender_username) {
     const buttons = notification.querySelectorAll('img');
     console.log('deleteResponsesButtons > notification.id:', notification.id);
 
-    if (notification.id == sender_username && buttons.length > 0) {
+    if (notification.id == username && buttons.length > 0) {
       // If the image is not the avatar, remove it
-        console.log('deleteResponsesButtons > buttons[0].id:', buttons[0].id);
         buttons.forEach(button => {
           if (button.id !== 'avatar') {
             button.remove();    
@@ -404,6 +403,10 @@ function addResponseNotification(data) {
     const acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
 
     const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);
+
+  // If data type is game, delete the accept and decline buttons from other previous games notifications
+  if (data.type === 'game_request_response' && data.response === 'accept')
+    deleteResponsesButtons(notificationDropdownClass, receiver_username);
 
     appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status);
 

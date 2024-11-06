@@ -36,6 +36,8 @@ async def invite_to_game(self, content, users_connected):
       'Content-Type': 'application/json',
       'Referer': 'https://gateway:8443',
   }
+  # language = self.scope['cookies']['django_language']
+  
 
   logger.debug(f'invite_to_game > content: {content}')
   sender_id = content.get('sender_id', '')

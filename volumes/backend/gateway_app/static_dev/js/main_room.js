@@ -63,7 +63,6 @@ window.onload = () => {
   // On websocket message
   mainRoomSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
-    console.log('Received message from socket: ', data);
     parseSocketMessage(data);
   };
 
