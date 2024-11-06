@@ -2,14 +2,10 @@ Auth:
 - Password validator commented while in development. Uncomment 2 * validate_password() in api_signup() and api_edit_profile() of authentif_app/authentif/views.py
 
 @iisaacc
--	Minor module: Show in more languages (3 minimum).
-  - Username and password are not being translated X
-  - It only adds the country prefix when you click in change language, but it doesnt stay while navigating
--	Replacing Pong implementation in the backend
--	Research web sockets?? Live chat and playing at the same time??
--	Other game implementation
+
+
+
   # Questions
-  - It seems so strange to have different django's configs files for each container. "Django’s philosophy revolves around modularity and reusability. This is where the distinction between projects and applications comes into play. A project represents the entire web application — a collection of settings, configurations, and apps that work together to form a complete entity. An application, on the other hand, is a smaller, self-contained module within the project that serves a specific purpose. An application could be a user authentication system, a blog, or any other standalone functionality."
 
 
   @BenjaminLarger
@@ -38,3 +34,8 @@ calcgame    | PongCalcRemote > Opening connection with players: Bellingham#1, Be
 gateway     | INFO:     172.18.0.1:42918 - "GET /media/avatars/default.png HTTP/1.1" 200 OK
 postgres    | 2024-11-06 14:30:45.866 UTC [27] LOG:  checkpoint starting: time
 postgres    | 2024-11-06 14:30:47.584 UTC [27] LOG:  checkpoint complete: wrote 18 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.708 s, sync=0.003 s, total=1.718 s; sync files=18, longest=0.002 s, average=0.001 s; distance=35 kB, estimate=35 kB; lsn=0/1CE6670, redo lsn=0/1CE6638
+
+# TO-DO
+  - Modal when inviting to play someone
+  - If someone invite me to play, I accept but then I exit before he joins the room, the other playter doesnt get   notified
+  - 
