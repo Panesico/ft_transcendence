@@ -241,7 +241,12 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
 
       if (type === 'game_request_response') {
         // Sender cancels the invite response. The receiver in the waiting room needs to be notified
-        sendMessagesBySocket({ 'type': 'cancel_waiting_room', 'response': 'decline', 'sender_id': receiver_id, 'receiver_id': sender_id, 'sender_username': receiver_username, 'receiver_username': sender_username }, mainRoomSocket);
+        sendMessagesBySocket({ 'type': 'cancel_waiting_room',
+          'response': 'decline',
+          'sender_id': receiver_id,
+          'receiver_id': sender_id,
+          'sender_username': receiver_username,
+          'receiver_username': sender_username }, mainRoomSocket);
       }
 
       acceptButton.remove();
@@ -366,6 +371,7 @@ function addResponseNotification(data) {
   sender_username = data.sender_username;
   sender_id = data.sender_id;
   receiver_avatar_url = data.receiver_avatar_url;
+  sender_avatar_url = data.sender_avatar_url;
 
   // Remove the 'no notifications' message
   removeEmptyMessage();
@@ -378,21 +384,28 @@ function addResponseNotification(data) {
   const date = createDateElement(data.date, newNotification);
 
   // Create an img element for the avatar
-  const avatar = createAvatarElement(receiver_avatar_url);
+  // const avatar = createAvatarElement(receiver_avatar_url);
+  const avatar = createAvatarElement(sender_avatar_url);
 
   // Create a span element for the message
+  console.warn('addResponseNotification > data:', data);
   inputMessage = gameRequestCancelled;
-  if (data.response === 'accept' && data.type === 'friend_request_response') {
-    inputMessage = friendRequestAccepted;
+  if (data.type === 'friend_request_response') {
+    // if data.message contrains 'accepted', then the message is 'accepted'
+    if (data.message.includes('accepted')) {
+      inputMessage = friendRequestAccepted;
+    }
+    else if (data.message.includes('declined')) {
+      inputMessage = friendRequestDeclined;
+    }
   }
-  else if (data.response === 'decline' && data.type === 'friend_request_response') {
-    inputMessage = friendRequestDeclined;
-  }
-  else if (data.response === 'accept' && data.type === 'game_request_response') {
-    inputMessage = gameWaitingToPlay;
-  }
-  else if (data.response === 'decline' && data.type === 'game_request_response') {
-    inputMessage = gameRequestDeclined;
+  else if (data.type === 'game_request_response') {
+    if (data.message.includes('waiting')) {
+      inputMessage = gameRequestAccepted;
+    }
+    else if (data.message.includes('declined')) {
+      inputMessage = gameRequestDeclined;
+    }
   }
   else if (data.type === 'cancel_waiting_room' && data.html) {
     inputMessage = gameRequestCancelled;
@@ -408,7 +421,8 @@ function addResponseNotification(data) {
   //   inputMessage = gameRequestAccepted;
   // }
 
-  const message = createMessageElement(receiver_username, inputMessage);
+  // const message = createMessageElement(receiver_username, inputMessage);
+  const message = createMessageElement(sender_username, inputMessage);
   if (data.response === 'accept' && data.type === 'game_request_response') {
     const acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
 

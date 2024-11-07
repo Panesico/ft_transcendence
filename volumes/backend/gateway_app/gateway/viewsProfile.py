@@ -19,8 +19,6 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 def get_profileapi_variables_userId(user_id):
-  # jwt_token = request.COOKIES.get('jwt_token')
-  # user_id = getUserId(jwt_token)
   logger.debug(f"get_profileapi_variables > user_id: {user_id}")
   profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id) + '/'
   logger.debug(f"get_profileapi_variables > profile_api_url: {profile_api_url}")
@@ -268,7 +266,6 @@ def post_edit_profile_security(request):
 
     #handle wrong confirmation password
     else:
-      profile_data = get_profileapi_variables(request=request)
       if profile_data.get('status') == 'error':
         return redirect(profile_data.get('status_code'))
       data = json.loads(request.body)
@@ -329,7 +326,6 @@ def post_edit_profile_general(request):
 
     # Redirection usage
     form = EditProfileFormFrontend()
-    profile_data = get_profileapi_variables(request=request)
     if profile_data.get('status') == 'error':
         return redirect(profile_data.get('status_code'))
 
@@ -346,7 +342,6 @@ def post_edit_profile_general(request):
         
     #handle displayName already taken
     else:
-      profile_data = get_profileapi_variables(request=request)
       if profile_data.get('status') == 'error':
         return redirect(profile_data.get('status_code'))
       logger.debug('profile_data: %s', profile_data)
@@ -421,7 +416,6 @@ def post_edit_profile_avatar(request):
         return user_response
     else:
       form = EditProfileFormFrontend()
-      profile_data = get_profileapi_variables(request=request)
       if profile_data.get('status') == 'error':
         return redirect(profile_data.get('status_code'))
       logger.debug('post_edit_profile > Response KO')
@@ -431,7 +425,6 @@ def post_edit_profile_avatar(request):
   # Handle the case where no file is uploaded
   else:
     logger.debug('post_edit_profile_avatar > No file uploaded')
-    profile_data = get_profileapi_variables(request=request)
     if profile_data.get('status') == 'error':
         return redirect('404')
     logger.debug('profile_data: %s', profile_data)
@@ -451,7 +444,6 @@ def download_42_avatar(request):
         # Get the image URL from the parsed JSON
         image_url = body_data.get('image_url')
         
-        logger.info(f"HEL MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE -------------------------> {image_url}")
         if not image_url:
             return JsonResponse({'error': 'No image URL provided'}, status=400)
 

@@ -30,9 +30,14 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
   response = content.get('response', '')
   type = content.get('type', '')
   logger.debug(f'requestResponse > type: {type}')
-  message = _('has accepted your friend request.')
-  if type == 'game_request_response':
+  if type == 'friend_request_response' and response == 'accept':
+    message = _('has accepted your friend request.')
+  elif type == 'friend_request_response' and response == 'decline':
+    message = _('has declined your friend request.')
+  elif type == 'game_request_response' and response == 'accept':
     message = _('is waiting to play ') + game_type.capitalize()
+  elif type == 'game_request_response' and response == 'decline':
+    message = _('has declined the game request.')
   elif type == 'cancel_waiting_room':
     message = _('has canceled the game request.')
     user = { 'username': receiver_username }
