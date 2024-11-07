@@ -1,4 +1,4 @@
-import os, json, logging, requests, mimetypes
+import os, json, logging, requests, mimetypes, asyncio, aiohttp
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from .utils import getUserId
 # from .utils import getUserData
 import prettyprinter
 from prettyprinter import pformat
@@ -17,8 +18,27 @@ prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
+def get_profileapi_variables_userId(user_id):
+  # jwt_token = request.COOKIES.get('jwt_token')
+  # user_id = getUserId(jwt_token)
+  logger.debug(f"get_profileapi_variables > user_id: {user_id}")
+  profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id) + '/'
+  logger.debug(f"get_profileapi_variables > profile_api_url: {profile_api_url}")
+  response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+  if response.status_code == 200:
+    logger.debug(f"-------> get_edit_profile > Response: {response.json()}")
+    return response.json()
+  else:
+    status = response.status_code
+    message = response.json().get('message')
+    logger.debug(f"-------> get_edit_profile > error Response: {response.status_code}")
+    return {'status': 'error', 'message': message, 'status_code': status}
+
 def get_profileapi_variables(request):
+  # jwt_token = request.COOKIES.get('jwt_token')
+  # user_id = getUserId(jwt_token)
   user_id = request.user.id
+  logger.debug(f"get_profileapi_variables > user_id: {user_id}")
   profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id) + '/'
   logger.debug(f"get_profileapi_variables > profile_api_url: {profile_api_url}")
   response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))

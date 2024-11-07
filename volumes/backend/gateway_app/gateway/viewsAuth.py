@@ -6,7 +6,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .forms import SignUpFormFrontend, LogInFormFrontend
-from .viewsProfile import get_profileapi_variables
+from .viewsProfile import get_profileapi_variables, get_profileapi_variables_userId
 import jwt
 from django.utils.translation import gettext as _
 from django.http import HttpResponse
@@ -126,7 +126,7 @@ def post_login(request):
             return JsonResponse(response.json())
         if jwt_token:
             user_response = JsonResponse({'status': 'success', 'type': type, 'message': message, 'user_id': user_id})
-            profile_data = get_profileapi_variables(request=request)
+            profile_data = get_profileapi_variables_userId(user_id)
             if profile_data.get('status') == 'error':
               return redirect('404')
             logger.debug(f"post_login > profile_data: {profile_data}")
