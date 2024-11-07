@@ -67,41 +67,41 @@ def get_user_score_from_blockchain(contract, tournament_id, user_id, web3):
   except Exception as e:
     logger.error(f"getScore function reverted : {e}")
 
-def connect_to_blockchain(request):
-    logger.debug("")
-    logger.debug("connect_to_blockchain")
+# def connect_to_blockchain(request):
+#     logger.debug("")
+#     logger.debug("connect_to_blockchain")
 
-    if web3.is_connected():
-        logger.debug("Connected to the blockchain.")
+#     if web3.is_connected():
+#         logger.debug("Connected to the blockchain.")
 
-        # Recover the contract address from a local json file
-        with open('/usr/src/app/blockchain_app/deployedAddress.json') as f:
-          data = json.load(f)
-          contract_address = data['contractAddress']
-        logger.debug(f"Contract address: {contract_address}")
+#         # Recover the contract address from a local json file
+#         with open('/usr/src/app/blockchain_app/deployedAddress.json') as f:
+#           data = json.load(f)
+#           contract_address = data['contractAddress']
+#         logger.debug(f"Contract address: {contract_address}")
 
-        # Load the contract ABI from the JSON file
-        with open(os.getenv('CONTRACT_ABI')) as f:
-          contract_json = json.load(f)
-          contract_abi = contract_json['abi']
-        logger.debug(f"Contract ABI: {contract_abi}")
+#         # Load the contract ABI from the JSON file
+#         with open(os.getenv('CONTRACT_ABI')) as f:
+#           contract_json = json.load(f)
+#           contract_abi = contract_json['abi']
+#         logger.debug(f"Contract ABI: {contract_abi}")
 
-        # Load the contract ABI from the JSON file
-        contract = web3.eth.contract(address=contract_address, abi=contract_abi)
+#         # Load the contract ABI from the JSON file
+#         contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
-        # Create a tournament into the blockchain
-        create_tournament_in_blockchain(contract, 0, [1, 2, 3, 4])
+#         # Create a tournament into the blockchain
+#         create_tournament_in_blockchain(contract, 0, [1, 2, 3, 4])
 
-        # Update score of each users in the blockchain
-        update_user_score_in_blockchain(contract, 0, 1, 2)
+#         # Update score of each users in the blockchain
+#         update_user_score_in_blockchain(contract, 0, 1, 2)
 
-        # Get user score from the blockchain
-        get_user_score_from_blockchain(contract, 0, 1, web3)
+#         # Get user score from the blockchain
+#         get_user_score_from_blockchain(contract, 0, 1, web3)
 
-        return JsonResponse({'status': 'success', 'message': 'Connected to the blockchain.'})
-    else:
-        logger.error("Failed to connect to the blockchain.")
-        return JsonResponse({'status': 'error', 'message': 'Failed to connect to the blockchain.'})
+#         return JsonResponse({'status': 'success', 'message': 'Connected to the blockchain.'})
+#     else:
+#         logger.error("Failed to connect to the blockchain.")
+#         return JsonResponse({'status': 'error', 'message': 'Failed to connect to the blockchain.'})
   
 
 def get_blockchain_contract():
@@ -131,7 +131,6 @@ def get_blockchain_contract():
           logger.error(f"Failed to load the contract: {e}")
           return None
     else:
-
       return None
 
 def save_tournament_results_in_blockchain(tournament, game_winner_id):
