@@ -145,7 +145,7 @@ class JWTAuthenticationMiddleware:
     @staticmethod
     def cleanup_blacklisted_tokens():
         current_time = int(datetime.now(timezone.utc).timestamp())
-        tokens_to_remove = [token for token, exp in blacklisted_refresh_tokens.items() if exp < current_time]
+        tokens_to_remove = [token for token, exp in blacklisted_refresh_tokens.items() if int(exp.timestamp()) < current_time]
         for token in tokens_to_remove:
             del blacklisted_refresh_tokens[token]
 
