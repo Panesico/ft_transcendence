@@ -36,6 +36,5 @@ postgres    | 2024-11-06 14:30:45.866 UTC [27] LOG:  checkpoint starting: time
 postgres    | 2024-11-06 14:30:47.584 UTC [27] LOG:  checkpoint complete: wrote 18 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.708 s, sync=0.003 s, total=1.718 s; sync files=18, longest=0.002 s, average=0.001 s; distance=35 kB, estimate=35 kB; lsn=0/1CE6670, redo lsn=0/1CE6638
 
 # TO-DO
-  - Modal when inviting to play someone
-  - If someone invite me to play, I accept but then I exit before he joins the room, the other playter doesnt get   notified
+  - If someone invite me to play, I accept but then I exit before he joins the room, the other playter doesnt get notified
   - 

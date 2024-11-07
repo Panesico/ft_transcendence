@@ -183,7 +183,7 @@ function innit_listening() {
   });
 
   // Send message
-  sendButton.addEventListener('click', function () {
+  function sendChatMessage() {
     const selectedContact = document.querySelector('.list-group-item.selected-contact');
     const blockSwitch = document.querySelector('input[data-user-id]');
 
@@ -222,6 +222,15 @@ function innit_listening() {
     sendMessagesBySocket(data, mainRoomSocket);
     console.log('data:', data);
     messageInput.value = '';
+  }
+
+  sendButton.addEventListener('click', sendChatMessage);
+
+  messageInput.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+          event.preventDefault(); // Previene el comportamiento predeterminado de la tecla Enter
+          sendChatMessage(); // Llama a la función para enviar el mensaje
+      }
   });
 }
 
