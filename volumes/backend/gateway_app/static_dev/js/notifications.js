@@ -394,7 +394,7 @@ function addResponseNotification(data) {
   else if (data.response === 'decline' && data.type === 'game_request_response') {
     inputMessage = gameRequestDeclined;
   }
-  else if (data.type === 'cancel_waiting_room') {
+  else if (data.type === 'cancel_waiting_room' && data.html) {
     inputMessage = gameRequestCancelled;
     document.querySelector('main').innerHTML = data.html;
     displayMessageInModal(data.sender_username + gameRequestCancelled);

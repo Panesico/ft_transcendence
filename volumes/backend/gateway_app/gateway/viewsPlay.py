@@ -23,6 +23,8 @@ def get_tournament(request):
     
     if request.user.id != 0:
         user_profile = get_profileapi_variables(request)
+        if user_profile.get('status') == 'error':
+            return redirect('404')
         info = {
             'p1_label': request.user.username,
             'p1_value': user_profile['display_name'],
@@ -51,6 +53,8 @@ def get_play(request):
 
     if request.user.id != 0:
         user_profile = get_profileapi_variables(request)
+        if user_profile.get('status') == 'error':
+            return redirect('404') 
         info = {
             'p1_label': request.user.username,
             'p1_value': user_profile['display_name'],

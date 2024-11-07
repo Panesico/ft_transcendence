@@ -127,6 +127,8 @@ def post_login(request):
         if jwt_token:
             user_response = JsonResponse({'status': 'success', 'type': type, 'message': message, 'user_id': user_id})
             profile_data = get_profileapi_variables(request=request)
+            if profile_data.get('status') == 'error':
+              return redirect('404')
             logger.debug(f"post_login > profile_data: {profile_data}")
             preferred_language = profile_data.get('preferred_language')
             logger.debug(f"post_login > preferred_language: {preferred_language}")
@@ -297,6 +299,8 @@ def oauth(request):
         
         if response.cookies.get('django_language') == None:
             profile_data = get_profileapi_variables(request=request)
+            if user_profile.get('status') == 'error':
+              return redirect('404')
             logger.debug(f"post_login > profile_data: {profile_data}")
             preferred_language = profile_data.get('preferred_language')
             json_response.set_cookie('django_language', preferred_language, samesite='Lax', httponly=True, secure=True)

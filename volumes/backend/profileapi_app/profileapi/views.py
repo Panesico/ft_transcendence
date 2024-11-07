@@ -55,6 +55,7 @@ def api_signup(request):
 
 
 def api_edit_profile(request):
+    logger.debug("")
     logger.debug("api_edit_profile")
     language = request.headers.get('X-Language', 'en')
     activate(language)
@@ -197,6 +198,7 @@ def get_profile_api(request, user_id):
               'wins': user_obj.wins,
               'defeats': user_obj.defeats,
               'blocked_users': list(user_obj.blocked_users.values_list('id', flat=True)),
+              'status': 'success',
             }
         return JsonResponse(data, status=200)
     except Profile.DoesNotExist:
