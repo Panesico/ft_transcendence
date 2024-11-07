@@ -154,6 +154,7 @@ async def friendRequest(content, users_connected, self):
   msg_body = _('sent you a friend request')
   message = sender_username + ' ' + msg_body
   game_type = content.get('game_type', '')
+  receiver_avatar_url = content.get('receiver_avatar_url', '')
 
   # Get username of receiver
   user_data = get_authentif_variables(receiver_id)
@@ -204,7 +205,8 @@ async def friendRequest(content, users_connected, self):
           'receiver_avatar_url': self.avatar_url,
           'receiver_username': receiver_username,
           'receiver_id': receiver_id,
-          'date': date
+          'date': date,
+          'receiver_avatar_url': receiver_avatar_url
         })
     else:
       logger.debug(f'friendRequest > Error saving friend request in database')
@@ -293,6 +295,14 @@ async def checkForNotifications(self):
         receiver_data = get_authentif_variables(notification['receiver'])
         receiver_username = receiver_data.get('username', '')
         receiver_avatar_url = '/media/' + receiver_data.get('avatar_url', '')
+
+        # If notif is a response, reverse sender and receiver info
+        if notification['type'] == 'game_request_response' or notification['type'] == 'friend_request_response':
+          sender_username = receiver_data.get('username', '')
+          sender_avatar_url = '/media/' + receiver_data.get('avatar_url', '')
+          receiver_username = sender_data.get('username', '')
+          receiver_avatar_url = '/media/' + sender_data.get('avatar_url', '')
+
         # Send notification to frontend
         await self.send_json({
           'type': notification['type'],

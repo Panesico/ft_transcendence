@@ -88,7 +88,6 @@ window.onload = () => {
 
   // Parse the socket message
   function parseSocketMessage(data) {
-    console.log('parseSocketMessage > data:', data);
     if (data.type === 'friend_request') {
       addRequestNotification(data);
     }

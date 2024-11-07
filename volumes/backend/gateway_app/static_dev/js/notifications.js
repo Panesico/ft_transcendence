@@ -216,7 +216,9 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
       'sender_username': sender_username,
       'receiver_username': receiver_username,
       'game_mode': data.game_mode,
-      'game_type': data.game_type
+      'game_type': data.game_type,
+      'sender_avatar_url': data.sender_avatar_url,
+      'receiver_avatar_url': data.receiver_avatar_url
     }, mainRoomSocket) == true) {
       acceptButton.remove();
       declineButton.remove();
@@ -236,8 +238,15 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
   });
 
   declineButton.addEventListener('click', function () {
-    console.log('Decline button clicked');
-    if (sendMessagesBySocket({ 'type': response_type, 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id, 'sender_username': sender_username, 'receiver_username': receiver_username }, mainRoomSocket) == true) {
+    if (sendMessagesBySocket({ 'type': response_type,
+        'response': 'decline',
+        'sender_id': sender_id,
+        'receiver_id': receiver_id,
+        'sender_username': sender_username,
+        'receiver_username': receiver_username,
+        'sender_avatar_url': data.sender_avatar_url,
+        'receiver_avatar_url': data.receiver_avatar_url}
+        , mainRoomSocket) == true) {
 
       if (type === 'game_request_response') {
         // Sender cancels the invite response. The receiver in the waiting room needs to be notified
@@ -246,7 +255,11 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
           'sender_id': receiver_id,
           'receiver_id': sender_id,
           'sender_username': receiver_username,
-          'receiver_username': sender_username }, mainRoomSocket);
+          'receiver_username': sender_username,
+          'receiver_avatar_url': data.receiver_avatar_url,
+          'sender_avatar_url': data.sender_avatar_url}
+          ,mainRoomSocket);
+
       }
 
       acceptButton.remove();
@@ -259,7 +272,10 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
     const notificationDropdown = document.getElementById('navbarDropdownNotifications');
     notificationDropdown.addEventListener('click', function () {
       unreadNotifications = false;
-      sendMessagesBySocket({ 'type': 'mark_notification_as_read', 'receiver_id': receiver_id, 'sender_id': sender_id }, mainRoomSocket);
+      sendMessagesBySocket({
+        'type': 'mark_notification_as_read',
+        'receiver_id': receiver_id,
+        'sender_id': sender_id }, mainRoomSocket);
     }
     );
   });
@@ -367,7 +383,6 @@ function addResponseNotification(data) {
   const notificationDropdownClass = document.getElementById('notificationClassContent');
   receiver_username = data.receiver_username;
   receiver_id = data.receiver_id;
-  sender_username = data.receiver_username;
   sender_username = data.sender_username;
   sender_id = data.sender_id;
   receiver_avatar_url = data.receiver_avatar_url;
@@ -385,7 +400,7 @@ function addResponseNotification(data) {
 
   // Create an img element for the avatar
   // const avatar = createAvatarElement(receiver_avatar_url);
-  const avatar = createAvatarElement(sender_avatar_url);
+  const avatar = createAvatarElement(receiver_avatar_url);
 
   // Create a span element for the message
   console.warn('addResponseNotification > data:', data);
@@ -410,7 +425,7 @@ function addResponseNotification(data) {
   else if (data.type === 'cancel_waiting_room' && data.html) {
     inputMessage = gameRequestCancelled;
     document.querySelector('main').innerHTML = data.html;
-    displayMessageInModal(data.sender_username + gameRequestCancelled);
+    displayMessageInModal(data.receiver_username + gameRequestCancelled);
     // console.warn('redirect to home');
   }
 
@@ -422,7 +437,7 @@ function addResponseNotification(data) {
   // }
 
   // const message = createMessageElement(receiver_username, inputMessage);
-  const message = createMessageElement(sender_username, inputMessage);
+  const message = createMessageElement(receiver_username, inputMessage);
   if (data.response === 'accept' && data.type === 'game_request_response') {
     const acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
 
