@@ -58,10 +58,10 @@ INSTALLED_APPS = [
     'profileapi',
     'livechat',
     'channels',
-    # 'authentif',
+    'authentif',
 ]
 
-# AUTH_USER_MODEL = 'authentif.User'
+AUTH_USER_MODEL = 'authentif.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSION DU PACKAGE\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 16:51+0000\n"
+"POT-Creation-Date: 2024-11-08 10:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: NOM COMPLET <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUE <LL@li.org>\n"
@@ -128,19 +128,33 @@ msgstr "Confirmer le nouveau mot de passe"
 msgid " has invited you to play: "
 msgstr " vous a invité à jouer : "
 
-#: gateway/handleMainRoom.py:33
+#: gateway/handleMainRoom.py:34
 msgid "has accepted your friend request."
 msgstr "a accepté votre demande d'amis."
 
-#: gateway/handleMainRoom.py:35
-msgid " is waiting to play "
+#: gateway/handleMainRoom.py:36
+#, fuzzy
+#| msgid " declined your friend request."
+msgid "has declined your friend request."
+msgstr " a refusé votre demande d'amis."
+
+#: gateway/handleMainRoom.py:38
+#, fuzzy
+#| msgid " is waiting to play "
+msgid "is waiting to play "
 msgstr " attend pour jouer "
 
-#: gateway/handleMainRoom.py:37
+#: gateway/handleMainRoom.py:40
+#, fuzzy
+#| msgid " has declined your game request."
+msgid "has declined the game request."
+msgstr " a refusé votre demande de jeu."
+
+#: gateway/handleMainRoom.py:42
 msgid "has canceled the game request."
 msgstr "a annulé la demande de jeu."
 
-#: gateway/handleMainRoom.py:149
+#: gateway/handleMainRoom.py:154
 msgid "sent you a friend request"
 msgstr "t'a envoyé une demande d'amis"
 
@@ -265,7 +279,7 @@ msgstr "Envoyer"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:86
 msgid "Security"
-msgstr "Seguridad"
+msgstr "Sécurité"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:104
 msgid "Change Password"
@@ -281,7 +295,7 @@ msgstr "Activer"
 
 #: gateway/templates/fragments/friend_profile_fragment.html:13
 #: gateway/templates/fragments/myfriends_fragment.html:70
-#: gateway/templates/includes/chat_modal.html:76
+#: gateway/templates/includes/chat_modal.html:72
 msgid "Block"
 msgstr "Bloquer"
 
@@ -291,8 +305,8 @@ msgstr "Envoyer une demande d'ami"
 
 #: gateway/templates/fragments/friend_profile_fragment.html:24
 #: gateway/templates/fragments/myfriends_fragment.html:62
-#: gateway/templates/includes/chat_modal.html:49
-#: gateway/templates/includes/chat_modal.html:67
+#: gateway/templates/includes/chat_modal.html:48
+#: gateway/templates/includes/chat_modal.html:64
 msgid "Invite to play"
 msgstr "Inviter à jouer"
 
@@ -437,7 +451,6 @@ msgstr "Cet utilisateur vous a bloqué."
 #: gateway/templates/fragments/myfriends_fragment.html:49
 #: gateway/templates/fragments/play_fragment.html:22
 #: gateway/templates/fragments/tournament_form_fragment.html:13
-#: gateway/templates/includes/chat_modal.html:54
 msgid "Game selection"
 msgstr "Sélection du jeu"
 
@@ -477,7 +490,7 @@ msgstr "À distance"
 #: gateway/templates/fragments/tournament_form_fragment.html:43
 #: gateway/templates/fragments/tournament_form_fragment.html:48
 #: gateway/templates/fragments/tournament_form_fragment.html:53
-#: gateway/viewsPlay.py:32 gateway/viewsPlay.py:60
+#: gateway/viewsPlay.py:34 gateway/viewsPlay.py:64
 msgid "Name Player"
 msgstr "Nom du joueur"
 
@@ -485,7 +498,7 @@ msgstr "Nom du joueur"
 #: gateway/templates/fragments/tournament_form_fragment.html:44
 #: gateway/templates/fragments/tournament_form_fragment.html:49
 #: gateway/templates/fragments/tournament_form_fragment.html:54
-#: gateway/viewsPlay.py:33 gateway/viewsPlay.py:61
+#: gateway/viewsPlay.py:35 gateway/viewsPlay.py:65
 msgid "Name"
 msgstr "Nom"
 
@@ -601,23 +614,23 @@ msgid "avatar"
 msgstr "avatar"
 
 #: gateway/templates/includes/chat_modal.html:44
-#: gateway/templates/includes/chat_modal.html:108
+#: gateway/templates/includes/chat_modal.html:104
 msgid "Select a contact"
 msgstr "Sélectionnez un contact"
 
-#: gateway/templates/includes/chat_modal.html:93
+#: gateway/templates/includes/chat_modal.html:89
 msgid "Type message"
 msgstr "Tapez un message"
 
-#: gateway/templates/includes/chat_modal.html:93
+#: gateway/templates/includes/chat_modal.html:89
 msgid "Recipient's username"
 msgstr "Nom d'utilisateur du destinataire"
 
-#: gateway/templates/includes/chat_modal.html:94
+#: gateway/templates/includes/chat_modal.html:90
 msgid "Send"
 msgstr "Envoyer"
 
-#: gateway/templates/includes/chat_modal.html:107
+#: gateway/templates/includes/chat_modal.html:103
 msgid "No friends yet"
 msgstr "Pas encore d'amis"
 
@@ -657,28 +670,28 @@ msgstr "Déconnexion réussie"
 msgid "Method not allowed"
 msgstr "Méthode non autorisée"
 
-#: gateway/viewsAuth.py:100 gateway/viewsAuth.py:188
-#: gateway/viewsProfile.py:215 gateway/viewsProfile.py:283
+#: gateway/viewsAuth.py:100 gateway/viewsAuth.py:193
+#: gateway/viewsProfile.py:243 gateway/viewsProfile.py:314
 msgid "Invalid form data"
 msgstr "Données de formulaire invalides"
 
-#: gateway/viewsAuth.py:273
+#: gateway/viewsAuth.py:281
 msgid "No message provided"
 msgstr "Aucun message fourni"
 
-#: gateway/viewsAuth.py:301
+#: gateway/viewsAuth.py:311
 msgid "Failed to login with 42"
 msgstr "Échec de la connexion avec 42"
 
-#: gateway/viewsAuth.py:336
+#: gateway/viewsAuth.py:346
 msgid "Invalid request method. Use POST."
 msgstr "Méthode de requête invalide. Utilisez POST."
 
-#: gateway/viewsAuth.py:343
+#: gateway/viewsAuth.py:353
 msgid "OTP code is required"
 msgstr "Le code OTP est requis"
 
-#: gateway/viewsAuth.py:345
+#: gateway/viewsAuth.py:355
 msgid "Invalid JSON format"
 msgstr "Format JSON invalide"
 
@@ -710,30 +723,30 @@ msgstr "Ajoutez ce joueur comme ami avant de l'inviter à jouer"
 msgid "Invitation to play sent!"
 msgstr "Invitation à jouer envoyée !"
 
-#: gateway/viewsInvitation.py:185
+#: gateway/viewsInvitation.py:187
 msgid "You cannot block yourself"
 msgstr "Vous ne pouvez pas vous bloquer vous-même"
 
-#: gateway/viewsInvitation.py:199
+#: gateway/viewsInvitation.py:201
 msgid "User blocked"
 msgstr "Utilisateur bloqué"
 
-#: gateway/viewsInvitation.py:201 gateway/viewsInvitation.py:237
+#: gateway/viewsInvitation.py:203 gateway/viewsInvitation.py:243
 msgid "An error occured"
 msgstr "Une erreur s'est produite"
 
-#: gateway/viewsInvitation.py:221
+#: gateway/viewsInvitation.py:227
 msgid "You cannot unblock yourself"
 msgstr "Vous ne pouvez pas vous débloquer vous-même"
 
-#: gateway/viewsInvitation.py:235
+#: gateway/viewsInvitation.py:241
 msgid "User unblocked"
 msgstr "Utilisateur débloqué"
 
-#: gateway/viewsProfile.py:183
+#: gateway/viewsProfile.py:210
 msgid "Error retrieving match history"
 msgstr "Erreur lors de la récupération de l'historique des matchs"
 
-#: gateway/viewsProfile.py:392
+#: gateway/viewsProfile.py:432
 msgid "Please select a file to upload"
 msgstr "Veuillez sélectionner un fichier à télécharger"

@@ -302,6 +302,14 @@ function addRecvChatMessage(data) {
 
   messageElement.appendChild(messageContent);
   chatMessages.appendChild(messageElement);
+
+  // Update unread messages count
+  const unreadMessagesData = {
+    type: 'chat',
+    subtype: 'delete_unread_messages',
+    user_id: data.sender_id,
+  };
+  sendMessagesBySocket(unreadMessagesData, mainRoomSocket);
 }
 
 function addUnreadMessages(data) {
