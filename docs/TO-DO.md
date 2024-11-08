@@ -17,3 +17,15 @@ Auth:
 
 # TO-DO
   - Modal when inviting to play someone
+
+
+- Logout sometimes fails
+
+- game crashes when accessing some jwt
+user_id = await getUserId(jwt_token)
+
+- If friend is blocked, shouldn't be able to start an invite game where the invite had been sent beforehand
+
+- Languages cookies not set properly when changing from edit profile
+
+- user profile pictures don't show with nginx
