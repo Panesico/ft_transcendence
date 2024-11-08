@@ -238,27 +238,31 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
   });
 
   declineButton.addEventListener('click', function () {
-    if (sendMessagesBySocket({ 'type': response_type,
-        'response': 'decline',
-        'sender_id': sender_id,
-        'receiver_id': receiver_id,
-        'sender_username': sender_username,
-        'receiver_username': receiver_username,
-        'sender_avatar_url': data.sender_avatar_url,
-        'receiver_avatar_url': data.receiver_avatar_url}
-        , mainRoomSocket) == true) {
+    if (sendMessagesBySocket({
+      'type': response_type,
+      'response': 'decline',
+      'sender_id': sender_id,
+      'receiver_id': receiver_id,
+      'sender_username': sender_username,
+      'receiver_username': receiver_username,
+      'sender_avatar_url': data.sender_avatar_url,
+      'receiver_avatar_url': data.receiver_avatar_url
+    }
+      , mainRoomSocket) == true) {
 
       if (type === 'game_request_response') {
         // Sender cancels the invite response. The receiver in the waiting room needs to be notified
-        sendMessagesBySocket({ 'type': 'cancel_waiting_room',
+        sendMessagesBySocket({
+          'type': 'cancel_waiting_room',
           'response': 'decline',
           'sender_id': receiver_id,
           'receiver_id': sender_id,
           'sender_username': receiver_username,
           'receiver_username': sender_username,
           'receiver_avatar_url': data.receiver_avatar_url,
-          'sender_avatar_url': data.sender_avatar_url}
-          ,mainRoomSocket);
+          'sender_avatar_url': data.sender_avatar_url
+        }
+          , mainRoomSocket);
 
       }
 
@@ -275,7 +279,8 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
       sendMessagesBySocket({
         'type': 'mark_notification_as_read',
         'receiver_id': receiver_id,
-        'sender_id': sender_id }, mainRoomSocket);
+        'sender_id': sender_id
+      }, mainRoomSocket);
     }
     );
   });
@@ -291,10 +296,10 @@ function deleteResponsesButtons(notificationDropdownClass, username) {
 
     if (notification.id == username && buttons.length > 0) {
       // If the image is not the avatar, remove it
-        buttons.forEach(button => {
-          if (button.id !== 'avatar') {
-            button.remove();    
-          }
+      buttons.forEach(button => {
+        if (button.id !== 'avatar') {
+          button.remove();
+        }
       });
     }
   }
@@ -343,7 +348,7 @@ function addRequestNotification(data) {
   if (data.type === 'game_request') {
     // message.textContent = `${sender_username} invited you to play a game.`;
     console.log('addRequestNotification > data', data);
-    message.textContent =  sender_username + gameRequestReceived + data.game_type;
+    message.textContent = sender_username + gameRequestReceived + data.game_type;
   }
 
   // Add button to accept the friend request represented by accept png
@@ -428,10 +433,12 @@ function addResponseNotification(data) {
     displayMessageInModal(data.receiver_username + gameRequestCancelled);
     // console.warn('redirect to home');
   }
-
-  // else if (data.type === 'next_in_tournament') {
-  //   inputMessage = gamePlayNextTournament;
-  // }
+  else if (data.type === 'next_in_tournament') {
+    inputMessage = gamePlayNextTournament;
+  }
+  else {
+    console.warn('addResponseNotification > data:', data);
+  }
   // else if (data.type === 'game_request_response') {
   //   inputMessage = gameRequestAccepted;
   // }
@@ -443,9 +450,9 @@ function addResponseNotification(data) {
 
     const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);
 
-  // If data type is game, delete the accept and decline buttons from other previous games notifications
-  if (data.type === 'game_request_response' && data.response === 'accept')
-    deleteResponsesButtons(notificationDropdownClass, receiver_username);
+    // If data type is game, delete the accept and decline buttons from other previous games notifications
+    if (data.type === 'game_request_response' && data.response === 'accept')
+      deleteResponsesButtons(notificationDropdownClass, receiver_username);
 
     appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status);
 
