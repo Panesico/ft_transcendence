@@ -220,9 +220,9 @@ Nearby People CSS
 }
 
 .blocked-contact {
-  pointer-events: none;
   background-color: grey;
   opacity: 0.5;
+  cursor: not-allowed !important;
 }
 
 .custom-contact {
