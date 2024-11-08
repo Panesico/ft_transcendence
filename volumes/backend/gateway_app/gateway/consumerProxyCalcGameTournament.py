@@ -222,7 +222,8 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
             }))
             return
         
-        if response['message'] == 'tournament ended':
+        # if response['message'] == 'tournament ended':
+        if response['message'].find('Tournament ended') != -1:
             logger.debug("ProxyCalcGameTournament > tournament ended")
             await self.tournament_end(response)
             return

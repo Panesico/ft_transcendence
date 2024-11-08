@@ -192,8 +192,9 @@ def api_updateTournament(request):
                   'game_round': game_round
               }
               # Save the results in the blockchain
-              blockchain_response = save_tournament_results_in_blockchain(tournament, game_winner_id)
-              message = ("tournament ended")
+              blockchain_response = json.loads(save_tournament_results_in_blockchain(tournament, game_winner_id))
+              message = blockchain_response.get('message')
+              # message = ("tournament ended")
             logger.debug(f'api_updateTournament > {game_round}: {message}')
             logger.debug(f'api_updateTournament > info: {info}')
 

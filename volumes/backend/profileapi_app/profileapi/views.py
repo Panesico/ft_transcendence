@@ -194,9 +194,6 @@ def get_profile_api(request, user_id):
               'city': user_obj.city,
               'display_name': user_obj.display_name,
               'preferred_language': user_obj.preferred_language,
-              'played_games': user_obj.played_games,
-              'wins': user_obj.wins,
-              'defeats': user_obj.defeats,
               'blocked_users': list(user_obj.blocked_users.values_list('id', flat=True)),
               'status': 'success',
             }

@@ -141,7 +141,7 @@ def save_tournament_results_in_blockchain(tournament, game_winner_id):
   contract = get_blockchain_contract()
   if contract is None:
     logger.error("Failed to load the contract.")
-    return
+    return JsonResponse({'status': 'error', 'message': 'Failed to save results in the blockchain.'})
   try:
     tournament_id = tournament.id
     user_id_1 = tournament.t_p1_id
@@ -149,11 +149,18 @@ def save_tournament_results_in_blockchain(tournament, game_winner_id):
     user_id_3 = tournament.t_p3_id
     user_id_4 = tournament.t_p4_id
 
+    # If a user id is equal to 0, we do not save it in the blockchain
+    if user_id_1 == 0 or user_id_2 == 0 or user_id_3 == 0 or user_id_4 == 0:
+      logger.error("Tournament results are only saved in the blockchain if all users are registered.")
+      return json.dumps({'status': 'success', 'message': 'Tournament ended.'})
+
     # Create the tournament in the blockchain
     create_tournament_in_blockchain(tournament.id, [user_id_1, user_id_2, user_id_3, user_id_4])
+    logger.debug(f"Tournament {tournament_id} created in the blockchain.")
 
     # Save winner score in blockchain
     update_user_score_in_blockchain(tournament.id, game_winner_id, 2)
+    logger.debug(f"Winner score saved in the blockchain for tournament {tournament_id}, winner: {game_winner_id}")
 
     # Save finalist score in blockchain
     if game_winner_id == tournament.semifinal1.game_winner_id:
@@ -161,14 +168,18 @@ def save_tournament_results_in_blockchain(tournament, game_winner_id):
     else:
       finalist_id = tournament.semifinal1.game_winner_id      
     update_user_score_in_blockchain(tournament.id, finalist_id, 1)
+    logger.debug(f"Finalist score saved in the blockchain for tournament {tournament_id}, finalist: {finalist_id}")
 
     # Save losers score in blockchain
     for user_id in [user_id_1, user_id_2, user_id_3, user_id_4]:
       if user_id != game_winner_id and user_id != finalist_id:
+        logger.debug(f"Save losers score in blockchain > User: {user_id}")
         update_user_score_in_blockchain(tournament.id, user_id, 0)
+        logger.debug(f"User {user_id} score saved in the blockchain for tournament {tournament_id}")
     logger.debug(f"Results saved in the blockchain for tournament {tournament_id}, winner: {game_winner_id}")
-    return JsonResponse({'status': 'success', 'message': 'Tournament ended, results saved in the blockchain.'})
+    success_message = _('Tournament ended, results saved in the blockchain.')
+    return json.dumps({'status': 'success', 'message': success_message})
 
   except Exception as e:
     logger.error(f"saveTournamentResults function reverted : {e}")
-    return JsonResponse({'status': 'error', 'message': 'Failed to save results in the blockchain.'})
+    return json.dumps({'status': 'bug', 'message': 'Tournament ended, failed to save results in the blockchain.'})

@@ -2,6 +2,9 @@ Auth:
 - Password validator commented while in development. Uncomment 2 * validate_password() in api_signup() and api_edit_profile() of authentif_app/authentif/views.py
 
 @iisaacc
+- Do the translation for this message :
+      success_message = _('Tournament ended, results saved in the blockchain.')
+      -> line 133 viewBlockchain (play container)
 
 
 
@@ -33,9 +36,9 @@ calcgame    | PongCalcRemote > Opening connection with players: Bellingham#1, Be
 gateway     | INFO:     172.18.0.1:42918 - "GET /media/avatars/default.png HTTP/1.1" 200 OK
 postgres    | 2024-11-06 14:30:45.866 UTC [27] LOG:  checkpoint starting: time
 postgres    | 2024-11-06 14:30:47.584 UTC [27] LOG:  checkpoint complete: wrote 18 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.708 s, sync=0.003 s, total=1.718 s; sync files=18, longest=0.002 s, average=0.001 s; distance=35 kB, estimate=35 kB; lsn=0/1CE6670, redo lsn=0/1CE6638
-- Delete games info in profile container
 - edit_profile_page display name and password edit
 - startGame-button does not works during tournament
+- When we click on a notification during a game, the game get interupted and does not resume
 
 
 # TO-DO
