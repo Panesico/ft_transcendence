@@ -18,6 +18,8 @@ services:
     networks:
       - transcendence
     restart: unless-stopped
+    depends_on:
+      - gateway
 
   gateway:
     build:
