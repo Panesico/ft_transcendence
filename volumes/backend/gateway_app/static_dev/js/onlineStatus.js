@@ -8,14 +8,19 @@ function updateOnlineFriends(data) {
   const myfriendsContainer = document.querySelector('.myfriends-container');
   // console.log('myfriendsContainer:', myfriendsContainer);
   if (myfriendsContainer) {
-    const friendElement = myfriendsContainer.querySelector(`span[data-online="${userIdToUpdate}"]`);
-    // console.log('friendElement:', friendElement);
-    if (friendElement) {
-      if (data.type === 'user_connected') {
-        friendElement.style.display = 'block';
-      }
-      else if (data.type === 'user_left') {
-        friendElement.style.display = 'none';
+
+    const friendDiv = myfriendsContainer.querySelector(`div[data-userid="${userIdToUpdate}"]`);
+    // If friend is not blocked
+    if (friendDiv && !friendDiv.classList.contains('blocked')) {
+      const friendOnlineBadge = myfriendsContainer.querySelector(`span[data-online="${userIdToUpdate}"]`);
+      // console.log('friendElement:', friendElement);
+      if (friendOnlineBadge) {
+        if (data.type === 'user_connected') {
+          friendOnlineBadge.style.display = 'block';
+        }
+        else if (data.type === 'user_left') {
+          friendOnlineBadge.style.display = 'none';
+        }
       }
     }
   }
@@ -24,14 +29,18 @@ function updateOnlineFriends(data) {
   const contactList = document.querySelector('#contactList');
   // console.log('contactList:', contactList);
   if (contactList) {
-    const friendElement = contactList.querySelector(`span[data-online="${userIdToUpdate}"]`);
-    // console.log('friendElement:', friendElement);
-    if (friendElement) {
-      if (data.type === 'user_connected') {
-        friendElement.style.display = 'block';
-      }
-      else if (data.type === 'user_left') {
-        friendElement.style.display = 'none';
+    const friendListItem = contactList.querySelector(`li[data-contact-id="${userIdToUpdate}"]`);
+    // If friend is not blocked
+    if (friendListItem && !friendListItem.classList.contains('blocked-contact')) {
+      const friendOnlineBadge = contactList.querySelector(`span[data-online="${userIdToUpdate}"]`);
+      // console.log('friendOnlineBadge:', friendOnlineBadge);
+      if (friendOnlineBadge) {
+        if (data.type === 'user_connected') {
+          friendOnlineBadge.style.display = 'block';
+        }
+        else if (data.type === 'user_left') {
+          friendOnlineBadge.style.display = 'none';
+        }
       }
     }
   }
