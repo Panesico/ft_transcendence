@@ -120,11 +120,6 @@ def get_full_profile(request, user_id):
               'display_name': user_obj.display_name,
               'preferred_language': user_obj.preferred_language,
               'blocked_users': list(user_obj.blocked_users.values_list('id', flat=True)),
-              'played_games': user_obj.played_games,
-              'wins': user_obj.wins,
-              'defeats': user_obj.defeats,
-              'winrate': 0 if user_obj.played_games == 0 else round(user_obj.wins / user_obj.played_games * 100, 2),
-              'total_score' : user_obj.wins * 50,
             }
         return JsonResponse(data, status=200)
     except Profile.DoesNotExist:
@@ -164,9 +159,6 @@ def get_friends(request, user_id):
                 'country': friend.country,
                 'city': friend.city,
                 'preferred_language': friend.preferred_language,
-                'played_games': friend.played_games,
-                'wins': friend.wins,
-                'defeats': friend.defeats,
                 'avatar': '/media/' + user_data['avatar_url'],
                 'username': user_data['username'],
                 'is_blocked': is_blocked,

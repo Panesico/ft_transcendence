@@ -60,6 +60,8 @@ services:
         SERVICE_NAME: authentif
     image: authentif
     container_name: authentif
+    environment:
+      - PYTHONPATH=/usr/src/app/authentif_app
     env_file:
       - .env
     expose:
@@ -83,6 +85,8 @@ services:
         SERVICE_NAME: profileapi
     image: profileapi
     container_name: profileapi
+    environment:
+      - PYTHONPATH=/usr/src/app/authentif_app
     env_file:
       - .env
     expose:
@@ -106,6 +110,8 @@ services:
         SERVICE_NAME: play
     image: play
     container_name: play
+    environment:
+      - PYTHONPATH=/usr/src/app/authentif_app
     env_file:
       - .env
     expose:
@@ -128,6 +134,8 @@ services:
         SERVICE_NAME: calcgame
     image: calcgame
     container_name: calcgame
+    environment:
+      - PYTHONPATH=/usr/src/app/authentif_app
     env_file:
       - .env
     expose:
