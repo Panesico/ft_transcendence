@@ -60,7 +60,7 @@ def list_friends(request):
       logger.debug(f"list_friends > users_connected: {users_connected}")
       # Add 'online': true to friends who are in users_connected
       for friend in friends:
-        if friend['user_id'] in users_connected:
+        if not friend['im_blocked'] and friend['user_id'] in users_connected:
           friend['online'] = True
 
       blocked_users = response_user_profile['blocked_users']

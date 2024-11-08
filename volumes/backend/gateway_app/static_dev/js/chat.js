@@ -71,11 +71,11 @@ function innit_listening() {
             avatar.style.width = '2rem';
             avatar.alt = 'avatar';
 
-            // Create online status element
+            // Display online status element if friend is not blocked (always create element)
             const onlineStatus = document.createElement('span');
             onlineStatus.classList.add('position-absolute', 'translate-middle', 'bg-success', 'online-status-chat');
             onlineStatus.dataset.online = friend.user_id;
-            if (friend.online)
+            if (friend.online && !imBlocked)
               onlineStatus.style.display = 'block';
             else
               onlineStatus.style.display = 'none';
@@ -226,11 +226,11 @@ function innit_listening() {
 
   sendButton.addEventListener('click', sendChatMessage);
 
-  messageInput.addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-          event.preventDefault(); // Previene el comportamiento predeterminado de la tecla Enter
-          sendChatMessage(); // Llama a la función para enviar el mensaje
-      }
+  messageInput.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      sendChatMessage();
+    }
   });
 }
 
