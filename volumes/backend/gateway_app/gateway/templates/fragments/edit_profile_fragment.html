@@ -59,7 +59,7 @@
             <div class="text-danger fs-6">{{ form.city.errors }}</div>
           </div>
           <div class="mb-3">
-            <label for="{{ form.preferred_language.id_for_label }}" class="form-label">{% trans "Preferred Language" %}</label>
+            <label for="{{ form.preferred_language.id_for_label }}" class="form-label">{% trans "Preferred language" %}</label>
             <div id="{{ form.preferred_language.id_for_label }}" role="group" aria-label="Basic radio toggle button group">
               <input type="radio" class="language-button-input btn-check" name="preferred_language" id="btnradio1" value="en" autocomplete="off" {% if profile_data.preferred_language == 'en' %}checked{% endif %}>
               <label class="language-button-input btn btn-outline-primary" for="btnradio1">{% trans "English" %}</label>

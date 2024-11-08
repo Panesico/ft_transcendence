@@ -54,7 +54,7 @@ class SignUpFormFrontend(forms.Form):
           'class': 'form-control',
           'id': 'signupConfirmPassword'
           }), 
-        label=_('Confirm Password'), 
+        label=_('Confirm password'), 
         required=True
         )
 
@@ -96,7 +96,7 @@ class EditProfileFormFrontend(forms.Form):
             'class': 'form-control',
             'id': 'editProfileDisplayName'
           }),
-        label=_('DisplayName'), 
+        label=_('Display name'),
         required=False,
         validators=[validate_username],
         )
@@ -145,7 +145,7 @@ class EditProfileFormFrontend(forms.Form):
           'class': 'form-control',
           'id': 'editProfileConfirmPassword'
           }), 
-        label=_('Confirm new Password'), 
+        label=_('Confirm new password'), 
         required=False
         )
 

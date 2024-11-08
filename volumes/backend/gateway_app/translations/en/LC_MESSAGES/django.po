@@ -100,8 +100,8 @@ msgid "Upload avatar"
 msgstr "Upload avatar"
 
 #: gateway/forms.py:99
-msgid "DisplayName"
-msgstr "DisplayName"
+msgid "Display name"
+msgstr "Display name"
 
 #: gateway/forms.py:109
 msgid "Country"
@@ -120,8 +120,8 @@ msgid "New password"
 msgstr "New password"
 
 #: gateway/forms.py:148
-msgid "Confirm new Password"
-msgstr "Confirm new Password"
+msgid "Confirm new password"
+msgstr "Confirm new password"
 
 #: gateway/handleInvite.py:54 gateway/templates/base_index.html:94
 msgid " has invited you to play: "
@@ -273,8 +273,8 @@ msgid "User Info"
 msgstr "User Info"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:62
-msgid "Preferred Language"
-msgstr "Preferred Language"
+msgid "Preferred language"
+msgstr "Preferred language"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:65
 msgid "English"

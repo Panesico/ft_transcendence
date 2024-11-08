@@ -12,15 +12,6 @@ Auth:
 
 
   @BenjaminLarger
-- Must process two logouts to logout ---> Maybe realated with token/midlleware --> Jorge
-    logs : authentif   | Incoming request: GET /api/logout/
-    authentif   | EditProfileForm > Meta
-    authentif   | model: <class 'authentif.models.User'>
-    authentif   | fields: ('username', 'avatar')
-    authentif   | api_logout > token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE3MzA3OTU3MTIsInJlZnJlc2hfZXhwIjoxNzMxMzk0MTA0LCJpYXQiOjE3MzA3OTU2NTJ9.s8hJUQbQcevhckMhqFBJWHjnN_wktgcaJ1WIl3qIWoQ
-    authentif   | api_logout > user assignation failed
-    authentif   | api_logout > response: <JsonResponse status_code=200, "application/json">
-    authentif   | INFO:     172.18.0.8:44306 - "GET /api/logout/ HTTP/1.1" 200 OK
 - Strongsify password
 - You can play against yourself
   gateway     | Matched players with combined_id 4_12
@@ -36,7 +27,6 @@ calcgame    | PongCalcRemote > Opening connection with players: Bellingham#1, Be
 gateway     | INFO:     172.18.0.1:42918 - "GET /media/avatars/default.png HTTP/1.1" 200 OK
 postgres    | 2024-11-06 14:30:45.866 UTC [27] LOG:  checkpoint starting: time
 postgres    | 2024-11-06 14:30:47.584 UTC [27] LOG:  checkpoint complete: wrote 18 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.708 s, sync=0.003 s, total=1.718 s; sync files=18, longest=0.002 s, average=0.001 s; distance=35 kB, estimate=35 kB; lsn=0/1CE6670, redo lsn=0/1CE6638
-- edit_profile_page display name and password edit
 - startGame-button does not works during tournament
 - When we click on a notification during a game, the game get interupted and does not resume
 

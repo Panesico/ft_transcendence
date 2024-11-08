@@ -89,7 +89,7 @@ msgid "Password"
 msgstr "Contraseña"
 
 #: gateway/forms.py:57
-msgid "Confirm Password"
+msgid "Confirm password"
 msgstr "Confirmar contraseña"
 
 #: gateway/forms.py:69
@@ -101,7 +101,7 @@ msgid "Upload avatar"
 msgstr "Subir avatar"
 
 #: gateway/forms.py:99
-msgid "DisplayName"
+msgid "Display name"
 msgstr "Nombre visible"
 
 #: gateway/forms.py:109
@@ -121,7 +121,7 @@ msgid "New password"
 msgstr "Nueva contraseña"
 
 #: gateway/forms.py:148
-msgid "Confirm new Password"
+msgid "Confirm new password"
 msgstr "Confirmar nueva contraseña"
 
 #: gateway/handleInvite.py:54 gateway/templates/base_index.html:94
@@ -133,20 +133,16 @@ msgid "has accepted your friend request."
 msgstr " aceptó tu solicitud de amistad."
 
 #: gateway/handleMainRoom.py:36
-#, fuzzy
-#| msgid " declined your friend request."
 msgid "has declined your friend request."
-msgstr " rechazó tu solicitud de amistad."
+msgstr "rechazó tu solicitud de amistad."
 
 #: gateway/handleMainRoom.py:38
 msgid "is waiting to play "
 msgstr " está esperando para jugar "
 
 #: gateway/handleMainRoom.py:40
-#, fuzzy
-#| msgid " has declined your game request."
 msgid "has declined the game request."
-msgstr " rechazó tu solicitud de juego."
+msgstr "rechazó tu solicitud de juego."
 
 #: gateway/handleMainRoom.py:42
 msgid "has canceled the game request."
@@ -264,7 +260,7 @@ msgid "User Info"
 msgstr "Información del usuario"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:62
-msgid "Preferred Language"
+msgid "Preferred language"
 msgstr "Idioma preferido"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:65
