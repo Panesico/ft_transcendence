@@ -143,7 +143,9 @@ async function startNewTournament(
     const button = document.getElementById('startGame-button');
     if (button) {
       button.addEventListener('click', () => {
+        console.log('addStartButtonListener > button clicked');
         button.removeEventListener('click', arguments.callee);
+        console.log('addStartButtonListener > removeEventListener');
         calcGameSocket.send(JSON.stringify({ type: 'players_ready' }));
       });
     }
@@ -154,7 +156,9 @@ async function startNewTournament(
     console.log('addNextRoundButtonListener > info:', info);
     if (button) {
       button.addEventListener('click', () => {
+        console.log('addNextRoundButtonListener > button clicked');
         button.removeEventListener('click', arguments.callee);
+        console.log('addNextRoundButtonListener > removeEventListener');
 
         calcGameSocket.send(JSON.stringify({
           type: 'next_game, game details',
