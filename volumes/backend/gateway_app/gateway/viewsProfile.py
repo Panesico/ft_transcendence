@@ -370,14 +370,20 @@ def post_edit_profile_avatar(request):
 
   # Recover data from the form
   data = request.POST.copy()
-  logger.debug("request.FILES: %s", request.FILES)
-  logger.debug(f"post data : {data}")
 
   # Check if the avatar file is empty
   if request.FILES.get('avatar') is not None:
       
     # Get the uploaded file   
     uploaded_file = request.FILES['avatar']
+
+    # Check if the file is an image
+    if not uploaded_file.content_type.startswith('image'):
+        form = EditProfileFormFrontend(data)
+        form.add_error(None, _('Please select an image file'))
+        logger.debug('post_edit_profile_avatar > Invalid file type')
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
+        return JsonResponse({'html': html, 'status': 'error'}, status=400)
 
     # Save the uploaded file
     avatar_dir = os.path.join(settings.MEDIA_ROOT, 'avatars')
@@ -387,34 +393,24 @@ def post_edit_profile_avatar(request):
     # Construct the data to send to the profileapi service
     data['user_id'] = request.user.id
     data['avatar'] = '/avatars/' + filename
-    logger.debug(f"post_edit_profile_avatar > data: {data}")
     authentif_url = 'https://authentif:9001/api/editprofile/' 
     response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
     status = response.json().get("status")
     message = response.json().get("message")
     type = response.json().get("type")
-    logger.debug(f"post_edit_profile > response.json from authentif editprofile: {response.json()}")
     html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
 
     if  response.ok:
-        logger.debug('post_edit_profile_avatar > Response OK')
         user_response =  JsonResponse({'type': type, 'message': message, 'status': 'success'})
         user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
         return user_response
     else:
-      form = EditProfileFormFrontend()
-      if profile_data.get('status') == 'error':
-        return redirect(profile_data.get('status_code'))
-      logger.debug('post_edit_profile > Response KO')
       html = render_to_string('fragments/edit_profile_fragment.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message})
   
   # Handle the case where no file is uploaded
   else:
     logger.debug('post_edit_profile_avatar > No file uploaded')
-    if profile_data.get('status') == 'error':
-        return redirect('404')
-    logger.debug('profile_data: %s', profile_data)
     form = EditProfileFormFrontend(data)
     form.add_error(None, _('Please select a file to upload'))
     html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
