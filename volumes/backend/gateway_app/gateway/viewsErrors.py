@@ -7,7 +7,7 @@ from django.contrib import messages
 import logging
 logger = logging.getLogger(__name__)
 
-def get_404(request):
+def get_404(request, exception=None):
     logger.debug("")
     logger.debug("get_404")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
