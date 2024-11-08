@@ -6,7 +6,10 @@ logger = logging.getLogger(__name__)
 
 web3 = Web3(Web3.HTTPProvider("http://blockchain:8545"))
 
-def create_tournament_in_blockchain(tournament_id, users_ids):
+def str_to_bytes32(s):
+    return bytes(s, 'utf-8').ljust(32, b'\0')[:32]
+
+def create_tournament_in_blockchain(tournament_id, users_names):
   logger.debug("")
   logger.debug("create_tournament_in_blockchain")
 
@@ -17,7 +20,7 @@ def create_tournament_in_blockchain(tournament_id, users_ids):
     logger.error("Failed to load the contract.")
     raise Exception("Failed to load the contract.")
   account = web3.eth.account.from_key(os.getenv('CONTRACT_PRIVATE_KEY')).address
-  tx = contract.functions.createTournament(tournament_id, users_ids).build_transaction({
+  tx = contract.functions.createTournament(tournament_id, users_names).build_transaction({
       'from': account,
       'gas': 1000000,
       'nonce': web3.eth.get_transaction_count(account),
@@ -32,7 +35,7 @@ def create_tournament_in_blockchain(tournament_id, users_ids):
   tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
   # logger.debug(f"Transaction receipt: {tx_receipt}")
 
-def update_user_score_in_blockchain(tournament_id, user_id, score):
+def update_user_score_in_blockchain(tournament_id, user_name, score):
   logger.debug("")
   logger.debug("update_user_score_in_blockchain")
 
@@ -42,7 +45,7 @@ def update_user_score_in_blockchain(tournament_id, user_id, score):
     logger.error("Failed to load the contract.")
     raise Exception("Failed to load the contract.")
   account = web3.eth.account.from_key(os.getenv('CONTRACT_PRIVATE_KEY')).address
-  tx = contract.functions.updateScore(tournament_id, user_id, score).build_transaction({
+  tx = contract.functions.updateScore(tournament_id, user_name, score).build_transaction({
       'from': account,
       'gas': 1000000,
       'nonce': web3.eth.get_transaction_count(account),
@@ -55,14 +58,14 @@ def update_user_score_in_blockchain(tournament_id, user_id, score):
   # Wait for the transaction to be mined
   tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
   
-def get_user_score_from_blockchain(contract, tournament_id, user_id, web3):
+def get_user_score_from_blockchain(contract, tournament_id, user_name, web3):
   logger.debug("")
   logger.debug("get_user_score_from_blockchain")
 
   try:
     account = web3.eth.account.from_key(os.getenv('CONTRACT_PRIVATE_KEY')).address
-    score = contract.functions.getScore(tournament_id, user_id).call()
-    logger.debug(f"User {user_id} score: {score}")
+    score = contract.functions.getScore(tournament_id, user_name).call()
+    logger.debug(f"User {user_name} score: {score}")
     return score
   except Exception as e:
     logger.error(f"getScore function reverted : {e}")
@@ -133,7 +136,7 @@ def get_blockchain_contract():
     else:
       return None
 
-def save_tournament_results_in_blockchain(tournament, game_winner_id):
+def save_tournament_results_in_blockchain(tournament, game_winner_name):
   logger.debug("")
   logger.debug("save_tournament_results_in_blockchain")
 
@@ -144,40 +147,46 @@ def save_tournament_results_in_blockchain(tournament, game_winner_id):
     return JsonResponse({'status': 'error', 'message': 'Failed to save results in the blockchain.'})
   try:
     tournament_id = tournament.id
-    user_id_1 = tournament.t_p1_id
-    user_id_2 = tournament.t_p2_id
-    user_id_3 = tournament.t_p3_id
-    user_id_4 = tournament.t_p4_id
+    user_name_1 = str_to_bytes32(tournament.t_p1_name)
+    user_name_2 = str_to_bytes32(tournament.t_p2_name)
+    user_name_3 = str_to_bytes32(tournament.t_p3_name)
+    user_name_4 = str_to_bytes32(tournament.t_p4_name)
+    game_winner_name32 = str_to_bytes32(game_winner_name)
 
     # If a user id is equal to 0, we do not save it in the blockchain
-    if user_id_1 == 0 or user_id_2 == 0 or user_id_3 == 0 or user_id_4 == 0:
-      logger.error("Tournament results are only saved in the blockchain if all users are registered.")
-      return json.dumps({'status': 'success', 'message': 'Tournament ended.'})
+    # if user_name_1 == 0 or user_name_2 == 0 or user_name_3 == 0 or user_name_4 == 0:
+    #   logger.error("Tournament results are only saved in the blockchain if all users are registered.")
+    #   return json.dumps({'status': 'success', 'message': 'Tournament ended.'})
 
     # Create the tournament in the blockchain
-    create_tournament_in_blockchain(tournament.id, [user_id_1, user_id_2, user_id_3, user_id_4])
+    create_tournament_in_blockchain(tournament.id, [user_name_1, user_name_2, user_name_3, user_name_4])
     logger.debug(f"Tournament {tournament_id} created in the blockchain.")
 
     # Save winner score in blockchain
-    update_user_score_in_blockchain(tournament.id, game_winner_id, 2)
-    logger.debug(f"Winner score saved in the blockchain for tournament {tournament_id}, winner: {game_winner_id}")
+    update_user_score_in_blockchain(tournament.id, game_winner_name32, 2)
+    logger.debug(f"Winner score saved in the blockchain for tournament {tournament_id}, winner: {game_winner_name}")
 
     # Save finalist score in blockchain
-    if game_winner_id == tournament.semifinal1.game_winner_id:
-      finalist_id = tournament.semifinal2.game_winner_id
+    if game_winner_name == tournament.semifinal1.game_winner_name:
+      finalist_name = str_to_bytes32(tournament.semifinal2.game_winner_name)
     else:
-      finalist_id = tournament.semifinal1.game_winner_id      
-    update_user_score_in_blockchain(tournament.id, finalist_id, 1)
-    logger.debug(f"Finalist score saved in the blockchain for tournament {tournament_id}, finalist: {finalist_id}")
+      finalist_name = str_to_bytes32(tournament.semifinal1.game_winner_name)
+    update_user_score_in_blockchain(tournament.id, finalist_name, 1)
+    logger.debug(f"Finalist score saved in the blockchain for tournament {tournament_id}, finalist: {finalist_name}")
 
     # Save losers score in blockchain
-    for user_id in [user_id_1, user_id_2, user_id_3, user_id_4]:
-      if user_id != game_winner_id and user_id != finalist_id:
-        logger.debug(f"Save losers score in blockchain > User: {user_id}")
-        update_user_score_in_blockchain(tournament.id, user_id, 0)
-        logger.debug(f"User {user_id} score saved in the blockchain for tournament {tournament_id}")
-    logger.debug(f"Results saved in the blockchain for tournament {tournament_id}, winner: {game_winner_id}")
-    success_message = _('Tournament ended, results saved in the blockchain.')
+    for user_name in [user_name_1, user_name_2, user_name_3, user_name_4]:
+      if user_name != game_winner_name32 and user_name != finalist_name:
+        logger.debug(f"Save losers score in blockchain > User: {user_name}")
+        update_user_score_in_blockchain(tournament.id, user_name, 0)
+        logger.debug(f"User {user_name} score saved in the blockchain for tournament {tournament_id}")
+    logger.debug(f"Results saved in the blockchain for tournament {tournament_id}, winner: {game_winner_name}")
+    success_message = 'Tournament ended, results saved in the blockchain.'
+
+    # Use the blockchain to retrieve the scores
+    user_score_1 = get_user_score_from_blockchain(contract, tournament_id, user_name_1, web3)
+    logger.debug(f"Blockchain retrieve score user ---> User {user_name_1} score: {user_score_1}")
+
     return json.dumps({'status': 'success', 'message': success_message})
 
   except Exception as e:

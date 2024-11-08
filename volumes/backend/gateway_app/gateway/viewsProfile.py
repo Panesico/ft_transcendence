@@ -281,7 +281,7 @@ def post_edit_profile_general(request):
         'Cookie': f'csrftoken={csrf_token}',
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
-        # 'Authorization': f'Bearer {jwt_token}', --> does not work when included
+        'Authorization': f'Bearer {jwt_token}',
     }
 
     # Recover data from the form

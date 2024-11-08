@@ -6,9 +6,12 @@ contract TournamentManager {
     // Structure to store tournament information
     struct Tournament {
         uint256 id;
-        uint256[] users_id; // List of user id participating in the tournament
+        // uint256[] users_id; // List of user id participating in the tournament
+        // users id disaplayed names
+        bytes32[] users_name;
+
         // Add a minimum length to create a tournament (4)?
-        mapping(uint256 => uint256) scores; // Mapping of user id to their score
+        mapping(bytes32 => uint256) scores; // Mapping of user name to their score
         bool exists; // Flag to check if tournament exists
     }
 
@@ -17,23 +20,23 @@ contract TournamentManager {
     mapping(uint256 => Tournament) public tournaments;
 
     // Event to notify when a tournament is created or a score is updated
-    event TournamentCreated(uint256 tournamentId, uint256[] users_id);
-    event ScoreUpdated(uint256 tournamentId, uint256 user, uint256 newScore);
+    event TournamentCreated(uint256 tournamentId, bytes32[] users_name);
+    event ScoreUpdated(uint256 tournamentId, bytes32 user, uint256 newScore);
 
     // Function to create a tournament
-    function createTournament(uint256 _tournamentId, uint256[] memory _users_id) public {
+    function createTournament(uint256 _tournamentId, bytes32[] memory users_name) public {
         require(!tournaments[_tournamentId].exists, "Tournament already exists");
 
         Tournament storage newTournament = tournaments[_tournamentId];
         newTournament.id = _tournamentId;
-        newTournament.users_id = _users_id;
+        newTournament.users_name = users_name;
         newTournament.exists = true;
 
-        emit TournamentCreated(_tournamentId, _users_id);
+        emit TournamentCreated(_tournamentId, users_name);
     }
 
     // Function to update the score of a user in a tournament
-    function updateScore(uint256 _tournamentId, uint256 _user, uint256 _score) public {
+    function updateScore(uint256 _tournamentId, bytes32 _user, uint256 _score) public {
         require(tournaments[_tournamentId].exists, "Tournament does not exist");
         
         Tournament storage tournament = tournaments[_tournamentId];
@@ -45,7 +48,7 @@ contract TournamentManager {
     }
 
     // Function to get the score of a user in a tournament
-    function getScore(uint256 _tournamentId, uint256 _user) public view returns (uint256) {
+    function getScore(uint256 _tournamentId, bytes32 _user) public view returns (uint256) {
         require(tournaments[_tournamentId].exists, "Tournament does not exist");
 
         Tournament storage tournament = tournaments[_tournamentId];
@@ -55,9 +58,9 @@ contract TournamentManager {
     }
 
     // Internal function to check if a user is in the tournament
-    function isUserInTournament(Tournament storage tournament, uint256 _user) internal view returns (bool) {
-        for (uint256 i = 0; i < tournament.users_id.length; i++) {
-            if (tournament.users_id[i] == _user) {
+    function isUserInTournament(Tournament storage tournament, bytes32 _user) internal view returns (bool) {
+        for (uint256 i = 0; i < tournament.users_name.length; i++) {
+            if (tournament.users_name[i] == _user) {
                 return true;
             }
         }
@@ -65,19 +68,19 @@ contract TournamentManager {
     }
 
     // Get tournament winner
-    function getWinner(uint256 _tournamentId) public view returns (uint256) {
+    function getWinner(uint256 _tournamentId) public view returns (bytes32) {
         require(tournaments[_tournamentId].exists, "Tournament does not exist");
 
         Tournament storage tournament = tournaments[_tournamentId];
-        require(tournament.users_id.length > 0, "No users in the tournament");
+        require(tournament.users_name.length > 0, "No users in the tournament");
 
-        uint256 winner = tournament.users_id[0];
+        bytes32 winner = tournament.users_name[0];
         uint256 maxScore = tournament.scores[winner];
 
-        for (uint256 i = 1; i < tournament.users_id.length; i++) {
-            uint256 score = tournament.scores[tournament.users_id[i]];
+        for (uint256 i = 1; i < tournament.users_name.length; i++) {
+            uint256 score = tournament.scores[tournament.users_name[i]];
             if (score > maxScore) {
-                winner = tournament.users_id[i];
+                winner = tournament.users_name[i];
                 maxScore = score;
             }
         }
