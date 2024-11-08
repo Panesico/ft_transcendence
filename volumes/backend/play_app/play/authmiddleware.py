@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from datetime import datetime, timedelta, timezone
 from django.http import JsonResponse
 from functools import wraps
+from django.shortcuts import render
 
 logger = logging.getLogger(__name__)
 
@@ -155,6 +156,6 @@ def login_required(view_func):
     def _wrapped_view(request, *args, **kwargs):
         # If user is not authenticated, respond with an error
         if not request.user.is_authenticated:
-            return JsonResponse({'error': 'Authentication required.'}, status=401)
+            return render(request, 'partials/401.html', status=401)
         return view_func(request, *args, **kwargs)
     return _wrapped_view
