@@ -336,6 +336,12 @@ function addRequestNotification(data) {
   const newNotification = document.createElement('li');
   newNotification.id = sender_username;
   newNotification.classList.add('dropdown-item');
+  // style the notification --bs-dropdown-link-active-bg: var(--bs-danger-rgb);
+  newNotification.style.setProperty('--bs-dropdown-link-active-bg', 'transparent');
+  // Prevents the dropdown from closing
+  newNotification.addEventListener('click', function (event) {
+    event.stopPropagation();
+  });
 
   // Create an element for the date
   const date = createDateElement(data.date, newNotification);
@@ -399,6 +405,11 @@ function addResponseNotification(data) {
   // Create a new notification element
   const newNotification = document.createElement('li');
   newNotification.classList.add('dropdown-item');
+  newNotification.style.setProperty('--bs-dropdown-link-active-bg', 'transparent');
+  // Prevents the dropdown from closing
+  newNotification.addEventListener('click', function (event) {
+    event.stopPropagation();
+  });
 
   // Create an element for the date
   const date = createDateElement(data.date, newNotification);

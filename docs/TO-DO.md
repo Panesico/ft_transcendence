@@ -2,35 +2,15 @@ Auth:
 - Password validator commented while in development. Uncomment 2 * validate_password() in api_signup() and api_edit_profile() of authentif_app/authentif/views.py
 
 @iisaacc
-- Do the translation for this message :
-      success_message = _('Tournament ended, results saved in the blockchain.')
-      -> line 133 viewBlockchain (play container)
-
-
 
   # Questions
 
 
   @BenjaminLarger
 - Strongsify password
-- You can play against yourself
-  gateway     | Matched players with combined_id 4_12
-gateway     | 
-gateway     | ProxyCalcGameInvite > start_game game_id: 120093
-calcgame    | INFO:     ('172.18.0.8', 49728) - "WebSocket /pongcalc_consumer/remote/pong/" [accepted]
-calcgame    | PongCalcRemote > Client connected
-calcgame    | INFO:     connection open
-gateway     | ProxyCalcGameLocal > from calcgame: You are connected!
-gateway     | ProxyCalcGameInvite > listen_to_calcgame:  p1_name: Bellingham#1, p2_name: Bellingham#2
-calcgame    | PongCalcRemote > received data: {'type': 'opening_connection, game details', 'game_id': 120093, 'p1_name': 'Bellingham#1', 'p2_name': 'Bellingham#2'}
-calcgame    | PongCalcRemote > Opening connection with players: Bellingham#1, Bellingham#2
-gateway     | INFO:     172.18.0.1:42918 - "GET /media/avatars/default.png HTTP/1.1" 200 OK
-postgres    | 2024-11-06 14:30:45.866 UTC [27] LOG:  checkpoint starting: time
-postgres    | 2024-11-06 14:30:47.584 UTC [27] LOG:  checkpoint complete: wrote 18 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.708 s, sync=0.003 s, total=1.718 s; sync files=18, longest=0.002 s, average=0.001 s; distance=35 kB, estimate=35 kB; lsn=0/1CE6670, redo lsn=0/1CE6638
-- startGame-button does not works during tournament
-- When we click on a notification during a game, the game get interupted and does not resume
+- startGame-button does not works during tournament -> does not happens each time
+- When we click on a notification during a game, the game get interupted and does not resume -> does not happens each time
 
 
 # TO-DO
   - Modal when inviting to play someone
-  - If someone invite me to play, I accept but then I exit before he joins the room, the other playter doesnt get notified

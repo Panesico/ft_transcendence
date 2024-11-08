@@ -38,3 +38,15 @@ function getCookie(name) {
   }
   return cookieValue;
 }
+ // Prevents the dropdown from closing
+document.addEventListener('DOMContentLoaded', () => {
+  const notificationContent = document.getElementById('notificationContent');
+  
+  if (notificationContent) {
+    notificationContent.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+  }
+});
+
+
