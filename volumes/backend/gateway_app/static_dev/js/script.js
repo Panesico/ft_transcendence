@@ -34,10 +34,10 @@ async function loadContent(path) {
       sessionStorage.setItem('afterLogout', 'true');
       sessionStorage.setItem('afterLogoutMessage', data.message);
       window.location.replace('/');
-      console.log('IM NOT GEI');
+      console.log('loadContent > logout_successful');
     } else
       document.querySelector('main').innerHTML = data.html;
-      console.log('IM GEI');
+    console.log('loadContent > main updated');
 
     displayMessageInModal(data.message);
     handleFormSubmission();
