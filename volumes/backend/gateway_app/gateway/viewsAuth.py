@@ -126,9 +126,7 @@ def post_login(request):
             return JsonResponse(response.json())
         if jwt_token:
             user_response = JsonResponse({'status': 'success', 'type': type, 'message': message, 'user_id': user_id})
-            profile_data = get_profileapi_variables_userId(user_id)
-            if profile_data.get('status') == 'error':
-              return redirect('404')
+            profile_data = get_profileapi_variables(response=response)
             logger.debug(f"post_login > profile_data: {profile_data}")
             preferred_language = profile_data.get('preferred_language')
             logger.debug(f"post_login > preferred_language: {preferred_language}")
@@ -278,7 +276,8 @@ def oauth(request):
         # Create a base JsonResponse with status and message
         json_response_data = {
             'status': 'success',
-            'message': response_data.get("message", _("No message provided"))
+            'message': response_data.get("message", _("No message provided")),
+            'user_id': response_data.get("user_id")
         }
 
         # Merge response_data into the JsonResponse data
@@ -298,9 +297,7 @@ def oauth(request):
                 json_response[header_name] = header_value
         
         if response.cookies.get('django_language') == None:
-            profile_data = get_profileapi_variables(request=request)
-            if user_profile.get('status') == 'error':
-              return redirect('404')
+            profile_data = get_profileapi_variables(response)
             logger.debug(f"post_login > profile_data: {profile_data}")
             preferred_language = profile_data.get('preferred_language')
             json_response.set_cookie('django_language', preferred_language, samesite='Lax', httponly=True, secure=True)

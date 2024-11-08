@@ -18,25 +18,12 @@ prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
-def get_profileapi_variables_userId(user_id):
-  logger.debug(f"get_profileapi_variables > user_id: {user_id}")
-  profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id) + '/'
-  logger.debug(f"get_profileapi_variables > profile_api_url: {profile_api_url}")
-  response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
-  if response.status_code == 200:
-    logger.debug(f"-------> get_edit_profile > Response: {response.json()}")
-    return response.json()
+def get_profileapi_variables(request=None, response=None):
+  if response is not None:
+    user_id = int(response.json().get('user_id'))
+    logger.debug(f"get_profileapi_variables > user_id: {user_id}")
   else:
-    status = response.status_code
-    message = response.json().get('message')
-    logger.debug(f"-------> get_edit_profile > error Response: {response.status_code}")
-    return {'status': 'error', 'message': message, 'status_code': status}
-
-def get_profileapi_variables(request):
-  # jwt_token = request.COOKIES.get('jwt_token')
-  # user_id = getUserId(jwt_token)
-  user_id = request.user.id
-  logger.debug(f"get_profileapi_variables > user_id: {user_id}")
+    user_id = request.user.id
   profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id) + '/'
   logger.debug(f"get_profileapi_variables > profile_api_url: {profile_api_url}")
   response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
