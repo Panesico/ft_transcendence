@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSIÓN DEL PAQUETE\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-08 10:28+0000\n"
+"POT-Creation-Date: 2024-11-08 11:51+0000\n"
 "PO-Revision-Date: AÑO-MO-DA HO:MI+ZONA\n"
 "Last-Translator: NOMBRE COMPLETO <EMAIL@DIRECCIÓN>\n"
 "Language-Team: ESPAÑOL <ES@li.org>\n"
@@ -58,18 +58,18 @@ msgid "Semi-Final 1"
 msgstr "Semifinal 1"
 
 #: gateway/consumerProxyCalcGameTournament.py:120
-#: gateway/consumerProxyCalcGameTournament.py:238
+#: gateway/consumerProxyCalcGameTournament.py:239
 msgid "Semi-Final 2"
 msgstr "Semifinal 2"
 
 #: gateway/consumerProxyCalcGameTournament.py:122
-#: gateway/consumerProxyCalcGameTournament.py:240
+#: gateway/consumerProxyCalcGameTournament.py:241
 msgid "Final"
 msgstr "Final"
 
 #: gateway/consumerProxyCalcGameTournament.py:137
-#: gateway/consumerProxyCalcGameTournament.py:253
-#: gateway/consumerProxyCalcGameTournament.py:256
+#: gateway/consumerProxyCalcGameTournament.py:254
+#: gateway/consumerProxyCalcGameTournament.py:257
 msgid "you play next in the tournament"
 msgstr "juegas el siguiente en el torneo"
 
@@ -228,6 +228,14 @@ msgstr "Introduce el código"
 #: gateway/templates/fragments/2FA_verify_fragment.html:20
 msgid "Verify"
 msgstr "Verificar"
+
+#: gateway/templates/fragments/401_fragment.html:5
+msgid "Unauthorized"
+msgstr "No autorizado"
+
+#: gateway/templates/fragments/401_fragment.html:6
+msgid "Please, login before proceeding."
+msgstr "Porfavor, inicia sesión para continuar."
 
 #: gateway/templates/fragments/404_fragment.html:3
 msgid "Page Not Found"
@@ -668,28 +676,28 @@ msgstr "Cierre de sesión exitoso"
 msgid "Method not allowed"
 msgstr "Método no permitido"
 
-#: gateway/viewsAuth.py:100 gateway/viewsAuth.py:193
-#: gateway/viewsProfile.py:243 gateway/viewsProfile.py:314
+#: gateway/viewsAuth.py:100 gateway/viewsAuth.py:191
+#: gateway/viewsProfile.py:230 gateway/viewsProfile.py:301
 msgid "Invalid form data"
 msgstr "Datos del formulario inválidos"
 
-#: gateway/viewsAuth.py:281
+#: gateway/viewsAuth.py:279
 msgid "No message provided"
 msgstr "No se proporcionó mensaje"
 
-#: gateway/viewsAuth.py:311
+#: gateway/viewsAuth.py:308
 msgid "Failed to login with 42"
 msgstr "Error al iniciar sesión con 42"
 
-#: gateway/viewsAuth.py:346
+#: gateway/viewsAuth.py:343
 msgid "Invalid request method. Use POST."
 msgstr "Método de solicitud inválido. Use POST."
 
-#: gateway/viewsAuth.py:353
+#: gateway/viewsAuth.py:350
 msgid "OTP code is required"
 msgstr "Se requiere código OTP"
 
-#: gateway/viewsAuth.py:355
+#: gateway/viewsAuth.py:352
 msgid "Invalid JSON format"
 msgstr "Formato JSON inválido"
 
@@ -741,10 +749,10 @@ msgstr "No puedes desbloquearte a ti mismo"
 msgid "User unblocked"
 msgstr "Usuario desbloqueado"
 
-#: gateway/viewsProfile.py:210
+#: gateway/viewsProfile.py:197
 msgid "Error retrieving match history"
 msgstr "Error al recuperar el historial de partidas"
 
-#: gateway/viewsProfile.py:432
+#: gateway/viewsProfile.py:419
 msgid "Please select a file to upload"
 msgstr "Por favor, seleccione un archivo para subir"
