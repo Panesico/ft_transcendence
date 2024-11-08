@@ -1,4 +1,4 @@
-import os, json, logging, requests, mimetypes
+import os, json, logging, requests, mimetypes, asyncio, aiohttp
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect
@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from .utils import getUserId
 # from .utils import getUserData
 import prettyprinter
 from prettyprinter import pformat
@@ -30,12 +31,10 @@ def get_profileapi_variables(request=None, response=None):
     logger.debug(f"-------> get_edit_profile > Response: {response.json()}")
     return response.json()
   else:
-    logger.debug(f"-------> get_edit_profile > Response: {response.status_code}")
-    return {'avatar': '/media/avatars/default.png',#Need to be handled better
-            'country': 'Spain',
-            'city': 'Málaga',
-            'display_name': 'MyDisplayName',
-            'preferred_language': 'en',
+    status = response.status_code
+    message = response.json().get('message')
+    logger.debug(f"-------> get_edit_profile > error Response: {response.status_code}")
+    return {'status': 'error', 'message': message, 'status_code': status
             }
 
 @login_required
@@ -48,6 +47,13 @@ def get_profile(request):
 
     # GET profile user's variables
     profile_data = get_profileapi_variables(request=request)
+    if profile_data.get('status') == 'error':
+        return redirect(profile_data.get('status_code'))
+
+    # Ensure the user has a profile
+    if profile_data.get('status') == 'error':
+        return redirect('404')
+
     logger.debug(f"get_profile > profile_data: {profile_data}")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_profile XMLHttpRequest")
@@ -64,6 +70,8 @@ def get_edit_profile(request):
 
     # GET profile user's variables
     profile_data = get_profileapi_variables(request=request)
+    if profile_data.get('status') == 'error':
+        return redirect(profile_data.get('status_code'))
     logger.debug(f"get_edit_profile > profile_data: {profile_data}")
 
     form = EditProfileFormFrontend()
@@ -150,6 +158,8 @@ def view_user_profile(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         profile = get_profileapi_variables(request)
+        if profile.get('status') == 'error':
+            return redirect(profile_data.get('status_code'))
         # logger.debug(f"view_user_profile > user: {pformat(user.__dict__)}")
         # logger.debug(f"view_user_profile > profile: {pformat(profile)}")
     except:
@@ -209,9 +219,10 @@ def post_edit_profile_security(request):
     # Recover data from the form
     data = json.loads(request.body)
     data['user_id'] = request.user.id
-    logger.debug(f"post_edit_profile > data: {data}")
 
     profile_data = get_profileapi_variables(request=request)
+    if profile_data.get('status') == 'error':
+        return redirect(profile_data.get('status_code'))
 
     # Check form is valid
     form = EditProfileFormFrontend(data)
@@ -242,7 +253,8 @@ def post_edit_profile_security(request):
 
     #handle wrong confirmation password
     else:
-      profile_data = get_profileapi_variables(request=request)
+      if profile_data.get('status') == 'error':
+        return redirect(profile_data.get('status_code'))
       data = json.loads(request.body)
       form = EditProfileFormFrontend(data)
       form.add_error(None, message)
@@ -269,7 +281,7 @@ def post_edit_profile_general(request):
         'Cookie': f'csrftoken={csrf_token}',
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
-        'Authorization': f'Bearer {jwt_token}',
+        # 'Authorization': f'Bearer {jwt_token}', --> does not work when included
     }
 
     # Recover data from the form
@@ -280,6 +292,8 @@ def post_edit_profile_general(request):
     logger.debug(f"post_edit_profile > data: {data}")
 
     profile_data = get_profileapi_variables(request=request)
+    if profile_data.get('status') == 'error':
+        return redirect(profile_data.get('status_code'))
 
     # Check form is valid
     form = EditProfileFormFrontend(data)
@@ -290,8 +304,8 @@ def post_edit_profile_general(request):
         return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
 
     # Send and recover response from the profileapi service
-    authentif_url = 'https://profileapi:9002/api/editprofile/' 
-    response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
+    profileapi_url = 'https://profileapi:9002/api/editprofile/' 
+    response = requests.post(profileapi_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
     status = response.json().get("status")
     message = response.json().get("message")
     type = response.json().get("type")
@@ -299,7 +313,9 @@ def post_edit_profile_general(request):
 
     # Redirection usage
     form = EditProfileFormFrontend()
-    profile_data = get_profileapi_variables(request=request)
+    if profile_data.get('status') == 'error':
+        return redirect(profile_data.get('status_code'))
+
     if response.ok:
         logger.debug('post_edit_profile_general > Response OK')      
             #construct html to return
@@ -313,7 +329,8 @@ def post_edit_profile_general(request):
         
     #handle displayName already taken
     else:
-      profile_data = get_profileapi_variables(request=request)
+      if profile_data.get('status') == 'error':
+        return redirect(profile_data.get('status_code'))
       logger.debug('profile_data: %s', profile_data)
       data = json.loads(request.body)
       form = EditProfileFormFrontend(data)
@@ -347,6 +364,8 @@ def post_edit_profile_avatar(request):
   # Redirection usage
   form = EditProfileFormFrontend()
   profile_data = get_profileapi_variables(request=request)
+  if profile_data.get('status') == 'error':
+    return redirect(profile_data.get('status_code'))
   preferred_language = profile_data.get('preferred_language')
 
   # Recover data from the form
@@ -384,7 +403,8 @@ def post_edit_profile_avatar(request):
         return user_response
     else:
       form = EditProfileFormFrontend()
-      profile_data = get_profileapi_variables(request=request)
+      if profile_data.get('status') == 'error':
+        return redirect(profile_data.get('status_code'))
       logger.debug('post_edit_profile > Response KO')
       html = render_to_string('fragments/edit_profile_fragment.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message})
@@ -392,7 +412,8 @@ def post_edit_profile_avatar(request):
   # Handle the case where no file is uploaded
   else:
     logger.debug('post_edit_profile_avatar > No file uploaded')
-    profile_data = get_profileapi_variables(request=request)
+    if profile_data.get('status') == 'error':
+        return redirect('404')
     logger.debug('profile_data: %s', profile_data)
     form = EditProfileFormFrontend(data)
     form.add_error(None, _('Please select a file to upload'))
@@ -410,7 +431,6 @@ def download_42_avatar(request):
         # Get the image URL from the parsed JSON
         image_url = body_data.get('image_url')
         
-        logger.info(f"HEL MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE -------------------------> {image_url}")
         if not image_url:
             return JsonResponse({'error': 'No image URL provided'}, status=400)
 
@@ -448,6 +468,8 @@ async def checkNameExists(request):
 
     if request.user.id != 0:
         user_profile = get_profileapi_variables(request)
+        if user_profile.get('status') == 'error':
+            return redirect(profile_data.get('status_code'))
         if data['name'] == user_profile['display_name'] or data['name'] == request.user.username:
             return JsonResponse({'status': 'success', 'message': 'display name and username are available'})
 

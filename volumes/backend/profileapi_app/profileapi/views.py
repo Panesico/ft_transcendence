@@ -55,6 +55,7 @@ def api_signup(request):
 
 
 def api_edit_profile(request):
+    logger.debug("")
     logger.debug("api_edit_profile")
     language = request.headers.get('X-Language', 'en')
     activate(language)
@@ -197,6 +198,7 @@ def get_profile_api(request, user_id):
               'wins': user_obj.wins,
               'defeats': user_obj.defeats,
               'blocked_users': list(user_obj.blocked_users.values_list('id', flat=True)),
+              'status': 'success',
             }
         return JsonResponse(data, status=200)
     except Profile.DoesNotExist:
@@ -306,7 +308,6 @@ def get_notifications(request, user_id):
         user_obj = Profile.objects.get(user_id=id)
         logger.debug('user_obj recovered')
         notifications = Notification.objects.filter(receiver=user_obj)
-        logger.debug('notifications recovered')
         data = []
         for notification in notifications:
             data.append({
@@ -318,12 +319,13 @@ def get_notifications(request, user_id):
                 'status': notification.status,
                 'game_type': notification.game_type,
             })
+            logger.debug(f'notification data: {data}')
         return JsonResponse(data, status=200, safe=False)
     except Profile.DoesNotExist:
         logger.debug('get_notifications > User not found')
         return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
     except Exception as e:
-        logger.debug(f'get_notifications > {str(e)}')
+        logger.debug(f'get_notifications exception > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 # def accept_friend_request(request, sender_id, receiver_id, sender_obj, receiver_obj):
