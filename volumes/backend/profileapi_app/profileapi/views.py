@@ -57,31 +57,29 @@ def api_signup(request):
 def api_edit_profile(request):
     logger.debug("")
     logger.debug("api_edit_profile")
-    language = request.headers.get('X-Language', 'en')
-    activate(language)
+    # language = request.headers.get('X-Language', 'en')
+    # activate(language)
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            logger.debug(f'data: {data}')
+            logger.debug(f'api_edit_profile > data: {data}')
             user_id = data.get('user_id')
-            logger.debug(f'user_id: {user_id}')
+            logger.debug(f'api_edit_profile > user_id: {user_id}')
 
             # Use get_object_or_404 to handle the case where the user is not found
             user_obj = Profile.objects.get(user_id=user_id)
-            logger.debug('user_obj recovered')
+            logger.debug('api_edit_profile > current user_obj recovered')
 
             # Log the current profile data
-            logger.debug(f'country: {user_obj.country}')
-            logger.debug(f'city: {user_obj.city}')
-            logger.debug(f'preferred_language: {user_obj.preferred_language}')
+            logger.debug(f'Current profile, country: {user_obj.country}, city: {user_obj.city}, preferred_language: {user_obj.preferred_language}')
+            logger.debug('------------------------------')
 
             # Ensure data is passed as a dictionary
             form = EditProfileForm(data, instance=user_obj)
-            logger.debug(f'form: {form}')
-            # Log the current profile data
-            logger.debug('------------------------------')
-            logger.debug(f'country: {user_obj.country}')
-            logger.debug(f'city: {user_obj.city}')
+            logger.debug(f'api_edit_profile > form: {form}')
+
+            language = data.get('preferred_language')
+            activate(language)
 
             if form.is_valid():
                 logger.debug('api_edit_profile > Form is valid')
