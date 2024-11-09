@@ -143,14 +143,18 @@ function innit_listening() {
                 // Add block switch
                 blockSwitchContainer.style.display = 'block';
                 const blockSwitch = blockSwitchContainer.querySelector('input');
+                const blockSwitchDiv = blockSwitchContainer.querySelector('#blockSwitchDiv');
                 blockSwitch.setAttribute('data-user-id', friend.user_id);
                 blockSwitch.setAttribute('id', `blockSwitch-${friend.user_id}`);
-                blockSwitch.addEventListener('change', function () {
+                // Cloning and replacing the blockSwitch before adding event listener to avoid duplicates
+                const newBlockSwitch = blockSwitch.cloneNode(true);
+                blockSwitchDiv.replaceChild(newBlockSwitch, blockSwitch);
+                newBlockSwitch.addEventListener('change', function () {
                   blockFriend(friend.user_id);
                 });
                 checkIfBlocked(friend.user_id).then((isBlocked) => {
                   console.log('isBlocked:', isBlocked);
-                  blockSwitch.checked = isBlocked;
+                  newBlockSwitch.checked = isBlocked;
                   messageInput.placeholder = isBlocked
                     ? 'You cannot send messages to blocked users'
                     : 'Type a message to send';
