@@ -27,7 +27,11 @@ async def getDecodedJWT(jwt_token):
 
 # Get user_id from JWT token
 async def getUserId(jwt_token):
-    decoded_data = await getDecodedJWT(jwt_token)
+    try:
+        decoded_data = await getDecodedJWT(jwt_token)
+    except Exception as e:
+        logger.error(f"getUserId > Error decoding JWT: {e}")
+        return 0
     user_id = decoded_data['user_id']
     return user_id
     

@@ -46,11 +46,6 @@ def get_play(request):
     if request.method != 'GET': 
       return redirect('405')
     
-    # jwt_token = request.COOKIES.get('jwt_token')
-    # user_id = await getUserId(jwt_token)
-    # user = await getUserData(user_id)
-    # logger.debug(f"get_play > user['profile']: {user['profile']}")
-
     if request.user.id != 0:
         user_profile = get_profileapi_variables(request)
         if user_profile.get('status') == 'error':
