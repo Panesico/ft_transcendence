@@ -117,3 +117,13 @@ def get_player_language(context):
     
     # Default to 'en'
     return 'en'
+
+# Send data via websocket checking if connection is open
+async def send_data_via_websocket(ws, data):
+    if ws and ws.state == websockets.protocol.State.OPEN:
+        try:
+            await ws.send(data)
+        except websockets.exceptions.ConnectionClosed as e:
+            logger.error(f"WebSocket connection closed: {e}")
+    else:
+        logger.error("WebSocket connection is not open.")
