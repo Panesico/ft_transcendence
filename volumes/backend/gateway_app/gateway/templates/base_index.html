@@ -31,7 +31,7 @@
   </header>
   {% include 'includes/popupMessages.html' %}
   
-  {% if user.is_authenticated %}
+  {% if user.username %}
     {% include 'includes/chat_modal.html' %}
   {% endif %}
 
