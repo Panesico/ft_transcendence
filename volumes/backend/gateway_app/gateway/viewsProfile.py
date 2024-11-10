@@ -317,7 +317,7 @@ def post_edit_profile_general(request):
 
     if response.ok:
         logger.debug('post_edit_profile_general > Response OK')      
-        preferred_language = profile_data.get('preferred_language')
+        preferred_language = data.get('preferred_language')
         logger.debug(f"post_edit_profile > preferred_language: {preferred_language}")
         user_response =  JsonResponse({'status': status, 'type': type, 'message': message, 'preferred_language': preferred_language})
         user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
