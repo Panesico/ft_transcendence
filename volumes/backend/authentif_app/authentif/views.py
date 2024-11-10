@@ -511,6 +511,14 @@ def oauth(request):
         samesite='Lax',  # Control cross-site request behavior
         max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
         )
+        response.set_cookie(
+        key='refresh_jwt_token',
+        value=refresh_jwt_token,
+        httponly=True,  # Prevent JavaScript access to the cookie (for security)
+        secure=True,  # Only send the cookie over HTTPS (ensure your environment supports this)
+        samesite='Lax',  # Control cross-site request behavior
+        max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
+        )
         return response
     except User.DoesNotExist:
         # Check if this is a "42 user" by seeing if `id` exists in user_data (or any other identifier for 42 user)
@@ -531,8 +539,10 @@ def oauth(request):
     if user == None:
         login(request, user)
 
-    jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
+    jwt_token, refresh_jwt_token = generate_jwt_token(user)  # Ensure this function is properly implemented
+
     payload = json.dumps({'image_url': user_data['image']['link']})  # Convert the data to a JSON string
+    logger.debug(f"payload: {payload}")
     
     headers = {
         'X-CSRFToken': csrf_token,
@@ -549,7 +559,7 @@ def oauth(request):
     if response.status_code == 200:
         # Get the content type from the response
         content_type = response.headers['Content-Type']
-        image_name = response.headers.get('Content-Disposition').split('filename=')[1].strip('"')
+        image_name = response.headers.get('Content-Disposition').split('filename=')[1].strip('\"')
 
         # Prepare the multipart form data for editing the profile avatar
         files = {
@@ -625,7 +635,15 @@ def oauth(request):
         httponly=True,  # Prevent JavaScript access to the cookie (for security)
         secure=True,  # Only send the cookie over HTTPS (ensure your environment supports this)
         samesite='Lax',  # Control cross-site request behavior
-        max_age=60 * 60 * 24 * 7,  # Cookie expiration (optional, e.g., 7 days)
+        max_age=60 * 15,
+    )
+    response.set_cookie(
+        key='refresh_jwt_token',
+        value=refresh_jwt_token,
+        httponly=True,  # Prevent JavaScript access to the cookie (for security)
+        secure=True,  # Only send the cookie over HTTPS (ensure your environment supports this)
+        samesite='Lax',  # Control cross-site request behavior
+        max_age=60 * 60 * 24 * 7,
     )
     response.set_cookie('django_language', language, samesite='Lax', httponly=True, secure=True)
     
@@ -795,11 +813,12 @@ def verify2FA(request, user_id):
     # Use pyotp to verify the provided OTP code
     totp = pyotp.TOTP(user.two_factor_token)
     if totp.verify(otp_code):
-        new_token = generate_jwt_token(user)
+        new_token, refresh_jwt_token = generate_jwt_token(user)
 
         # Respond with success and set the new JWT as a secure cookie
         response = JsonResponse({"status": "success", "message": _("2FA verified")})
         response.set_cookie('jwt_token', new_token, httponly=True, secure=True, samesite='Lax')
+        response.set_cookie('refresh_jwt_token', refresh_jwt_token, httponly=True, secure=True, samesite='Lax')
 
         return response
     else:

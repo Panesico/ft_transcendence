@@ -33,7 +33,7 @@ async function loadContent(path) {
     if (data.type && data.message && (data.type === 'logout_successful')) {
       sessionStorage.setItem('afterLogout', 'true');
       sessionStorage.setItem('afterLogoutMessage', data.message);
-      window.location.replace('/');
+      handleAfterLogin();
       console.log('loadContent > logout_successful');
     } else
       document.querySelector('main').innerHTML = data.html;
@@ -59,10 +59,7 @@ function navigate(e, path) {
   e.preventDefault();
 
   // Push the new state into the browser's history
-  if (path === '/api/auth/logout') {
-    window.history.pushState({}, '', '/');
-  } else
-    window.history.pushState({}, '', path);
+  window.history.pushState({}, '', path);
 
   loadContent(path);
 }

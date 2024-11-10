@@ -54,6 +54,9 @@
   <!-- Store the user ID in a hidden input -->
   <input type="hidden" id="userID" value="{{ request.user.id }}">
       
+  <!-- Auth JS -->
+  <script src="{% static 'js/auth/auth.js' %}"></script>
+  
   <!-- Custom JS -->
   <script src="{% static 'js/script.js' %}"></script>
   <script src="{% static 'js/utils.js' %}"></script>
@@ -71,9 +74,6 @@
   <script src="{% static 'js/play/playStart.js' %}"></script>
   <script src="{% static 'js/play/tournament.js' %}"></script>
   <script src="{% static 'js/play/tournamentStart.js' %}"></script>
-
-  <!-- Auth JS -->
-  <script src="{% static 'js/auth/auth.js' %}"></script>
 
 
   <script type="text/javascript">
