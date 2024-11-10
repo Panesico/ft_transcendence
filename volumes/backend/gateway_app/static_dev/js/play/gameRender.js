@@ -244,11 +244,9 @@ function getCalcGameSocket(gameMode, gameType, gameRound) {
 }
 
 // Attach and remove event listeners to navbar items on socket open/close
-function setupNavigateEventListeners(socket) {
+function setupNavbarNavigateEventListeners(socket) {
   const header = document.querySelector("#mainHeader");
   const navLinks = header.querySelectorAll("a");
-  const contactAvatarLink = document.querySelector("#contactAvatarLink");
-  const contactDisplayNameLink = document.querySelector("#contactDisplayNameLink");
 
   // Define the event listener for navigation
   function closeSocketOnNavigateClick() {
@@ -257,15 +255,47 @@ function setupNavigateEventListeners(socket) {
       socket.close();
       socket = null;
 
-      removeNavigateListeners();
+      removeNavbarNavigateListeners();
     }
   }
 
   // Remove event listeners from the navbar links and chat nav items
-  function removeNavigateListeners() {
+  function removeNavbarNavigateListeners() {
     navLinks.forEach(link => {
       link.removeEventListener("click", closeSocketOnNavigateClick);
     });
+  }
+
+  // Attach event listeners to all navbar links and chat nav items
+  function addNavbarNavigateListeners() {
+    navLinks.forEach(link => {
+      link.addEventListener("click", closeSocketOnNavigateClick);
+    });
+  }
+
+  addNavbarNavigateListeners();
+}
+
+// Attach and remove event listeners to navbar items on socket open/close
+function setupChatNavigateEventListeners(socket) {
+  const contactAvatarLink = document.querySelector("#contactAvatarLink");
+  const contactDisplayNameLink = document.querySelector("#contactDisplayNameLink");
+  console.log("contactAvatarLink", contactAvatarLink);
+  console.log("contactDisplayNameLink", contactDisplayNameLink);
+
+  // Define the event listener for navigation
+  function closeSocketOnNavigateClick() {
+    if (socket) {
+      // console.log("Closing WebSocket due to navigation.");
+      socket.close();
+      socket = null;
+
+      removeChatNavigateListeners();
+    }
+  }
+
+  // Remove event listeners from the navbar links and chat nav items
+  function removeChatNavigateListeners() {
     if (contactAvatarLink)
       contactAvatarLink.removeEventListener("click", closeSocketOnNavigateClick);
     if (contactDisplayNameLink)
@@ -273,14 +303,12 @@ function setupNavigateEventListeners(socket) {
   }
 
   // Attach event listeners to all navbar links and chat nav items
-  function addNavigateListeners() {
-    navLinks.forEach(link => {
-      link.addEventListener("click", closeSocketOnNavigateClick);
-    });
+  function addChatNavigateListeners() {
     if (contactAvatarLink)
       contactAvatarLink.addEventListener("click", closeSocketOnNavigateClick);
     if (contactDisplayNameLink)
       contactDisplayNameLink.addEventListener("click", closeSocketOnNavigateClick);
   }
-  addNavigateListeners();
+
+  addChatNavigateListeners();
 }

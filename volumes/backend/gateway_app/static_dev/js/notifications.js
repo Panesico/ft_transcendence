@@ -226,12 +226,24 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
 
     // console.log('listenUserResponse > type:', type, ', data:', data);
     if (type === 'game_request') {
+      // Cancel current game if any
+      if (calcGameSocket) {
+        calcGameSocket.close();
+        calcGameSocket = null;
+      }
       // Receiver accepts the invite and goes to the waiting room
       playGameInvite(data.game_mode, data.game_type, receiver_username, { sender_username, sender_id, receiver_username, receiver_id });
+
     }
     else if (type === 'game_request_response') {
+      // Cancel current game if any
+      if (calcGameSocket) {
+        calcGameSocket.close();
+        calcGameSocket = null;
+      }
       // Sender accepts the invite response and goes to the waiting room
       playGameInvite(data.game_mode, data.game_type, sender_username, { sender_username, sender_id, receiver_username, receiver_id });
+
     }
 
     //    mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id}));

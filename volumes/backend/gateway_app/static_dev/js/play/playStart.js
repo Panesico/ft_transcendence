@@ -1,3 +1,5 @@
+let calcGameSocket;
+
 // Open WebSocket connection to calcgame and start a new local or remote game
 async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, invite_data) {
 
@@ -6,14 +8,14 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
   let player_role;
 
   // Open websocket connection
-  const calcGameSocket = getCalcGameSocket(gameMode, gameType, gameRound);
+  calcGameSocket = getCalcGameSocket(gameMode, gameType, gameRound);
   if (calcGameSocket === undefined) return;
 
   calcGameSocket.onopen = function (e) {
     console.log('startNewGame > .onopen, connection opened.');
 
     // Set up event listeners on navbar items to close connection on navigate
-    setupNavigateEventListeners(calcGameSocket);
+    setupNavbarNavigateEventListeners(calcGameSocket);
     // Set up event listeners for controls
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);

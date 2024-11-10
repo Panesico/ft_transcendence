@@ -127,6 +127,7 @@ function innit_listening() {
                 newContactDisplayNameLink.addEventListener('click', function (event) {
                   navigate(event, `/userprofile/${friend.user_id}`);
                 });
+                setupChatNavigateEventListeners(calcGameSocket);
 
                 currentChatId.value = friend.user_id;
 
