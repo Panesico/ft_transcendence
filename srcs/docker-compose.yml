@@ -1,21 +1,25 @@
 name: transcendence
 
 services:
-  # nginx:
-  #   build:
-  #     context: ./nginx
-  #     dockerfile: Dockerfile
-  #   image: nginx
-  #   container_name: nginx
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - static:/var/www/html
-  #   networks:
-  #     - transcendence
-  #   restart: unless-stopped
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: nginx
+    container_name: nginx
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend:/usr/src/app
+      - frontend:/usr/src/frontend
+      - certs:/certs
+    networks:
+      - transcendence
+    restart: unless-stopped
+    depends_on:
+      - gateway
 
   gateway:
     build:
@@ -29,8 +33,8 @@ services:
       - PYTHONPATH=/usr/src/app/authentif_app
     env_file:
       - .env
-    ports:
-      - "8443:8443"
+    expose:
+      - 8443
     networks:
       - transcendence
     volumes:

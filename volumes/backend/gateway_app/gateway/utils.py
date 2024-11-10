@@ -27,7 +27,11 @@ async def getDecodedJWT(jwt_token):
 
 # Get user_id from JWT token
 async def getUserId(jwt_token):
-    decoded_data = await getDecodedJWT(jwt_token)
+    try:
+        decoded_data = await getDecodedJWT(jwt_token)
+    except Exception as e:
+        logger.error(f"getUserId > Error decoding JWT: {e}")
+        return 0
     user_id = decoded_data['user_id']
     return user_id
     
@@ -113,3 +117,13 @@ def get_player_language(context):
     
     # Default to 'en'
     return 'en'
+
+# Send data via websocket checking if connection is open
+async def send_data_via_websocket(ws, data):
+    if ws and ws.state == websockets.protocol.State.OPEN:
+        try:
+            await ws.send(data)
+        except websockets.exceptions.ConnectionClosed as e:
+            logger.error(f"WebSocket connection closed: {e}")
+    else:
+        logger.error("WebSocket connection is not open.")

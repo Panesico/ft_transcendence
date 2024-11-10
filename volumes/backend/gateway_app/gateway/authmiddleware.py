@@ -79,6 +79,7 @@ class JWTAuthenticationMiddleware:
         return response
 
     def process_request(self, request):
+        logger.debug(settings.MEDIA_ROOT)
         auth_header = request.headers.get('Authorization')
         access_token = request.COOKIES.get('jwt_token')
         refresh_token = request.COOKIES.get('refresh_jwt_token')

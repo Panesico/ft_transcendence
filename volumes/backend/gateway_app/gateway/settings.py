@@ -30,7 +30,7 @@ REDIRECT_URI = os.environ.get('REDIRECT_URI')
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Redirects to his address when using @login_required
 LOGIN_URL = '/login/'
@@ -233,11 +233,13 @@ SESSION_COOKIE_SECURE = True
 # Mitigates the risk of cross-site scripting (XSS) - document.cookie not accessible in the browser.
 SESSION_COOKIE_HTTPONLY = True
 
-CORS_ALLOWED_ORIGINS = [ "https://localhost:8443" ]
+CORS_ALLOWED_ORIGINS = [ "https://localhost:8443", "https://localhost:8000" ]
 
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'Strict'
 CSRF_TRUSTED_ORIGINS = [
+    'https://localhost:8000',
+    'https://nginx:8000',
     'https://gateway:8443',
     'https://authentif:9001',
     'https://profileapi:9002',

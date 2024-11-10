@@ -1,7 +1,7 @@
 import os, json, logging, websockets, ssl, asyncio, aiohttp
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest, get_player_language
+from .utils import getUserId, getUserData, asyncRequest, get_player_language, send_data_via_websocket
 from django.utils.translation import activate, gettext as _
 
 import prettyprinter
@@ -153,9 +153,9 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
                 'info': self.game_info,
             }))
 
-            if self.calcgame_ws:
-              self.game_info['type'] = 'opening_connection, game details'
-              await self.calcgame_ws.send(json.dumps(self.game_info))
+            self.game_info['type'] = 'opening_connection, game details'
+            await send_data_via_websocket(self.calcgame_ws, json.dumps(self.game_info))
+            
             return
 
         elif data['type'] == 'next_game, game details':
@@ -172,9 +172,8 @@ class ProxyCalcGameTournament(AsyncWebsocketConsumer):
             # Listener Loop as background task that listens for messages from the calcgame WebSocket and sends those updates to the client. 
             self.calcgame_task = asyncio.create_task(self.listen_to_calcgame())
 
-        if self.calcgame_ws:
-          # Forward the message from the client to the calcgame WebSocket server
-          await self.calcgame_ws.send(text_data)
+        # Forward the message from the client to the calcgame WebSocket server
+        await send_data_via_websocket(self.calcgame_ws, text_data)
     
     async def createTournament(self):
         logger.debug("ProxyCalcGameTournament > createTournament")

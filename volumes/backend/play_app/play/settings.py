@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -214,8 +214,12 @@ CORS_ALLOWED_ORIGINS = [ "https://localhost:8443" ]
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'Strict'
 CSRF_TRUSTED_ORIGINS = [
+    'https://localhost:8000',
+    'https://nginx:8000',
     'https://gateway:8443',
     'https://authentif:9001',
     'https://profileapi:9002',
     'https://play:9003',
+    'https://calcgame:9004',
     ]
+

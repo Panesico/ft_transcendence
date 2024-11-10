@@ -2,7 +2,7 @@ import os, json, logging, websockets, ssl, asyncio
 from datetime import datetime, timedelta
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest, generate_unique_id, get_player_language
+from .utils import getUserId, getUserData, asyncRequest, generate_unique_id, get_player_language, send_data_via_websocket
 from django.utils.translation import activate, gettext as _
 
 import prettyprinter
@@ -339,7 +339,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             # Forward client message to calcgame websocket
             if data['game_id'] and data['game_id'] in self.active_games and 'calcgame_ws' in self.active_games[data['game_id']]:
                 calcgame_ws = self.active_games[data['game_id']]['calcgame_ws']
-                await calcgame_ws.send(text_data)
+                await send_data_via_websocket(calcgame_ws, text_data)
 
     async def listen_to_calcgame(self, game_id):
         try:
@@ -364,7 +364,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
                         'p2_name': player2['player_name'],
                     })
                     logger.debug(f"ProxyCalcGameRemote > listen_to_calcgame:  p1_name: {player1['player_name']}, p2_name: {player2['player_name']}")
-                    await calcgame_ws.send(text_data)
+                    await send_data_via_websocket(calcgame_ws, text_data)
 
                     # Send message received from calcgame to both players
                     await player1['ws'].send(calcgame_response)

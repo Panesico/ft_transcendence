@@ -1,6 +1,6 @@
 FROM  nginx:1.27.1
 
-RUN   mkdir -p /nginx/html/ /etc/nginx/ssl /var/www/html
+RUN   mkdir -p /nginx/html/ /etc/nginx/ssl
 
 # Generate self-signed certificates
 RUN   openssl req -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/nginx.key \

@@ -1,7 +1,7 @@
 import os, json, logging, websockets, ssl, asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest, get_player_language
+from .utils import getUserId, getUserData, asyncRequest, get_player_language, send_data_via_websocket
 from django.utils.translation import activate, gettext as _
 
 import prettyprinter
@@ -103,7 +103,7 @@ class ProxyCalcGameLocal(AsyncWebsocketConsumer):
                 'html': html,
             }))
         # Forward the message from the client to the calcgame WebSocket server
-        await self.calcgame_ws.send(text_data)
+        await send_data_via_websocket(self.calcgame_ws, text_data)
 
     async def listen_to_calcgame(self):
         try:
