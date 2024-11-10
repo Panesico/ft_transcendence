@@ -62,6 +62,14 @@ async def getUserData(user_id):
 
     return user
 
+
+async def getUserProfile(user_id):
+    url = 'https://profileapi:9002/api/profile/' + str(user_id) + '/'
+
+    response = await asyncRequest("GET", "", url, "")
+    return response
+    
+
 # Async http request, csrf_token and data can be "" for 'GET' requests
 async def asyncRequest(method, csrf_token, url, data):
     headers = {

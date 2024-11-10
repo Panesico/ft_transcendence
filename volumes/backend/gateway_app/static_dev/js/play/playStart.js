@@ -62,6 +62,13 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
       document.querySelector('main').innerHTML = data.html;
       announceGame(data.title, data.message);
 
+    } else if (data.type === 'blocked_user') {
+      console.warn('startNewGame > .onmessage blocked_user:', data.type);
+
+      document.querySelector('main').innerHTML = data.html;
+      announceGame(data.title, data.message);
+      calcGameSocket.close();
+
     } else if (data.type === 'waiting_room') {  // while finding an opponent
       // in remote
       console.log('startNewGame > .onmessage waiting_room:', data.message);

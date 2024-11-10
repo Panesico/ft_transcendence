@@ -2,7 +2,7 @@ import os, json, logging, websockets, ssl, asyncio
 from datetime import datetime, timedelta
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest, generate_unique_id, get_player_language, send_data_via_websocket
+from .utils import getUserId, getUserData, asyncRequest, generate_unique_id, get_player_language, send_data_via_websocket, getUserProfile
 from django.utils.translation import activate, gettext as _
 
 import prettyprinter
@@ -84,6 +84,14 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
         if game_type in self.waiting:
             for player_id, player_info in self.waiting[game_type].items():
                 if player_info['player_name'] is not None:
+                    
+                    # Check if user blocked and remove it from waiting
+                    sender_id, receiver_id = map(int, player_info['combined_id'].split('_'))
+                    is_blocked = await self.check_blocked(sender_id, receiver_id, player_info)
+                    if is_blocked:
+                        self.waiting[game_type].pop(player_id)
+                        return
+                    
                     for other_player_id, other_player_info in self.waiting[game_type].items():
                       # Check if 2 players have the same combined_id
                       if player_info['combined_id'] == other_player_info['combined_id'] and player_id != other_player_id:
@@ -227,6 +235,12 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
             game_type = data['game_type']
             if connect_id in self.waiting[game_type]:
                 player = self.waiting[game_type][connect_id]
+   
+                # Check if user blocked
+                is_blocked = await self.check_blocked(data['sender_id'], data['receiver_id'], player)
+                if is_blocked:
+                    return
+
                 player['player_name'] = data['p1_name']
                 player['ready'] = False
                 player['game_type'] = game_type
@@ -456,3 +470,31 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
             'title': _('Forfeit'),
             'message': _('Your opponent has disconnected'),
         }))
+
+
+    async def check_blocked(self, sender_id, receiver_id, player): 
+        sender_profile = await getUserProfile(sender_id)
+        receiver_profile = await getUserProfile(receiver_id)
+
+        # logger.debug(f"ProxyCalcGameInvite > is receiver_id {receiver_id} blocked by sender_id {sender_id}?")
+        # logger.debug(f"ProxyCalcGameInvite > sender_profile.get('blocked_users') {sender_profile.get('blocked_users', [])}")
+        # logger.debug(f"ProxyCalcGameInvite > receiver_profile.get('blocked_users') {receiver_profile.get('blocked_users', [])}")
+
+        if receiver_id in sender_profile.get('blocked_users', []) or sender_id in receiver_profile.get('blocked_users', []):
+            logger.error(f"Receiver {receiver_id} is blocked by sender {sender_id}")
+
+            player_language = get_player_language(player['context'])
+            activate(player_language)
+            html = render_to_string('fragments/home_fragment.html', {
+                  'user': player['context']['user'],
+                })
+
+            await self.send(json.dumps({
+                'type': 'blocked_user',
+                'html': html,
+                'title': _('Cancelled'),
+                'message': _('You cannot play with this user'),
+            }))
+
+            return True
+        return False

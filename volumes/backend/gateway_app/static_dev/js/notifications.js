@@ -204,8 +204,34 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
   response_type = type + '_response';
   console.log('listenUserResponse > response_type:', response_type);
 
-  acceptButton.addEventListener('click', function () {
+  acceptButton.addEventListener('click', async function () {
     console.log('Accept button clicked');
+
+    // Check if a user is blocked
+    let blocked, imBlocked;
+    if (type === 'game_request') {
+      blocked = await checkIfBlocked(sender_id);
+      imBlocked = await checkIfImBlocked(sender_id);
+    }
+    else if (type === 'game_request_response') {
+      blocked = await checkIfBlocked(receiver_id);
+      imBlocked = await checkIfImBlocked(receiver_id);
+    }
+
+    if (blocked || imBlocked) {
+      acceptButton.remove();
+      declineButton.remove();
+
+      let lang = getCookie('django_language');
+      let error = 'You cannot play with this user';
+      if (lang === 'fr')
+        error = 'Vous ne pouvez pas jouer avec cet utilisateur';
+      else if (lang === 'es')
+        error = 'No puedes jugar con este usuario';
+      displayMessageInModal(error);
+
+      return;
+    }
 
     // Sender is notified that the receiver has accepted the invite
     if (sendMessagesBySocket({

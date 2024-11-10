@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSION DU PACKAGE\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-10 16:10+0000\n"
+"POT-Creation-Date: 2024-11-10 21:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: NOM COMPLET <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUE <LL@li.org>\n"
@@ -18,36 +18,41 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: gateway/consumerProxyCalcGameInvite.py:143
-#: gateway/consumerProxyCalcGameInvite.py:154
+#: gateway/consumerProxyCalcGameInvite.py:151
+#: gateway/consumerProxyCalcGameInvite.py:162
 #: gateway/consumerProxyCalcGameRemote.py:200
 #: gateway/consumerProxyCalcGameRemote.py:211
 msgid "Game starting..."
 msgstr "Le jeu commence..."
 
-#: gateway/consumerProxyCalcGameInvite.py:144
+#: gateway/consumerProxyCalcGameInvite.py:152
 #: gateway/consumerProxyCalcGameRemote.py:201
 msgid "You are the player on the left"
 msgstr "Vous êtes le joueur à gauche"
 
-#: gateway/consumerProxyCalcGameInvite.py:155
+#: gateway/consumerProxyCalcGameInvite.py:163
 #: gateway/consumerProxyCalcGameRemote.py:212
 msgid "You are the player on the right"
 msgstr "Vous êtes le joueur à droite"
 
-#: gateway/consumerProxyCalcGameInvite.py:456
+#: gateway/consumerProxyCalcGameInvite.py:470
 #: gateway/consumerProxyCalcGameRemote.py:517
 msgid "Forfeit"
 msgstr "Abandon"
 
-#: gateway/consumerProxyCalcGameInvite.py:457
+#: gateway/consumerProxyCalcGameInvite.py:471
 #: gateway/consumerProxyCalcGameRemote.py:518
 msgid "Your opponent has disconnected"
 msgstr "Votre adversaire s'est déconnecté"
 
+#: gateway/consumerProxyCalcGameInvite.py:495
 #: gateway/consumerProxyCalcGameRemote.py:548
 msgid "Cancelled"
 msgstr "Annulé"
+
+#: gateway/consumerProxyCalcGameInvite.py:496
+msgid "You cannot play with this user"
+msgstr "Vous ne pouvez pas jouer avec cet utilisateur"
 
 #: gateway/consumerProxyCalcGameRemote.py:549
 msgid "You are already waiting for a game"
@@ -77,51 +82,51 @@ msgstr "vous êtes le prochain à jouer dans le tournoi"
 msgid "Alphanumeric characters, underscores and hyphens only."
 msgstr "Caractères alphanumériques, tirets bas et tirets seulement."
 
-#: gateway/forms.py:16
+#: gateway/forms.py:17
 msgid "Letters and spaces only."
 msgstr "Lettres et espaces seulement."
 
-#: gateway/forms.py:27 gateway/forms.py:47 gateway/forms.py:96
+#: gateway/forms.py:28 gateway/forms.py:48 gateway/forms.py:97
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
-#: gateway/forms.py:36 gateway/forms.py:56
+#: gateway/forms.py:37 gateway/forms.py:57
 msgid "Password"
 msgstr "Mot de passe"
 
-#: gateway/forms.py:64
+#: gateway/forms.py:65
 msgid "Confirm password"
 msgstr "Confirmer le mot de passe"
 
-#: gateway/forms.py:76
+#: gateway/forms.py:77
 msgid "Friend's Name"
 msgstr "Nom de l'ami"
 
-#: gateway/forms.py:87
+#: gateway/forms.py:88
 msgid "Upload avatar"
 msgstr "Télécharger l'avatar"
 
-#: gateway/forms.py:106
+#: gateway/forms.py:107
 msgid "Display name"
 msgstr "Nom d'affichage"
 
-#: gateway/forms.py:116
+#: gateway/forms.py:117
 msgid "Country"
 msgstr "Pays"
 
-#: gateway/forms.py:126
+#: gateway/forms.py:127
 msgid "City"
 msgstr "Ville"
 
-#: gateway/forms.py:134
+#: gateway/forms.py:135
 msgid "Language"
 msgstr "Langue"
 
-#: gateway/forms.py:147
+#: gateway/forms.py:148
 msgid "New password"
 msgstr "Nouveau mot de passe"
 
-#: gateway/forms.py:155
+#: gateway/forms.py:156
 msgid "Confirm new password"
 msgstr "Confirmer le nouveau mot de passe"
 
