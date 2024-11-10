@@ -49,4 +49,43 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+function askUserToReload() {
+  const reload = confirm('Connection lost. Please reload the page');
+  if (reload) {
+    location.reload();
+  }
+}
 
+function reconnectSocket(socket) {
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const hostname = window.location.hostname;
+  const port = window.location.port ? `:${window.location.port}` : '';
+  console.log('sendMessagesBySocket > reconnecting to the socket..')
+
+  // Reconnect to the corresponding socket
+  if (socket === mainRoomSocket) {
+    console.log('sendMessagesBySocket > reconnecting to the mainRoomSocket');
+    const userID = document.getElementById('userID').value;
+    console.log('userID:', userID);
+    if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null || userID === 'None' || userID === '[object HTMLInputElement]') {
+      console.warn('Client is not logged in');
+      return false;
+    }
+    socket = new WebSocket(`${protocol}//${hostname}${port}/wss/mainroom/${userID}/`);
+  }
+  else if (socket === inviteFriendSocket) {
+    console.log('sendMessagesBySocket > reconnecting to the inviteFriendSocket');
+    socket = new WebSocket(`${protocol}//${hostname}${port}/wss/invite_friend/`);
+  }
+
+  // Check the socket state
+  if (socket.readyState === WebSocket.OPEN) {
+    console.log('sendMessagesBySocket > socket reconnected successfully');
+    return true;
+  }
+  else {
+    askUserToReload();
+    console.log('sendMessagesBySocket > socket failed to reconnect');
+    return false;
+  }
+}

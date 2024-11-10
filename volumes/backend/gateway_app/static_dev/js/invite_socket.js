@@ -213,7 +213,7 @@ function onModalClose(modal) {
   }
 
   // Close properly the websocket
-  if (inviteFriendSocket && inviteFriendSocket.readyState === WebSocket.OPEN) {
+  if (inviteFriendSocket ) {
     inviteFriendSocket.close();
     console.log('Modal is closed and WebSocket is closed');
   } else {
@@ -228,7 +228,7 @@ function onModalClose(modal) {
 
 // Function to listen for the friend invitation
 function listenFriendInvitation(modal, form) {
-  let inputField = document.getElementById('username_input');
+  let inputField = document.getElementById('usernameInput');
   let userID = document.getElementById('userID').value;
 
   console.log('User ID:', userID);

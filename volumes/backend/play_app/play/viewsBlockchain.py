@@ -7,7 +7,11 @@ logger = logging.getLogger(__name__)
 web3 = Web3(Web3.HTTPProvider("http://blockchain:8545"))
 
 def str_to_bytes32(s):
-    return bytes(s, 'utf-8').ljust(32, b'\0')[:32]
+    convertion = bytes(s, 'utf-8').ljust(32, b'\0')[:32]
+    logger.debug(f"String {s} converted to bytes32: {convertion}")
+    if len(convertion) != 32:
+        raise ValueError("String is too long to convert to bytes32")
+    return convertion
 
 def create_tournament_in_blockchain(tournament_id, users_names):
   logger.debug("")
