@@ -14,6 +14,9 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
 
     // Set up event listeners on navbar items to close connection on navigate
     setupNavbarEventListeners(calcGameSocket);
+    // Set up event listeners for controls
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
     if (gameMode === 'local')
       calcGameSocket.send(JSON.stringify({
@@ -134,8 +137,12 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
   calcGameSocket.onclose = function (e) {
     if (!e.wasClean) {
       console.error('WebSocket closed unexpectedly:', e);
-    } else
+    } else {
       console.log('startNewGame > .onclose, connection closed');
+    }
+
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
   };
 
   calcGameSocket.onerror = function (e) {
@@ -143,23 +150,23 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
   };
 
   // Event listeners for controls
-  window.addEventListener('keydown', (e) => {
+  function handleKeyDown(e) {
     if (e.key in cfg.keys) {
       cfg.keys[e.key] = true;
       notifyKeyPressed();
     }
-  });
-  window.addEventListener('keyup', (e) => {
+  }
+
+  function handleKeyUp(e) {
     if (e.key in cfg.keys) {
       cfg.keys[e.key] = false;
       notifyKeyPressed();
     }
-  });
+  }
 
   function notifyKeyPressed() {
     // Filter out the keys that are pressed
     const pressedKeys = Object.keys(cfg.keys).filter(key => cfg.keys[key]);
-    // console.log('pressedKeys:', pressedKeys);
     calcGameSocket.send(JSON.stringify(
       { type: 'key_press', keys: pressedKeys, game_id, player_role }));
   }

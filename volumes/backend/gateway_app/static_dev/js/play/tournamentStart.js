@@ -16,6 +16,9 @@ async function startNewTournament(
 
     // Set up event listeners on navbar items to close connection on navigate
     setupNavbarEventListeners(calcGameSocket);
+    // Set up event listeners for controls
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
     if (gameMode === 'local')
       calcGameSocket.send(JSON.stringify({
@@ -28,12 +31,6 @@ async function startNewTournament(
         game_round: gameRound
       }));
 
-    // else if (gameMode === 'remote')
-    //   calcGameSocket.send(JSON.stringify({
-    //     type: 'opening_connection, my name is',
-    //     p1_name: p1_name,
-    //     game_type: gameType
-    //   }));
   };
 
   calcGameSocket.onmessage = function (e) {
@@ -43,12 +40,6 @@ async function startNewTournament(
       console.log(
         'startNewTournament > .onmessage connection_established:', data.message);
       cfg = getInitialVariables(gameType, data.initial_vars);
-
-      // } else if (data.type === 'waiting_room') {  // while finding an opponent
-      //   // in remote
-      //   console.log('startNewTournament > .onmessage waiting_room:', data.message);
-      //   // Load html waiting room
-      //   document.querySelector('main').innerHTML = data.html;
 
     }  // displays Start button in local and checkboxes in remote
     else if (data.type === 'game_start') {
@@ -108,8 +99,12 @@ async function startNewTournament(
   calcGameSocket.onclose = function (e) {
     if (!e.wasClean) {
       console.error('WebSocket closed unexpectedly:', e);
-    } else
+    } else {
       console.log('startNewTournament > .onclose, connection closed');
+    }
+
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
   };
 
   calcGameSocket.onerror = function (e) {
@@ -117,23 +112,23 @@ async function startNewTournament(
   };
 
   // Event listeners for controls
-  window.addEventListener('keydown', (e) => {
+  function handleKeyDown(e) {
     if (e.key in cfg.keys) {
       cfg.keys[e.key] = true;
       notifyKeyPressed();
     }
-  });
-  window.addEventListener('keyup', (e) => {
+  }
+
+  function handleKeyUp(e) {
     if (e.key in cfg.keys) {
       cfg.keys[e.key] = false;
       notifyKeyPressed();
     }
-  });
+  }
 
   function notifyKeyPressed() {
     // Filter out the keys that are pressed
     const pressedKeys = Object.keys(cfg.keys).filter(key => cfg.keys[key]);
-    // console.log('pressedKeys:', pressedKeys);
     calcGameSocket.send(JSON.stringify(
       { type: 'key_press', keys: pressedKeys, game_id, player_role }));
   }
