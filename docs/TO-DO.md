@@ -10,7 +10,6 @@ Auth:
 - Strongsify password
 - startGame-button does not works during tournament -> does not happens each time
 - When we click on a notification during a game, the game get interupted and does not resume -> does not happens each time
-- Upload file with space + only accept picture file
 - a user should be able to accept a game invite if block
 - Fail to save tournament in blockchain -> byte32 conversion
 

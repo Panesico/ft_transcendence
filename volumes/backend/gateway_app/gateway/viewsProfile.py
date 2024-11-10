@@ -318,11 +318,8 @@ def post_edit_profile_general(request):
 
     if response.ok:
         logger.debug('post_edit_profile_general > Response OK')      
-            #construct html to return
         preferred_language = profile_data.get('preferred_language')
         logger.debug(f"post_edit_profile > preferred_language: {preferred_language}")
-        #html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'preferred_language': preferred_language}, request=request)
-        #user_response =  JsonResponse({'html': html, 'status': status, 'message': message, 'preferred_language': preferred_language})
         user_response =  JsonResponse({'status': status, 'type': type, 'message': message, 'preferred_language': preferred_language})
         user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
         return user_response
