@@ -6,7 +6,15 @@ import re
 def validate_username(value):
     if not re.match(r'^[\w-]+$', value):
         raise ValidationError(
-            _('Username can only contain alphanumeric characters, underscores and hyphens.'),
+            _('Alphanumeric characters, underscores and hyphens only.'),
+            params={'value': value},
+        )
+
+def validate_city(value):
+    # Letters (including letters with accents) and spaces only
+    if not re.match(r'^[\u0041-\u005A\u0061-\u007A\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF\u0100-\u017F\u0180-\u024F\s]+$', value):
+        raise ValidationError(
+            _('Letters and spaces only.'),
             params={'value': value},
         )
 
@@ -108,7 +116,7 @@ class EditProfileFormFrontend(forms.Form):
           }),
         label=_('Country'), 
         required=False,
-        validators=[validate_username],
+        validators=[validate_city],
         )
   city = forms.CharField(
         max_length=16, 
@@ -118,7 +126,7 @@ class EditProfileFormFrontend(forms.Form):
           }),
         label=_('City'), 
         required=False,
-        validators=[validate_username],
+        validators=[validate_city],
         )
 
   preferred_language = forms.ChoiceField(
