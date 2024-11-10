@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSION DU PACKAGE\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-08 11:51+0000\n"
+"POT-Creation-Date: 2024-11-10 16:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: NOM COMPLET <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUE <LL@li.org>\n"
@@ -58,69 +58,70 @@ msgid "Semi-Final 1"
 msgstr "Demi-finale 1"
 
 #: gateway/consumerProxyCalcGameTournament.py:120
-#: gateway/consumerProxyCalcGameTournament.py:239
+#: gateway/consumerProxyCalcGameTournament.py:238
 msgid "Semi-Final 2"
 msgstr "Demi-finale 2"
 
 #: gateway/consumerProxyCalcGameTournament.py:122
-#: gateway/consumerProxyCalcGameTournament.py:241
+#: gateway/consumerProxyCalcGameTournament.py:240
 msgid "Final"
 msgstr "Finale"
 
 #: gateway/consumerProxyCalcGameTournament.py:137
-#: gateway/consumerProxyCalcGameTournament.py:254
-#: gateway/consumerProxyCalcGameTournament.py:257
+#: gateway/consumerProxyCalcGameTournament.py:253
+#: gateway/consumerProxyCalcGameTournament.py:256
 msgid "you play next in the tournament"
 msgstr "vous êtes le prochain à jouer dans le tournoi"
 
 #: gateway/forms.py:9
-msgid ""
-"Username can only contain alphanumeric characters, underscores and hyphens."
-msgstr ""
-"Le nom d'utilisateur ne peut contenir que des caractères alphanumériques, "
-"des underscores et des tirets."
+msgid "Alphanumeric characters, underscores and hyphens only."
+msgstr "Caractères alphanumériques, tirets bas et tirets seulement."
 
-#: gateway/forms.py:20 gateway/forms.py:40 gateway/forms.py:89
+#: gateway/forms.py:16
+msgid "Letters and spaces only."
+msgstr "Lettres et espaces seulement."
+
+#: gateway/forms.py:27 gateway/forms.py:47 gateway/forms.py:96
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
-#: gateway/forms.py:29 gateway/forms.py:49
+#: gateway/forms.py:36 gateway/forms.py:56
 msgid "Password"
 msgstr "Mot de passe"
 
-#: gateway/forms.py:57
-msgid "Confirm Password"
+#: gateway/forms.py:64
+msgid "Confirm password"
 msgstr "Confirmer le mot de passe"
 
-#: gateway/forms.py:69
+#: gateway/forms.py:76
 msgid "Friend's Name"
 msgstr "Nom de l'ami"
 
-#: gateway/forms.py:80
+#: gateway/forms.py:87
 msgid "Upload avatar"
 msgstr "Télécharger l'avatar"
 
-#: gateway/forms.py:99
+#: gateway/forms.py:106
 msgid "Display name"
 msgstr "Nom d'affichage"
 
-#: gateway/forms.py:109
+#: gateway/forms.py:116
 msgid "Country"
 msgstr "Pays"
 
-#: gateway/forms.py:119
+#: gateway/forms.py:126
 msgid "City"
 msgstr "Ville"
 
-#: gateway/forms.py:127
+#: gateway/forms.py:134
 msgid "Language"
 msgstr "Langue"
 
-#: gateway/forms.py:140
+#: gateway/forms.py:147
 msgid "New password"
 msgstr "Nouveau mot de passe"
 
-#: gateway/forms.py:148
+#: gateway/forms.py:155
 msgid "Confirm new password"
 msgstr "Confirmer le nouveau mot de passe"
 
@@ -247,7 +248,7 @@ msgstr "Méthode non autorisée"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:3
 #: gateway/templates/fragments/profile_fragment.html:27
-#: gateway/templates/includes/header.html:63
+#: gateway/templates/includes/header.html:61
 msgid "Edit profile"
 msgstr "Modifier le profil"
 
@@ -442,7 +443,7 @@ msgstr "Gagnant"
 
 #: gateway/templates/fragments/myfriends_fragment.html:5
 #: gateway/templates/fragments/profile_fragment.html:29
-#: gateway/templates/includes/header.html:69
+#: gateway/templates/includes/header.html:67
 msgid "My friends"
 msgstr "Mes amis"
 
@@ -492,7 +493,7 @@ msgstr "À distance"
 #: gateway/templates/fragments/tournament_form_fragment.html:43
 #: gateway/templates/fragments/tournament_form_fragment.html:48
 #: gateway/templates/fragments/tournament_form_fragment.html:53
-#: gateway/viewsPlay.py:34 gateway/viewsPlay.py:64
+#: gateway/viewsPlay.py:34 gateway/viewsPlay.py:59
 msgid "Name Player"
 msgstr "Nom du joueur"
 
@@ -500,7 +501,7 @@ msgstr "Nom du joueur"
 #: gateway/templates/fragments/tournament_form_fragment.html:44
 #: gateway/templates/fragments/tournament_form_fragment.html:49
 #: gateway/templates/fragments/tournament_form_fragment.html:54
-#: gateway/viewsPlay.py:35 gateway/viewsPlay.py:65
+#: gateway/viewsPlay.py:35 gateway/viewsPlay.py:60
 msgid "Name"
 msgstr "Nom"
 
@@ -517,12 +518,12 @@ msgid "Profile page"
 msgstr "Page de profil"
 
 #: gateway/templates/fragments/profile_fragment.html:12
-#: gateway/templates/includes/header.html:53
+#: gateway/templates/includes/header.html:51
 msgid "default icon"
 msgstr "Icône par défaut"
 
 #: gateway/templates/fragments/profile_fragment.html:28
-#: gateway/templates/includes/header.html:66
+#: gateway/templates/includes/header.html:64
 msgid "Stats"
 msgstr "Statistiques"
 
@@ -648,15 +649,15 @@ msgstr "Accueil"
 msgid "Play"
 msgstr "Jouer"
 
-#: gateway/templates/includes/header.html:60
+#: gateway/templates/includes/header.html:58
 msgid "Profile"
 msgstr "Profil"
 
-#: gateway/templates/includes/header.html:75
+#: gateway/templates/includes/header.html:73
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: gateway/templates/includes/header.html:140
+#: gateway/templates/includes/header.html:138
 msgid "You have no notifications"
 msgstr "Vous n'avez pas de notifications"
 
@@ -673,7 +674,7 @@ msgid "Method not allowed"
 msgstr "Méthode non autorisée"
 
 #: gateway/viewsAuth.py:100 gateway/viewsAuth.py:191
-#: gateway/viewsProfile.py:230 gateway/viewsProfile.py:301
+#: gateway/viewsProfile.py:230 gateway/viewsProfile.py:300
 msgid "Invalid form data"
 msgstr "Données de formulaire invalides"
 
@@ -749,6 +750,6 @@ msgstr "Utilisateur débloqué"
 msgid "Error retrieving match history"
 msgstr "Erreur lors de la récupération de l'historique des matchs"
 
-#: gateway/viewsProfile.py:419
-msgid "Please select a file to upload"
-msgstr "Veuillez sélectionner un fichier à télécharger"
+#: gateway/viewsProfile.py:380 gateway/viewsProfile.py:412
+msgid "Please select an image file"
+msgstr "Veuillez sélectionner une image à télécharger"

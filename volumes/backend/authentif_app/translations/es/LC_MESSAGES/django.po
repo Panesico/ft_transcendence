@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-04 14:23+0000\n"
+"POT-Creation-Date: 2024-11-10 16:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,144 +54,144 @@ msgstr "Debe establecerse la contraseña o el id_42."
 msgid "You cannot set both password and id_42."
 msgstr "No puede establecer tanto la contraseña como el id_42."
 
-#: authentif/views.py:41 authentif/views.py:43 authentif/views.py:328
-#: authentif/views.py:756
+#: authentif/views.py:41 authentif/views.py:43 authentif/views.py:359
+#: authentif/views.py:783
 msgid "User not found"
 msgstr "Usuario no encontrado"
 
-#: authentif/views.py:61
+#: authentif/views.py:63
 msgid "Logged out successfully"
 msgstr "Cierre de sesión exitoso"
 
-#: authentif/views.py:69
+#: authentif/views.py:72
 msgid "No active session found"
 msgstr "No se encontró una sesión activa"
 
-#: authentif/views.py:88 authentif/views.py:134
+#: authentif/views.py:91 authentif/views.py:145
 msgid "Wrong credentials"
 msgstr "Credenciales incorrectas"
 
-#: authentif/views.py:101
+#: authentif/views.py:104
 msgid "2FA required"
 msgstr "Se requiere 2FA"
 
-#: authentif/views.py:111 authentif/views.py:228 authentif/views.py:470
-#: authentif/views.py:584
+#: authentif/views.py:114 authentif/views.py:249 authentif/views.py:501
+#: authentif/views.py:613
 msgid "Login successful"
 msgstr "Inicio de sesión exitoso"
 
-#: authentif/views.py:131
+#: authentif/views.py:142
 msgid "Invalid username or password"
 msgstr "Nombre de usuario o contraseña inválidos"
 
-#: authentif/views.py:137 authentif/views.py:260 authentif/views.py:286
-#: authentif/views.py:325
+#: authentif/views.py:148 authentif/views.py:286 authentif/views.py:312
+#: authentif/views.py:356
 msgid "Invalid JSON"
 msgstr "JSON inválido"
 
-#: authentif/views.py:140
+#: authentif/views.py:151
 msgid "Wrong or invalid password"
 msgstr "Contraseña no válida"
 
-#: authentif/views.py:142 authentif/views.py:268 authentif/views.py:288
-#: authentif/views.py:334
+#: authentif/views.py:153 authentif/views.py:294 authentif/views.py:314
+#: authentif/views.py:365
 msgid "Method not allowed"
 msgstr "Método no permitido"
 
-#: authentif/views.py:210
+#: authentif/views.py:226
 msgid "User is inactive"
 msgstr "El usuario está inactivo"
 
-#: authentif/views.py:219
+#: authentif/views.py:235
 msgid "Failed to create profile"
 msgstr "Error al crear el perfil"
 
-#: authentif/views.py:263 authentif/views.py:331
+#: authentif/views.py:289 authentif/views.py:362
 msgid "Not a valid password"
 msgstr "Contraseña no válida"
 
-#: authentif/views.py:266
+#: authentif/views.py:292
 msgid "An unexpected error occurred"
 msgstr "Ocurrió un error inesperado"
 
-#: authentif/views.py:280
+#: authentif/views.py:306
 msgid "User exists"
 msgstr "El usuario ya existe"
 
-#: authentif/views.py:283
+#: authentif/views.py:309
 msgid "User does not exist"
 msgstr "El usuario no existe"
 
-#: authentif/views.py:317
-msgid "Profile updated"
-msgstr "Perfil actualizado"
-
-#: authentif/views.py:322
-msgid "Invalid profile update"
-msgstr "Actualización de perfil inválida"
-
-#: authentif/views.py:618 authentif/views.py:665 authentif/views.py:730
-msgid "Invalid request method. Use POST."
-msgstr "Método de solicitud inválido. Use POST."
-
-#: authentif/views.py:621 authentif/views.py:624 authentif/views.py:668
-#: authentif/views.py:672 authentif/views.py:714 authentif/views.py:733
+#: authentif/views.py:328 authentif/views.py:651 authentif/views.py:654
+#: authentif/views.py:698 authentif/views.py:702 authentif/views.py:744
 msgid "Unauthorized"
 msgstr "No autorizado"
 
-#: authentif/views.py:630
+#: authentif/views.py:348
+msgid "Profile updated"
+msgstr "Perfil actualizado"
+
+#: authentif/views.py:353
+msgid "Invalid profile update"
+msgstr "Actualización de perfil inválida"
+
+#: authentif/views.py:648 authentif/views.py:695 authentif/views.py:760
+msgid "Invalid request method. Use POST."
+msgstr "Método de solicitud inválido. Use POST."
+
+#: authentif/views.py:660
 msgid "2FA is already enabled"
 msgstr "2FA ya está habilitado"
 
-#: authentif/views.py:652
+#: authentif/views.py:682
 msgid "Scan the QR code, then enter the OTP below to confirm"
 msgstr ""
 "Escanee el código QR, luego ingrese el OTP a continuación para confirmar"
 
-#: authentif/views.py:679 authentif/views.py:766
+#: authentif/views.py:709 authentif/views.py:793
 msgid "OTP code is required"
 msgstr "Se requiere el código OTP"
 
-#: authentif/views.py:681
+#: authentif/views.py:711
 msgid "Invalid JSON format"
 msgstr "Formato de JSON inválido"
 
-#: authentif/views.py:687
+#: authentif/views.py:717
 msgid "No 2FA setup in progress or setup expired"
 msgstr "No hay configuración de 2FA en progreso o la configuración ha expirado"
 
-#: authentif/views.py:702
+#: authentif/views.py:732
 msgid "2FA is now enabled"
 msgstr "2FA ahora está habilitado"
 
-#: authentif/views.py:706 authentif/views.py:779
+#: authentif/views.py:736 authentif/views.py:806
 msgid "Invalid OTP code"
 msgstr "Código OTP inválido"
 
-#: authentif/views.py:720
+#: authentif/views.py:750
 msgid "2FA disabled successfully"
 msgstr "2FA deshabilitado con éxito"
 
-#: authentif/views.py:722
+#: authentif/views.py:752
 msgid "2FA is not enabled"
 msgstr "2FA no está habilitado"
 
-#: authentif/views.py:723
+#: authentif/views.py:753
 msgid "Invalid request"
 msgstr "Solicitud inválida"
 
-#: authentif/views.py:737
+#: authentif/views.py:764
 msgid "User ID is required"
 msgstr "Se requiere ID de usuario"
 
-#: authentif/views.py:750
+#: authentif/views.py:777
 msgid "Token or user mismatch"
 msgstr "El token o el usuario no coinciden"
 
-#: authentif/views.py:759
+#: authentif/views.py:786
 msgid "2FA is not enabled for this user"
 msgstr "2FA no está habilitado para este usuario"
 
-#: authentif/views.py:774
+#: authentif/views.py:801
 msgid "2FA verified"
 msgstr "2FA verificado"

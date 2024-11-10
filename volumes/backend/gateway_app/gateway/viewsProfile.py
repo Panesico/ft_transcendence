@@ -409,7 +409,7 @@ def post_edit_profile_avatar(request):
   else:
     logger.debug('post_edit_profile_avatar > No file uploaded')
     form = EditProfileFormFrontend(data)
-    form.add_error(None, _('Please select a file to upload'))
+    form.add_error(None, _('Please select an image file'))
     html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
     return JsonResponse({'html': html, 'status': 'error'}, status=400)
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-08 11:51+0000\n"
+"POT-Creation-Date: 2024-11-10 16:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ENGLISH <LL@li.org>\n"
@@ -58,68 +58,70 @@ msgid "Semi-Final 1"
 msgstr "Semi-Final 1"
 
 #: gateway/consumerProxyCalcGameTournament.py:120
-#: gateway/consumerProxyCalcGameTournament.py:239
+#: gateway/consumerProxyCalcGameTournament.py:238
 msgid "Semi-Final 2"
 msgstr "Semi-Final 2"
 
 #: gateway/consumerProxyCalcGameTournament.py:122
-#: gateway/consumerProxyCalcGameTournament.py:241
+#: gateway/consumerProxyCalcGameTournament.py:240
 msgid "Final"
 msgstr "Final"
 
 #: gateway/consumerProxyCalcGameTournament.py:137
-#: gateway/consumerProxyCalcGameTournament.py:254
-#: gateway/consumerProxyCalcGameTournament.py:257
+#: gateway/consumerProxyCalcGameTournament.py:253
+#: gateway/consumerProxyCalcGameTournament.py:256
 msgid "you play next in the tournament"
 msgstr "you play next in the tournament"
 
 #: gateway/forms.py:9
-msgid ""
-"Username can only contain alphanumeric characters, underscores and hyphens."
-msgstr ""
-"Username can only contain alphanumeric characters, underscores and hyphens."
+msgid "Alphanumeric characters, underscores and hyphens only."
+msgstr "Alphanumeric characters, underscores and hyphens only."
 
-#: gateway/forms.py:20 gateway/forms.py:40 gateway/forms.py:89
+#: gateway/forms.py:16
+msgid "Letters and spaces only."
+msgstr "Letters and spaces only."
+
+#: gateway/forms.py:27 gateway/forms.py:47 gateway/forms.py:96
 msgid "Username"
 msgstr "Username"
 
-#: gateway/forms.py:29 gateway/forms.py:49
+#: gateway/forms.py:36 gateway/forms.py:56
 msgid "Password"
 msgstr "Password"
 
-#: gateway/forms.py:57
-msgid "Confirm Password"
-msgstr "Confirm Password"
+#: gateway/forms.py:64
+msgid "Confirm password"
+msgstr "Confirm password"
 
-#: gateway/forms.py:69
+#: gateway/forms.py:76
 msgid "Friend's Name"
 msgstr "Friend's Name"
 
-#: gateway/forms.py:80
+#: gateway/forms.py:87
 msgid "Upload avatar"
 msgstr "Upload avatar"
 
-#: gateway/forms.py:99
+#: gateway/forms.py:106
 msgid "Display name"
 msgstr "Display name"
 
-#: gateway/forms.py:109
+#: gateway/forms.py:116
 msgid "Country"
 msgstr "Country"
 
-#: gateway/forms.py:119
+#: gateway/forms.py:126
 msgid "City"
 msgstr "City"
 
-#: gateway/forms.py:127
+#: gateway/forms.py:134
 msgid "Language"
 msgstr "Language"
 
-#: gateway/forms.py:140
+#: gateway/forms.py:147
 msgid "New password"
 msgstr "New password"
 
-#: gateway/forms.py:148
+#: gateway/forms.py:155
 msgid "Confirm new password"
 msgstr "Confirm new password"
 
@@ -128,38 +130,28 @@ msgid " has invited you to play: "
 msgstr " has invited you to play: "
 
 #: gateway/handleMainRoom.py:34
-#, fuzzy
-#| msgid " accepted your friend request."
 msgid "has accepted your friend request."
-msgstr " accepted your friend request."
+msgstr "has accepted your friend request."
 
 #: gateway/handleMainRoom.py:36
-#, fuzzy
-#| msgid " declined your friend request."
 msgid "has declined your friend request."
-msgstr " declined your friend request."
+msgstr "has declined your friend request."
 
 #: gateway/handleMainRoom.py:38
-#, fuzzy
-#| msgid " is waiting to play "
 msgid "is waiting to play "
-msgstr " is waiting to play "
+msgstr "is waiting to play "
 
 #: gateway/handleMainRoom.py:40
-#, fuzzy
-#| msgid " declined your friend request."
 msgid "has declined the game request."
-msgstr " declined your friend request."
+msgstr "has declined your friend request."
 
 #: gateway/handleMainRoom.py:42
-#, fuzzy
-#| msgid " has canceled the game request."
 msgid "has canceled the game request."
-msgstr " has canceled the game request."
+msgstr "has canceled the game request."
 
 #: gateway/handleMainRoom.py:154
 msgid "sent you a friend request"
-msgstr " sent you a friend request"
+msgstr "sent you a friend request"
 
 #: gateway/templates/base_index.html:83
 msgid "Choose..."
@@ -168,7 +160,7 @@ msgstr "Choose..."
 #: gateway/templates/base_index.html:90
 #: gateway/templates/includes/popupMessages.html:8
 msgid "Notification"
-msgstr ""
+msgstr "Notification"
 
 #: gateway/templates/base_index.html:91
 msgid " sent you a friend request."
@@ -183,16 +175,12 @@ msgid " declined your friend request."
 msgstr " declined your friend request."
 
 #: gateway/templates/base_index.html:95
-#, fuzzy
-#| msgid " accepted your friend request."
 msgid " has accepted your game request."
-msgstr " accepted your friend request."
+msgstr " has accepted your friend request."
 
 #: gateway/templates/base_index.html:96
-#, fuzzy
-#| msgid " declined your friend request."
 msgid " has declined your game request."
-msgstr " declined your friend request."
+msgstr " has declined your friend request."
 
 #: gateway/templates/base_index.html:97
 msgid " has cancelled the game request."
@@ -204,7 +192,7 @@ msgstr " is waiting to play."
 
 #: gateway/templates/base_index.html:99
 msgid " you play next in the tournament."
-msgstr "you play next in the tournament."
+msgstr " you play next in the tournament."
 
 #: gateway/templates/base_index.html:100
 msgid "Friend blocked successfully."
@@ -240,11 +228,11 @@ msgstr "Verify"
 
 #: gateway/templates/fragments/401_fragment.html:5
 msgid "Unauthorized"
-msgstr ""
+msgstr "Unauthorized"
 
 #: gateway/templates/fragments/401_fragment.html:6
 msgid "Please, login before proceeding."
-msgstr ""
+msgstr "Please, login before proceeding."
 
 #: gateway/templates/fragments/404_fragment.html:3
 msgid "Page Not Found"
@@ -260,7 +248,7 @@ msgstr "Method Not Allowed"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:3
 #: gateway/templates/fragments/profile_fragment.html:27
-#: gateway/templates/includes/header.html:63
+#: gateway/templates/includes/header.html:61
 msgid "Edit profile"
 msgstr "Edit profile"
 
@@ -294,7 +282,7 @@ msgstr "Submit"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:86
 msgid "Security"
-msgstr ""
+msgstr "Security"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:104
 msgid "Change Password"
@@ -455,7 +443,7 @@ msgstr "Winner"
 
 #: gateway/templates/fragments/myfriends_fragment.html:5
 #: gateway/templates/fragments/profile_fragment.html:29
-#: gateway/templates/includes/header.html:69
+#: gateway/templates/includes/header.html:67
 msgid "My friends"
 msgstr "My friends"
 
@@ -505,7 +493,7 @@ msgstr "Remote"
 #: gateway/templates/fragments/tournament_form_fragment.html:43
 #: gateway/templates/fragments/tournament_form_fragment.html:48
 #: gateway/templates/fragments/tournament_form_fragment.html:53
-#: gateway/viewsPlay.py:34 gateway/viewsPlay.py:64
+#: gateway/viewsPlay.py:34 gateway/viewsPlay.py:59
 msgid "Name Player"
 msgstr "Name Player"
 
@@ -513,7 +501,7 @@ msgstr "Name Player"
 #: gateway/templates/fragments/tournament_form_fragment.html:44
 #: gateway/templates/fragments/tournament_form_fragment.html:49
 #: gateway/templates/fragments/tournament_form_fragment.html:54
-#: gateway/viewsPlay.py:35 gateway/viewsPlay.py:65
+#: gateway/viewsPlay.py:35 gateway/viewsPlay.py:60
 msgid "Name"
 msgstr "Name"
 
@@ -530,12 +518,12 @@ msgid "Profile page"
 msgstr "Profile page"
 
 #: gateway/templates/fragments/profile_fragment.html:12
-#: gateway/templates/includes/header.html:53
+#: gateway/templates/includes/header.html:51
 msgid "default icon"
 msgstr "default icon"
 
 #: gateway/templates/fragments/profile_fragment.html:28
-#: gateway/templates/includes/header.html:66
+#: gateway/templates/includes/header.html:64
 msgid "Stats"
 msgstr "Stats"
 
@@ -661,15 +649,15 @@ msgstr "Home"
 msgid "Play"
 msgstr "Play"
 
-#: gateway/templates/includes/header.html:60
+#: gateway/templates/includes/header.html:58
 msgid "Profile"
 msgstr "Profile"
 
-#: gateway/templates/includes/header.html:75
+#: gateway/templates/includes/header.html:73
 msgid "Logout"
 msgstr "Logout"
 
-#: gateway/templates/includes/header.html:140
+#: gateway/templates/includes/header.html:138
 msgid "You have no notifications"
 msgstr "You have no notifications"
 
@@ -686,7 +674,7 @@ msgid "Method not allowed"
 msgstr "Method not allowed"
 
 #: gateway/viewsAuth.py:100 gateway/viewsAuth.py:191
-#: gateway/viewsProfile.py:230 gateway/viewsProfile.py:301
+#: gateway/viewsProfile.py:230 gateway/viewsProfile.py:300
 msgid "Invalid form data"
 msgstr "Invalid form data"
 
@@ -762,6 +750,6 @@ msgstr "User unblocked"
 msgid "Error retrieving match history"
 msgstr "Error retrieving match history"
 
-#: gateway/viewsProfile.py:419
-msgid "Please select a file to upload"
-msgstr "Please select a file to upload"
+#: gateway/viewsProfile.py:380 gateway/viewsProfile.py:412
+msgid "Please select an image file"
+msgstr "Please select an image file"
