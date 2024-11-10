@@ -297,7 +297,7 @@ def oauth(request):
                 json_response[header_name] = header_value
         
         if response.cookies.get('django_language') == None:
-            profile_data = get_profileapi_variables(response)
+            profile_data = get_profileapi_variables(response=response)
             logger.debug(f"post_login > profile_data: {profile_data}")
             preferred_language = profile_data.get('preferred_language')
             json_response.set_cookie('django_language', preferred_language, samesite='Lax', httponly=True, secure=True)
@@ -455,8 +455,15 @@ def verify2FA_redir(request, user_id):
     return json_response
 
 def refresh_token(request):
-    # Create the base JSON response
+    #get jwt cookie from request
+    jwt_token = request.COOKIES.get('jwt_token')
+
     json_response = JsonResponse({'status': 'success', 'message': 'Token refreshed successfully'})
+    if len(jwt_token) > 10:
+        try:
+            jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            json_response = JsonResponse({'status': 'success', 'message': 'Expired Token refreshed'})
 
     # Filter and copy relevant cookies from the request to the response
     # This example assumes you are only setting an 'auth_token' cookie.

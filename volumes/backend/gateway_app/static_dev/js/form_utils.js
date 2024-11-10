@@ -60,15 +60,16 @@ function listenForm(form) {
         if (data.type === 'login_successful') {
           sessionStorage.setItem('afterLogin', 'true');
           sessionStorage.setItem('afterLoginMessage', data.message);
-
+          handleAfterLogin();
         } else if (data.type === 'signup_successful') {
           sessionStorage.setItem('afterSignup', 'true');
           sessionStorage.setItem('afterSignupMessage', data.message);
+          handleAfterLogin();
 
         } else if (data.type === 'profile_updated') {
           sessionStorage.setItem('afterProfileUpdate', 'true');
           sessionStorage.setItem('afterProfileUpdateMessage', data.message);
-
+          handleAfterLogin();
         } else if (data.type === '2FA') {
             try {
                 const verifyResponse = await fetch('/verify2FA/' + data.user_id + "/", {
@@ -102,19 +103,9 @@ function listenForm(form) {
             } catch (error) {
                 console.error('2FA verification template load error:', error);
             }
-            return; // You can remove this return if there are further actions
+            return;
         }
         
-        
-
-        // Reload or redirect home
-        if (data.type === 'profile_updated') {
-          location.reload();
-        }
-        else {
-          window.location.replace('/');
-        }
-
       } else
         document.querySelector('main').innerHTML = data.html;
 

@@ -9,13 +9,19 @@ from .authmiddleware import login_required
 logger = logging.getLogger(__name__)
 
 def get_home(request):
-    logger.debug("")
+    if request.user.is_authenticated:
+        logger.debug(f"IN GET HOME > USERNAME: {request.user.username}")
     logger.debug(f"get_home > request: {request}")
     status = request.GET.get('status', '')
     message = request.GET.get('message', '')
+    type_msg = request.GET.get('type', '')
     logger.debug(f"get_home > Request Cookies: {request.COOKIES}")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        html = render_to_string('fragments/home_fragment.html', context={}, request=request)
+        context = {'user': request.user}
+        if type_msg == 'header':
+            html = render_to_string('includes/header.html', context=context, request=request)
+        else:
+            html = render_to_string('fragments/home_fragment.html', context=context, request=request)
         return JsonResponse({'html': html, 'status': status, 'message': message})
     return render(request, 'partials/home.html', {'status': status, 'message': message})
 

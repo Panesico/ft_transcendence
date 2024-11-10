@@ -2,38 +2,87 @@
 function deleteCookie(name) {
   document.cookie = name + '=; Max-Age=-99999999; path=/;';
 }
+  
+
+function handleAfterLogin() {
+    // First GET request for the main content
+    fetch(`/home/?status=success&message=Logged%20in%20successfully&type=main`, {
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'x-requested-with': 'XMLHttpRequest',
+        },
+        credentials: 'include'
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            document.querySelector('main').innerHTML = data.html;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+
+    // Second GET request for the header content
+    fetch(`/home/?status=success&message=Logged%20in%20successfully&type=header`, {
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'x-requested-with': 'XMLHttpRequest',
+        },
+        credentials: 'include'
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            document.querySelector('header').innerHTML = data.html;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    window.history.pushState({}, '', '/');
+}
 
 // TODO -- Client secret changes over a certain period, making it unsuable.
 // Your 42 OAuth settings from Django variables
 
 // Function to handle OAuth code once available
-function handleOAuthCode(oauth_callback_url) {
-  const oauthCode = getCookie('oauth_code');
-  if (oauthCode) {
-    console.log("OAuth code found in cookie:", oauthCode);
-    // Delete the OAuth code cookie after retrieving it
-    deleteCookie('oauth_code');
-
-    // Send the code to the server to exchange for an access token
-    fetch(oauth_callback_url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCookie('csrftoken')
-
-      },
-      body: JSON.stringify({ code: oauthCode })
-    }).then(response => {
-      if (response.ok) {
-        window.location.href = "/";
-      } else {
-        console.error("OAuth authentication failed");
-      }
-    }).catch(error => {
-      console.error("Error during OAuth authentication:", error);
-    });
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
-}
+  
+  async function handleOAuthCode(oauth_callback_url) {
+    const oauthCode = getCookie('oauth_code');
+    if (oauthCode) {
+      console.log("OAuth code found in cookie:", oauthCode);
+      // Delete the OAuth code cookie after retrieving it
+      deleteCookie('oauth_code');
+  
+      try {
+        // Send the code to the server to exchange for an access token
+        const response = await fetch(oauth_callback_url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie('csrftoken')
+          },
+          body: JSON.stringify({ code: oauthCode })
+        });
+  
+        if (response.ok) {
+          console.log("OAuth authentication successful");
+          await sleep(1000);
+          refreshToken();
+          await sleep(1000);
+          handleAfterLogin();
+        } else {
+          console.error("OAuth authentication failed");
+        }
+      } catch (error) {
+        console.error("Error during OAuth authentication:", error);
+      }
+    }
+  }
 
 // When the user clicks the "Login with 42" button
 function loginButton42() {
@@ -216,10 +265,17 @@ async function refreshToken() {
 
         if (!response.ok) {
             throw new Error("Failed to refresh token");
-        }
+        }        
 
         const data = await response.json();
         
+        // check for the message variable in the response body if its == 'Expired Token refreshed'
+        if (data.message === 'Expired Token refreshed') {
+            console.log("Expired Token refreshed");
+            await sleep(300);
+            handleAfterLogin();
+        }
+
         // Assuming the new token is in data.token
         return data.token;
     } catch (error) {
