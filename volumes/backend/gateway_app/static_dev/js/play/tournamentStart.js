@@ -15,7 +15,7 @@ async function startNewTournament(
     console.log('startNewTournament > .onopen, connection opened.');
 
     // Set up event listeners on navbar items to close connection on navigate
-    setupNavbarEventListeners(calcGameSocket);
+    setupNavigateEventListeners(calcGameSocket);
     // Set up event listeners for controls
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);

@@ -244,30 +244,43 @@ function getCalcGameSocket(gameMode, gameType, gameRound) {
 }
 
 // Attach and remove event listeners to navbar items on socket open/close
-function setupNavbarEventListeners(socket) {
+function setupNavigateEventListeners(socket) {
   const header = document.querySelector("#mainHeader");
   const navLinks = header.querySelectorAll("a");
+  const contactAvatarLink = document.querySelector("#contactAvatarLink");
+  const contactDisplayNameLink = document.querySelector("#contactDisplayNameLink");
 
   // Define the event listener for navigation
-  function closeSocketOnNavbarClick() {
+  function closeSocketOnNavigateClick() {
     if (socket) {
       // console.log("Closing WebSocket due to navigation.");
       socket.close();
       socket = null;
 
-      removeNavbarListeners();
+      removeNavigateListeners();
     }
   }
 
-  // Remove event listeners from the navbar links
-  function removeNavbarListeners(socket) {
+  // Remove event listeners from the navbar links and chat nav items
+  function removeNavigateListeners() {
     navLinks.forEach(link => {
-      link.removeEventListener("click", closeSocketOnNavbarClick);
+      link.removeEventListener("click", closeSocketOnNavigateClick);
     });
+    if (contactAvatarLink)
+      contactAvatarLink.removeEventListener("click", closeSocketOnNavigateClick);
+    if (contactDisplayNameLink)
+      contactDisplayNameLink.removeEventListener("click", closeSocketOnNavigateClick);
   }
 
-  // Attach event listeners to all navbar links
-  navLinks.forEach(link => {
-    link.addEventListener("click", closeSocketOnNavbarClick);
-  });
+  // Attach event listeners to all navbar links and chat nav items
+  function addNavigateListeners() {
+    navLinks.forEach(link => {
+      link.addEventListener("click", closeSocketOnNavigateClick);
+    });
+    if (contactAvatarLink)
+      contactAvatarLink.addEventListener("click", closeSocketOnNavigateClick);
+    if (contactDisplayNameLink)
+      contactDisplayNameLink.addEventListener("click", closeSocketOnNavigateClick);
+  }
+  addNavigateListeners();
 }
