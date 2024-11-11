@@ -156,7 +156,7 @@ def post_login(request):
 # Signup
 
 def view_signup(request):
-    logger.debug('view_login')
+    logger.debug('view_signup')
     if request.user.is_authenticated:
       return redirect('home')
     if request.method == 'GET': 
@@ -183,7 +183,10 @@ def post_signup(request):
     if request.method != 'POST':
       return redirect('405')
     
-    data = json.loads(request.body)
+    try:
+      data = json.loads(request.body)
+    except json.JSONDecodeError:
+      return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
     
     # Validate the form data
     form = SignUpFormFrontend(data)
