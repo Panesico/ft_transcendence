@@ -297,7 +297,7 @@ async def checkForNotifications(self):
         receiver_avatar_url = '/media/' + receiver_data.get('avatar_url', '')
 
         # If notif is a response, reverse sender and receiver info
-        if notification['type'] == 'game_request_response' or notification['type'] == 'friend_request_response':
+        if notification['type'] == 'game_request_response' or notification['type'] == 'friend_request_response' or notification['type'] == 'cancel_waiting_room':
           sender_username = receiver_data.get('username', '')
           sender_avatar_url = '/media/' + receiver_data.get('avatar_url', '')
           receiver_username = sender_data.get('username', '')
