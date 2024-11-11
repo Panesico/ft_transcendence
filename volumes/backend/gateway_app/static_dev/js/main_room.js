@@ -4,12 +4,18 @@ unreadNotifications = false;
 
 // Safe way to send messages by socket
 function sendMessagesBySocket(message, socket) {
+  // if user id == 0 do not use websocket
+  if (document.getElementById('userID').value === '0') {
+    console.warn('Client is not logged in, cannot use websocket');
+    return;
+  }
+
   console.log('sendMessagesBySocket > message:', message);
-  if (socket.readyState === WebSocket.OPEN) {
+  if (socket && socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(message));
     return true;
   }
-  else {
+  else if (socket && socket.readyState !== WebSocket.OPEN) {
     console.error('sendMessagesBySocket > socker not ready > socket.readyState:', socket.readyState, 'socker.OPEN:', WebSocket.OPEN);
     return false;
   }

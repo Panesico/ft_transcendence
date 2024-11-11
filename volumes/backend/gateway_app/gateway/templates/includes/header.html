@@ -28,7 +28,7 @@
           onclick="navigate(event, '{% url 'tournament' %}')">{% trans "Tournament" %}</a>
       </li>
 
-      {% if not user.username %}
+      {% if not user.username or user.username == "" %}
         <li class="nav-item d-flex align-items-center">
           <a class="nav-link" href="{% url 'signup' %}"
             onclick="navigate(event, '{% url 'signup' %}')">{% trans "Sign Up" %}</a>
