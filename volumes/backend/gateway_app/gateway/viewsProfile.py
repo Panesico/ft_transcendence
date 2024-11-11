@@ -9,8 +9,8 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from .utils import getUserId
-# from .utils import getUserData
+from .utils import getUserProfile
+
 import prettyprinter
 from prettyprinter import pformat
 prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
@@ -157,11 +157,10 @@ def view_user_profile(request, user_id):
     
     try:
         user = User.objects.get(id=user_id)
-        profile = get_profileapi_variables(request)
-        if profile.get('status') == 'error':
-            return redirect(profile_data.get('status_code'))
+        profile = getUserProfile(user_id)
+        
         # logger.debug(f"view_user_profile > user: {pformat(user.__dict__)}")
-        # logger.debug(f"view_user_profile > profile: {pformat(profile)}")
+        logger.debug(f"view_user_profile > profile: {pformat(profile)}")
     except:
         return redirect('404')
     

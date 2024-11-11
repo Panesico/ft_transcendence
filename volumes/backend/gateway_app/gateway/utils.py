@@ -1,4 +1,4 @@
-import os, json, logging, websockets, ssl, asyncio, aiohttp, jwt, random
+import os, json, logging, websockets, ssl, asyncio, aiohttp, jwt, random, requests
 from django.conf import settings
 
 import prettyprinter
@@ -63,11 +63,17 @@ async def getUserData(user_id):
     return user
 
 
-async def getUserProfile(user_id):
+async def getUserProfileAsync(user_id):
     url = 'https://profileapi:9002/api/profile/' + str(user_id) + '/'
 
     response = await asyncRequest("GET", "", url, "")
     return response
+
+def getUserProfile(user_id):
+    url = 'https://profileapi:9002/api/profile/' + str(user_id) + '/'
+
+    response = requests.get(url, verify=os.getenv("CERTFILE"))
+    return response.json()
     
 
 # Async http request, csrf_token and data can be "" for 'GET' requests

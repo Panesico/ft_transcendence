@@ -2,7 +2,7 @@ import os, json, logging, websockets, ssl, asyncio
 from datetime import datetime, timedelta
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.template.loader import render_to_string
-from .utils import getUserId, getUserData, asyncRequest, generate_unique_id, get_player_language, send_data_via_websocket, getUserProfile
+from .utils import getUserId, getUserData, asyncRequest, generate_unique_id, get_player_language, send_data_via_websocket, getUserProfileAsync
 from django.utils.translation import activate, gettext as _
 
 import prettyprinter
@@ -473,8 +473,8 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
 
 
     async def check_blocked(self, sender_id, receiver_id, player): 
-        sender_profile = await getUserProfile(sender_id)
-        receiver_profile = await getUserProfile(receiver_id)
+        sender_profile = await getUserProfileAsync(sender_id)
+        receiver_profile = await getUserProfileAsync(receiver_id)
 
         # logger.debug(f"ProxyCalcGameInvite > is receiver_id {receiver_id} blocked by sender_id {sender_id}?")
         # logger.debug(f"ProxyCalcGameInvite > sender_profile.get('blocked_users') {sender_profile.get('blocked_users', [])}")
