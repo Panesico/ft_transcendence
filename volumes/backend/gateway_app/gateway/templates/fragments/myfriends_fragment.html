@@ -65,10 +65,10 @@
                   {% else %}
                   <p class="text-danger d-flex flex-column p-2 mb-0">{% trans "This user is blocked and cannot be invited to play." %}</p>
                   {% endif %}
-                    <div class="form-check form-switch m-4">
+                    {% comment %} <div class="form-check form-switch m-4">
                       <input id="blockSwitch-{{ friend.user_id }}" data-user-id="{{ friend.user_id }}" class="form-check-input" type="checkbox"  onchange="blockFriend({{ friend.user_id }})" {% if friend.is_blocked %}checked{% endif %}>
                       <label class="form-check-label" for="blockSwitch-{{ friend.user_id }}">{% trans "Block" %}</label>
-                    </div>
+                    </div> {% endcomment %}
                     
                 </div>
 

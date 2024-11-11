@@ -191,14 +191,22 @@ def block_friends(request, user_id):
     data = {
       'user_id': request.user.id,
     }
-    request = requests.post(
+    response = requests.post(
       'https://profileapi:9002/api/blockFriend/' + str(user_id) + '/',
       headers=headers,
       json=data,
       verify=os.getenv("CERTFILE")
       )
-    if request.status_code == 200:
-      user_response = JsonResponse({'status': 'success', 'message': _('User blocked')})
+    
+    if response.ok:
+      # Get friends
+      profile_api_url = 'https://profileapi:9002/api/getfriends/' + str(request.user.id) + '/'
+      response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+      friends = response.json()
+
+      html = render_to_string('fragments/myfriends_fragment.html', {'friends': friends}, request=request)
+
+      user_response = JsonResponse({'status': 'success', 'message': _('User blocked'), 'html': html})
     else:
       user_response = JsonResponse({'status': 'error', 'message': _('An error occured')})
   return user_response
@@ -231,14 +239,22 @@ def unblock_friends(request, user_id):
     data = {
       'user_id': request.user.id,
     }
-    request = requests.post(
+
+    response = requests.post(
       'https://profileapi:9002/api/unblockFriend/' + str(user_id) + '/',
       headers=headers,
       json=data,
       verify=os.getenv("CERTFILE")
       )
-    if request.status_code == 200:
-      user_response = JsonResponse({'status': 'success', 'message': _('User unblocked')})
+    if response.ok:
+      # Get friends
+      profile_api_url = 'https://profileapi:9002/api/getfriends/' + str(request.user.id) + '/'
+      response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
+      friends = response.json()
+
+      html = render_to_string('fragments/myfriends_fragment.html', {'friends': friends}, request=request)
+
+      user_response = JsonResponse({'status': 'success', 'message': _('User blocked'), 'html': html})
     else:
       user_response = JsonResponse({'status': 'error', 'message': _('An error occured')})
   return user_response
