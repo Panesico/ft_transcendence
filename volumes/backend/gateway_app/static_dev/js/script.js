@@ -42,7 +42,6 @@ async function loadContent(path) {
     if (data.type && data.message && (data.type === 'logout_successful')) {
       sessionStorage.setItem('afterLogout', 'true');
       sessionStorage.setItem('afterLogoutMessage', data.message);
-      handleAfterLogin(data.user_id);
       // disconnect main room socket
       handleRefresh("logout");
       closeMainRoomSocket();
