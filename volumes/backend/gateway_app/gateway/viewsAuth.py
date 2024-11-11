@@ -225,13 +225,7 @@ def post_signup(request):
         user_response.set_cookie('refresh_jwt_token', refresh_jwt_token, httponly=True, secure=True, samesite='Lax')
         return user_response
     else:
-        # logger.debug('post_signup > Response NOT OK')
-        data = json.loads(request.body)
-        form = SignUpFormFrontend(data)
-        form.add_error(None, message)
-        
-        html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
-        return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
+        return JsonResponse({'status': 'error', 'message': _('Failed to retrieve token')}, status=401)
 
 
 @csrf_exempt
