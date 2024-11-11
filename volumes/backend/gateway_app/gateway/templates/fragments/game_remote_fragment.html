@@ -35,23 +35,28 @@
     </div>
 
     <!-- Game is displayed inside game-container -->
-    <div id="game-container" class="d-flex flex-column align-items-center justify-content-center">
-      {% comment %} <button id="startGame-button" class="btn btn-secondary rounded-0 fs-1 px-4"
-      onclick="startGame(
-        '{{ info.game_type }}',
-        {{ info.tournament_id }}, '{{ info.game_round }}',
-        '{{ info.p1_name }}', {{ info.p1_id }},
-        '{{ info.p2_name }}', {{ info.p2_id }}
-      )">{% trans "Start" %}</button> {% endcomment %}
+    <div id="game-container" class="d-flex flex-column align-items-center justify-content-around">
 
-      <div class="form-check form-switch form-check-reverse d-flex align-items-center">
-        <label class="form-check-label fs-3 pe-2" for="player1-ready">{{ info.p1_name }}, {% trans "ready" %}?</label>
-        <input class="form-check-input fs-4 mt-0" type="checkbox" id="player1-ready" disabled>
+      <div class="d-flex flex-row align-items-center justify-content-between" style="width: 80%; height 100px">
+        <p> </p> {% comment %} keep for vertical alignement {% endcomment %}
       </div>
-      <div class="form-check form-switch form-check-reverse d-flex align-items-center">
-        <label class="form-check-label fs-3 pe-2" for="player2-ready">{{ info.p2_name }}, {% trans "ready" %}?</label>
-        <input class="form-check-input fs-4 mt-0" type="checkbox" id="player2-ready" disabled>
+
+      <div>
+        <div class="form-check form-switch form-check-reverse d-flex align-items-center">
+          <label class="form-check-label fs-3 pe-2" for="player1-ready">{{ info.p1_name }}, {% trans "ready" %}?</label>
+          <input class="form-check-input fs-4 mt-0" type="checkbox" id="player1-ready" disabled>
+        </div>
+        <div class="form-check form-switch form-check-reverse d-flex align-items-center">
+          <label class="form-check-label fs-3 pe-2" for="player2-ready">{{ info.p2_name }}, {% trans "ready" %}?</label>
+          <input class="form-check-input fs-4 mt-0" type="checkbox" id="player2-ready" disabled>
+        </div>
       </div>
+
+      <div id="keys-instructions" class="d-flex flex-row align-items-center justify-content-between" style="width: 80%;">
+        <p id="keysPlayer1" class="fs-4">{% trans "keys" %}: <span></span></p>
+        <p id="keysPlayer2" class="fs-4">{% trans "keys" %}: <span></span></p>
+      </div>
+
     </div>
   </div>
 

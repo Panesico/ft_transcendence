@@ -22,7 +22,7 @@ def get_home(request):
             html = render_to_string('includes/header.html', context=context, request=request)
         else:
             html = render_to_string('fragments/home_fragment.html', context=context, request=request)
-        return JsonResponse({'html': html, 'status': status, 'message': message})
+        return JsonResponse({'html': html, 'status': status, 'message': message, 'user_id': request.user.id}, status=200)
     return render(request, 'partials/home.html', {'status': status, 'message': message})
 
 @login_required

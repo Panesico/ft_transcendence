@@ -4,7 +4,7 @@ function deleteCookie(name) {
 }
   
 
-function handleAfterLogin() {
+function handleRefresh(type) {
     // First GET request for the main content
     fetch(`/home/?status=success&message=Logged%20in%20successfully&type=main`, {
         headers: {
@@ -35,6 +35,14 @@ function handleAfterLogin() {
         .then(data => {
           if (data.status === 'success') {
             document.querySelector('header').innerHTML = data.html;
+            // get the div with id 'userID' and replace its value with the new user id. Example <input type="hidden" id="userID" value="1">
+            if (type == 'logout') {
+                document.getElementById('userID').value = "0";
+            }
+            else
+            {
+                document.getElementById('userID').value = data.user_id;
+            }
           }
         })
         .catch(error => {
@@ -74,7 +82,7 @@ function sleep(ms) {
           await sleep(1000);
           refreshToken();
           await sleep(1000);
-          handleAfterLogin();
+          handleRefresh("oauth");
         } else {
           console.error("OAuth authentication failed");
         }
@@ -273,7 +281,7 @@ async function refreshToken() {
         if (data.message === 'Expired Token refreshed') {
             console.log("Expired Token refreshed");
             await sleep(300);
-            handleAfterLogin();
+            handleRefresh("refresh");
         }
 
         // Assuming the new token is in data.token

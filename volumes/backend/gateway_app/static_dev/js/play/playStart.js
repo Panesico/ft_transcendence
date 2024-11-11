@@ -89,6 +89,7 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
         announceGame(data.title, data.message);
         setPlayerReadyCheckBoxes(player_role, calcGameSocket, game_id);
       }
+      displayKeyUsageInstructions(gameMode, gameType, player_role);
 
     }  // updates oppenent's ready checkbox in remote
     else if (data.type === 'opponent_ready') {
@@ -113,6 +114,7 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
       // console.log('game_end data:', data);
 
       document.querySelector('#game-container').innerHTML = data.html;
+      document.querySelector('#game-container').classList.replace('justify-content-around', 'justify-content-center');
       document.querySelector('.scorePlayer1').textContent =
         data.game_result.p1_score;
       document.querySelector('.scorePlayer2').textContent =
@@ -129,6 +131,7 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
       // console.log('disconnection data:', data);
 
       document.querySelector('#game-container').innerHTML = data.html;
+      document.querySelector('#game-container').classList.replace('justify-content-around', 'justify-content-center');
       document.querySelector('.scorePlayer1').textContent =
         data.game_result.p1_score;
       document.querySelector('.scorePlayer2').textContent =

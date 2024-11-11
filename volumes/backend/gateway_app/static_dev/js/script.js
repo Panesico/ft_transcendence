@@ -44,6 +44,7 @@ async function loadContent(path) {
       sessionStorage.setItem('afterLogoutMessage', data.message);
       handleAfterLogin(data.user_id);
       // disconnect main room socket
+      handleRefresh("logout");
       closeMainRoomSocket();
       console.log('loadContent > logout_successful');
     }

@@ -84,30 +84,22 @@ class JWTAuthenticationMiddleware:
         refresh_token = request.COOKIES.get('refresh_jwt_token')
         header_token = auth_header.split('Bearer ')[1] if auth_header and auth_header.startswith('Bearer ') else None
 
-        logger.debug(f"cookie token {access_token} in {request.path}")
-        logger.debug(f"header token {header_token} in {request.path}")
         token = access_token if access_token else header_token
 
-        logger.debug(f"Token: {token} in {request.path}")
-
         if not token:
-            logger.info(f"No token found, treating as guest!!!!!!!!!!!!! in {request.path}")
             request.user = self.create_guest_user()
             return
 
         if self.is_token_blacklisted(refresh_token):
-            logger.info("Refresh token is blacklisted, treating as guest.")
             request.user = self.create_guest_user()
             return
 
         try:
             decoded_data = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
             user_id = decoded_data.get('user_id')
-            logger.debug(f"User ID: {user_id} in {request.path}")
             user = User.objects.get(pk=user_id)
             request.user = user
         except (InvalidTokenError, User.DoesNotExist):
-            logger.info(f"Invalid token, treating as guest. {request.path}")
             request.user = self.create_guest_user()
         if refresh_token and request.path == '/api/refresh-token/':
             try:
@@ -120,7 +112,6 @@ class JWTAuthenticationMiddleware:
                 request.new_refresh_token = new_refresh_token
                 request.user = user
             except (ExpiredSignatureError, InvalidTokenError, User.DoesNotExist):
-                logger.info("Invalid refresh token, treating as guest.")
                 request.user = self.create_guest_user()
 
     def process_response(self, request, response):

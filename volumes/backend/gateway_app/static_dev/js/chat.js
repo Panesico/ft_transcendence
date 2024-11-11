@@ -105,8 +105,9 @@ function innit_listening() {
                 // Add the 'selected-contact' class to the clicked contact
                 contactItem.classList.add('selected-contact');
 
-                // Update the avatar and display name
                 document.getElementById('contactContainer').style.display = 'flex';
+
+                // Update the avatar and display name
                 const contactAvatarAndName = document.getElementById('contactAvatarAndName');
                 const contactAvatarLink = document.getElementById('contactAvatarLink');
                 const contactDisplayNameLink = document.getElementById('contactDisplayNameLink');
@@ -151,11 +152,20 @@ function innit_listening() {
                 const newBlockSwitch = blockSwitch.cloneNode(true);
                 blockSwitchDiv.replaceChild(newBlockSwitch, blockSwitch);
                 checkIfBlocked(friend.user_id).then((isBlocked) => {
-                  console.log('isBlocked:', isBlocked);
+                  console.log('chat checkIfBlocked > isBlocked:', isBlocked);
                   newBlockSwitch.checked = isBlocked;
-                  messageInput.placeholder = isBlocked
-                  ? 'You cannot send messages to blocked users'
-                  : 'Type a message to send';
+                  if (isBlocked) {
+                    document.getElementById('contactGameInviteContainer').style.display = 'none';
+                    document.getElementById('chat-modal-footer').style.display = 'none';
+                  }
+                  else {
+                    document.getElementById('contactGameInviteContainer').style.display = 'flex';
+                    document.getElementById('chat-modal-footer').style.display = 'flex';
+                    document.getElementById('messageInput').value = '';
+                  }
+                  // messageInput.placeholder = isBlocked
+                  //   ? 'You cannot send messages to blocked users'
+                  //   : 'Type a message to send';
                 });
                 newBlockSwitch.addEventListener('change', function () {
                   sendBlockInfoToSocket(userID, friend.user_id, newBlockSwitch.checked);
@@ -173,8 +183,7 @@ function innit_listening() {
                 sendMessagesBySocket(messageData, mainRoomSocket);
               });
             }
-            // // addOnlineStatusBadge on friends from contact list
-            // sendMessagesBySocket({ 'type': 'get_connected_friends', 'sender_id': userID, }, mainRoomSocket);
+
           });
         });
 
@@ -195,16 +204,16 @@ function innit_listening() {
     const blockSwitch = document.querySelector('input[data-user-id]');
 
     if (!selectedContact) {
-      console.error('No contact selected');
-      messageInput.placeholder = 'Select a contact to send a message';
+      // messageInput.placeholder = 'Select a contact to send a message';
+      console.log('No contact selected');
       return;
     } else if (!messageInput.value) {
-      messageInput.placeholder = 'Type a message to send';
-      console.error('No message to send');
+      // messageInput.placeholder = 'Type a message to send';
+      console.log('No message to send');
       return;
     } else if (blockSwitch.checked) {
-      messageInput.placeholder = 'You cannot send messages to blocked users';
-      console.error('Cannot send messages to blocked users');
+      // messageInput.placeholder = 'You cannot send messages to blocked users';
+      console.log('Cannot send messages to blocked users');
       return;
     }
 

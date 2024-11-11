@@ -156,7 +156,7 @@ def post_login(request):
 # Signup
 
 def view_signup(request):
-    logger.debug('view_login')
+    logger.debug('view_signup')
     if request.user.is_authenticated:
       return redirect('home')
     if request.method == 'GET': 
@@ -183,7 +183,10 @@ def post_signup(request):
     if request.method != 'POST':
       return redirect('405')
     
-    data = json.loads(request.body)
+    try:
+      data = json.loads(request.body)
+    except json.JSONDecodeError:
+      return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
     
     # Validate the form data
     form = SignUpFormFrontend(data)
@@ -225,13 +228,7 @@ def post_signup(request):
         user_response.set_cookie('refresh_jwt_token', refresh_jwt_token, httponly=True, secure=True, samesite='Lax')
         return user_response
     else:
-        # logger.debug('post_signup > Response NOT OK')
-        data = json.loads(request.body)
-        form = SignUpFormFrontend(data)
-        form.add_error(None, message)
-        
-        html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
-        return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
+        return JsonResponse({'status': 'error', 'message': _('Failed to retrieve token')}, status=401)
 
 
 @csrf_exempt

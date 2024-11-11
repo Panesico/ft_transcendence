@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-10 21:07+0000\n"
+"POT-Creation-Date: 2024-11-11 12:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ENGLISH <LL@li.org>\n"
@@ -379,14 +379,23 @@ msgstr "Game"
 msgid "user profile picture"
 msgstr "user profile picture"
 
-#: gateway/templates/fragments/game_fragment.html:35
+#: gateway/templates/fragments/game_fragment.html:41
 #: gateway/templates/fragments/tournament_next_game_fragment.html:8
-#: gateway/templates/fragments/tournament_start_fragment.html:38
+#: gateway/templates/fragments/tournament_start_fragment.html:44
 msgid "Start"
 msgstr "Start"
 
-#: gateway/templates/fragments/game_remote_fragment.html:49
-#: gateway/templates/fragments/game_remote_fragment.html:53
+#: gateway/templates/fragments/game_fragment.html:44
+#: gateway/templates/fragments/game_fragment.html:45
+#: gateway/templates/fragments/game_remote_fragment.html:57
+#: gateway/templates/fragments/game_remote_fragment.html:58
+#: gateway/templates/fragments/tournament_start_fragment.html:47
+#: gateway/templates/fragments/tournament_start_fragment.html:48
+msgid "keys"
+msgstr "keys"
+
+#: gateway/templates/fragments/game_remote_fragment.html:47
+#: gateway/templates/fragments/game_remote_fragment.html:51
 msgid "ready"
 msgstr "ready"
 
@@ -558,7 +567,7 @@ msgstr "Sign Up"
 msgid "Already have an account?"
 msgstr "Already have an account?"
 
-#: gateway/templates/fragments/tournament_end_fragment.html:5
+#: gateway/templates/fragments/tournament_end_fragment.html:6
 msgid "And the grand winner is:"
 msgstr "And the grand winner is:"
 
@@ -666,7 +675,7 @@ msgstr "Logout"
 msgid "You have no notifications"
 msgstr "You have no notifications"
 
-#: gateway/views.py:82
+#: gateway/views.py:88
 msgid "Error retrieving friends"
 msgstr "Error retrieving friends"
 

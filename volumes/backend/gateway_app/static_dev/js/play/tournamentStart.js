@@ -58,6 +58,7 @@ async function startNewTournament(
         username = (data.info.p1_id != 0) ? data.info.p1_name : data.info.p2_name;
         sendMessagesBySocket({ 'type': 'next_in_tournament', 'response': '', 'sender_id': userID, 'receiver_id': userID, 'sender_username': username, 'receiver_username': username, 'notify_player': data.info.notify_player }, mainRoomSocket);
       }
+      displayKeyUsageInstructions(gameMode, gameType, player_role);
 
     } else if (data.type === 'game_countdown') {
       console.log('startNewTournament > .onmessage game_countdown:', data.message);
@@ -76,6 +77,7 @@ async function startNewTournament(
       console.log('game_result:', data.game_result);
 
       document.querySelector('#game-container').innerHTML = data.html;
+      document.querySelector('#game-container').classList.replace('justify-content-around', 'justify-content-center');
       document.querySelector('.scorePlayer1').textContent =
         data.game_result.p1_score;
       document.querySelector('.scorePlayer2').textContent =

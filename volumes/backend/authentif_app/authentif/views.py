@@ -239,7 +239,6 @@ def api_signup(request):
                 # if validate_password(password) == None:
                 #   raise DjangoValidationError(['Not a valid password'])
 
-                logger.debug(f"BEFORE TOKEN BABY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 jwt_token, refresh_jwt_token = generate_jwt_token(user)
         
                 # Create response object
