@@ -33,12 +33,6 @@ async function loadContent(path) {
 
     console.log('loadContent > data: ', data);
 
-    // If login successful, connect to the main room socket
-    if (data.type && data.type === 'login_successful' && data.status === 'success') {
-      // Connect to the main room socket
-      connectMainRoomSocket(data.userID);
-    }
-
     if (data.type && data.message && (data.type === 'logout_successful')) {
       sessionStorage.setItem('afterLogout', 'true');
       sessionStorage.setItem('afterLogoutMessage', data.message);

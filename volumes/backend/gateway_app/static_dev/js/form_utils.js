@@ -45,7 +45,11 @@ function listenForm(form) {
         'listenForm > data.preferred_language ', data.preferred_language);
       console.log('listenForm > data.message: ', data.message);
       // console.log('listenForm > data.html: ', data.html);
-
+      const userIdElement = document.getElementById('userID');
+      const user_id = userIdElement ? userIdElement.value : null;
+      if (user_id === null || user_id === '0' || user_id === '' || user_id === undefined || user_id === 'None' || user_id === '[object HTMLInputElement]') {
+        user_id = data.user_id;
+      }
       if (data.type === 'invite_sent') {
         console.log('Invitation to play sent, data: ', data);
         inviteFriendToPlay(data.sender_username, data.sender_id, data.sender_avatar_url, data.receiver_id, data.game_type, data.game_mode);
@@ -54,20 +58,23 @@ function listenForm(form) {
       }
       else if (data.status != 'error' && data.type && data.message && !data.html) {
         console.log('data.type: ', data.type, 'data.message: ', data.message);
-
+        // If login successful, connect to the main room socket
         if (data.type === 'login_successful') {
           sessionStorage.setItem('afterLogin', 'true');
           sessionStorage.setItem('afterLoginMessage', data.message);
           handleRefresh("login");
+          connectMainRoomSocket(user_id);
         } else if (data.type === 'signup_successful') {
           sessionStorage.setItem('afterSignup', 'true');
           sessionStorage.setItem('afterSignupMessage', data.message);
           handleRefresh("signup");
+          connectMainRoomSocket(user_id);
 
         } else if (data.type === 'profile_updated') {
           sessionStorage.setItem('afterProfileUpdate', 'true');
           sessionStorage.setItem('afterProfileUpdateMessage', data.message);
           handleRefresh("profile_update");
+          connectMainRoomSocket(user_id);
         } else if (data.type === '2FA') {
           try {
             const verifyResponse = await fetch('/verify2FA/' + data.user_id + "/", {
