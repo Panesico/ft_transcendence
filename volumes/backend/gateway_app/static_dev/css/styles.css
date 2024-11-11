@@ -144,7 +144,7 @@ body {
     rotate: -90deg;
   }
   25% {
-    left: calc(100% - 120px);
+    left: calc(100% - 140px);
     top: calc(70% - 80px);
     rotate: 360deg;
   }
@@ -154,7 +154,7 @@ body {
     rotate: -360deg;
   }
   75% {
-    left: calc(100% - 120px);
+    left: calc(100% - 140px);
     top: calc(50% - 80px);
     rotate: -0deg;
   }

@@ -312,3 +312,40 @@ function setupChatNavigateEventListeners(socket) {
 
   addChatNavigateListeners();
 }
+
+function displayKeyUsageInstructions(gameMode, gameType, player_role) {
+  const keysPlayer1 = document.querySelector('#keysPlayer1');
+  const keysPlayer2 = document.querySelector('#keysPlayer2');
+
+  if (gameType === 'pong') {
+
+    if (gameMode === 'local') {
+      keysPlayer1.querySelector('span').innerHTML = 'W, S';
+      keysPlayer2.querySelector('span').innerHTML = '8, 5';
+    } else {
+      if (player_role === '1') {
+        keysPlayer1.querySelector('span').innerHTML = 'W, S';
+        keysPlayer2.innerHTML = ' ';
+      } else if (player_role === '2') {
+        keysPlayer1.innerHTML = ' ';
+        keysPlayer2.querySelector('span').innerHTML = '8, 5';
+      }
+    }
+
+  } else if (gameType === 'cows') {
+
+    if (gameMode === 'local') {
+      keysPlayer1.querySelector('span').innerHTML = 'W, S, A, D';
+      keysPlayer2.querySelector('span').innerHTML = '8, 5, 4, 6';
+    } else {
+      if (player_role === '1') {
+        keysPlayer1.querySelector('span').innerHTML = 'W, S, A, D';
+        keysPlayer2.innerHTML = ' ';
+      } else if (player_role === '2') {
+        keysPlayer1.innerHTML = ' ';
+        keysPlayer2.querySelector('span').innerHTML = '8, 5, 4, 6';
+      }
+    }
+
+  }
+}
