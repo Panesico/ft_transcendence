@@ -110,3 +110,30 @@ async function blockFriend(friendId) {
 		}
 	}
 }
+
+function sendBlockInfoToSocket(sender_id, receiver_id, is_blocked)
+{
+  console.log('is_blocked:', is_blocked);
+  type = "";
+  if (is_blocked) {
+    type = 'block';
+  }
+  else {
+    type = 'unblock';
+  }
+  const data = {
+    sender_id: sender_id,
+    receiver_id: receiver_id,
+    type: type
+  }
+  console.log('sendBlockInfoToSocket > data:', data);
+  mainRoomSocket.send(JSON.stringify(data));
+}
+
+function handleBlockedNotif(data) {
+  receiver_username = data.receiver_username;
+  sender_username = data.sender_username;
+  const notificationDropdownClass = document.getElementById('notificationClassContent');
+
+  deleteResponsesButtons(notificationDropdownClass, sender_username);
+}

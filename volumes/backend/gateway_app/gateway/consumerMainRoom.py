@@ -1,6 +1,6 @@
 import json, asyncio, logging, requests, os
 from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
-from .handleMainRoom import readMessage, requestResponse, friendRequest, handleNewConnection, checkForNotifications, markNotificationAsRead
+from .handleMainRoom import readMessage, requestResponse, friendRequest, handleNewConnection, checkForNotifications, markNotificationAsRead, checkIfUsersAreBlocked, block_user_responses
 from .handleChatMessages import sendChatMessage, innitChat, getConversation, checkForChatMessages
 from .handleInvite import get_authentif_variables, invite_to_game
 logger = logging.getLogger(__name__)
@@ -50,6 +50,10 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     subTypeMessage = content.get('subtype', '')
     logger.debug(f'mainRoom > typeMessage: {typeMessage}')
 
+    # Check if users have a blocked relationship
+    if typeMessage == 'invite_game' or typeMessage == 'game_response' or typeMessage == 'friend_request' or typeMessage == 'friend_request_response':
+      if checkIfUsersAreBlocked(self, content) == True:
+        return
     # Message / Logs
     if typeMessage == 'message':
       readMessage(content.get('message', ''))
@@ -79,5 +83,7 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     elif typeMessage == 'next_in_tournament':
       logger.debug(f'mainRoom > next_in_tournament, username: {self.username}')
       await requestResponse(content, users_connected, self.avatar_url, self)
+    elif typeMessage == 'block':
+      await block_user_responses(self, content, users_connected)
     # elif typeMessage == 'get_connected_friends':
     #   await getConnectedFriends(self, content, users_connected)

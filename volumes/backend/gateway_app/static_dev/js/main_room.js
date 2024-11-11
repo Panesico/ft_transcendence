@@ -2,6 +2,21 @@ let mainRoomSocket;
 
 unreadNotifications = false;
 
+function closeMainRoomSocket() {
+  if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
+    console.warn('closeMainRoomSocket > mainRoomSocket socket closed');
+    mainRoomSocket.close();
+  }
+  else {
+        if (mainRoomSocket) {
+    console.warn('closeMainRoomSocket > mainRoomSocket.readyState:', mainRoomSocket.readyState);
+    }
+    else {
+      console.warn('closeMainRoomSocket > mainRoomSocket is not defined');
+    }          
+  }
+}
+
 // Safe way to send messages by socket
 function sendMessagesBySocket(message, socket) {
   // if user id == 0 do not use websocket
@@ -38,26 +53,15 @@ document.addEventListener('DOMContentLoaded', function () {
   );
 });
 
-// Routine when user reload the page
-window.onload = () => {
-  // Handle form submission
-  handleFormSubmission();
-
-  // Get the User ID
-  const userID = document.getElementById('userID').value;
-  console.log('userID:', userID);
-  if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null || userID === 'None' || userID === '[object HTMLInputElement]') {
-    console.warn('Client is not logged in');
-    return;
-  }
+// Connect to the main room socket
+function connectMainRoomSocket(user_id) {
+  console.log('connectMainRoomSocket');
 
   // Establish connection to the main room
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const hostname = window.location.hostname;
   const port = window.location.port ? `:${window.location.port}` : '';
-  mainRoomSocket = new WebSocket(`${protocol}//${hostname}${port}/wss/mainroom/${userID}/`);
-  console.log('mainRoomSocket.readyState:', mainRoomSocket.readyState);
-  console.log('mainRoomSocket userID:', userID);
+  mainRoomSocket = new WebSocket(`${protocol}//${hostname}${port}/wss/mainroom/${user_id}/`);
 
   // On websocket open
   mainRoomSocket.onopen = function (e) {
@@ -74,55 +78,74 @@ window.onload = () => {
 
   // On websocket close
   mainRoomSocket.onclose = function (e) {
-    console.error('mainRoomSocket socket closed unexpectedly');
+    console.warn('mainRoomSocket onclose > mainRoomSocket socket closed');
   };
 
   // Close the main room socket when the window is closed
   window.onbeforeunload = () => {
     if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
+      console.warn('mainRoomSocket socket closed');
       mainRoomSocket.close();
     }
-  }
-
-
-  // Close the main room socket when the window is closed
-  window.onbeforeunload = () => {
-    if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
-      mainRoomSocket.close();
+    else {
+      console.warn('mainRoomSocket is not open');
     }
   }
 
   // Parse the socket message
-  function parseSocketMessage(data) {
-    if (data.type === 'friend_request') {
-      addRequestNotification(data);
-    }
-    else if (data.type === 'friend_request_response') {
-      addResponseNotification(data);
-    }
-    else if (data.type === 'chat') {
-      handleChatMessages(data);
-    }
-    else if (data.type === 'game_request') {
-      addRequestNotification(data);
-    }
-    else if (data.type === 'game_request_response') {
-      addResponseNotification(data);
-    }
-    else if (data.type === 'cancel_waiting_room') {
-      addResponseNotification(data);
-    }
-    else if (data.type === 'user_connected' || data.type === 'user_left') {
-      updateOnlineFriends(data);
-    }
-    else if (data.type === 'next_in_tournament') {
-      addResponseNotification(data);
-    }
-    // else if (data.type === 'connected_friends') {
-    //   addOnlineStatusBadge(data);
-    // }
-    else {
-      console.log('parseSocketMessage > data.type:', data.type);
-    }
+}
+
+// Routine when user reload the page
+window.onload = () => {
+  // Handle form submission
+  handleFormSubmission();
+
+  // Get the User ID
+  const userID = document.getElementById('userID').value;
+  console.log('userID:', userID);
+  if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null || userID === 'None' || userID === '[object HTMLInputElement]') {
+    console.warn('Client is not logged in');
+    return;
+  }
+
+  // Connect to the main room socket
+  connectMainRoomSocket(userID);
+}
+
+function parseSocketMessage(data) {
+  if (data.type === 'friend_request') {
+    addRequestNotification(data);
+  }
+  else if (data.type === 'friend_request_response') {
+    addResponseNotification(data);
+  }
+  else if (data.type === 'chat') {
+    handleChatMessages(data);
+  }
+  else if (data.type === 'game_request') {
+    addRequestNotification(data);
+  }
+  else if (data.type === 'game_request_response') {
+    addResponseNotification(data);
+  }
+  else if (data.type === 'cancel_waiting_room') {
+    addResponseNotification(data);
+  }
+  else if (data.type === 'user_connected' || data.type === 'user_left') {
+    updateOnlineFriends(data);
+  }
+  else if (data.type === 'next_in_tournament') {
+    addResponseNotification(data);
+  }
+  else if (data.type === 'block')
+  {
+    console.warn('parseSocketMessage > data:', data);
+    handleBlockedNotif(data);
+  }
+  // else if (data.type === 'connected_friends') {
+  //   addOnlineStatusBadge(data);
+  // }
+  else {
+    console.log('parseSocketMessage > data.type:', data.type);
   }
 }

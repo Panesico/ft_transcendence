@@ -37,4 +37,7 @@ urlpatterns = [
 
     # Check display names
     path('api/checkDisplaynameExists/', views.check_displayname_exists, name='check_displayname_exists'),
+
+    # Blocked
+    path('api/getBlockedUsers/<int:sender_id>/<int:receiver_id>/', views.get_blocked_users, name='get_blocked_users'),
 ]

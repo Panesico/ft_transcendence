@@ -30,13 +30,26 @@ async function loadContent(path) {
       throw new Error(`HTTP error - status: ${response.status}`);
     }
     const data = await response.json();
+
+    console.log('loadContent > data: ', data);
+
+    // If login successful, connect to the main room socket
+    if (data.type && data.type === 'login_successful' && data.status === 'success') {
+      // Connect to the main room socket
+      connectMainRoomSocket(data.userID);
+    }
+
     if (data.type && data.message && (data.type === 'logout_successful')) {
       sessionStorage.setItem('afterLogout', 'true');
       sessionStorage.setItem('afterLogoutMessage', data.message);
-      handleAfterLogin();
+      handleAfterLogin(data.user_id);
+      // disconnect main room socket
+      closeMainRoomSocket();
       console.log('loadContent > logout_successful');
-    } else
+    }
+    else {
       document.querySelector('main').innerHTML = data.html;
+    }
     console.log('loadContent > main updated');
 
     displayMessageInModal(data.message);

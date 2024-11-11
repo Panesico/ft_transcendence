@@ -53,7 +53,6 @@ def api_signup(request):
     except Exception as e:
       return JsonResponse({'error': str(e)}, status=400)
 
-
 def api_edit_profile(request):
     logger.debug("")
     logger.debug("api_edit_profile")
@@ -208,6 +207,31 @@ def get_users_ids(request):
         logger.debug(f'get_users_ids > {str(e)}')
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
+def get_blocked_users(request, sender_id, receiver_id):
+  logger.debug("get_blocked_users")
+  try:
+    sender_obj = Profile.objects.get(user_id=sender_id)
+    receiver_obj = Profile.objects.get(user_id=receiver_id)
+    logger.debug('sender_obj and receiver_obj recovered')
+
+    sender_blocked_users = sender_obj.sender_blocked_users.all()
+    receiver_blocked_users = receiver_obj.blocked_users.all()
+    logger.debug(f'blocked_users recovered: {sender_blocked_users}')
+    logger.debug(f'blocked_users recovered: {receiver_blocked_users}')
+
+    # Assuming sender_blocked_users is a queryset of blocked users
+    if sender_blocked_users.filter(user_id=receiver_id).exists():
+      return JsonResponse({'status': 'success', 'message': _('User is blocked')}, status=200)
+    elif receiver_blocked_users.filter(user_id=sender_id).exists():
+      return JsonResponse({'status': 'blocked', 'message': _('User is blocked')}, status=200)
+    else:
+      logger.debug('get_blocked_users > User is not blocked')
+      return JsonResponse({'status': 'blocked', 'message': _('User is not blocked')}, status=200)
+
+  except Profile.DoesNotExist:
+    logger.debug('get_blocked_users > User not found')
+    return JsonResponse({'status': 'unblocked', 'message': _('User not found')}, status=404)
+
 # If an unresponded friend request or game request already exists , we delete the previous notification (call this function after a friend/game request has been accepted)
 def check_if_symetric_request_exists(request, sender_id, receiver_id, type):
   logger.debug('')
@@ -287,6 +311,26 @@ def create_notifications(request):
         logger.debug('create_notifications > Method not allowed')
         return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
 
+def check_if_users_are_blocked(sender_id, receiver_id):
+  logger.debug("check_if_users_are_blocked")
+  try:
+    sender_obj = Profile.objects.get(user_id=sender_id)
+    receiver_obj = Profile.objects.get(user_id=receiver_id)
+    logger.debug('sender_obj and receiver_obj recovered')
+    if receiver_obj in sender_obj.blocked_users.all():
+      logger.debug('check_if_users_are_blocked > User is blocked')
+      return True
+    elif sender_obj in receiver_obj.blocked_users.all():
+      logger.debug('check_if_users_are_blocked > User is blocked')
+      return True
+    else:
+      logger.debug('check_if_users_are_blocked > User is not blocked')
+      return False
+  except Profile.DoesNotExist:
+    logger.debug('check_if_users_are_blocked > User not found')
+    return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
+
+
 def get_notifications(request, user_id):
     logger.debug("get_notifications")
     id = int(user_id)
@@ -297,16 +341,20 @@ def get_notifications(request, user_id):
         notifications = Notification.objects.filter(receiver=user_obj)
         data = []
         for notification in notifications:
-            data.append({
-                'sender': notification.sender.user_id,
-                'receiver': notification.receiver.user_id,
-                'message': notification.message,
-                'type': notification.type,
-                'date': notification.date,
-                'status': notification.status,
-                'game_type': notification.game_type,
-            })
-            logger.debug(f'notification data: {data}')
+            # If users are blocked, we do not send the notification
+            if check_if_users_are_blocked(notification.sender.user_id, notification.receiver.user_id) == False:
+                data.append({
+                    'sender': notification.sender.user_id,
+                    'receiver': notification.receiver.user_id,
+                    'message': notification.message,
+                    'type': notification.type,
+                    'date': notification.date,
+                    'status': notification.status,
+                    'game_type': notification.game_type,
+                })
+                logger.debug(f'notification data: {data}')
+            else:
+               logger.debug('get_notifications > User is blocked')
         return JsonResponse(data, status=200, safe=False)
     except Profile.DoesNotExist:
         logger.debug('get_notifications > User not found')

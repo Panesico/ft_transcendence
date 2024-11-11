@@ -363,3 +363,70 @@ async def markNotificationAsRead(self, content, user_id):
 #     })
 #   else:
 #     logger.error(f"getConnectedFriends > Error retrieving friends")
+
+async def checkIfUsersAreBlocked(self, content):
+  sender_id = content.get('sender_id', '')
+  receiver_id = content.get('receiver_id', '')
+  type = content.get('type', '')
+  profileapi_url = 'https://profileapi:9002/api/getBlockedUsers/' + str(sender_id) + '/' + str(receiver_id) + '/'
+  csrf_token = self.scope['cookies']['csrftoken']
+  headers = {
+      'X-CSRFToken': csrf_token,
+      'Cookie': f'csrftoken={csrf_token}',
+      'Content-Type': 'application/json',
+      'HTTP_HOST': 'profileapi',
+      'Referer': 'https://gateway:8443',
+  }
+  response = requests.get(profileapi_url, headers=headers, verify=os.getenv("CERTFILE"))
+  logger.debug(f'checkIfUsersAreBlocked > response: {response}')
+  logger.debug(f'checkIfUsersAreBlocked > response.json(): {response.json()}')
+  if response.ok:
+    status = response.json().get('status', '')
+    logger.debug(f'checkIfUsersAreBlocked > status: {status}')
+    if status == 'blocked':
+      # Send message to frontend
+      return True
+  else:
+    logger.debug(f'checkIfUsersAreBlocked > Error checking if users are blocked')
+  return False
+
+async def block_user_responses(self, content, users_connected):
+  logger.debug(f'block_user_responses > content: {content}')
+  sender_id = content.get('sender_id', '')
+  receiver_id = content.get('receiver_id', '')
+
+  # Get usernames
+  sender_data = get_authentif_variables(sender_id)
+  sender_username = sender_data.get('username', '')
+  receiver_data = get_authentif_variables(receiver_id)
+  receiver_username = receiver_data.get('username', '')
+  logger.debug(f'block_user_responses > sender_username: {sender_username}')
+
+  # Send to the sender if connected
+  logger.debug(f'block_user_responses > users_connected: {users_connected}')
+  if sender_id in users_connected:
+    logger.debug(f'block_user_responses > sender_id: {sender_id} is in users_connected')
+    await users_connected[sender_id].send_json({
+      'type': 'block',
+      'message': f'You have blocked {receiver_username}',
+      'receiver_username': receiver_username,
+      'receiver_id': receiver_id,
+      'block_sender': True,
+    })
+  else:
+    logger.debug(f'block_user_responses > sender_id: {sender_id} is not in users_connected')
+  
+  # Send to the receiver if connected
+  if receiver_id in users_connected:
+    logger.debug(f'block_user_responses > receiver_id: {receiver_id} is in users_connected')
+    await users_connected[receiver_id].send_json({
+      'type': 'block',
+      'message': f'You have been blocked by {sender_username}',
+      'sender_username': sender_username,
+      'sender_id': sender_id,
+      'block_sender': False,
+    })
+  else:
+    logger.debug(f'block_user_responses > receiver_id: {receiver_id} is not in users_connected')
+  
+  

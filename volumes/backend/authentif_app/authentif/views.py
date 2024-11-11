@@ -384,73 +384,73 @@ def get_42_user_data(token):
     return response.json()
 
 
-def create_or_get_user(request, user_data):
-    """
-    Creates a new user or retrieves an existing one based on the 42 API data.
-    Logs in the user after creation or retrieval, and calls the profile API to create the profile.
-    """
-    language = request.headers.get('X-Language', 'en')
-    activate(language)
-    try:
-        # Try to find the user by their 42 login (username)
-        user = User.objects.get(username=user_data['login'])
-        logger.info(f"User found: {user.username}")
-    except User.DoesNotExist:
-        # Check if this is a "42 user" by seeing if `id` exists in user_data (or any other identifier for 42 user)
-        if 'id' in user_data:  # Assuming `id` from user_data corresponds to 42 ID
-            data = {"username": user_data['login'], "id_42": user_data['id']}  # No password needed for 42 users
+# def create_or_get_user(request, user_data):
+#     """
+#     Creates a new user or retrieves an existing one based on the 42 API data.
+#     Logs in the user after creation or retrieval, and calls the profile API to create the profile.
+#     """
+#     language = request.headers.get('X-Language', 'en')
+#     activate(language)
+#     try:
+#         # Try to find the user by their 42 login (username)
+#         user = User.objects.get(username=user_data['login'])
+#         logger.info(f"User found: {user.username}")
+#     except User.DoesNotExist:
+#         # Check if this is a "42 user" by seeing if `id` exists in user_data (or any other identifier for 42 user)
+#         if 'id' in user_data:  # Assuming `id` from user_data corresponds to 42 ID
+#             data = {"username": user_data['login'], "id_42": user_data['id']}  # No password needed for 42 users
 
-            # Bypass the password field if user is 42-based
-            form = SignUpForm(data=data)
-            if form.is_valid():
-                user = form.save()
-            else:
-                logger.error(f"SignUpForm error: {form.errors}")
-        else:
-            # Create a standard user with a password if not a 42 user
-            data = {"username": user_data['login'], "password": "1", "confirm_password": "1"}
-            form = SignUpForm(data=data)
-            if form.is_valid():
-                user = form.save()
-            else:
-                logger.error(f"SignUpForm error: {form.errors}")
+#             # Bypass the password field if user is 42-based
+#             form = SignUpForm(data=data)
+#             if form.is_valid():
+#                 user = form.save()
+#             else:
+#                 logger.error(f"SignUpForm error: {form.errors}")
+#         else:
+#             # Create a standard user with a password if not a 42 user
+#             data = {"username": user_data['login'], "password": "1", "confirm_password": "1"}
+#             form = SignUpForm(data=data)
+#             if form.is_valid():
+#                 user = form.save()
+#             else:
+#                 logger.error(f"SignUpForm error: {form.errors}")
         
-        # Create the profile
-        createProfile(user_data['login'], user_data['id'], "", 'id' in user_data, language)  # True if 42 user
-        payload = json.dumps({'image_url': user_data['image']['link']})  # Convert the data to a JSON string
-        csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
-        jwt_token = request.COOKIES.get('jwt_token')
+#         # Create the profile
+#         createProfile(user_data['login'], user_data['id'], "", 'id' in user_data, language)  # True if 42 user
+#         payload = json.dumps({'image_url': user_data['image']['link']})  # Convert the data to a JSON string
+#         csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+#         jwt_token = request.COOKIES.get('jwt_token')
 
-        headers = {
-            'X-CSRFToken': csrf_token,
-            'Cookie': f'csrftoken={csrf_token}',
-            'Content-Type': 'application/json',
-            'Referer': 'https://authentif:9001',
-            'Authorization': f'Bearer {jwt_token}',
-        }
+#         headers = {
+#             'X-CSRFToken': csrf_token,
+#             'Cookie': f'csrftoken={csrf_token}',
+#             'Content-Type': 'application/json',
+#             'Referer': 'https://authentif:9001',
+#             'Authorization': f'Bearer {jwt_token}',
+#         }
         
-        # Make the POST request to the external authentif service
-        response = requests.post("https://gateway:8443/download_42_avatar/", data=payload, headers=headers, verify=os.getenv("CERTFILE"))
-        csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
-        jwt_token = request.COOKIES.get('jwt_token')
+#         # Make the POST request to the external authentif service
+#         response = requests.post("https://gateway:8443/download_42_avatar/", data=payload, headers=headers, verify=os.getenv("CERTFILE"))
+#         csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+#         jwt_token = request.COOKIES.get('jwt_token')
 
-        headers = {
-            'X-CSRFToken': csrf_token,
-            'Cookie': f'csrftoken={csrf_token}',
-            'Content-Type': f"{response.json()['avatar']['content_type']}",
-            'Referer': 'https://authentif:9001',
-            'Authorization': f'Bearer {jwt_token}',
-        }
+#         headers = {
+#             'X-CSRFToken': csrf_token,
+#             'Cookie': f'csrftoken={csrf_token}',
+#             'Content-Type': f"{response.json()['avatar']['content_type']}",
+#             'Referer': 'https://authentif:9001',
+#             'Authorization': f'Bearer {jwt_token}',
+#         }
 
-        response = requests.post("https://gateway:8443/post_edit_profile_avatar", body=response.text, headers=headers, verify=os.getenv("CERTFILE"))
+#         response = requests.post("https://gateway:8443/post_edit_profile_avatar", body=response.text, headers=headers, verify=os.getenv("CERTFILE"))
         
         
 
         
-    if user == None:
-        login(request, user)
+#     if user == None:
+#         login(request, user)
 
-    return user
+#     return user
 
 
 @csrf_exempt

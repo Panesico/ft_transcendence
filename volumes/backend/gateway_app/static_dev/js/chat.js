@@ -150,17 +150,19 @@ function innit_listening() {
                 // Cloning and replacing the blockSwitch before adding event listener to avoid duplicates
                 const newBlockSwitch = blockSwitch.cloneNode(true);
                 blockSwitchDiv.replaceChild(newBlockSwitch, blockSwitch);
-                newBlockSwitch.addEventListener('change', function () {
-                  blockFriend(friend.user_id);
-                });
                 checkIfBlocked(friend.user_id).then((isBlocked) => {
                   console.log('isBlocked:', isBlocked);
                   newBlockSwitch.checked = isBlocked;
                   messageInput.placeholder = isBlocked
-                    ? 'You cannot send messages to blocked users'
-                    : 'Type a message to send';
+                  ? 'You cannot send messages to blocked users'
+                  : 'Type a message to send';
                 });
-
+                newBlockSwitch.addEventListener('change', function () {
+                  sendBlockInfoToSocket(userID, friend.user_id, newBlockSwitch.checked);
+                  blockFriend(friend.user_id);
+                  // Send info to the websocket
+                });
+                
                 // Get all the messages between the user and the selected friend
                 const messageData = {
                   type: 'chat',
