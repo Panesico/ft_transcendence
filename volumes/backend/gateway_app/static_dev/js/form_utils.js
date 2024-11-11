@@ -45,11 +45,13 @@ function listenForm(form) {
         'listenForm > data.preferred_language ', data.preferred_language);
       console.log('listenForm > data.message: ', data.message);
       // console.log('listenForm > data.html: ', data.html);
+
       const userIdElement = document.getElementById('userID');
-      const user_id = userIdElement ? userIdElement.value : null;
+      let user_id = userIdElement ? userIdElement.value : null;
       if (user_id === null || user_id === '0' || user_id === '' || user_id === undefined || user_id === 'None' || user_id === '[object HTMLInputElement]') {
         user_id = data.user_id;
       }
+
       if (data.type === 'invite_sent') {
         console.log('Invitation to play sent, data: ', data);
         inviteFriendToPlay(data.sender_username, data.sender_id, data.sender_avatar_url, data.receiver_id, data.game_type, data.game_mode);
