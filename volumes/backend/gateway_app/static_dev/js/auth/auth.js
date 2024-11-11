@@ -2,53 +2,93 @@
 function deleteCookie(name) {
   document.cookie = name + '=; Max-Age=-99999999; path=/;';
 }
-  
+
 
 function handleRefresh(type) {
-    // First GET request for the main content
-    fetch(`/home/?status=success&message=Logged%20in%20successfully&type=main`, {
-        headers: {
-          'X-CSRFToken': getCookie('csrftoken'),
-          'x-requested-with': 'XMLHttpRequest',
-        },
-        credentials: 'include'
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === 'success') {
-            document.querySelector('main').innerHTML = data.html;
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
+  // First GET request for the main content
+  fetch(`/home/?status=success&message=Logged%20in%20successfully&type=main`, {
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'x-requested-with': 'XMLHttpRequest',
+    },
+    credentials: 'include'
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        document.querySelector('main').innerHTML = data.html;
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
 
-    // Second GET request for the header content
-    fetch(`/home/?status=success&message=Logged%20in%20successfully&type=header`, {
-        headers: {
-          'X-CSRFToken': getCookie('csrftoken'),
-          'x-requested-with': 'XMLHttpRequest',
-        },
-        credentials: 'include'
+  // Second GET request for the header content
+  fetch(`/home/?status=success&message=Logged%20in%20successfully&type=header`, {
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'x-requested-with': 'XMLHttpRequest',
+    },
+    credentials: 'include'
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        document.querySelector('header').innerHTML = data.html;
+        // get the div with id 'userID' and replace its value with the new user id. Example <input type="hidden" id="userID" value="1">
+        if (type == 'logout') {
+          document.getElementById('userID').value = "0";
+        }
+        else {
+          document.getElementById('userID').value = data.user_id;
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+
+  // Remove chat on logout and Add it in other situations
+  if (type == 'logout') {
+    // remove chat element
+    const chatSection = document.getElementById('chatSection');
+    if (chatSection)
+      chatSection.remove();
+    const chatButton = document.getElementById('chatButton');
+    if (chatButton)
+      chatButton.remove();
+
+  }
+  else if (type == 'login' || type == 'refresh' || type == 'oauth' || type == 'signup') {
+    // GET request for chat section
+    fetch(`/home/?status=success&message=Logged%20in%20successfully&type=chat`, {
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'x-requested-with': 'XMLHttpRequest',
+      },
+      credentials: 'include'
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          document.querySelector('body').innerHTML += data.html;
+
+          // Initialise the chat modal
+          const modalElement = document.getElementById('chatModal');
+          const chatModal = new bootstrap.Modal(modalElement);
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop)
+            backdrop.remove();
+          chatModal.hide();
+
+        }
       })
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === 'success') {
-            document.querySelector('header').innerHTML = data.html;
-            // get the div with id 'userID' and replace its value with the new user id. Example <input type="hidden" id="userID" value="1">
-            if (type == 'logout') {
-                document.getElementById('userID').value = "0";
-            }
-            else
-            {
-                document.getElementById('userID').value = data.user_id;
-            }
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
-    window.history.pushState({}, '', '/');
+      .catch(error => {
+        console.error('Error:', error);
+      });
+
+  }
+  window.history.pushState({}, '', '/');
 }
 
 // TODO -- Client secret changes over a certain period, making it unsuable.
@@ -56,41 +96,41 @@ function handleRefresh(type) {
 
 // Function to handle OAuth code once available
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-  
-  async function handleOAuthCode(oauth_callback_url) {
-    const oauthCode = getCookie('oauth_code');
-    if (oauthCode) {
-      console.log("OAuth code found in cookie:", oauthCode);
-      // Delete the OAuth code cookie after retrieving it
-      deleteCookie('oauth_code');
-  
-      try {
-        // Send the code to the server to exchange for an access token
-        const response = await fetch(oauth_callback_url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": getCookie('csrftoken')
-          },
-          body: JSON.stringify({ code: oauthCode })
-        });
-  
-        if (response.ok) {
-          console.log("OAuth authentication successful");
-          await sleep(1000);
-          refreshToken();
-          await sleep(1000);
-          handleRefresh("oauth");
-        } else {
-          console.error("OAuth authentication failed");
-        }
-      } catch (error) {
-        console.error("Error during OAuth authentication:", error);
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function handleOAuthCode(oauth_callback_url) {
+  const oauthCode = getCookie('oauth_code');
+  if (oauthCode) {
+    console.log("OAuth code found in cookie:", oauthCode);
+    // Delete the OAuth code cookie after retrieving it
+    deleteCookie('oauth_code');
+
+    try {
+      // Send the code to the server to exchange for an access token
+      const response = await fetch(oauth_callback_url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie('csrftoken')
+        },
+        body: JSON.stringify({ code: oauthCode })
+      });
+
+      if (response.ok) {
+        console.log("OAuth authentication successful");
+        await sleep(1000);
+        refreshToken();
+        await sleep(1000);
+        handleRefresh("oauth");
+      } else {
+        console.error("OAuth authentication failed");
       }
+    } catch (error) {
+      console.error("Error during OAuth authentication:", error);
     }
   }
+}
 
 // When the user clicks the "Login with 42" button
 function loginButton42() {
@@ -246,48 +286,48 @@ function disable2FA() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    await refreshToken();
-    // Set interval to refresh token every 50 seconds
-    setInterval(async () => {
-        try {
-            const newToken = await refreshToken();
-            console.log("Token refreshed");
-        } catch (error) {
-            console.error("Failed to refresh token:", error);
-            // Handle token refresh failure (e.g., redirect to login)
-        }
-    }, 20 * 1000); // 20 seconds
+  await refreshToken();
+  // Set interval to refresh token every 50 seconds
+  setInterval(async () => {
+    try {
+      const newToken = await refreshToken();
+      console.log("Token refreshed");
+    } catch (error) {
+      console.error("Failed to refresh token:", error);
+      // Handle token refresh failure (e.g., redirect to login)
+    }
+  }, 20 * 1000); // 20 seconds
 });
 
 async function refreshToken() {
-    try {
-        const response = await fetch('/api/refresh-token/', {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-              },
-            credentials: 'include'
-        });
+  try {
+    const response = await fetch('/api/refresh-token/', {
+      method: 'POST',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      credentials: 'include'
+    });
 
-        if (!response.ok) {
-            throw new Error("Failed to refresh token");
-        }        
-
-        const data = await response.json();
-        
-        // check for the message variable in the response body if its == 'Expired Token refreshed'
-        if (data.message === 'Expired Token refreshed') {
-            console.log("Expired Token refreshed");
-            await sleep(300);
-            handleRefresh("refresh");
-        }
-
-        // Assuming the new token is in data.token
-        return data.token;
-    } catch (error) {
-        console.error("Error refreshing token:", error);
-        throw error;
+    if (!response.ok) {
+      throw new Error("Failed to refresh token");
     }
+
+    const data = await response.json();
+
+    // check for the message variable in the response body if its == 'Expired Token refreshed'
+    if (data.message === 'Expired Token refreshed') {
+      console.log("Expired Token refreshed");
+      await sleep(300);
+      handleRefresh("refresh");
+    }
+
+    // Assuming the new token is in data.token
+    return data.token;
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    throw error;
+  }
 }

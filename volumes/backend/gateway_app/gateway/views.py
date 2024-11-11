@@ -18,10 +18,14 @@ def get_home(request):
     logger.debug(f"get_home > Request Cookies: {request.COOKIES}")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         context = {'user': request.user}
+
         if type_msg == 'header':
             html = render_to_string('includes/header.html', context=context, request=request)
+        elif type_msg == 'chat':
+            html = render_to_string('includes/chat_modal.html', context=context, request=request)
         else:
             html = render_to_string('fragments/home_fragment.html', context=context, request=request)
+            
         return JsonResponse({'html': html, 'status': status, 'message': message, 'user_id': request.user.id}, status=200)
     return render(request, 'partials/home.html', {'status': status, 'message': message})
 
