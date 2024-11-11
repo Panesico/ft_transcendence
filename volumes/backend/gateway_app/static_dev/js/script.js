@@ -33,7 +33,7 @@ async function loadContent(path) {
     if (data.type && data.message && (data.type === 'logout_successful')) {
       sessionStorage.setItem('afterLogout', 'true');
       sessionStorage.setItem('afterLogoutMessage', data.message);
-      handleAfterLogin();
+      handleRefresh("logout");
       console.log('loadContent > logout_successful');
     } else
       document.querySelector('main').innerHTML = data.html;
