@@ -1,7 +1,7 @@
-function innit_listening() {
+function init_listening() {
 
   // const stackTrace = new Error().stack;
-  // console.log('innit_listening call stack:', stackTrace);
+  // console.log('init_listening call stack:', stackTrace);
 
   let friendsData = [];
   const userID = document.getElementById('userID').value;
@@ -70,6 +70,7 @@ function innit_listening() {
 
 
 function checkUnreadMessages() {
+  const userID = document.getElementById('userID').value;
   const data = {
     'type': 'chat',
     'subtype': 'check_unread_messages',
@@ -80,8 +81,8 @@ function checkUnreadMessages() {
 
 
 function handleChatMessages(data) {
-  if (data.subtype === 'innit_listening') {
-    innit_listening();
+  if (data.subtype === 'init_listening') {
+    init_listening();
     console.log('chat listen init');
   }
   else if (data.subtype === 'chat_message') {

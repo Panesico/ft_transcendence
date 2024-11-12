@@ -82,7 +82,7 @@ function handleRefresh(type) {
           // if (backdrop)
           //   backdrop.remove();
           chatModal.hide();
-          innit_listening();
+          init_listening();
 
         }
       })

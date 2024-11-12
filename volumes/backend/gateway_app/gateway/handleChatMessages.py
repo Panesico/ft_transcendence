@@ -129,7 +129,7 @@ async def setReadMessages(self):
 async def innitListening(self):
   await self.send_json({
       'type': 'chat',
-      'subtype': 'innit_listening',
+      'subtype': 'init_listening',
     })
 
 async def innitChat(self):

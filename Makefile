@@ -58,7 +58,10 @@ deletenotifications:
 		-c "psql -U postgres_main_user -d transcendence_db -c 'DELETE FROM profileapi_notification;'"
 deletefriendships:
 	docker exec postgres sh \
-		-c "psql -U postgres_main_user -d transcendence_db -c 'DELETE FROM profileapi_profile_friends;;'"
+		-c "psql -U postgres_main_user -d transcendence_db -c 'DELETE FROM profileapi_profile_friends;'"
+deletemessages:
+	docker exec postgres sh \
+		-c "psql -U postgres_main_user -d transcendence_db -c 'DELETE FROM livechat_message;'"
 
 gateway:
 	docker exec -it gateway /bin/sh
