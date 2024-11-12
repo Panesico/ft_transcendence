@@ -13,7 +13,7 @@
         {% if friends %}
 
           {% for friend in friends %}
-            <div class="card mb-3 flex-row flex-wrap justify-content-between {% if friend.im_blocked %}blocked {% endif %}" style="background-color: lightslategray;" data-userid="{{ friend.user_id }}">
+            <div class="card mb-3 flex-row justify-content-between {% if friend.im_blocked %}blocked{% endif %}" style="background-color: lightslategray; height: 136px;" data-userid="{{ friend.user_id }}">
             
                   <div class="d-flex flex-row align-items-center justify-content-center">
 
@@ -39,7 +39,7 @@
 
                   </div>
 
-                <div class="d-flex align-items-center justify-content-center flex-wrap">
+                <div class="d-flex align-items-center justify-content-center">
                   {% if friend.im_blocked%}
                     <p class="text-danger d-flex flex-column justify-content-center p-2">{% trans "This user has blocked you." %}</p>
                   {% elif not friend.is_blocked %}

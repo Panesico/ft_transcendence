@@ -8,12 +8,12 @@ function closeMainRoomSocket() {
     mainRoomSocket.close();
   }
   else {
-        if (mainRoomSocket) {
-    console.warn('closeMainRoomSocket > mainRoomSocket.readyState:', mainRoomSocket.readyState);
+    if (mainRoomSocket) {
+      console.warn('closeMainRoomSocket > mainRoomSocket.readyState:', mainRoomSocket.readyState);
     }
     else {
       console.warn('closeMainRoomSocket > mainRoomSocket is not defined');
-    }          
+    }
   }
 }
 
@@ -137,11 +137,11 @@ function parseSocketMessage(data) {
   else if (data.type === 'next_in_tournament') {
     addResponseNotification(data);
   }
-  else if (data.type === 'block')
-  {
+  else if (data.type === 'block') {
     console.warn('parseSocketMessage > data:', data);
     handleBlockedNotif(data);
     addRequestNotification(data);
+    updateFriendsState();
   }
   // else if (data.type === 'connected_friends') {
   //   addOnlineStatusBadge(data);
