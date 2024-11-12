@@ -143,14 +143,11 @@ function parseSocketMessage(data) {
     addRequestNotification(data);
     updateFriendsState();
   }
-  else if (data.type === 'unblock')
-  {
+  else if (data.type === 'unblock') {
     console.warn('parseSocketMessage > data:', data);
     addRequestNotification(data);
+    updateFriendsState();
   }
-  // else if (data.type === 'connected_friends') {
-  //   addOnlineStatusBadge(data);
-  // }
   else {
     console.log('unknown parseSocketMessage > data.type:', data.type);
   }
