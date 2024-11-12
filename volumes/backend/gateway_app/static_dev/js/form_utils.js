@@ -33,10 +33,10 @@ function listenForm(form) {
         credentials: 'include',
         body: JSON.stringify(jsonObject)
       });
-      // console.log('handleFormSubmission > request: ', request);
+      // console.log('listenForm > request: ', request);
       const response = await fetch(request);
       const data = await response.json();
-
+      // console.log('listenForm > data: ', data);
       if (!response.ok && (!data.html || !data.html.includes('class="errorlist nonfield'))) {
         throw new Error(`HTTP error - status: ${response.status}`);
       }

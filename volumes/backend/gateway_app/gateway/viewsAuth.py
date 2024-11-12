@@ -220,7 +220,6 @@ def post_signup(request):
     type = response_data.get("type")
     refresh_jwt_token = response.cookies.get('refresh_jwt_token')
 
-
     if jwt_token:
         user_response = JsonResponse({'status': 'success', 'type': type, 'message': message, 'user_id': user_id})
         # Set the JWT token in a secure, HTTP-only cookie
@@ -228,7 +227,9 @@ def post_signup(request):
         user_response.set_cookie('refresh_jwt_token', refresh_jwt_token, httponly=True, secure=True, samesite='Lax')
         return user_response
     else:
-        return JsonResponse({'status': 'error', 'message': _('Failed to retrieve token')}, status=401)
+        form.add_error(None, message)
+        html = render_to_string('fragments/signup_fragment.html', {'form': form}, request=request)
+        return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
 
 
 @csrf_exempt
