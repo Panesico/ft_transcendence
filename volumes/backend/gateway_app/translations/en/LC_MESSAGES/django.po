@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-12 11:50+0000\n"
+"POT-Creation-Date: 2024-11-12 15:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ENGLISH <LL@li.org>\n"
@@ -130,7 +130,12 @@ msgstr "New password"
 msgid "Confirm new password"
 msgstr "Confirm new password"
 
-#: gateway/handleInvite.py:54 gateway/templates/base_index.html:94
+#: gateway/handleInvite.py:56 gateway/handleMainRoom.py:437
+#: gateway/templates/base_index.html:101
+msgid "has unblocked you."
+msgstr "has unblocked you."
+
+#: gateway/handleInvite.py:59 gateway/templates/base_index.html:94
 msgid " has invited you to play: "
 msgstr " has invited you to play: "
 
@@ -154,19 +159,17 @@ msgstr "has declined your friend request."
 msgid "has canceled the game request."
 msgstr "has canceled the game request."
 
-#: gateway/handleMainRoom.py:157
+#: gateway/handleMainRoom.py:57
+msgid "has unblocked you."
+msgstr "has unblocked you"
+
+#: gateway/handleMainRoom.py:161
 msgid "sent you a friend request"
 msgstr "sent you a friend request"
 
-#: gateway/handleMainRoom.py:412
-#, fuzzy
-#| msgid "has blocked you"
-msgid "You have blocked "
-msgstr "has blocked you"
-
-#: gateway/handleMainRoom.py:429 gateway/templates/base_index.html:100
-msgid " has blocked you."
-msgstr "has blocked you"
+#: gateway/handleMainRoom.py:439 gateway/templates/base_index.html:100
+msgid "has blocked you."
+msgstr "has blocked you."
 
 #: gateway/templates/base_index.html:83
 msgid "Choose..."
@@ -209,17 +212,26 @@ msgstr " is waiting to play."
 msgid " you play next in the tournament."
 msgstr " you play next in the tournament."
 
-#: gateway/templates/base_index.html:101
+#: gateway/templates/base_index.html:102
 msgid "Friend blocked successfully."
 msgstr "Friend blocked successfully."
 
-#: gateway/templates/base_index.html:102
+#: gateway/templates/base_index.html:103
 msgid "Friend unblocked successfully."
 msgstr "Friend unblocked successfully."
 
-#: gateway/templates/base_index.html:103
+#: gateway/templates/base_index.html:104
 msgid "Form submission error. Please reload and retry."
 msgstr ""
+
+#: gateway/templates/base_index.html:106
+msgid "No friends yet"
+msgstr "No friends yet"
+
+#: gateway/templates/base_index.html:107
+#: gateway/templates/includes/chat_modal.html:44
+msgid "Select a contact"
+msgstr "Select a contact"
 
 #: gateway/templates/fragments/2FA_enable_fragment.html:5
 msgid "Enter OTP"
@@ -643,11 +655,6 @@ msgstr "Contacts"
 msgid "avatar"
 msgstr "avatar"
 
-#: gateway/templates/includes/chat_modal.html:44
-#: gateway/templates/includes/chat_modal.html:108
-msgid "Select a contact"
-msgstr "Select a contact"
-
 #: gateway/templates/includes/chat_modal.html:93
 msgid "Type message"
 msgstr "Type message"
@@ -655,10 +662,6 @@ msgstr "Type message"
 #: gateway/templates/includes/chat_modal.html:94
 msgid "Send"
 msgstr "Send"
-
-#: gateway/templates/includes/chat_modal.html:107
-msgid "No friends yet"
-msgstr "No friends yet"
 
 #: gateway/templates/includes/header.html:10
 msgid "Toggle navigation"
@@ -776,6 +779,10 @@ msgstr "Error retrieving match history"
 #: gateway/viewsProfile.py:379 gateway/viewsProfile.py:411
 msgid "Please select an image file"
 msgstr "Please select an image file"
+
+
+#~ msgid "has blocked you"
+#~ msgstr "has blocked you"
 
 #~| msgid "User blocked"
 #~ msgid "has been blocked"

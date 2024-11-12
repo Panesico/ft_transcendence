@@ -51,8 +51,6 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
     message = content.get('notify_player', '')
     receiver_id = sender_id
     receiver_username = sender_username
-  elif type == 'blocked':
-    message = content.get('message', '')
   logger.debug(f'requestResponse > message: {message}, type: {type}')
 
   # Send response to frontend sender
@@ -74,6 +72,8 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
       'game_type': game_type,
       'html': html,
     })
+  else:
+    logger.debug(f'requestResponse > sender_id: {sender_id} is not in users_connected')
   
   # Set the notification as read
   profileapi_url = 'https://profileapi:9002/api/setnotifasread/' + str(sender_id) + '/' + str(receiver_id) + '/' + str(type) + '/' + str(response) + '/'
@@ -243,7 +243,8 @@ async def handleNewConnection(self, users_connected):
     self.avatar_url = '/media/' + user_data.get('avatar_url', '')
     logger.debug(f'mainRoom > self.avatar_url: {self.avatar_url}')
     await self.send_json({
-      'message': f'Welcome {self.room_user_name}!'
+      'message': f'Welcome {self.room_user_name}!',
+      'type': 'user_info',
     })
   else:
     logger.debug(f'mainRoom > Error getting user info')
@@ -406,32 +407,17 @@ async def block_user_responses(self, content, users_connected):
   receiver_username = receiver_data.get('username', '')
   receiver_avatar_url = '/media/' + receiver_data.get('avatar_url', '')
   game_type = ""
+  type = content.get('type', '')
   logger.debug(f'block_user_responses > sender_username: {sender_username}')
-
-  # Send to the sender if connected
-  logger.debug(f'block_user_responses > users_connected: {users_connected}')
-  message = _('You have blocked ')
-  if sender_id in users_connected:
-    logger.debug(f'block_user_responses > sender_id: {sender_id} is in users_connected')
-    await users_connected[sender_id].send_json({
-      'type': 'block',
-      'message': f'You have blocked {receiver_username}',
-      'receiver_username': receiver_username,
-      'receiver_id': receiver_id,
-      'block_sender': True,
-      'sender_username': sender_username,
-      'sender_avatar_url': sender_avatar_url,
-      'receiver_avatar_url': receiver_avatar_url,
-    })
-  else:
-    logger.debug(f'block_user_responses > sender_id: {sender_id} is not in users_connected')
-  
   # Send to the receiver if connected
-  message = _(' has blocked you.')
+  if type == 'unblock':
+    message = _(' has unblocked you.')
+  elif type == 'block':
+    message = _(' has blocked you.')
   if receiver_id in users_connected:
     logger.debug(f'block_user_responses > receiver_id: {receiver_username} is in users_connected')
     await users_connected[receiver_id].send_json({
-      'type': 'block',
+      'type': type,
       'message': message,
       'sender_username': sender_username,
       'sender_id': sender_id,
@@ -445,10 +431,21 @@ async def block_user_responses(self, content, users_connected):
     logger.debug(f'block_user_responses > receiver: {receiver_username} is not in users_connected')
   
   # Save the notification in database
-  message = receiver_username + ' ' + message
-  logger.debug(f'requestResponse > message: {message}')
+  if type == 'block':
+    message = sender_username + ' ' + message
+  if type == 'unblock':
+    message = sender_username + message
+  logger.debug(f'block_user_responses > message: {message}')
   profileapi_url = 'https://profileapi:9002/api/createnotif/'
-  notification_data = { 'sender_id': receiver_id, 'receiver_id': sender_id, 'message': message, 'type': type, 'game_type': game_type }
+  csrf_token = self.scope['cookies']['csrftoken']
+  headers = {
+          'X-CSRFToken': csrf_token,
+          'Cookie': f'csrftoken={csrf_token}',
+          'Content-Type': 'application/json',
+          'HTTP_HOST': 'profileapi',
+          'Referer': 'https://gateway:8443',
+      }
+  notification_data = { 'sender_id': sender_id, 'receiver_id': receiver_id, 'message': message, 'type': type, 'game_type': game_type }
   try:
     response = requests.post(
           profileapi_url, json=notification_data, headers=headers, verify=os.getenv("CERTFILE"))

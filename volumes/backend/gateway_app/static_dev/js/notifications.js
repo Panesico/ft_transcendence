@@ -91,7 +91,7 @@ function appendElements(avatar, message, acceptButton, declineButton, newNotific
   contentDiv.appendChild(leftContainer);
 
   // Set buttons only if status is pending
-  if (status !== 'accepted' && status !== 'declined' && type !== 'block') {
+  if (status !== 'accepted' && status !== 'declined' && type !== 'block' && type !== 'unblock') {
     const markersDiv = document.createElement('div');
     markersDiv.style.display = 'flex';
     markersDiv.style.flexDirection = 'row';
@@ -353,7 +353,6 @@ function addRequestNotification(data) {
   sender_id = data.sender_id;
   sender_avatar_url = data.sender_avatar_url;
   type = data.type;
-  console.log('addRequestNotification > data:', data);
   // example.data = {
   //   date: "2024-10-24 17:49:53"
   //   game_mode: "invite"
@@ -392,11 +391,14 @@ function addRequestNotification(data) {
   const message = createMessageElement(sender_username, friendRequestReceived);
   if (data.type === 'game_request') {
     // message.textContent = `${sender_username} invited you to play a game.`;
-    console.log('addRequestNotification > data', data);
     message.textContent = sender_username + gameRequestReceived + data.game_type;
   }
   else if (data.type === 'block') {
     message.textContent = sender_username + ' ' + userBlocked;
+  }
+  else if (data.type === 'unblock') {
+    message.textContent = sender_username + ' ' + userUnblocked;
+    console.log('addRequestNotification > message:', message);
   }
 
   // Add button to accept the friend request represented by accept png
@@ -411,8 +413,10 @@ function addRequestNotification(data) {
   // Append the avatar and message to the newNotification element
   appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status, type);
 
-  // Change default down icon notification to the new notification icon
-  changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id, data.status);
+  // Change default down icon notification to the new notification icon if the notif has not been read
+  if (data.status !== 'read') {
+    changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id, data.status);
+  }
 
   // Set last notification on top
   if (notificationDropdownClass.childElementCount === 0) {
