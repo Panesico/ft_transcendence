@@ -122,7 +122,7 @@ def get_player_language(context):
     profile = user.get('profile', {})
     
     # Check for language in cookies
-    if 'django_language' in cookies:
+    if 'django_language' in cookies and len(cookies['django_language']) == 2:
         return cookies['django_language']
     
     # Check for preferred language in profile

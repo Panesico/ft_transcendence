@@ -6,7 +6,7 @@ function announceGame(round, message) {
   messageModal.show();
   document.getElementById('messageModalLabel').innerText = round;
   document.getElementById('messageContent').innerText = message;
-  document.getElementById('messageContent').classList.remove('text-end');
+  document.getElementById('messageContent').classList.remove('text-start');
   document.getElementById('messageContent').classList.add('text-center');
 }
 // Show message modal
@@ -20,10 +20,10 @@ function displayMessageInModal(message) {
     let messageModal =
       new bootstrap.Modal(document.getElementById('messageModal'));
     messageModal.show();
-    document.getElementById('messageModalLabel').innerText = notificationMsg;
+    document.getElementById('messageModalLabel').innerText = '';
     document.getElementById('messageContent').innerText = message;
     document.getElementById('messageContent').classList.remove('text-center');
-    document.getElementById('messageContent').classList.add('text-end');
+    document.getElementById('messageContent').classList.add('text-start');
   }
 }
 

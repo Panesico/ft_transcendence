@@ -2,7 +2,7 @@ import os, json, requests, logging
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
-from django.utils.translation import gettext as _
+from django.utils.translation import activate, gettext as _
 from .consumerMainRoom import users_connected
 from .authmiddleware import login_required
 # from django.template.response import TemplateResponse
@@ -103,7 +103,8 @@ def set_language(request):
     
     # logger.debug(f"set_language > data: {data}")
     language = data.get('language')
-    # logger.debug(f"set_language > new language: {language}")
+    activate(language)
+    logger.debug(f"set_language > new language: {language}")
     response = JsonResponse({'language': language}, status=200)
-    response.set_cookie('django_language', language, httponly=True, secure=True)
+    response.set_cookie('django_language', language, httponly=False, secure=True, samesite='Lax')
     return response

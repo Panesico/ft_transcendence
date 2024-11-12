@@ -175,7 +175,7 @@ def block_friends(request, user_id):
   
   csrf_token = request.COOKIES.get('csrftoken')
   jwt_token = request.COOKIES.get('jwt_token')
-  django_language = request.COOKIES.get('django_language')
+  django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
   headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',
@@ -225,7 +225,7 @@ def unblock_friends(request, user_id):
   
   csrf_token = request.COOKIES.get('csrftoken')
   jwt_token = request.COOKIES.get('jwt_token')
-  django_language = request.COOKIES.get('django_language')
+  django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
   headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',

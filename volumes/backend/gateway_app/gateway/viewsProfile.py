@@ -204,7 +204,7 @@ def post_edit_profile_security(request):
 
     # Cookies & headers
     csrf_token = request.COOKIES.get('csrftoken')
-    django_language = request.COOKIES.get('django_language', 'en')
+    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
     jwt_token = request.COOKIES.get('jwt_token')
     headers = {
         'X-CSRFToken': csrf_token,
@@ -247,7 +247,7 @@ def post_edit_profile_security(request):
       logger.debug('post_edit_profile > Response OK')
 #      html = render_to_string('fragments/login_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
       user_response =  JsonResponse({'type': type, 'status': status, 'message': message})
-      user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
+      user_response.set_cookie('django_language', preferred_language, httponly=False, secure=True, samesite='Lax')
       return user_response
 
     #handle wrong confirmation password
@@ -272,7 +272,7 @@ def post_edit_profile_general(request):
 
     # Cookies & headers
     csrf_token = request.COOKIES.get('csrftoken')
-    django_language = request.COOKIES.get('django_language', 'en')
+    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
     jwt_token = request.COOKIES.get('jwt_token')
     headers = {
         'X-CSRFToken': csrf_token,
@@ -319,7 +319,7 @@ def post_edit_profile_general(request):
         preferred_language = data.get('preferred_language')
         logger.debug(f"post_edit_profile > preferred_language: {preferred_language}")
         user_response =  JsonResponse({'status': status, 'type': type, 'message': message, 'preferred_language': preferred_language})
-        user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
+        user_response.set_cookie('django_language', preferred_language, httponly=False, secure=True, samesite='Lax')
 
         return user_response
         
@@ -346,7 +346,7 @@ def post_edit_profile_avatar(request):
   logger.debug("")
   logger.debug("post_edit_profile_avatar")
   csrf_token = request.COOKIES.get('csrftoken')
-  django_language = request.COOKIES.get('django_language', 'en')
+  django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
   jwt_token = request.COOKIES.get('jwt_token')
   headers = {
         'X-CSRFToken': csrf_token,
@@ -398,7 +398,7 @@ def post_edit_profile_avatar(request):
 
     if  response.ok:
         user_response =  JsonResponse({'type': type, 'message': message, 'status': 'success'})
-        user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
+        user_response.set_cookie('django_language', preferred_language, httponly=False, secure=True, samesite='Lax')
         return user_response
     else:
       html = render_to_string('fragments/edit_profile_fragment.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
@@ -466,7 +466,7 @@ async def checkNameExists(request):
             return JsonResponse({'status': 'success', 'message': 'display name and username are available'})
 
     csrf_token = request.COOKIES.get('csrftoken')
-    django_language = request.COOKIES.get('django_language', 'en')
+    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
     jwt_token = request.COOKIES.get('jwt_token')
     headers = {
         'X-CSRFToken': csrf_token,

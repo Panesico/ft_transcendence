@@ -644,7 +644,7 @@ def oauth(request):
         samesite='Lax',  # Control cross-site request behavior
         max_age=60 * 60 * 24 * 7,
     )
-    response.set_cookie('django_language', language, samesite='Lax', httponly=True, secure=True)
+    response.set_cookie('django_language', language, httponly=False, secure=True, samesite='Lax')
     
     return response
 

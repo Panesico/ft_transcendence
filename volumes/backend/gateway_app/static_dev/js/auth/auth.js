@@ -92,7 +92,14 @@ function handleRefresh(type) {
           init_listening();
 
           if (type == 'profile_update') {
-            displayMessageInModal(profileUpdatedmsg);
+            let lang = getCookie('django_language');
+            console.log('handleRefresh > lang:', lang);
+            let message = 'Profile updated';
+            if (lang === 'fr')
+              message = 'Profil mis à jour';
+            else if (lang === 'es')
+              message = 'Perfil actualizado';
+            displayMessageInModal(message);
           }
 
         }

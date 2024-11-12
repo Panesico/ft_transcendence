@@ -82,7 +82,7 @@ def post_login(request):
 
     csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
     jwt_token = request.COOKIES.get('jwt_token')
-    django_language = request.COOKIES.get('django_language', 'en')
+    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
     headers = {
         'X-CSRFToken': csrf_token,
         'X-Language': django_language,
@@ -131,7 +131,7 @@ def post_login(request):
             preferred_language = profile_data.get('preferred_language')
             logger.debug(f"post_login > preferred_language: {preferred_language}")
             # Set the preferred language of the user, HTTP-only cookie
-            user_response.set_cookie('django_language', preferred_language, domain='localhost', httponly=True, secure=True)
+            user_response.set_cookie('django_language', preferred_language, httponly=False, secure=True, samesite='Lax')
             # Set the JWT token in a secure, HTTP-only cookie
             user_response.set_cookie('jwt_token', jwt_token, httponly=True, secure=True, samesite='Lax')
             user_response.set_cookie('refresh_jwt_token', refresh_jwt_token, httponly=True, secure=True, samesite='Lax')            
@@ -198,7 +198,7 @@ def post_signup(request):
 
     csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
     jwt_token = request.COOKIES.get('jwt_token')
-    django_language = request.COOKIES.get('django_language', 'en')
+    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
     headers = {
         'X-CSRFToken': csrf_token,
         'X-Language': django_language,
@@ -257,7 +257,7 @@ def oauth(request):
         payload = json.dumps({'code': auth_code})  # Convert the data to a JSON string
         csrf_token = request.COOKIES.get('csrftoken')
         jwt_token = request.COOKIES.get('jwt_token')
-        django_language = request.COOKIES.get('django_language', 'en')
+        django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
         headers = {
           'X-CSRFToken': csrf_token,
           'X-Language': django_language,
@@ -298,7 +298,7 @@ def oauth(request):
             profile_data = get_profileapi_variables(response=response)
             logger.debug(f"post_login > profile_data: {profile_data}")
             preferred_language = profile_data.get('preferred_language')
-            json_response.set_cookie('django_language', preferred_language, samesite='Lax', httponly=True, secure=True)
+            json_response.set_cookie('django_language', preferred_language, httponly=False, secure=True, samesite='Lax')
         return json_response
 
     except requests.exceptions.RequestException as e:
@@ -319,7 +319,7 @@ def enable2FA_redir(request):
 
     csrf_token = request.COOKIES.get('csrftoken')
     jwt_token = request.COOKIES.get('jwt_token')
-    django_language = request.COOKIES.get('django_language', 'en')
+    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
     headers = {
         'X-CSRFToken': csrf_token,
         'X-Language': django_language,
@@ -351,9 +351,9 @@ def confirm2FA_redir(request):
 
     authentif_url = 'https://authentif:9001/api/confirm2FA/'
 
-    csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+    csrf_token = request.COOKIES.get('csrftoken')
     jwt_token = request.COOKIES.get('jwt_token')
-    django_language = request.COOKIES.get('django_language', 'en')
+    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
     headers = {
         'X-CSRFToken': csrf_token,
         'X-Language': django_language,
@@ -381,9 +381,9 @@ def confirm2FA_redir(request):
 def disable2FA_redir(request):
     authentif_url = 'https://authentif:9001/api/disable2FA/'
 
-    csrf_token = request.COOKIES.get('csrftoken')  # Get CSRF token from cookies
+    csrf_token = request.COOKIES.get('csrftoken')
     jwt_token = request.COOKIES.get('jwt_token')
-    django_language = request.COOKIES.get('django_language', 'en')
+    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
     headers = {
         'X-CSRFToken': csrf_token,
         'X-Language': django_language,
@@ -413,7 +413,7 @@ def verify2FA_redir(request, user_id):
 
     csrf_token = request.COOKIES.get('csrftoken')
     jwt_token = request.COOKIES.get('jwt_token')
-    django_language = request.COOKIES.get('django_language', 'en')
+    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
     headers = {
         'X-CSRFToken': csrf_token,
         'X-Language': django_language,

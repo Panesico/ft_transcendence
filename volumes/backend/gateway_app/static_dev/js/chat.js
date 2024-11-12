@@ -190,6 +190,11 @@ async function getFriendsData() {
 
 
 function displayFriendsInChat(friendsData) {
+  // Displays who called this function
+  console.log('displayFriendsInChat > friendsData: ', friendsData);
+  const stackTrace = new Error().stack;
+  console.log('displayFriendsInChat > call stack:', stackTrace);
+
   const contactAvatar = document.getElementById('contactAvatar');
   const contactDisplayName = document.getElementById('contactDisplayName');
   // const unreadCount = document.getElementById('unreadChatsCount');
@@ -212,7 +217,13 @@ function displayFriendsInChat(friendsData) {
   contactList.innerHTML = '';
   if (friendsData.length === 0) {
     const noFriends = document.createElement('p');
-    noFriends.textContent = noFriendsmsg;
+    let lang = getCookie('django_language');
+    let message = 'No friends yet';
+    if (lang === 'fr')
+      error = 'Aucun amis';
+    else if (lang === 'es')
+      error = 'Sin amigos aún';
+    noFriends.textContent = message;
     noFriends.classList.add('no-friends-message');
     contactList.appendChild(noFriends);
     return;
