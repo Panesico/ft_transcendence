@@ -246,7 +246,7 @@ function getCalcGameSocket(gameMode, gameType, gameRound) {
 // Attach and remove event listeners to navbar items on socket open/close
 function setupNavbarNavigateEventListeners(socket) {
   const header = document.querySelector("#mainHeader");
-  const navLinks = header.querySelectorAll("a");
+  const navLinks = [...header.querySelectorAll("a"), ...header.querySelectorAll(".language-btn")];
 
   // Define the event listener for navigation
   function closeSocketOnNavigateClick() {

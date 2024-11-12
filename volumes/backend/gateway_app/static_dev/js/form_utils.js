@@ -114,7 +114,8 @@ function listenForm(form) {
         document.querySelector('main').innerHTML = data.html;
 
       if (!data?.html?.includes('class="errorlist nonfield')) {
-        if (data.message != 'starting Semi-Final 1' && data.type != 'login_successful') {
+        // console.log('displayMessageInModal type: ', data.type, 'message: ', data.message);
+        if (data.message != 'starting Semi-Final 1' && data.type != 'login_successful' && data.type != 'profile_updated') {
           displayMessageInModal(data.message);
         }
       }

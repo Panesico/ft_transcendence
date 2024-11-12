@@ -6,24 +6,31 @@ function deleteCookie(name) {
 
 function handleRefresh(type) {
   // First GET request for the main content
-  fetch(`/home/?status=success&message=Logged%20in%20successfully&type=main`, {
-    headers: {
-      'X-CSRFToken': getCookie('csrftoken'),
-      'x-requested-with': 'XMLHttpRequest',
-    },
-    credentials: 'include'
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === 'success') {
-        document.querySelector('main').innerHTML = data.html;
-      }
+  console.log('handleRefresh > type:', type);
+
+  if (type != 'language') {
+    console.log('handleRefresh > main content');
+    fetch(`/home/?status=success&message=Logged%20in%20successfully&type=main`, {
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'x-requested-with': 'XMLHttpRequest',
+      },
+      credentials: 'include'
     })
-    .catch(error => {
-      console.error('Error:', error);
-    });
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          document.querySelector('main').innerHTML = data.html;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+
 
   // Second GET request for the header content
+  console.log('handleRefresh > header');
   fetch(`/home/?status=success&message=Logged%20in%20successfully&type=header`, {
     headers: {
       'X-CSRFToken': getCookie('csrftoken'),
@@ -48,9 +55,10 @@ function handleRefresh(type) {
       console.error('Error:', error);
     });
 
-  // console.log('handleRefresh > type:', type);
-  // Remove chat on logout and Add it in other situations
-  if (type == 'logout') {
+
+  // Remove chat on logout and language change
+  if (type == 'logout' || type == 'language' || type == 'profile_update') {
+    console.log('handleRefresh > remove chat');
     // remove chat element
     const chatSection = document.getElementById('chatSection');
     if (chatSection)
@@ -58,9 +66,11 @@ function handleRefresh(type) {
     const chatButton = document.getElementById('chatButton');
     if (chatButton)
       chatButton.remove();
-
   }
-  else if (type == 'login' || type == 'refresh' || type == 'oauth' || type == 'signup') {
+
+  // Add chat
+  if (type == 'login' || type == 'refresh' || type == 'oauth' || type == 'signup' || type == 'language' || type == 'profile_update') {
+    console.log('handleRefresh > add chat');
     // GET request for chat section
     fetch(`/home/?status=success&message=Logged%20in%20successfully&type=chat`, {
       headers: {
@@ -76,13 +86,14 @@ function handleRefresh(type) {
           document.querySelector('body').innerHTML += data.html;
 
           // Initialise the chat modal
-          const modalElement = document.getElementById('chatModal');
-          const chatModal = new bootstrap.Modal(modalElement);
-          // const backdrop = document.querySelector('.modal-backdrop');
-          // if (backdrop)
-          //   backdrop.remove();
+          const chatModalElement = document.getElementById('chatModal');
+          const chatModal = new bootstrap.Modal(chatModalElement);
           chatModal.hide();
           init_listening();
+
+          if (type == 'profile_update') {
+            displayMessageInModal(profileUpdatedmsg);
+          }
 
         }
       })
@@ -91,7 +102,10 @@ function handleRefresh(type) {
       });
 
   }
-  window.history.pushState({}, '', '/');
+
+  if (type != 'language') {
+    window.history.pushState({}, '', '/');
+  }
 }
 
 // TODO -- Client secret changes over a certain period, making it unsuable.

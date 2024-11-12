@@ -1,4 +1,4 @@
-import os, requests, logging
+import os, json, requests, logging
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
@@ -90,3 +90,20 @@ def list_friends(request):
       if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'error': 'Error retrieving friends'}, status=500)
       return render(request, 'partials/myfriends.html', {'error': _('Error retrieving friends')})
+
+def set_language(request):
+    logger.debug("set_language")
+    if request.method != 'POST':
+        return redirect('405')
+    
+    try:
+      data = json.loads(request.body)
+    except json.JSONDecodeError:
+      return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
+    
+    # logger.debug(f"set_language > data: {data}")
+    language = data.get('language')
+    # logger.debug(f"set_language > new language: {language}")
+    response = JsonResponse({'language': language}, status=200)
+    response.set_cookie('django_language', language, httponly=True, secure=True)
+    return response

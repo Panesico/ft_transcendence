@@ -462,6 +462,8 @@ def check_displayname_exists(request):
 
 def block_friends(request, friend_id):
     logger.debug("block_friends")
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     try:
         if request.method != 'POST':
             logger.debug('block_friends > Method not allowed')
@@ -483,6 +485,8 @@ def block_friends(request, friend_id):
 
 def unblock_friends(request, friend_id):
     logger.debug("unblock_friends")
+    language = request.headers.get('X-Language', 'en')
+    activate(language)
     try:
         if request.method != 'POST':
             logger.debug('unblock_friends > Method not allowed')

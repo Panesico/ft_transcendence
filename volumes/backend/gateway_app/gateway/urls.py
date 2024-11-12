@@ -58,6 +58,8 @@ urlpatterns = [
 
     # Languages API
     path('i18n/', include('django.conf.urls.i18n')),
+    path('setLanguage/', views.set_language, name='set_language'),
+
 
 ]
 

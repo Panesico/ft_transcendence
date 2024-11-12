@@ -70,29 +70,31 @@ window.onpopstate = () => {
 };
 
 
-function changeLanguage(lang) {
-  console.log('CHANGELANGUAGE > lang: ', lang);
+async function changeLanguage(lang) {
+  console.log('changeLanguage > lang: ', lang);
+  const path = window.location.pathname;
 
-  const formData = new FormData();
-  formData.append('language', lang);
-  // Redirects the user back to the current page after changing the language
-  formData.append('next', window.location.pathname);
+  // console.log('changeLanguage > current django_language:', getCookie('django_language'));
 
-  fetch(`/i18n/setlang/`, {
-    method: 'POST',
-    headers: {
-      'X-CSRFToken': getCookie('csrftoken'),
-      'X-Requested-With': 'XMLHttpRequest'
-    },
-    credentials: 'include',
-    body: formData,
-  })
-    .then(response => {
-      if (response.ok) {
-        window.location.reload();
-      } else {
-        console.error('Error changing language:', response.statusText);
-      }
-    })
-    .catch(error => console.error('Fetch error:', error));
+  try {
+    const response = await fetch(`/setLanguage/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      credentials: 'include',
+      body: JSON.stringify({ language: lang })
+    });
+
+    if (response.ok) {
+      data = await response.json();
+      // console.log('changeLanguage > new django_language:', getCookie('django_language'));
+      loadContent(path);
+      handleRefresh('language');
+    } else {
+      console.error('Error changing language:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Fetch error:', error);
+  }
 }
