@@ -76,9 +76,9 @@ function handleRefresh(type) {
           // Initialise the chat modal
           const modalElement = document.getElementById('chatModal');
           const chatModal = new bootstrap.Modal(modalElement);
-          const backdrop = document.querySelector('.modal-backdrop');
-          if (backdrop)
-            backdrop.remove();
+          // const backdrop = document.querySelector('.modal-backdrop');
+          // if (backdrop)
+          //   backdrop.remove();
           chatModal.hide();
 
         }

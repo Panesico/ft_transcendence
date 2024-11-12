@@ -34,8 +34,6 @@ async function loadContent(path) {
     console.log('loadContent > data: ', data);
 
     if (data.type && data.message && (data.type === 'logout_successful')) {
-      sessionStorage.setItem('afterLogout', 'true');
-      sessionStorage.setItem('afterLogoutMessage', data.message);
       // disconnect main room socket
       handleRefresh("logout");
       closeMainRoomSocket();
@@ -54,12 +52,6 @@ async function loadContent(path) {
   }
 }
 
-// function isUserLoggedIn() {
-//   console.log(
-//     'isUserLoggedIn > sessionStorage.getItem(afterLogin): ',
-//     sessionStorage.getItem('afterLogin'));
-//   return sessionStorage.getItem('afterLogin') === 'true';
-// }
 
 // Handle navigation
 function navigate(e, path) {
@@ -77,86 +69,6 @@ window.onpopstate = () => {
   loadContent(window.location.pathname);
 };
 
-// Initialise the correct content on page load
-// window.onload = () => {
-//   console.log('onload');
-//   // loadContent(window.location.pathname);
-//   handleFormSubmission();
-// };
-
-// async function getProfileData() {
-//   try {
-//     let request = new Request('/profile/', {
-//       headers: {'X-Requested-With': 'XMLHttpRequest'},
-//       credentials: 'include',
-//     });
-
-//     const response = await fetch(request);
-//     if (!response.ok) {
-//       throw new Error(`HTTP error - status: ${response.status}`);
-//     }
-//     const data = await response.json();
-//     console.log('getProfileData > data: ', data);
-//     return data;
-//   } catch (error) {
-//     console.error('Error getting profile data:', error);
-//     return null;
-//   }
-// }
-
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('Session Storage listener > DOMContentLoaded');
-
-  // The message should be set in sessionStorage before the page is reloaded
-  // because the message needs to be translated
-
-  if (sessionStorage.getItem('afterLogin') === 'true') {
-    let message = sessionStorage.getItem('afterLoginMessage');
-    displayMessageInModal(message);
-    sessionStorage.removeItem('afterLogin');
-    sessionStorage.removeItem('afterLoginMessage');
-
-  } else if (sessionStorage.getItem('afterLogout') === 'true') {
-    let message = sessionStorage.getItem('afterLogoutMessage');
-    displayMessageInModal(message);
-    sessionStorage.removeItem('afterLogout');
-    sessionStorage.removeItem('afterLogoutMessage');
-
-  } else if (sessionStorage.getItem('afterSignup') === 'true') {
-    let message = sessionStorage.getItem('afterSignupMessage');
-    displayMessageInModal(message);
-    sessionStorage.removeItem('afterSignup');
-    sessionStorage.removeItem('afterSignupMessage');
-
-  } else if (sessionStorage.getItem('afterProfileUpdate') === 'true') {
-    let message = sessionStorage.getItem('afterProfileUpdateMessage');
-    displayMessageInModal(message);
-    sessionStorage.removeItem('afterProfileUpdate');
-    sessionStorage.removeItem('afterProfileUpdateMessage');
-
-  } else if (sessionStorage.getItem('afterAvatarUpdate') === 'true') {
-    // let message = 'Avatar updated';
-    let message = sessionStorage.getItem('afterAvatarUpdateMessage');
-    displayMessageInModal(message);
-    sessionStorage.removeItem('afterAvatarUpdate');
-    sessionStorage.removeItem('afterAvatarUpdateMessage');
-
-  } else if (sessionStorage.getItem('afterBlock') === 'true') {
-    let message = sessionStorage.getItem('afterBlockMessage');
-    displayMessageInModal(message);
-    sessionStorage.removeItem('afterBlock');
-    sessionStorage.removeItem('afterBlockMessage');
-
-  } else if (sessionStorage.getItem('afterUnblock') === 'true') {
-    let message = sessionStorage.getItem('afterUnblockMessage');
-    displayMessageInModal(message);
-    sessionStorage.removeItem('afterUnblock');
-    sessionStorage.removeItem('afterUnblockMessage');
-  }
-});
-
-
-// Display modal after redirect
 
 function changeLanguage(lang) {
   console.log('CHANGELANGUAGE > lang: ', lang);

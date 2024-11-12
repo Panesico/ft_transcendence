@@ -62,21 +62,18 @@ function listenForm(form) {
         console.log('data.type: ', data.type, 'data.message: ', data.message);
         // If login successful, connect to the main room socket
         if (data.type === 'login_successful') {
-          sessionStorage.setItem('afterLogin', 'true');
-          sessionStorage.setItem('afterLoginMessage', data.message);
+          console.log('displayMessageInModal login_successful');
           handleRefresh("login");
           connectMainRoomSocket(user_id);
+
         } else if (data.type === 'signup_successful') {
-          sessionStorage.setItem('afterSignup', 'true');
-          sessionStorage.setItem('afterSignupMessage', data.message);
           handleRefresh("signup");
           connectMainRoomSocket(user_id);
 
         } else if (data.type === 'profile_updated') {
-          sessionStorage.setItem('afterProfileUpdate', 'true');
-          sessionStorage.setItem('afterProfileUpdateMessage', data.message);
           handleRefresh("profile_update");
           connectMainRoomSocket(user_id);
+
         } else if (data.type === '2FA') {
           try {
             const verifyResponse = await fetch('/verify2FA/' + data.user_id + "/", {
@@ -117,8 +114,9 @@ function listenForm(form) {
         document.querySelector('main').innerHTML = data.html;
 
       if (!data?.html?.includes('class="errorlist nonfield')) {
-        if (data.message != 'starting Semi-Final 1')
+        if (data.message != 'starting Semi-Final 1' && data.type != 'login_successful') {
           displayMessageInModal(data.message);
+        }
       }
       handleFormSubmission();
     } catch (error) {
@@ -169,15 +167,14 @@ function listenFormUpload(form) {
       if (data.status != 'error' && data.type && data.message && !data.html) {
         console.log('data.type: ', data.type, 'data.message: ', data.message);
 
-        if (data.type === 'profile_updated') {
-          sessionStorage.setItem('afterProfileUpdate', 'true');
-          sessionStorage.setItem('afterProfileUpdateMessage', data.message);
-          location.reload();
-        }
+        // if (data.type === 'profile_updated') {
+        //   location.reload();
+        // }
 
       } else
         document.querySelector('main').innerHTML = data.html;
       if (!data?.html?.includes('class="errorlist nonfield')) {
+        console.log('displayMessageInModal 188');
         displayMessageInModal(data.message);
       }
       handleFormSubmission();
