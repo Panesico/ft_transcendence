@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-12 15:34+0000\n"
+"POT-Creation-Date: 2024-11-12 17:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ENGLISH <LL@li.org>\n"
@@ -130,12 +130,7 @@ msgstr "New password"
 msgid "Confirm new password"
 msgstr "Confirm new password"
 
-#: gateway/handleInvite.py:56 gateway/handleMainRoom.py:437
-#: gateway/templates/base_index.html:101
-msgid "has unblocked you."
-msgstr "has unblocked you."
-
-#: gateway/handleInvite.py:59 gateway/templates/base_index.html:94
+#: gateway/handleInvite.py:54 gateway/templates/base_index.html:94
 msgid " has invited you to play: "
 msgstr " has invited you to play: "
 
@@ -159,17 +154,17 @@ msgstr "has declined your friend request."
 msgid "has canceled the game request."
 msgstr "has canceled the game request."
 
-#: gateway/handleMainRoom.py:57
-msgid "has unblocked you."
-msgstr "has unblocked you"
-
-#: gateway/handleMainRoom.py:161
+#: gateway/handleMainRoom.py:157
 msgid "sent you a friend request"
 msgstr "sent you a friend request"
 
-#: gateway/handleMainRoom.py:439 gateway/templates/base_index.html:100
-msgid "has blocked you."
-msgstr "has blocked you."
+#: gateway/handleMainRoom.py:414 gateway/templates/base_index.html:101
+msgid " has unblocked you."
+msgstr " has unblocked you."
+
+#: gateway/handleMainRoom.py:416 gateway/templates/base_index.html:100
+msgid " has blocked you."
+msgstr " has blocked you."
 
 #: gateway/templates/base_index.html:83
 msgid "Choose..."
@@ -222,7 +217,7 @@ msgstr "Friend unblocked successfully."
 
 #: gateway/templates/base_index.html:104
 msgid "Form submission error. Please reload and retry."
-msgstr ""
+msgstr "Form submission error. Please reload and retry."
 
 #: gateway/templates/base_index.html:106
 msgid "No friends yet"
@@ -232,6 +227,10 @@ msgstr "No friends yet"
 #: gateway/templates/includes/chat_modal.html:44
 msgid "Select a contact"
 msgstr "Select a contact"
+
+#: gateway/templates/base_index.html:108
+msgid "Profile updated"
+msgstr "Profile updated"
 
 #: gateway/templates/fragments/2FA_enable_fragment.html:5
 msgid "Enter OTP"
@@ -704,27 +703,23 @@ msgstr "Method not allowed"
 msgid "Invalid form data"
 msgstr "Invalid form data"
 
-#: gateway/viewsAuth.py:231
-msgid "Failed to retrieve token"
-msgstr ""
-
-#: gateway/viewsAuth.py:276
+#: gateway/viewsAuth.py:277
 msgid "No message provided"
 msgstr "No message provided"
 
-#: gateway/viewsAuth.py:305
+#: gateway/viewsAuth.py:306
 msgid "Failed to login with 42"
 msgstr "Failed to login with 42"
 
-#: gateway/viewsAuth.py:340
+#: gateway/viewsAuth.py:341
 msgid "Invalid request method. Use POST."
 msgstr "Invalid request method. Use POST."
 
-#: gateway/viewsAuth.py:347
+#: gateway/viewsAuth.py:348
 msgid "OTP code is required"
 msgstr "OTP code is required"
 
-#: gateway/viewsAuth.py:349
+#: gateway/viewsAuth.py:350
 msgid "Invalid JSON format"
 msgstr "Invalid JSON format"
 
@@ -756,19 +751,19 @@ msgstr "Add this player as a friend before inviting them to play"
 msgid "Invitation to play sent!"
 msgstr "Invitation to play sent!"
 
-#: gateway/viewsInvitation.py:187
+#: gateway/viewsInvitation.py:189
 msgid "You cannot block yourself"
 msgstr "You cannot block yourself"
 
-#: gateway/viewsInvitation.py:209 gateway/viewsInvitation.py:257
+#: gateway/viewsInvitation.py:213 gateway/viewsInvitation.py:263
 msgid "User blocked"
 msgstr "User blocked"
 
-#: gateway/viewsInvitation.py:211 gateway/viewsInvitation.py:259
+#: gateway/viewsInvitation.py:215 gateway/viewsInvitation.py:265
 msgid "An error occured"
 msgstr "An error occurred"
 
-#: gateway/viewsInvitation.py:235
+#: gateway/viewsInvitation.py:239
 msgid "You cannot unblock yourself"
 msgstr "You cannot unblock yourself"
 
@@ -779,7 +774,6 @@ msgstr "Error retrieving match history"
 #: gateway/viewsProfile.py:379 gateway/viewsProfile.py:411
 msgid "Please select an image file"
 msgstr "Please select an image file"
-
 
 #~ msgid "has blocked you"
 #~ msgstr "has blocked you"

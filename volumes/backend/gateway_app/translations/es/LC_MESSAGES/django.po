@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSIÓN DEL PAQUETE\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-12 15:34+0000\n"
+"POT-Creation-Date: 2024-11-12 17:59+0000\n"
 "PO-Revision-Date: AÑO-MO-DA HO:MI+ZONA\n"
 "Last-Translator: NOMBRE COMPLETO <EMAIL@DIRECCIÓN>\n"
 "Language-Team: ESPAÑOL <ES@li.org>\n"
@@ -130,12 +130,7 @@ msgstr "Nueva contraseña"
 msgid "Confirm new password"
 msgstr "Confirmar nueva contraseña"
 
-#: gateway/handleInvite.py:56 gateway/handleMainRoom.py:437
-#: gateway/templates/base_index.html:101
-msgid "has unblocked you."
-msgstr "te ha bloqueado."
-
-#: gateway/handleInvite.py:59 gateway/templates/base_index.html:94
+#: gateway/handleInvite.py:54 gateway/templates/base_index.html:94
 msgid " has invited you to play: "
 msgstr " te ha invitado a jugar: "
 
@@ -159,17 +154,17 @@ msgstr "rechazó tu solicitud de juego."
 msgid "has canceled the game request."
 msgstr "ha cancelado la solicitud de juego."
 
-#: gateway/handleMainRoom.py:57
-msgid "has unblocked you."
-msgstr "te ha bloqueado."
-
-#: gateway/handleMainRoom.py:161
+#: gateway/handleMainRoom.py:157
 msgid "sent you a friend request"
 msgstr "te envió una solicitud de amistad."
 
-#: gateway/handleMainRoom.py:439 gateway/templates/base_index.html:100
-msgid "has blocked you."
-msgstr "te ha bloqueado."
+#: gateway/handleMainRoom.py:414 gateway/templates/base_index.html:101
+msgid " has unblocked you."
+msgstr " te ha bloqueado."
+
+#: gateway/handleMainRoom.py:416 gateway/templates/base_index.html:100
+msgid " has blocked you."
+msgstr " te ha bloqueado."
 
 #: gateway/templates/base_index.html:83
 msgid "Choose..."
@@ -222,7 +217,7 @@ msgstr "Amigo desbloqueado exitosamente."
 
 #: gateway/templates/base_index.html:104
 msgid "Form submission error. Please reload and retry."
-msgstr ""
+msgstr "Error en el envío del formulario. Recarga y vuelve a intentarlo."
 
 #: gateway/templates/base_index.html:106
 msgid "No friends yet"
@@ -232,6 +227,10 @@ msgstr "Aún no tienes amigos"
 #: gateway/templates/includes/chat_modal.html:44
 msgid "Select a contact"
 msgstr "Selecciona un contacto"
+
+#: gateway/templates/base_index.html:108
+msgid "Profile updated"
+msgstr "Perfil actualizado"
 
 #: gateway/templates/fragments/2FA_enable_fragment.html:5
 msgid "Enter OTP"
@@ -704,27 +703,23 @@ msgstr "Método no permitido"
 msgid "Invalid form data"
 msgstr "Datos del formulario inválidos"
 
-#: gateway/viewsAuth.py:231
-msgid "Failed to retrieve token"
-msgstr ""
-
-#: gateway/viewsAuth.py:276
+#: gateway/viewsAuth.py:277
 msgid "No message provided"
 msgstr "No se proporcionó mensaje"
 
-#: gateway/viewsAuth.py:305
+#: gateway/viewsAuth.py:306
 msgid "Failed to login with 42"
 msgstr "Error al iniciar sesión con 42"
 
-#: gateway/viewsAuth.py:340
+#: gateway/viewsAuth.py:341
 msgid "Invalid request method. Use POST."
 msgstr "Método de solicitud inválido. Use POST."
 
-#: gateway/viewsAuth.py:347
+#: gateway/viewsAuth.py:348
 msgid "OTP code is required"
 msgstr "Se requiere código OTP"
 
-#: gateway/viewsAuth.py:349
+#: gateway/viewsAuth.py:350
 msgid "Invalid JSON format"
 msgstr "Formato JSON inválido"
 
@@ -756,19 +751,19 @@ msgstr "Agrega a este jugador como amigo antes de invitarlo a jugar"
 msgid "Invitation to play sent!"
 msgstr "¡Invitación a jugar enviada!"
 
-#: gateway/viewsInvitation.py:187
+#: gateway/viewsInvitation.py:189
 msgid "You cannot block yourself"
 msgstr "No puedes bloquearte a ti mismo"
 
-#: gateway/viewsInvitation.py:209 gateway/viewsInvitation.py:257
+#: gateway/viewsInvitation.py:213 gateway/viewsInvitation.py:263
 msgid "User blocked"
 msgstr "Usuario bloqueado"
 
-#: gateway/viewsInvitation.py:211 gateway/viewsInvitation.py:259
+#: gateway/viewsInvitation.py:215 gateway/viewsInvitation.py:265
 msgid "An error occured"
 msgstr "Ocurrió un error"
 
-#: gateway/viewsInvitation.py:235
+#: gateway/viewsInvitation.py:239
 msgid "You cannot unblock yourself"
 msgstr "No puedes desbloquearte a ti mismo"
 
