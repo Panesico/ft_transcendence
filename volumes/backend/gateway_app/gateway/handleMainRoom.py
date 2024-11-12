@@ -429,7 +429,7 @@ async def block_user_responses(self, content, users_connected):
   # Send to the receiver if connected
   message = _(' has blocked you.')
   if receiver_id in users_connected:
-    logger.debug(f'block_user_responses > receiver_id: {receiver_id} is in users_connected')
+    logger.debug(f'block_user_responses > receiver_id: {receiver_username} is in users_connected')
     await users_connected[receiver_id].send_json({
       'type': 'block',
       'message': message,
@@ -442,7 +442,7 @@ async def block_user_responses(self, content, users_connected):
       'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     })
   else:
-    logger.debug(f'block_user_responses > receiver_id: {receiver_id} is not in users_connected')
+    logger.debug(f'block_user_responses > receiver: {receiver_username} is not in users_connected')
   
   # Save the notification in database
   message = receiver_username + ' ' + message
