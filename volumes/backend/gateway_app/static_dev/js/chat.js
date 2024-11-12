@@ -1,4 +1,8 @@
 function innit_listening() {
+
+  // const stackTrace = new Error().stack;
+  // console.log('innit_listening call stack:', stackTrace);
+
   let friendsData = [];
   const userID = document.getElementById('userID').value;
   const chatButton = document.getElementById('chatButton');
@@ -10,8 +14,9 @@ function innit_listening() {
   const currentChatId = document.getElementById('currentChatId');
   const blockSwitchContainer = document.getElementById('blockSwitchContainer');
 
+  console.log('chat.js > chatButton:', chatButton);
   // Listen for the chat button click
-  chatButton.addEventListener('click', function () {
+  chatButton?.addEventListener('click', function () {
     const request = new Request('/getFriends/', {
       method: 'GET',
       headers: {
@@ -172,7 +177,7 @@ function innit_listening() {
                   blockFriend(friend.user_id);
                   // Send info to the websocket
                 });
-                
+
                 // Get all the messages between the user and the selected friend
                 const messageData = {
                   type: 'chat',
@@ -240,9 +245,9 @@ function innit_listening() {
     messageInput.value = '';
   }
 
-  sendButton.addEventListener('click', sendChatMessage);
+  sendButton?.addEventListener('click', sendChatMessage);
 
-  messageInput.addEventListener('keydown', function (event) {
+  messageInput?.addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
       event.preventDefault();
       sendChatMessage();
@@ -330,7 +335,8 @@ function addRecvChatMessage(data) {
 
 function addUnreadMessages(data) {
   const unreadChatsCount = document.getElementById('unreadChatscount');
-  unreadChatsCount.textContent = data.unread_messages_count;
+  if (unreadChatsCount)
+    unreadChatsCount.textContent = data.unread_messages_count;
 }
 
 function toggleGameInvitePopup() {

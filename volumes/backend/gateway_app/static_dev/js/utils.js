@@ -2,7 +2,7 @@
 // Show modal before tournament game
 function announceGame(round, message) {
   let messageModal =
-      new bootstrap.Modal(document.getElementById('messageModal'));
+    new bootstrap.Modal(document.getElementById('messageModal'));
   messageModal.show();
   document.getElementById('messageModalLabel').innerText = round;
   document.getElementById('messageContent').innerText = message;
@@ -11,10 +11,14 @@ function announceGame(round, message) {
 }
 // Show message modal
 function displayMessageInModal(message) {
+
   if (message) {
-    console.log('displayMessageInModal > message: ', message);
+    // Displayed who called this function
+    const stackTrace = new Error().stack;
+    console.log('displayMessageInModal > message: ', message, ', call stack:', stackTrace);
+
     let messageModal =
-        new bootstrap.Modal(document.getElementById('messageModal'));
+      new bootstrap.Modal(document.getElementById('messageModal'));
     messageModal.show();
     document.getElementById('messageModalLabel').innerText = notificationMsg;
     document.getElementById('messageContent').innerText = message;
@@ -38,10 +42,10 @@ function getCookie(name) {
   }
   return cookieValue;
 }
- // Prevents the dropdown from closing
+// Prevents the dropdown from closing
 document.addEventListener('DOMContentLoaded', () => {
   const notificationContent = document.getElementById('notificationContent');
-  
+
   if (notificationContent) {
     notificationContent.addEventListener('click', (event) => {
       event.stopPropagation();
