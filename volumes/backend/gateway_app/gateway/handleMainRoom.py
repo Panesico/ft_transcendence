@@ -51,9 +51,12 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
     message = content.get('notify_player', '')
     receiver_id = sender_id
     receiver_username = sender_username
-  logger.debug(f'requestResponse > message: {message}')
+  elif type == 'blocked':
+    message = content.get('message', '')
+  logger.debug(f'requestResponse > message: {message}, type: {type}')
 
   # Send response to frontend sender
+  logger.debug(f'requestResponse > sender_id: {sender_id}, users_connected: {users_connected}, type: {type}')
   if sender_id in users_connected:
     logger.debug(f'requestResponse > sender_id: {sender_id} is in users_connected {response}')
     await users_connected[sender_id].send_json({
@@ -397,13 +400,17 @@ async def block_user_responses(self, content, users_connected):
 
   # Get usernames
   sender_data = get_authentif_variables(sender_id)
+  sender_avatar_url = '/media/' + sender_data.get('avatar_url', '')
   sender_username = sender_data.get('username', '')
   receiver_data = get_authentif_variables(receiver_id)
   receiver_username = receiver_data.get('username', '')
+  receiver_avatar_url = '/media/' + receiver_data.get('avatar_url', '')
+  game_type = ""
   logger.debug(f'block_user_responses > sender_username: {sender_username}')
 
   # Send to the sender if connected
   logger.debug(f'block_user_responses > users_connected: {users_connected}')
+  message = _('You have blocked ')
   if sender_id in users_connected:
     logger.debug(f'block_user_responses > sender_id: {sender_id} is in users_connected')
     await users_connected[sender_id].send_json({
@@ -412,21 +419,49 @@ async def block_user_responses(self, content, users_connected):
       'receiver_username': receiver_username,
       'receiver_id': receiver_id,
       'block_sender': True,
+      'sender_username': sender_username,
+      'sender_avatar_url': sender_avatar_url,
+      'receiver_avatar_url': receiver_avatar_url,
     })
   else:
     logger.debug(f'block_user_responses > sender_id: {sender_id} is not in users_connected')
   
   # Send to the receiver if connected
+  message = _(' has blocked you.')
   if receiver_id in users_connected:
     logger.debug(f'block_user_responses > receiver_id: {receiver_id} is in users_connected')
     await users_connected[receiver_id].send_json({
       'type': 'block',
-      'message': f'You have been blocked by {sender_username}',
+      'message': message,
       'sender_username': sender_username,
       'sender_id': sender_id,
       'block_sender': False,
+      'receiver_username': receiver_username,
+      'receiver_avatar_url': receiver_avatar_url,
+      'sender_avatar_url': sender_avatar_url,
+      'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     })
   else:
     logger.debug(f'block_user_responses > receiver_id: {receiver_id} is not in users_connected')
+  
+  # Save the notification in database
+  message = receiver_username + ' ' + message
+  logger.debug(f'requestResponse > message: {message}')
+  profileapi_url = 'https://profileapi:9002/api/createnotif/'
+  notification_data = { 'sender_id': receiver_id, 'receiver_id': sender_id, 'message': message, 'type': type, 'game_type': game_type }
+  try:
+    response = requests.post(
+          profileapi_url, json=notification_data, headers=headers, verify=os.getenv("CERTFILE"))
+
+    response.raise_for_status()
+    if response.status_code == 201:
+      logger.debug(f'requestResponse > Notification saved in database')
+    else:
+      logger.debug(f'requestResponse > Error saving notification')
+  except Exception as e:
+    logger.debug(f'requestResponse > Error saving notification: {e}')
+    return
+
+
   
   

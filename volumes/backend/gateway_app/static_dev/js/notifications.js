@@ -64,7 +64,7 @@ function createDateElement(dateString, newNotification) {
   return dateElement;
 }
 
-function appendElements(avatar, message, acceptButton, declineButton, newNotification, status) {
+function appendElements(avatar, message, acceptButton, declineButton, newNotification, status, type) {
   // Style the notification
   newNotification.style.color = 'white';
   newNotification.style.setProperty('--bs-dropdown-link-hover-bg', 'transparent');
@@ -91,7 +91,7 @@ function appendElements(avatar, message, acceptButton, declineButton, newNotific
   contentDiv.appendChild(leftContainer);
 
   // Set buttons only if status is pending
-  if (status !== 'accepted' && status !== 'declined') {
+  if (status !== 'accepted' && status !== 'declined' && type !== 'block') {
     const markersDiv = document.createElement('div');
     markersDiv.style.display = 'flex';
     markersDiv.style.flexDirection = 'row';
@@ -352,6 +352,7 @@ function addRequestNotification(data) {
   sender_username = data.sender_username;
   sender_id = data.sender_id;
   sender_avatar_url = data.sender_avatar_url;
+  type = data.type;
   console.log('addRequestNotification > data:', data);
   // example.data = {
   //   date: "2024-10-24 17:49:53"
@@ -394,10 +395,12 @@ function addRequestNotification(data) {
     console.log('addRequestNotification > data', data);
     message.textContent = sender_username + gameRequestReceived + data.game_type;
   }
+  else if (data.type === 'block') {
+    message.textContent = sender_username + ' ' + userBlocked;
+  }
 
   // Add button to accept the friend request represented by accept png
   const acceptButton = createAcceptButton(sender_id, receiver_id, newNotification);
-
   // Add button to decline the friend request represented by decline png
   const declineButton = createDeclineButton(sender_id, receiver_id, newNotification);
 
@@ -406,7 +409,7 @@ function addRequestNotification(data) {
     deleteResponsesButtons(notificationDropdownClass, sender_username);
 
   // Append the avatar and message to the newNotification element
-  appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status);
+  appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status, type);
 
   // Change default down icon notification to the new notification icon
   changeNotificationIconToUp(notificationDropdownClass, newNotification, notificationDropdown, receiver_id, data.status);
@@ -486,7 +489,7 @@ function addResponseNotification(data) {
     inputMessage = gamePlayNextTournament;
   }
   else {
-    console.warn('addResponseNotification > data:', data);
+    console.warn('uncaught type > addResponseNotification > data:', data);
   }
   // else if (data.type === 'game_request_response') {
   //   inputMessage = gameRequestAccepted;
@@ -503,7 +506,7 @@ function addResponseNotification(data) {
     if (data.type === 'game_request_response' && data.response === 'accept')
       deleteResponsesButtons(notificationDropdownClass, receiver_username);
 
-    appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status);
+    appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status, type);
 
     // Add event listener to the buttons accept and decline
     listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, data.type, data);

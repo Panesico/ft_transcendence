@@ -141,11 +141,12 @@ function parseSocketMessage(data) {
   {
     console.warn('parseSocketMessage > data:', data);
     handleBlockedNotif(data);
+    addRequestNotification(data);
   }
   // else if (data.type === 'connected_friends') {
   //   addOnlineStatusBadge(data);
   // }
   else {
-    console.log('parseSocketMessage > data.type:', data.type);
+    console.log('unknown parseSocketMessage > data.type:', data.type);
   }
 }
