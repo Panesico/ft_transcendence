@@ -72,7 +72,7 @@ function listenForm(form) {
 
         } else if (data.type === 'profile_updated') {
           handleRefresh("profile_update");
-          connectMainRoomSocket(user_id);
+          // connectMainRoomSocket(user_id);
 
         } else if (data.type === '2FA') {
           try {
@@ -151,7 +151,7 @@ function listenFormUpload(form) {
       const response = await fetch(request);
       const data = await response.json();
 
-      console.log('handleFormSubmission > response: ', response);
+      console.log('handleFormSubmission > data: ', data);
 
       if (!response.ok && response.status == 400) {
         // window.location.replace('/edit_profile');
@@ -167,9 +167,9 @@ function listenFormUpload(form) {
       if (data.status != 'error' && data.type && data.message && !data.html) {
         console.log('data.type: ', data.type, 'data.message: ', data.message);
 
-        // if (data.type === 'profile_updated') {
-        //   location.reload();
-        // }
+        if (data.type === 'profile_updated') {
+          handleRefresh("profile_update");
+        }
 
       } else
         document.querySelector('main').innerHTML = data.html;
