@@ -1,10 +1,9 @@
 import os, json, logging, requests
 from django.http import JsonResponse
-from django.conf import settings
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from .forms import InviteFriendFormFrontend
-from django.contrib import messages
+from .utils import getDjangoLanguageCookie
 from authentif.models import User
 from django.utils.translation import gettext as _
 logger = logging.getLogger(__name__)
@@ -175,7 +174,7 @@ def block_friends(request, user_id):
   
   csrf_token = request.COOKIES.get('csrftoken')
   jwt_token = request.COOKIES.get('jwt_token')
-  django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
+  django_language = getDjangoLanguageCookie(request)
   headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',
@@ -225,7 +224,7 @@ def unblock_friends(request, user_id):
   
   csrf_token = request.COOKIES.get('csrftoken')
   jwt_token = request.COOKIES.get('jwt_token')
-  django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
+  django_language = getDjangoLanguageCookie(request)
   headers = {
         'X-CSRFToken': csrf_token,
         'Cookie': f'csrftoken={csrf_token}',

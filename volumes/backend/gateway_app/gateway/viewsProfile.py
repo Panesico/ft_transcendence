@@ -9,7 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from .utils import getUserProfile
+from .utils import getUserProfile, getDjangoLanguageCookie
 
 import prettyprinter
 from prettyprinter import pformat
@@ -204,7 +204,7 @@ def post_edit_profile_security(request):
 
     # Cookies & headers
     csrf_token = request.COOKIES.get('csrftoken')
-    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
+    django_language = getDjangoLanguageCookie(request)
     jwt_token = request.COOKIES.get('jwt_token')
     headers = {
         'X-CSRFToken': csrf_token,
@@ -272,7 +272,7 @@ def post_edit_profile_general(request):
 
     # Cookies & headers
     csrf_token = request.COOKIES.get('csrftoken')
-    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
+    django_language = getDjangoLanguageCookie(request)
     jwt_token = request.COOKIES.get('jwt_token')
     headers = {
         'X-CSRFToken': csrf_token,
@@ -346,7 +346,7 @@ def post_edit_profile_avatar(request):
   logger.debug("")
   logger.debug("post_edit_profile_avatar")
   csrf_token = request.COOKIES.get('csrftoken')
-  django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
+  django_language = getDjangoLanguageCookie(request)
   jwt_token = request.COOKIES.get('jwt_token')
   headers = {
         'X-CSRFToken': csrf_token,
@@ -466,7 +466,7 @@ async def checkNameExists(request):
             return JsonResponse({'status': 'success', 'message': 'display name and username are available'})
 
     csrf_token = request.COOKIES.get('csrftoken')
-    django_language = request.COOKIES.get('django_language') if len(django_language) == 2 else 'en'
+    django_language = getDjangoLanguageCookie(request)
     jwt_token = request.COOKIES.get('jwt_token')
     headers = {
         'X-CSRFToken': csrf_token,

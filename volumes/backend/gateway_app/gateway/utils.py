@@ -141,3 +141,11 @@ async def send_data_via_websocket(ws, data):
             logger.error(f"WebSocket connection closed: {e}")
     else:
         logger.error("WebSocket connection is not open.")
+
+def getDjangoLanguageCookie(request):
+    django_language = ''
+    if 'django_language' in request.COOKIES and len(request.COOKIES['django_language']) == 2:
+        django_language = request.COOKIES['django_language']
+    if django_language not in ['en', 'fr', 'es']:
+        django_language = 'en'
+    return django_language
