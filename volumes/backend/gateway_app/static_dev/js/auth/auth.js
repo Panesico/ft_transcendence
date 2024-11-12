@@ -48,6 +48,7 @@ function handleRefresh(type) {
       console.error('Error:', error);
     });
 
+  // console.log('handleRefresh > type:', type);
   // Remove chat on logout and Add it in other situations
   if (type == 'logout') {
     // remove chat element
@@ -71,6 +72,7 @@ function handleRefresh(type) {
       .then(response => response.json())
       .then(data => {
         if (data.status === 'success') {
+          // console.log('Adding chat section');
           document.querySelector('body').innerHTML += data.html;
 
           // Initialise the chat modal
@@ -80,6 +82,7 @@ function handleRefresh(type) {
           // if (backdrop)
           //   backdrop.remove();
           chatModal.hide();
+          innit_listening();
 
         }
       })
