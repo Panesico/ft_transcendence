@@ -8,6 +8,15 @@ function init_listening() {
   const chatButton = document.getElementById('chatButton');
   const messageInput = document.getElementById('messageInput');
   const sendButton = document.getElementById('sendButton');
+  const chatModal = document.getElementById('chatModal');
+
+  if (chatModal) {
+    chatModal.addEventListener('hidden.bs.modal', () => {
+      console.log('Chat modal is closed');
+      const currentChatId = document.getElementById('currentChatId');
+      currentChatId.value = '';
+    });
+  }
 
   console.log('chat.js > chatButton:', chatButton);
   // Listen for the chat button click
@@ -87,8 +96,11 @@ function handleChatMessages(data) {
   }
   else if (data.subtype === 'chat_message') {
     const currentChatId = document.getElementById('currentChatId');
-    if (currentChatId.value == data.sender_id)
+    if (currentChatId.value == data.sender_id) {
       addRecvChatMessage(data);
+      // Update unread messages count
+      markConversationRead(sender_id, receiver_id);
+    }
     checkUnreadMessages();
   }
   else if (data.subtype === 'unread_messages') {
@@ -141,23 +153,37 @@ function addRecvChatMessage(data) {
 
   messageElement.appendChild(messageContent);
   chatMessages.appendChild(messageElement);
-
-  // Update unread messages count
-  const unreadMessagesData = {
-    type: 'chat',
-    subtype: 'delete_unread_messages',
-    user_id: data.sender_id,
-  };
-  sendMessagesBySocket(unreadMessagesData, mainRoomSocket);
+  console.log('addRecvChatMessage > data:', data);
 }
 
 
 function addUnreadMessages(data) {
+  console.log('addUnreadMessages > data:', data);
   const unreadChatsCount = document.getElementById('unreadChatscount');
   if (unreadChatsCount)
     unreadChatsCount.textContent = data.unread_messages_count;
 }
 
+function markConversationRead(sender_id, receiver_id) {
+  console.log('markConversationRead > sender_id:', sender_id, 'receiver_id:', receiver_id);
+  const unreadMessagesData = {
+    type: 'chat',
+    subtype: 'mark_conversation_read',
+    sender_id: sender_id,
+    receiver_id: receiver_id,
+  };
+  sendMessagesBySocket(unreadMessagesData, mainRoomSocket);
+}
+
+function getConversationBySocket(friend_id) {
+  const messageData = {
+    type: 'chat',
+    subtype: 'get_conversation',
+    sender_id: userID,
+    receiver_id: friend_id,
+  };
+  sendMessagesBySocket(messageData, mainRoomSocket);
+}
 
 function toggleGameInvitePopup() {
   const gameInvitePopup = document.getElementById('gameInvitePopup');
@@ -356,26 +382,12 @@ function displayFriendsInChat(friendsData) {
           });
 
           // Get all the messages between the user and the selected friend
-          const messageData = {
-            type: 'chat',
-            subtype: 'get_conversation',
-            sender_id: userID,
-            receiver_id: friend.user_id,
-          };
-          sendMessagesBySocket(messageData, mainRoomSocket);
+          getConversationBySocket(friend.user_id);
         });
       }
 
     });
   });
-
-  // Update unread messages count
-  const unreadMessagesData = {
-    type: 'chat',
-    subtype: 'delete_unread_messages',
-    user_id: userID,
-  };
-  sendMessagesBySocket(unreadMessagesData, mainRoomSocket);
 }
 
 async function updateFriendsState() {

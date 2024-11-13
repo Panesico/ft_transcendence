@@ -1,7 +1,7 @@
 import json, asyncio, logging, requests, os
 from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
-from .handleMainRoom import readMessage, requestResponse, friendRequest, handleNewConnection, checkForNotifications, markNotificationAsRead, checkIfUsersAreBlocked, block_user_responses
-from .handleChatMessages import sendChatMessage, innitChat, getConversation, checkForChatMessages
+from .handleMainRoom import readMessage, requestResponse, friendRequest, handleNewConnection, checkForNotifications, markNotificationAsRead, checkIfUsersAreBlocked, block_user_responses 
+from .handleChatMessages import sendChatMessage, innitChat, getConversation, checkForChatMessages, markConversationAsRead
 from .handleInvite import get_authentif_variables, invite_to_game
 logger = logging.getLogger(__name__)
 
@@ -71,6 +71,9 @@ class mainRoom(AsyncJsonWebsocketConsumer):
       elif subTypeMessage == 'check_unread_messages':
         logger.debug(f'mainRoom > check_unread_messages')
         await checkForChatMessages(self)
+      elif subTypeMessage == 'mark_conversation_read':
+        logger.debug(f'mainRoom > mark_conversation_read')
+        await markConversationAsRead(content, self)
     elif typeMessage == 'invite_game':
       logger.debug(f'mainRoom > invite_game')
       logger.debug(f'mainRoom > invite_game > content: {content}')

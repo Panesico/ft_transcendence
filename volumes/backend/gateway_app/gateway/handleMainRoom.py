@@ -242,10 +242,10 @@ async def handleNewConnection(self, users_connected):
     logger.debug(f'mainRoom > self.username: {self.username}')
     self.avatar_url = '/media/' + user_data.get('avatar_url', '')
     logger.debug(f'mainRoom > self.avatar_url: {self.avatar_url}')
-    await self.send_json({
-      'message': f'Welcome {self.room_user_name}!',
-      'type': 'user_info',
-    })
+    #await self.send_json({
+    #  'message': f'Welcome {self.room_user_name}!',
+    #  'type': 'user_info',
+    #})
   else:
     logger.debug(f'mainRoom > Error getting user info')
     await self.close()

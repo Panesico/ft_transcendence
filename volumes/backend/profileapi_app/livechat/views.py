@@ -73,16 +73,28 @@ def getReceivedChatMessages(request, user_id):
 	else:
 		return JsonResponse({'message': 'Method not allowed'}, status=405)
 	
-def markConversationAsRead(user_1, user_2):
-	messages = Message.objects.filter(send_user=user_1, dest_user=user_2)
-	for message in messages:
-		message.read = True
-		message.save()
-		
-	messages = Message.objects.filter(send_user=user_2, dest_user=user_1)
-	for message in messages:
-		message.read = True
-		message.save()
+def markConversationAsRead(request, user_1, user_2):
+	logger.debug('markConversationAsRead > user_1: ' + str(user_1) + ', user_2: ' + str(user_2))
+	user_1_id = int(user_1_id)
+	user_2_id = int(user_2_id)
+	if request.method == 'GET':
+		try:
+			user_1 = Profile.objects.get(user_id=user_1_id)
+			user_2 = Profile.objects.get(user_id=user_2_id)
+			messages = Message.objects.filter(send_user=user_1, dest_user=user_2)
+			for message in messages:
+				message.read = True
+				message.save()
+				
+			messages = Message.objects.filter(send_user=user_2, dest_user=user_1)
+			for message in messages:
+				message.read = True
+				message.save()
+			return JsonResponse({'message': 'Conversation marked as read'}, status=200)
+		except DatabaseError as e:
+			return JsonResponse({'message': 'Error marking conversation as read'}, status=400)
+	else:
+		return JsonResponse({'message': 'Method not allowed'}, status=405)
 
 
 def getConversation(request, user_1_id, user_2_id):
@@ -102,7 +114,7 @@ def getConversation(request, user_1_id, user_2_id):
 					'timestamp': message.timestamp,
 					'read': message.read
 				})
-			markConversationAsRead(user_1, user_2)
+			markConversationAsRead(request, user_1_id, user_2_id)
 			return JsonResponse(data, safe=False)
 		except DatabaseError as e:
 			return JsonResponse({'message': 'Error getting messages'}, status=400)

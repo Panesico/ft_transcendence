@@ -53,6 +53,7 @@ async def sendChatMessage(content, users_connected, self):
 
 async def getConversation(content, self):
   # Get the database chat messages
+  logger.debug(f'getConversation > self.user_id: {self.user_id}')
   receiver_id = content.get('receiver_id', '')
   profileapi_url = 'https://profileapi:9002/livechat/api/getConversation/' + str(self.user_id) + '/' + str(receiver_id) + '/'
   csrf_token = self.scope['cookies']['csrftoken']
@@ -69,13 +70,15 @@ async def getConversation(content, self):
   conversation.raise_for_status()
   if conversation.status_code == 200:
     conversation = sorted(conversation.json(), key=lambda x: x['timestamp'])
-  await self.send_json({
-    'type': 'chat',
-    'subtype': 'load_conversation',
-    'conversation': conversation,
-    'sender_id': self.user_id,
-    'receiver_id': receiver_id
-  })
+    await self.send_json({
+      'type': 'chat',
+      'subtype': 'load_conversation',
+      'conversation': conversation,
+      'sender_id': self.user_id,
+      'receiver_id': receiver_id
+    })
+  else:
+    logger.debug(f'getConversation > Error getting conversation')
 
 async def checkForChatMessages(self):
   # Get the database chat messages
@@ -131,6 +134,29 @@ async def innitListening(self):
       'type': 'chat',
       'subtype': 'init_listening',
     })
+  
+async def markConversationAsRead(content, self):
+  # Get the database chat messages
+  receiver_id = content.get('receiver_id', '')
+  sender_id = content.get('sender_id', '')
+  logger.debug(f'markConversationAsRead > sender_id: {sender_id}, receiver_id: {receiver_id}')
+  profileapi_url = 'https://profileapi:9002/livechat/api/markConversationAsRead/' + str(sender_id) + '/' + str(receiver_id) + '/'
+  csrf_token = self.scope['cookies']['csrftoken']
+  headers = {
+      'X-CSRFToken': csrf_token,
+      'Cookie': f'csrftoken={csrf_token}',
+      'Content-Type': 'application/json',
+      'HTTP_HOST': 'profileapi',
+      'Referer': 'https://gateway:8443',
+  }
+  response = requests.get(profileapi_url, headers=headers, verify=os.getenv("CERTFILE"))
+  logger.debug(f'markConversationAsRead > response.json(): {response.json()}')
+
+  response.raise_for_status()
+  if response.status_code == 200:
+    logger.debug(f'markConversationAsRead > Conversation marked as read')
+  else:
+    logger.debug(f'markConversationAsRead > Error marking conversation as read')
 
 async def innitChat(self):
   await innitListening(self)
