@@ -78,12 +78,14 @@ function connectMainRoomSocket(user_id) {
 
   // On websocket close
   mainRoomSocket.onclose = function (e) {
+    console.warn('mainRoomSocket closed called by:\n', new Error().stack.split('\n')[2].trim());
     console.warn('mainRoomSocket onclose > mainRoomSocket socket closed');
   };
 
   // Close the main room socket when the window is closed
   window.onbeforeunload = () => {
     if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
+
       console.warn('mainRoomSocket socket closed');
       mainRoomSocket.close();
     }

@@ -5,6 +5,7 @@ function deleteCookie(name) {
 
 
 function handleRefresh(type) {
+  console.warn('handleRefresh called by:\n', new Error().stack.split('\n')[2].trim());
   // First GET request for the main content
   console.log('handleRefresh > type:', type);
 
