@@ -510,7 +510,7 @@ function addResponseNotification(data) {
     if (data.type === 'game_request_response' && data.response === 'accept')
       deleteResponsesButtons(notificationDropdownClass, receiver_username);
 
-    appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status, type);
+    appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status, data.type);
 
     // Add event listener to the buttons accept and decline
     listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, data.type, data);

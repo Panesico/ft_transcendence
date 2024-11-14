@@ -189,7 +189,7 @@ msgstr " rechazó tu solicitud de amistad."
 
 #: gateway/templates/base_index.html:95
 msgid " has accepted your game request."
-msgstr " aceptó tu solicitud de amistad."
+msgstr " aceptó tu invitación de juego."
 
 #: gateway/templates/base_index.html:96
 msgid " has declined your game request."
