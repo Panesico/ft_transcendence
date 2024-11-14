@@ -176,6 +176,7 @@ function markConversationRead(sender_id, receiver_id) {
 }
 
 function getConversationBySocket(friend_id) {
+  const userID = document.getElementById('userID').value;
   const messageData = {
     type: 'chat',
     subtype: 'get_conversation',
