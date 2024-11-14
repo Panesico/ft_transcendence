@@ -67,7 +67,7 @@ body {
 #game-container {
   background-color: #000;
   height: 550px;
-  width: 900px;
+  width: 700px;
 }
 
 #startGame-button, #nextRound-button, #playAgain-button {

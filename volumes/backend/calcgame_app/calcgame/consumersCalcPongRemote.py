@@ -7,15 +7,15 @@ class PongCalcRemote(AsyncWebsocketConsumer):
   # Game configuration constants
   cfg = {
     "canvas": {
-      "width": 900,
+      "width": 700,
       "height": 550,
     },
-    "maxScore": 2,
+    "maxScore": 3,
     "ballSize": 15,
     "paddleWidth": 15,
     "paddleHeight": 80,
     "borderWidth": 15,
-    "paddleSpeed": 7,
+    "paddleSpeed": 12,
     "keys": { 'w': False, 's': False }
   }
 

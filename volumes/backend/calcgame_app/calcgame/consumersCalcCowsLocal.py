@@ -7,13 +7,13 @@ class CowsCalcLocal(AsyncWebsocketConsumer):
   # Game configuration constants
   cfg = {
     "canvas": {
-      "width": 900,
+      "width": 700,
       "height": 550,
     },
     "maxScore": 5,
     "playerDimension": 40,
     "cowDimension": 50,
-    "playerSpeed": 3,
+    "playerSpeed": 7,
     "keys": { 'w': False, 's': False, 'a': False, 'd': False, 4: False, 5: False, 6: False, 8: False }
   }
   
