@@ -75,8 +75,8 @@ def getReceivedChatMessages(request, user_id):
 	
 def markConversationAsRead(request, user_1, user_2):
 	logger.debug('markConversationAsRead > user_1: ' + str(user_1) + ', user_2: ' + str(user_2))
-	user_1_id = int(user_1_id)
-	user_2_id = int(user_2_id)
+	user_1_id = int(user_1)
+	user_2_id = int(user_2)
 	if request.method == 'GET':
 		try:
 			user_1 = Profile.objects.get(user_id=user_1_id)
