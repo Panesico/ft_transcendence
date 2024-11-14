@@ -265,6 +265,15 @@ function displayFriendsInChat(friendsData) {
 
   friendsData.forEach((friend) => {
     checkIfImBlocked(friend.user_id).then((imBlocked) => {
+      // Loop through every li of the contact list and return if the friend is already there: dataset.contactId = friend.user_id
+      const contacts = contactList.getElementsByClassName('list-group-item');
+      for (let c of contacts) {
+        if (c.dataset.contactId == friend.user_id) {
+          return;
+        }
+      }
+
+      // Create a new contact item for the friend
       const contactItem = document.createElement('li');
       contactItem.classList.add(
         'list-group-item',
