@@ -324,7 +324,7 @@ function displayKeyUsageInstructions(gameMode, gameType, player_role) {
       keysPlayer1.querySelector('span').innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center;">
         <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">W</span>
-        <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">S</span>
+        <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px;">S</span>
       </div>
     `;
 
@@ -332,16 +332,16 @@ function displayKeyUsageInstructions(gameMode, gameType, player_role) {
       keysPlayer2.querySelector('span').innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center;">
         <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">8</span>
-        <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">5</span>
+        <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px;">5</span>
       </div>
     `;
-      
+
     } else {
       if (player_role === '1') {
         keysPlayer1.querySelector('span').innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center;">
           <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">W</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">S</span>
+          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px;">S</span>
         </div>
       `;
         keysPlayer2.innerHTML = ' ';
@@ -350,7 +350,7 @@ function displayKeyUsageInstructions(gameMode, gameType, player_role) {
         keysPlayer2.querySelector('span').innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center;">
           <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">8</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">5</span>
+          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px;">5</span>
         </div>
       `;
       }
