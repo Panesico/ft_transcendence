@@ -54,7 +54,7 @@ function init_listening() {
     const data = {
       type: 'chat',
       subtype: 'chat_message',
-      sender_id: userID,
+      sender_id: parseInt(userID, 10),
       receiver_id: receiverId,
       receiver_display_name: receiverDisplayName,
       receiver_avatar: receiverAvatar,
@@ -99,7 +99,7 @@ function handleChatMessages(data) {
     if (currentChatId.value == data.sender_id) {
       addRecvChatMessage(data);
       // Update unread messages count
-      markConversationRead(sender_id, receiver_id);
+      markConversationRead(data.sender_id, data.receiver_id);
     }
     checkUnreadMessages();
   }
