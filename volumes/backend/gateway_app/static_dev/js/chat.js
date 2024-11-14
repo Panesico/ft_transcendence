@@ -42,6 +42,17 @@ function init_listening() {
       // messageInput.placeholder = 'You cannot send messages to blocked users';
       console.log('Cannot send messages to blocked users');
       return;
+    } else if (messageInput.value.length > 1000) {
+      let lang = getCookie('django_language');
+      let error = 'Message too long, max 1000';
+      if (lang === 'fr')
+        error = 'Message trop long, max 1000';
+      else if (lang === 'es')
+        error = 'Mensaje demasiado largo, máximo 1000';
+      messageInput.value = '';
+      alert(error);
+      console.log('Message too long');
+      return;
     }
 
     const selectedFriend = friendsData.find(
@@ -133,7 +144,7 @@ function addSentChatMessage(message) {
   messageElement.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-1');
 
   const messageContent = document.createElement('p');
-  messageContent.classList.add('small', 'p-2', 'me-3', 'mb-0', 'rounded-3', 'bg-dark', 'text-white');
+  messageContent.classList.add('small', 'p-2', 'me-3', 'mb-0', 'rounded-3', 'bg-dark', 'text-white', 'text-break');
   messageContent.textContent = message;
 
   messageElement.appendChild(messageContent);
@@ -147,7 +158,7 @@ function addRecvChatMessage(data) {
   messageElement.classList.add('d-flex', 'flex-row', 'justify-content-start', 'mb-1');
 
   const messageContent = document.createElement('p');
-  messageContent.classList.add('small', 'p-2', 'me-3', 'mb-0', 'rounded-3', 'bg-body-tertiary');
+  messageContent.classList.add('small', 'p-2', 'me-3', 'mb-0', 'rounded-3', 'bg-body-tertiary', 'text-break');
   messageContent.style.color = 'black';
   messageContent.textContent = data.message;
 
