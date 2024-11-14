@@ -222,19 +222,15 @@ function displayFriendsInChat(friendsData) {
   const stackTrace = new Error().stack;
   console.log('displayFriendsInChat > call stack:', stackTrace);
 
-  const contactAvatar = document.getElementById('contactAvatar');
-  const contactDisplayName = document.getElementById('contactDisplayName');
-  // const unreadCount = document.getElementById('unreadChatsCount');
   const currentChatId = document.getElementById('currentChatId');
   const blockSwitchContainer = document.getElementById('blockSwitchContainer');
   const userID = document.getElementById('userID').value;
 
   // Reset header
   document.getElementById('contactContainer').style.display = 'none';
-  // contactDisplayName.textContent = selectFriendmsg;
-  // contactAvatar.src = contactAvatarSrc;
   currentChatId.value = '';
   blockSwitchContainer.style.display = 'none';
+  document.getElementById('chat-modal-footer').style.display = 'none';
 
   // Reset conversation
   document.getElementById('conversation').innerHTML = '';
@@ -314,6 +310,7 @@ function displayFriendsInChat(friendsData) {
           contactItem.classList.add('selected-contact');
 
           document.getElementById('contactContainer').style.display = 'flex';
+          document.getElementById('chat-modal-footer').style.display = 'flex';
 
           // Update the avatar and display name
           const contactAvatarAndName = document.getElementById('contactAvatarAndName');
