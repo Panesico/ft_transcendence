@@ -233,19 +233,6 @@ def get_blocked_users(request, sender_id, receiver_id):
     return JsonResponse({'status': 'unblocked', 'message': _('User not found')}, status=404)
 
 # If an unresponded friend request or game request already exists , we delete the previous notification (call this function after a friend/game request has been accepted)
-def check_if_symetric_request_exists(request, sender_id, receiver_id, type):
-  logger.debug('')
-  logger.debug('check_if_symetric_request_exists')
-  notifications = Notification.objects.filter(type=type)
-  for notification in notifications:
-    logger.debug('create_notifications > Friend request already exists')
-    # delete symetrical notification
-    if int(notification.sender.user_id) == int(receiver_id) and int(notification.receiver.user_id) == int(sender_id) and (notification.status == 'read' or notification.status == 'unread'):
-      notification.delete()
-      logger.debug('delete the previous notification')
-    if int(notification.sender.user_id) == int(sender_id) and int(notification.receiver.user_id) == int(receiver_id) and (notification.status == 'read' or notification.status == 'unread'):
-      notification.delete()
-      logger.debug('delete double invitation')
 
 # If an unresponded friend/game request already exists from the same sender to the same receiver, we delete the previous notification (call this function before creating a same request)
 def check_if_double_request_exists(request, sender_id, receiver_id, type):
@@ -273,23 +260,9 @@ def create_notifications(request):
             message = data.get('message')
             type = data.get('type')
             game_type = data.get('game_type', None)
-
-            logger.debug(f'sender: {sender_id}')
-            logger.debug(f'receiver: {receiver_id}')
-            logger.debug(f'message: {message}')
-            logger.debug(f'type: {type}')
-            
             if (sender_id == receiver_id):
                 return JsonResponse({'status': 'error', 'message': _('You cannot send a notification to yourself')}, status=400)
 
-            # If a similar unresponded request already exists, we return an error
-            similar_request = check_if_double_request_exists(request, sender_id, receiver_id, type)
-            similar_request_data = json.loads(similar_request.content)
-            logger.debug(f'similar_request_data: {similar_request_data}')
-            if (type == 'friend_request' or type == 'game_request') and similar_request_data['status'] == 'error':
-                return JsonResponse({'status': 'error', 'message': _('You have already sent an unresponded request to this user')}, status=400)
-            else:
-                logger.debug(f'type: {type}, sender_id: {sender_id}, receiver_id: {receiver_id}')
 
             sender_obj = Profile.objects.get(user_id=sender_id)
             receiver_obj = Profile.objects.get(user_id=receiver_id)
@@ -402,8 +375,6 @@ def set_notif_as_readen(request, sender_id, receiver_id, type, response):
                 sender_obj.save()
                 receiver_obj.save()
             # if notification accepted, check if their is a symetric request
-            if ((type == 'friend_request_response' or type == 'game_request_response') and response == 'accept'):
-              check_if_symetric_request_exists(request, sender_id, receiver_id, request_type)
     except Profile.DoesNotExist:
         logger.debug('set_notif_as_readen > User not found')
         return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
