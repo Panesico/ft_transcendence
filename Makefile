@@ -12,13 +12,12 @@ check_certs: # creates certificates if needed
 	fi
 
 create_volumes_dirs: # creates volumes directories if needed
-	mkdir -p ./volumes/postgres_db ./volumes/frontend ./volumes/backend \
-  ./volumes/certs
+	mkdir -p ./volumes/frontend ./volumes/backend ./volumes/certs
 
-init:
-	bash -c "mkdir -p ./volumes/{postgres_db,frontend}"
-	touch ./srcs/.env
-	echo "Please, fill the .env file with the following variables: DJANGO_SECRET_KEY, DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL, DJANGO_SUPERUSER_PASSWORD, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, CERTFILE"
+# init:
+# 	bash -c "mkdir -p ./volumes/{postgres_db,frontend}"
+# 	touch ./srcs/.env
+# 	echo "Please, fill the .env file with the following variables: DJANGO_SECRET_KEY, DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL, DJANGO_SUPERUSER_PASSWORD, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, CERTFILE"
 
 down:
 	cd srcs && docker compose down -v

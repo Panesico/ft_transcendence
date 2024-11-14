@@ -47,11 +47,7 @@ services:
       - calcgame
       - profileapi
       - play
-    # command:
-    #   - daphne
-    #   - -e
-    #   - ssl:8443:/etc/ssl/certs/key.pem:/etc/ssl/certs/cert.pem
-    #   - gateway.asgi:application
+    # command: daphne -e ssl:8443:/certs/key.pem:/certs/cert.pem gateway.asgi:application
     command: uvicorn gateway.asgi:application --host 0.0.0.0 --port 8443 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
     # command: gunicorn gateway.asgi:application -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8443 --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem # to handle multiple connections
     # restart: unless-stopped
@@ -78,8 +74,9 @@ services:
       - certs:/certs
     depends_on:
       - postgres
+    # command: daphne -e ssl:9001:/certs/key.pem:/certs/cert.pem authentif.asgi:application
     command: uvicorn authentif.asgi:application --host 0.0.0.0 --port 9001 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
-  #   restart: unless-stopped
+    #   restart: unless-stopped
 
   profileapi:
     build:
@@ -104,6 +101,7 @@ services:
     depends_on:
       - postgres
       - authentif
+    # command: daphne -e ssl:9002:/certs/key.pem:/certs/cert.pem profileapi.asgi:application
     command: uvicorn profileapi.asgi:application --host 0.0.0.0 --port 9002 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
   play:
@@ -128,6 +126,7 @@ services:
       - certs:/certs
     depends_on:
       - postgres
+    # command: daphne -e ssl:9003:/certs/key.pem:/certs/cert.pem play.asgi:application
     command: uvicorn play.asgi:application --host 0.0.0.0 --port 9003 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
   calcgame:
@@ -153,6 +152,7 @@ services:
     depends_on:
       - postgres
       - authentif
+    # command: daphne -e ssl:9004:/certs/key.pem:/certs/cert.pem calcgame.asgi:application
     command: uvicorn calcgame.asgi:application --host 0.0.0.0 --port 9004 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
   blockchain:
@@ -176,6 +176,7 @@ services:
     depends_on:
       - postgres
       - authentif
+    # command: daphne -e ssl:8545:/certs/key.pem:/certs/cert.pem blockchain.asgi:application
     command: uvicorn blockchain.asgi:application --host 0.0.0.0 --port 8545 --reload --ssl-keyfile=/certs/key.pem --ssl-certfile=/certs/cert.pem
 
   postgres:
@@ -190,7 +191,7 @@ services:
       - 5432
     working_dir: /var/lib/postgresql/data
     volumes:
-      - postgres_db:/var/lib/postgresql/data
+      - postgres_database:/var/lib/postgresql/data
       - certs:/certs
     networks:
       - transcendence
@@ -212,13 +213,9 @@ volumes:
       type: none
       o: bind
       device: ../volumes/backend/
-  postgres_db:
-    name: postgres_db
+  postgres_database:
+    name: postgres_database
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ../volumes/postgres_db/
   certs:
     name: certs
     driver: local
