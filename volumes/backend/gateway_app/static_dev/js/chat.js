@@ -246,9 +246,9 @@ function displayFriendsInChat(friendsData) {
     let lang = getCookie('django_language');
     let message = 'No friends yet';
     if (lang === 'fr')
-      error = 'Aucun amis';
+      message = 'Aucun amis';
     else if (lang === 'es')
-      error = 'Sin amigos aún';
+      message = 'Sin amigos aún';
     noFriends.textContent = message;
     noFriends.classList.add('no-friends-message');
     contactList.appendChild(noFriends);

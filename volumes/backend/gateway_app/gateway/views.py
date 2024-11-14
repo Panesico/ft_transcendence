@@ -16,6 +16,11 @@ def get_home(request):
     message = request.GET.get('message', '')
     type_msg = request.GET.get('type', '')
     logger.debug(f"get_home > Request Cookies: {request.COOKIES}")
+
+    # django_language = request.COOKIES.get('django_language', 'en')
+    # activate(django_language)
+    # logger.debug(f"get_home > django_language cookie was: {request.COOKIES.get('django_language')}, activating: {django_language}, type: {type_msg}")
+
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         context = {'user': request.user}
 
@@ -25,9 +30,20 @@ def get_home(request):
             html = render_to_string('includes/chat_modal.html', context=context, request=request)
         else:
             html = render_to_string('fragments/home_fragment.html', context=context, request=request)
-            
-        return JsonResponse({'html': html, 'status': status, 'message': message, 'user_id': request.user.id}, status=200)
-    return render(request, 'partials/home.html', {'status': status, 'message': message})
+        
+        response = JsonResponse({'html': html, 'status': status, 'message': message, 'user_id': request.user.id}, status=200)
+
+        if not request.COOKIES.get('django_language'):
+            response.set_cookie('django_language', 'en', httponly=False, secure=True, samesite='Lax')
+        return response
+
+    response = render(request, 'partials/home.html', {'status': status, 'message': message})
+
+    if not request.COOKIES.get('django_language'):
+        response.set_cookie('django_language', 'en', httponly=False, secure=True, samesite='Lax')
+        
+    return response
+
 
 @login_required
 def get_friends(request):
