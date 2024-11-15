@@ -48,6 +48,14 @@ class FormConsumer(AsyncWebsocketConsumer):
           self.user_input += key_pressed
           logger.debug(f'FormConsumer > self.user_input: {self.user_input}')
       
+      #If the user input is empty, send back an empty list
+      if not self.user_input:
+        await self.send(text_data=json.dumps({
+          'type': 'suggestions',
+          'suggestions': [],
+          'message': 'Suggestions sent!'
+        }))
+        return
       # Find matching usernames
       matching_usernames = find_matching_usernames(self.usernames, self.user_input)
       logger.debug(f'FormConsumer > matching_usernames: {matching_usernames}')
