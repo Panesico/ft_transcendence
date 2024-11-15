@@ -29,6 +29,8 @@ urlpatterns = [
     path('verify2FA/<int:user_id>/', viewsAuth.verify2FA_redir, name='verify2FA'),
     # api refresh token
     path('api/refresh-token/', viewsAuth.refresh_token, name='refresh_token'),
+	#api get userID
+	path('api/getUserID/', viewsAuth.get_user_id, name='get_user_id'),
 
     # profile api
     path('profile/', viewsProfile.get_profile, name='profile'),

@@ -7,10 +7,11 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .forms import SignUpFormFrontend, LogInFormFrontend
 from .viewsProfile import get_profileapi_variables
-from .utils import getDjangoLanguageCookie
+from .utils import getDjangoLanguageCookie, getUserId
 from django.utils.translation import gettext as _
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
+
 logger = logging.getLogger(__name__)
 
 
@@ -476,3 +477,16 @@ def refresh_token(request):
         )
 
     return json_response
+
+async def get_user_id(request):
+    jwt_token = request.COOKIES.get('jwt_token')
+    if not jwt_token:
+        return JsonResponse({'status': 'error', 'message': 'No JWT token found'}, status=400)
+
+    try:
+        user_id = await getUserId(jwt_token)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    return JsonResponse({'status': 'success', 'user_id': user_id})
+

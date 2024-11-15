@@ -1,10 +1,10 @@
-function init_listening() {
+async function init_listening() {
 
   // const stackTrace = new Error().stack;
   // console.log('init_listening call stack:', stackTrace);
 
   let friendsData = [];
-  const userID = document.getElementById('userID').value;
+  const userID = await getUserID();
   const chatButton = document.getElementById('chatButton');
   const messageInput = document.getElementById('messageInput');
   const sendButton = document.getElementById('sendButton');
@@ -89,8 +89,8 @@ function init_listening() {
 }
 
 
-function checkUnreadMessages() {
-  const userID = document.getElementById('userID').value;
+async function checkUnreadMessages() {
+  const userID = await getUserID();
   const data = {
     'type': 'chat',
     'subtype': 'check_unread_messages',
@@ -186,8 +186,8 @@ function markConversationRead(sender_id, receiver_id) {
   sendMessagesBySocket(unreadMessagesData, mainRoomSocket);
 }
 
-function getConversationBySocket(friend_id) {
-  const userID = document.getElementById('userID').value;
+async function getConversationBySocket(friend_id) {
+  const userID = await getUserID();
   const messageData = {
     type: 'chat',
     subtype: 'get_conversation',
@@ -227,7 +227,7 @@ async function getFriendsData() {
 }
 
 
-function displayFriendsInChat(friendsData) {
+async function displayFriendsInChat(friendsData) {
   // Displays who called this function
   console.log('displayFriendsInChat > friendsData: ', friendsData);
   const stackTrace = new Error().stack;
@@ -235,7 +235,7 @@ function displayFriendsInChat(friendsData) {
 
   const currentChatId = document.getElementById('currentChatId');
   const blockSwitchContainer = document.getElementById('blockSwitchContainer');
-  const userID = document.getElementById('userID').value;
+  const userID = await getUserID();
 
   // Reset header
   document.getElementById('contactContainer').style.display = 'none';

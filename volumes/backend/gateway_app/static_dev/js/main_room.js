@@ -98,12 +98,12 @@ function connectMainRoomSocket(user_id) {
 }
 
 // Routine when user reload the page
-window.onload = () => {
+window.onload = async () => {
   // Handle form submission
   handleFormSubmission();
 
   // Get the User ID
-  const userID = document.getElementById('userID').value;
+  const userID = await getUserID();
   console.log('userID:', userID);
   if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null || userID === 'None' || userID === '[object HTMLInputElement]') {
     console.warn('Client is not logged in');

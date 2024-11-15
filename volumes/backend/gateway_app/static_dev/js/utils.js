@@ -60,7 +60,7 @@ function askUserToReload() {
   }
 }
 
-function reconnectSocket(socket) {
+async function reconnectSocket(socket) {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const hostname = window.location.hostname;
   const port = window.location.port ? `:${window.location.port}` : '';
@@ -69,7 +69,7 @@ function reconnectSocket(socket) {
   // Reconnect to the corresponding socket
   if (socket === mainRoomSocket) {
     console.log('sendMessagesBySocket > reconnecting to the mainRoomSocket');
-    const userID = document.getElementById('userID').value;
+    const userID = await getUserID();
     console.log('userID:', userID);
     if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null || userID === 'None' || userID === '[object HTMLInputElement]') {
       console.warn('Client is not logged in');
@@ -91,5 +91,30 @@ function reconnectSocket(socket) {
     askUserToReload();
     console.log('sendMessagesBySocket > socket failed to reconnect');
     return false;
+  }
+}
+
+// It gets the user ID from the server using the JWT token
+async function getUserID() {
+  console.log('getUserID > fetching userID..');
+  const request = new Request('/api/getUserID/', {
+    method: 'GET',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'jwt_token': getCookie('jwt_token'),
+    },
+    credentials: 'include',
+  });
+
+  try {
+    const response = await fetch(request);
+    const data = await response.json();
+    console.log('getUserID > data:', data);
+    const userID = parseInt(data.user_id, 10);
+    console.log('get UserID > userID:', userID);
+    return userID;
+  } catch (error) {
+    console.error('Error fetching UserID:', error);
+    return 0;
   }
 }

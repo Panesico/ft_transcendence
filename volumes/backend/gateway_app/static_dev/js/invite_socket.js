@@ -227,9 +227,9 @@ function onModalClose(modal) {
 }
 
 // Function to listen for the friend invitation
-function listenFriendInvitation(modal, form) {
+async function listenFriendInvitation(modal, form) {
   let inputField = document.getElementById('usernameInput');
-  let userID = document.getElementById('userID').value;
+  let userID = await getUserID();
 
   console.log('User ID:', userID);
   if (userID === '' || userID === undefined) {
