@@ -144,33 +144,60 @@ class IgnoreMtimeFilter(logging.Filter):
     def filter(self, record):
         return 'first seen with mtime' not in record.getMessage()
 
+
+LOG_DIR = '/usr/src/app/logs/'
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'filters': {
-        'ignore_mtime': {
-            '()': IgnoreMtimeFilter,
+    'formatters': {
+        'standard': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'uvicorn': {  # Formatter for Uvicorn logs
+            'format': '{asctime} {levelname} {message}',
+            'style': '{',
         },
     },
     'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'filters': ['ignore_mtime'],
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/usr/src/app/logs/django-gateway.log',
+            'formatter': 'standard',
         },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+        },
+        'uvicorn_file': {  # Separate file handler for Uvicorn logs
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/usr/src/app/logs/uvicorn-gateway.log',
+            'formatter': 'uvicorn',
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
-            'level': 'INFO',  # Set to INFO to reduce verbosity
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
             'propagate': False,
         },
-        'django.db.backends': {
-            'handlers': ['console'],
-            'level': 'WARNING',  # Set to WARNING to suppress SQL query logs
+        'uvicorn': {  # Base logger for Uvicorn
+            'handlers': ['uvicorn_file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'uvicorn.access': {  # Uvicorn access logs (HTTP requests)
+            'handlers': ['uvicorn_file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'uvicorn.error': {  # Uvicorn error logs
+            'handlers': ['uvicorn_file', 'console'],
+            'level': 'INFO',
             'propagate': False,
         },
     },

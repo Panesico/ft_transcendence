@@ -17,5 +17,7 @@ RUN   pip install -r /tmp/requirements.txt
 
 RUN   chmod +x /tmp/init_django.sh
 
+RUN   mkdir -p /usr/src/app/logs
+
 ENTRYPOINT [ "/bin/sh", "/tmp/init_django.sh" ]
 
