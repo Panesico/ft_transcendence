@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-12 17:59+0000\n"
+"POT-Creation-Date: 2024-11-16 15:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ENGLISH <LL@li.org>\n"
@@ -78,59 +78,63 @@ msgstr "Final"
 msgid "you play next in the tournament"
 msgstr "you play next in the tournament"
 
-#: gateway/forms.py:9
+#: gateway/forms.py:20 gateway/forms.py:42
+msgid "This field cannot be empty."
+msgstr "This field cannot be empty."
+
+#: gateway/forms.py:25
 msgid "Alphanumeric characters, underscores and hyphens only."
 msgstr "Alphanumeric characters, underscores and hyphens only."
 
-#: gateway/forms.py:17
+#: gateway/forms.py:48
 msgid "Letters and spaces only."
 msgstr "Letters and spaces only."
 
-#: gateway/forms.py:28 gateway/forms.py:48 gateway/forms.py:97
+#: gateway/forms.py:60 gateway/forms.py:81 gateway/forms.py:132
 msgid "Username"
 msgstr "Username"
 
-#: gateway/forms.py:37 gateway/forms.py:57
+#: gateway/forms.py:69 gateway/forms.py:90
 msgid "Password"
 msgstr "Password"
 
-#: gateway/forms.py:65
+#: gateway/forms.py:98
 msgid "Confirm password"
 msgstr "Confirm password"
 
-#: gateway/forms.py:77
+#: gateway/forms.py:111
 msgid "Friend's Name"
 msgstr "Friend's Name"
 
-#: gateway/forms.py:88
+#: gateway/forms.py:122
 msgid "Upload avatar"
 msgstr "Upload avatar"
 
-#: gateway/forms.py:107
+#: gateway/forms.py:143
 msgid "Display name"
 msgstr "Display name"
 
-#: gateway/forms.py:117
+#: gateway/forms.py:154
 msgid "Country"
 msgstr "Country"
 
-#: gateway/forms.py:127
+#: gateway/forms.py:165
 msgid "City"
 msgstr "City"
 
-#: gateway/forms.py:135
+#: gateway/forms.py:173
 msgid "Language"
 msgstr "Language"
 
-#: gateway/forms.py:148
+#: gateway/forms.py:186
 msgid "New password"
 msgstr "New password"
 
-#: gateway/forms.py:156
+#: gateway/forms.py:194
 msgid "Confirm new password"
 msgstr "Confirm new password"
 
-#: gateway/handleInvite.py:54 gateway/templates/base_index.html:94
+#: gateway/handleInvite.py:54 gateway/templates/base_index.html:92
 msgid " has invited you to play: "
 msgstr " has invited you to play: "
 
@@ -158,77 +162,77 @@ msgstr "has canceled the game request."
 msgid "sent you a friend request"
 msgstr "sent you a friend request"
 
-#: gateway/handleMainRoom.py:414 gateway/templates/base_index.html:101
+#: gateway/handleMainRoom.py:414 gateway/templates/base_index.html:99
 msgid " has unblocked you."
 msgstr " has unblocked you."
 
-#: gateway/handleMainRoom.py:416 gateway/templates/base_index.html:100
+#: gateway/handleMainRoom.py:416 gateway/templates/base_index.html:98
 msgid " has blocked you."
 msgstr " has blocked you."
 
-#: gateway/templates/base_index.html:83
+#: gateway/templates/base_index.html:81
 msgid "Choose..."
 msgstr "Choose..."
 
-#: gateway/templates/base_index.html:90
-#: gateway/templates/includes/popupMessages.html:8
+#: gateway/templates/base_index.html:88
+#: gateway/templates/includes/popupMessages.html:9
 msgid "Notification"
 msgstr "Notification"
 
-#: gateway/templates/base_index.html:91
+#: gateway/templates/base_index.html:89
 msgid " sent you a friend request."
 msgstr " sent you a friend request."
 
-#: gateway/templates/base_index.html:92
+#: gateway/templates/base_index.html:90
 msgid " accepted your friend request."
 msgstr " accepted your friend request."
 
-#: gateway/templates/base_index.html:93
+#: gateway/templates/base_index.html:91
 msgid " declined your friend request."
 msgstr " declined your friend request."
 
-#: gateway/templates/base_index.html:95
+#: gateway/templates/base_index.html:93
 msgid " has accepted your game request."
 msgstr " has accepted your game request."
 
-#: gateway/templates/base_index.html:96
+#: gateway/templates/base_index.html:94
 msgid " has declined your game request."
 msgstr " has declined your friend request."
 
-#: gateway/templates/base_index.html:97
+#: gateway/templates/base_index.html:95
 msgid " has cancelled the game request."
 msgstr " has canceled the game request."
 
-#: gateway/templates/base_index.html:98
+#: gateway/templates/base_index.html:96
 msgid " is waiting to play."
 msgstr " is waiting to play."
 
-#: gateway/templates/base_index.html:99
+#: gateway/templates/base_index.html:97
 msgid " you play next in the tournament."
 msgstr " you play next in the tournament."
 
-#: gateway/templates/base_index.html:102
+#: gateway/templates/base_index.html:100
 msgid "Friend blocked successfully."
 msgstr "Friend blocked successfully."
 
-#: gateway/templates/base_index.html:103
+#: gateway/templates/base_index.html:101
 msgid "Friend unblocked successfully."
 msgstr "Friend unblocked successfully."
 
-#: gateway/templates/base_index.html:104
+#: gateway/templates/base_index.html:102
 msgid "Form submission error. Please reload and retry."
 msgstr "Form submission error. Please reload and retry."
 
-#: gateway/templates/base_index.html:106
+#: gateway/templates/base_index.html:104
 msgid "No friends yet"
 msgstr "No friends yet"
 
-#: gateway/templates/base_index.html:107
+#: gateway/templates/base_index.html:105
 #: gateway/templates/includes/chat_modal.html:44
 msgid "Select a contact"
 msgstr "Select a contact"
 
-#: gateway/templates/base_index.html:108
+#: gateway/templates/base_index.html:106
 msgid "Profile updated"
 msgstr "Profile updated"
 
@@ -686,84 +690,84 @@ msgstr "Logout"
 msgid "You have no notifications"
 msgstr "You have no notifications"
 
-#: gateway/views.py:92
+#: gateway/views.py:108
 msgid "Error retrieving friends"
 msgstr "Error retrieving friends"
 
-#: gateway/viewsAuth.py:34
+#: gateway/viewsAuth.py:35
 msgid "Logged out successfully"
 msgstr "Logged out successfully"
 
-#: gateway/viewsAuth.py:52
+#: gateway/viewsAuth.py:53
 msgid "Method not allowed"
 msgstr "Method not allowed"
 
-#: gateway/viewsAuth.py:100 gateway/viewsAuth.py:194
-#: gateway/viewsProfile.py:229 gateway/viewsProfile.py:299
+#: gateway/viewsAuth.py:101 gateway/viewsAuth.py:195
+#: gateway/viewsProfile.py:229 gateway/viewsProfile.py:336
 msgid "Invalid form data"
 msgstr "Invalid form data"
 
-#: gateway/viewsAuth.py:277
+#: gateway/viewsAuth.py:278
 msgid "No message provided"
 msgstr "No message provided"
 
-#: gateway/viewsAuth.py:306
+#: gateway/viewsAuth.py:307
 msgid "Failed to login with 42"
 msgstr "Failed to login with 42"
 
-#: gateway/viewsAuth.py:341
+#: gateway/viewsAuth.py:342
 msgid "Invalid request method. Use POST."
 msgstr "Invalid request method. Use POST."
 
-#: gateway/viewsAuth.py:348
+#: gateway/viewsAuth.py:349
 msgid "OTP code is required"
 msgstr "OTP code is required"
 
-#: gateway/viewsAuth.py:350
+#: gateway/viewsAuth.py:351
 msgid "Invalid JSON format"
 msgstr "Invalid JSON format"
 
-#: gateway/viewsInvitation.py:71
+#: gateway/viewsInvitation.py:70
 msgid "Username not valid"
 msgstr "Username not valid"
 
-#: gateway/viewsInvitation.py:86 gateway/viewsInvitation.py:93
+#: gateway/viewsInvitation.py:85 gateway/viewsInvitation.py:92
 msgid "Already friends"
 msgstr "Already friends"
 
-#: gateway/viewsInvitation.py:100 gateway/viewsInvitation.py:143
+#: gateway/viewsInvitation.py:99 gateway/viewsInvitation.py:142
 msgid "You cannot invite yourself"
 msgstr "You cannot invite yourself"
 
-#: gateway/viewsInvitation.py:107
+#: gateway/viewsInvitation.py:106
 msgid "Invitation already sent"
 msgstr "Invitation already sent"
 
-#: gateway/viewsInvitation.py:114
+#: gateway/viewsInvitation.py:113
 msgid "Invitation sent!"
 msgstr "Invitation sent!"
 
-#: gateway/viewsInvitation.py:135
+#: gateway/viewsInvitation.py:134
 msgid "Add this player as a friend before inviting them to play"
 msgstr "Add this player as a friend before inviting them to play"
 
-#: gateway/viewsInvitation.py:156
+#: gateway/viewsInvitation.py:155
 msgid "Invitation to play sent!"
 msgstr "Invitation to play sent!"
 
-#: gateway/viewsInvitation.py:189
+#: gateway/viewsInvitation.py:188
 msgid "You cannot block yourself"
 msgstr "You cannot block yourself"
 
-#: gateway/viewsInvitation.py:213 gateway/viewsInvitation.py:263
+#: gateway/viewsInvitation.py:212 gateway/viewsInvitation.py:262
 msgid "User blocked"
 msgstr "User blocked"
 
-#: gateway/viewsInvitation.py:215 gateway/viewsInvitation.py:265
+#: gateway/viewsInvitation.py:214 gateway/viewsInvitation.py:264
 msgid "An error occured"
 msgstr "An error occurred"
 
-#: gateway/viewsInvitation.py:239
+#: gateway/viewsInvitation.py:238
 msgid "You cannot unblock yourself"
 msgstr "You cannot unblock yourself"
 
@@ -771,7 +775,31 @@ msgstr "You cannot unblock yourself"
 msgid "Error retrieving match history"
 msgstr "Error retrieving match history"
 
-#: gateway/viewsProfile.py:379 gateway/viewsProfile.py:411
+#: gateway/viewsProfile.py:278
+msgid "Display name cannot be empty"
+msgstr "Display name cannot be empty."
+
+#: gateway/viewsProfile.py:281
+msgid "City cannot be empty"
+msgstr "City cannot be empty."
+
+#: gateway/viewsProfile.py:284
+msgid "Country cannot be empty"
+msgstr "Country cannot be empty."
+
+#: gateway/viewsProfile.py:288
+msgid "Display name cannot contain spaces"
+msgstr "Display name cannot contain spaces."
+
+#: gateway/viewsProfile.py:295
+msgid "Username cannot be empty"
+msgstr "Username cannot be empty."
+
+#: gateway/viewsProfile.py:298
+msgid "Username cannot contain spaces"
+msgstr "Username cannot contain spaces."
+
+#: gateway/viewsProfile.py:420 gateway/viewsProfile.py:452
 msgid "Please select an image file"
 msgstr "Please select an image file"
 

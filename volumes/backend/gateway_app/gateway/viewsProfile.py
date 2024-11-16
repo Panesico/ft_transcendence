@@ -230,6 +230,10 @@ def post_edit_profile_security(request):
         form.add_error(None, message)
         html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
         return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
+    elif security_data_is_valid(data) == False:
+        form.add_error(None, data['message'])
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
+        return JsonResponse({'html': html, 'status': 'error', 'message': data['message']}, status=400)
 
     # Send and recover response from the profileapi service
     authentif_url = 'https://authentif:9001/api/editprofile/' 
@@ -262,7 +266,40 @@ def post_edit_profile_security(request):
       html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
       #return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})#change this line to return only the fragment
-      
+
+
+def general_data_is_valid(data):
+  display_name = data.get('display_name')
+  city = data.get('city')
+  country = data.get('country')
+
+  # Check if the fields are empty
+  if (display_name is None or display_name == ""):
+    data['message'] = _("Display name cannot be empty")
+    return False
+  if (city is None or city == "" or city.isspace()):
+    data['message'] = _("City cannot be empty")
+    return False
+  if (country is None or country == "" or city.isspace()):
+    data['message'] = _("Country cannot be empty")
+    return False
+  # Check if display_name has spaces
+  if ' ' in display_name:
+    data['message'] = _("Display name cannot contain spaces")
+    return False
+  return True
+
+def security_data_is_valid(data):
+  username = data.get('username')
+  if (username is None or username == ""):
+    data['message'] = _("Username cannot be empty")
+    return False
+  if ' ' in username:
+    data['message'] = _("Username cannot contain spaces")
+    return False
+  return True
+
+
 @login_required
 def post_edit_profile_general(request):
     logger.debug("")
@@ -300,6 +337,10 @@ def post_edit_profile_general(request):
         form.add_error(None, message)
         html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
         return JsonResponse({'html': html, 'status': 'error', 'message': message}, status=400)
+    elif general_data_is_valid(data) == False:
+        form.add_error(None, data['message'])
+        html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
+        return JsonResponse({'html': html, 'status': 'error', 'message': data['message']}, status=400)
 
     # Send and recover response from the profileapi service
     profileapi_url = 'https://profileapi:9002/api/editprofile/' 

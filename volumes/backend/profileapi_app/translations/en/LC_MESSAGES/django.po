@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-12 17:59+0000\n"
+"POT-Creation-Date: 2024-11-16 15:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,15 +34,15 @@ msgstr "Invalid profile data"
 msgid "Error: "
 msgstr "Error: "
 
-#: profileapi/views.py:99 profileapi/views.py:312 profileapi/views.py:461
-#: profileapi/views.py:470 profileapi/views.py:493
+#: profileapi/views.py:99 profileapi/views.py:285 profileapi/views.py:432
+#: profileapi/views.py:441 profileapi/views.py:464
 msgid "Method not allowed"
 msgstr "Method not allowed"
 
 #: profileapi/views.py:124 profileapi/views.py:167 profileapi/views.py:192
-#: profileapi/views.py:233 profileapi/views.py:331 profileapi/views.py:361
-#: profileapi/views.py:409 profileapi/views.py:426 profileapi/views.py:443
-#: profileapi/views.py:484 profileapi/views.py:507
+#: profileapi/views.py:233 profileapi/views.py:304 profileapi/views.py:334
+#: profileapi/views.py:380 profileapi/views.py:397 profileapi/views.py:414
+#: profileapi/views.py:455 profileapi/views.py:478
 msgid "User not found"
 msgstr "User not found"
 
@@ -54,54 +54,54 @@ msgstr "User is blocked"
 msgid "User is not blocked"
 msgstr "Friend blocked"
 
-#: profileapi/views.py:259 profileapi/views.py:290
+#: profileapi/views.py:246
 msgid "You have already sent an unresponded request to this user"
 msgstr "You have already sent an unresponded request to this user"
 
-#: profileapi/views.py:261
+#: profileapi/views.py:248
 msgid "Request does not exist"
 msgstr "Request does not exist"
 
-#: profileapi/views.py:283
+#: profileapi/views.py:264
 msgid "You cannot send a notification to yourself"
 msgstr "You cannot send a notification to yourself"
 
-#: profileapi/views.py:306
+#: profileapi/views.py:279
 msgid "Notification created"
 msgstr "Notification created"
 
-#: profileapi/views.py:410
+#: profileapi/views.py:381
 msgid "Notification marked as read"
 msgstr "Notification marked as read"
 
-#: profileapi/views.py:427
+#: profileapi/views.py:398
 msgid "All notifications marked as read"
 msgstr "All notifications marked as read"
 
-#: profileapi/views.py:437
+#: profileapi/views.py:408
 msgid "Friendship exists"
 msgstr "Friendship exists"
 
-#: profileapi/views.py:440
+#: profileapi/views.py:411
 msgid "Friendship does not exist"
 msgstr "Friendship does not exist"
 
-#: profileapi/views.py:453
+#: profileapi/views.py:424
 msgid "User exists"
 msgstr "User exists"
 
-#: profileapi/views.py:456
+#: profileapi/views.py:427
 msgid "User does not exist"
 msgstr "User does not exist"
 
-#: profileapi/views.py:459
+#: profileapi/views.py:430
 msgid "Invalid JSON"
 msgstr "Invalid JSON"
 
-#: profileapi/views.py:481
+#: profileapi/views.py:452
 msgid "Friend blocked"
 msgstr "Friend blocked"
 
-#: profileapi/views.py:504
+#: profileapi/views.py:475
 msgid "Friend unblocked"
 msgstr "Friend unblocked"
