@@ -1,7 +1,11 @@
 #! /bin/sh -l
 
 # Install hardhat dependencies
+echo "Installing npm"
+npm install -g npm@10.9.0
+echo "Installing hardhat dependencies"
 npm install --save-dev hardhat --no-audit
+echo "Installing hardhat plugins"
 npm install --save-dev @nomicfoundation/hardhat-toolbox --no-audit
 #npm install ethers@latest
 
