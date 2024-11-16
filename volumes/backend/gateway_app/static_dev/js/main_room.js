@@ -1,6 +1,8 @@
 let mainRoomSocket;
 
 unreadNotifications = false;
+// Global variable for userID
+let g_user_id;
 
 function closeMainRoomSocket() {
   if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
@@ -19,8 +21,8 @@ function closeMainRoomSocket() {
 
 // Safe way to send messages by socket
 function sendMessagesBySocket(message, socket) {
-  // if user id == 0 do not use websocket
-  if (document.getElementById('userID').value === '0') {
+
+  if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
     console.warn('Client is not logged in, cannot use websocket');
     return;
   }
@@ -37,7 +39,7 @@ function sendMessagesBySocket(message, socket) {
 }
 
 // Add event listener to the notification
-document.addEventListener('DOMContentLoaded', function () {
+function listenUserReadNotification() {
   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
   notificationDropdown.addEventListener('click', function () {
     console.log('Notification dropdown clicked');
@@ -51,17 +53,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
   );
-});
+}
 
 // Connect to the main room socket
-function connectMainRoomSocket(user_id) {
+async function connectMainRoomSocket() {
   console.log('connectMainRoomSocket');
 
   // Establish connection to the main room
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const hostname = window.location.hostname;
   const port = window.location.port ? `:${window.location.port}` : '';
-  mainRoomSocket = new WebSocket(`${protocol}//${hostname}${port}/wss/mainroom/${user_id}/`);
+  mainRoomSocket = new WebSocket(`${protocol}//${hostname}${port}/wss/mainroom/${g_user_id}/`);
 
   // On websocket open
   mainRoomSocket.onopen = function (e) {
@@ -78,7 +80,6 @@ function connectMainRoomSocket(user_id) {
 
   // On websocket close
   mainRoomSocket.onclose = function (e) {
-    console.warn('mainRoomSocket closed called by:\n', new Error().stack.split('\n')[2].trim());
     console.warn('mainRoomSocket onclose > mainRoomSocket socket closed');
   };
 
@@ -94,7 +95,8 @@ function connectMainRoomSocket(user_id) {
     }
   }
 
-  // Parse the socket message
+  // Listen for the notification read
+  listenUserReadNotification();
 }
 
 // Routine when user reload the page
@@ -102,16 +104,17 @@ window.onload = async () => {
   // Handle form submission
   handleFormSubmission();
 
-  // Get the User ID
-  const userID = await getUserID();
-  console.log('userID:', userID);
-  if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null || userID === 'None' || userID === '[object HTMLInputElement]') {
+  // Update user id global variable
+  g_user_id = await getUserID();
+
+  console.log('g_user_id:', g_user_id);
+  if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
     console.warn('Client is not logged in');
     return;
   }
 
   // Connect to the main room socket
-  connectMainRoomSocket(userID);
+  connectMainRoomSocket();
 }
 
 function parseSocketMessage(data) {

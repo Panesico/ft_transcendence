@@ -4,7 +4,12 @@ async function init_listening() {
   // console.log('init_listening call stack:', stackTrace);
 
   let friendsData = [];
-  const userID = await getUserID();
+  const userID = g_user_id;
+  if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null || userID === 'None' || userID === '[object HTMLInputElement]') {
+    console.error('Client is not logged in, cannot use websocket');
+    return;
+  }
+  console.warn('init_listening > userID:', userID);
   const chatButton = document.getElementById('chatButton');
   const messageInput = document.getElementById('messageInput');
   const sendButton = document.getElementById('sendButton');
@@ -90,7 +95,7 @@ async function init_listening() {
 
 
 async function checkUnreadMessages() {
-  const userID = await getUserID();
+  const userID = g_user_id
   const data = {
     'type': 'chat',
     'subtype': 'check_unread_messages',
@@ -187,7 +192,7 @@ function markConversationRead(sender_id, receiver_id) {
 }
 
 async function getConversationBySocket(friend_id) {
-  const userID = await getUserID();
+  const userID = g_user_id;
   const messageData = {
     type: 'chat',
     subtype: 'get_conversation',
@@ -235,7 +240,7 @@ async function displayFriendsInChat(friendsData) {
 
   const currentChatId = document.getElementById('currentChatId');
   const blockSwitchContainer = document.getElementById('blockSwitchContainer');
-  const userID = await getUserID();
+  const userID = g_user_id;
 
   // Reset header
   document.getElementById('contactContainer').style.display = 'none';

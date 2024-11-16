@@ -47,11 +47,10 @@ function listenForm(form) {
         console.log('listenForm > data.message: ', data.message);
         // console.log('listenForm > data.html: ', data.html);
 
-        const userIdElement = document.getElementById('userID');
-        let user_id = userIdElement ? userIdElement.value : null;
-        if (user_id === null || user_id === '0' || user_id === '' || user_id === undefined || user_id === 'None' || user_id === '[object HTMLInputElement]') {
-          user_id = data.user_id;
+        if (g_user_id === null || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
+          g_user_id = data.user_id;
         }
+
 
         if (data.type === 'invite_sent') {
           console.log('Invitation to play sent, data: ', data);
@@ -64,16 +63,31 @@ function listenForm(form) {
           // If login successful, connect to the main room socket
           if (data.type === 'login_successful') {
             console.log('displayMessageInModal login_successful');
+            // Update user id global variable
+            g_user_id = await getUserID();
+            if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
+              console.error('Failed to get user ID');
+              // Handle the redirect, maybe to a login page or another appropriate action
+              return;
+            }
+
+            console.warn('global variable g_user_id:', g_user_id);
             handleRefresh("login");
-            connectMainRoomSocket(user_id);
+            connectMainRoomSocket();
 
           } else if (data.type === 'signup_successful') {
+            // Update user id global variable
+            g_user_id = await getUserID();
+            if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
+              console.error('Failed to get user ID');
+              // Handle the redirect, maybe to a login page or another appropriate action
+              return;
+            }
             handleRefresh("signup");
-            connectMainRoomSocket(user_id);
+            connectMainRoomSocket();
 
           } else if (data.type === 'profile_updated') {
             handleRefresh("profile_update");
-            // connectMainRoomSocket(user_id);
 
           } else if (data.type === '2FA') {
             try {

@@ -310,18 +310,18 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
     //    mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id}));
   });
 
-  document.addEventListener('DOMContentLoaded', function () {
-    const notificationDropdown = document.getElementById('navbarDropdownNotifications');
-    notificationDropdown.addEventListener('click', function () {
-      unreadNotifications = false;
-      sendMessagesBySocket({
-        'type': 'mark_notification_as_read',
-        'receiver_id': receiver_id,
-        'sender_id': sender_id
-      }, mainRoomSocket);
-    }
-    );
-  });
+  // document.addEventListener('DOMContentLoaded', function () {
+  //   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
+  //   notificationDropdown.addEventListener('click', function () {
+  //     unreadNotifications = false;
+  //     sendMessagesBySocket({
+  //       'type': 'mark_notification_as_read',
+  //       'receiver_id': receiver_id,
+  //       'sender_id': sender_id
+  //     }, mainRoomSocket);
+  //   }
+  //   );
+  // });
 }
 
 function deleteResponsesButtons(notificationDropdownClass, username) {

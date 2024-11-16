@@ -45,10 +45,10 @@ function handleRefresh(type) {
         document.querySelector('header').innerHTML = data.html;
         // get the div with id 'userID' and replace its value with the new user id. Example <input type="hidden" id="userID" value="1">
         if (type == 'logout') {
-          document.getElementById('userID').value = "0";
+          g_user_id = 0;
         }
         else {
-          document.getElementById('userID').value = data.user_id;
+          g_user_id = data.user_id;
         }
       }
     })
