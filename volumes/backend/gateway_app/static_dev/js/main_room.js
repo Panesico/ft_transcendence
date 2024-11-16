@@ -41,6 +41,10 @@ function sendMessagesBySocket(message, socket) {
 // Add event listener to the notification
 function listenUserReadNotification() {
   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
+  if (notificationDropdown.hasEventListener) {
+    return;
+  }
+
   notificationDropdown.addEventListener('click', function () {
     console.log('Notification dropdown clicked');
     unreadNotifications = false;
@@ -52,7 +56,7 @@ function listenUserReadNotification() {
       sendMessagesBySocket({ 'type': 'mark_notification_as_read', 'receiver_id': receiver_id }, mainRoomSocket);
     }
   }
-  );
+);
 }
 
 // Connect to the main room socket
@@ -94,9 +98,6 @@ async function connectMainRoomSocket() {
       console.warn('mainRoomSocket is not open');
     }
   }
-
-  // Listen for the notification read
-  listenUserReadNotification();
 }
 
 // Routine when user reload the page
@@ -118,6 +119,9 @@ window.onload = async () => {
 }
 
 function parseSocketMessage(data) {
+
+  listenUserReadNotification();
+
   if (data.type === 'friend_request') {
     addRequestNotification(data);
   }

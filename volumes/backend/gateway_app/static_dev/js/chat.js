@@ -9,7 +9,6 @@ async function init_listening() {
     console.error('Client is not logged in, cannot use websocket');
     return;
   }
-  console.warn('init_listening > userID:', userID);
   const chatButton = document.getElementById('chatButton');
   const messageInput = document.getElementById('messageInput');
   const sendButton = document.getElementById('sendButton');
