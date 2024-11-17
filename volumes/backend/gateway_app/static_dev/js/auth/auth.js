@@ -116,9 +116,6 @@ function handleRefresh(type) {
   }
 }
 
-// TODO -- Client secret changes over a certain period, making it unsuable.
-// Your 42 OAuth settings from Django variables
-
 // Function to handle OAuth code once available
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -162,9 +159,8 @@ function loginButton42() {
   const configElement = document.getElementById('config42login');
   const CLIENT_ID = configElement.getAttribute('data-client-id');
   const REDIRECT_URI = configElement.getAttribute('data-redirect-uri');
-  const STATE = Math.random().toString(36).substring(7); // Generate random state to prevent CSRF attacks
   const oauth_callback_url = configElement.getAttribute('oauth-view-url');
-  const authUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=public&state=${STATE}`;
+  const authUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=public`;
   const width = 600;
   const height = 600;
   const left = (window.innerWidth / 2) - (width / 2);
@@ -266,12 +262,16 @@ function verify2FA() {
     body: JSON.stringify({ otp_code: otpCode })
   })
     .then(response => response.json())
-    .then(data => {
+    .then(async data => {
       const messageDiv = document.getElementById('2fa-message');
 
       if (data.status === 'success') {
         messageDiv.innerHTML = `<p class="text-success">${data.message}</p>`;
-        window.location.replace('/');
+        refreshToken();
+        await sleep(200);
+        g_user_id = await getUserID();
+        handleRefresh('login');
+        connectMainRoomSocket();
       } else {
         messageDiv.innerHTML = `<p class="text-danger">${data.message}</p>`;
       }

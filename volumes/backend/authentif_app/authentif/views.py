@@ -685,7 +685,7 @@ def enable2FA(request):
     cache.set(cache_key, secret, timeout=300)  # Cache for 5 minutes
 
     # Generate QR code for authenticator app
-    qr = qrcode.make(totp.provisioning_uri(name=str(user.id), issuer_name="Pongscendence"))
+    qr = qrcode.make(totp.provisioning_uri(name=str(user.username), issuer_name="Pongscendence"))
     qr_io = BytesIO()
     qr.save(qr_io, format="PNG")
     qr_io.seek(0)
@@ -780,19 +780,6 @@ def verify2FA(request, user_id):
     if not user_id:
         return JsonResponse({"status": "error", "message": _("User ID is required")}, status=400)
 
-    # Generate the cache key for the user and attempt to retrieve the cached JWT token
-    cache_key = f"2fa_user_{user_id}"
-    cached_jwt = cache.get(cache_key)
-
-    logger.debug(f"verify2FA > cache_key: {cache_key}, cached_jwt: {cached_jwt}")
-
-    # Retrieve the current JWT from the request headers or cookies
-    current_jwt = request.COOKIES.get('jwt_token') or request.headers.get('Authorization', '').replace('Bearer ', '')
-
-    # Verify the JWT token and user ID are in cache
-    if not cached_jwt or cached_jwt != current_jwt:
-        return JsonResponse({"status": "error", "message": _("Token or user mismatch")}, status=401)
-
     # Attempt to retrieve the user and check if they have 2FA enabled
     try:
         user = User.objects.get(pk=user_id)
@@ -815,7 +802,7 @@ def verify2FA(request, user_id):
         new_token, refresh_jwt_token = generate_jwt_token(user)
 
         # Respond with success and set the new JWT as a secure cookie
-        response = JsonResponse({"status": "success", "message": _("2FA verified")})
+        response = JsonResponse({"status": "success", 'type': 'login_successful', "message": _("Login successful"), "token": new_token})
         response.set_cookie('jwt_token', new_token, httponly=True, secure=True, samesite='Lax')
         response.set_cookie('refresh_jwt_token', refresh_jwt_token, httponly=True, secure=True, samesite='Lax')
 

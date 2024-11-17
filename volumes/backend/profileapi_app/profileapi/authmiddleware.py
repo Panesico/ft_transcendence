@@ -130,11 +130,6 @@ class JWTAuthenticationMiddleware:
             if not access_token:
                 guest_token = generate_guest_token()
                 response.set_cookie('jwt_token', guest_token, httponly=True, secure=True, samesite='Lax')
-            try:
-                jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
-            except:
-                guest_token = generate_guest_token()
-                response.set_cookie('jwt_token', guest_token, httponly=True, secure=True, samesite='Lax')
 
     def create_guest_user(self):
         return GuestUser()
