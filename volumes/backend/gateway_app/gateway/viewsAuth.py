@@ -8,9 +8,12 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import SignUpFormFrontend, LogInFormFrontend
 from .viewsProfile import get_profileapi_variables
 from .utils import getDjangoLanguageCookie, getUserId
+from .authmiddleware import generate_guest_token
 from django.utils.translation import gettext as _
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
+from datetime import datetime, timedelta, timezone
+
 
 logger = logging.getLogger(__name__)
 
@@ -456,6 +459,14 @@ def verify2FA_redir(request, user_id):
 def refresh_token(request):
     #get jwt cookie from request
     jwt_token = request.COOKIES.get('jwt_token')
+    refresh_token = request.COOKIES.get('refresh_jwt_token')
+    try:
+        decoded_data = jwt.decode(refresh_token, settings.SECRET_KEY, algorithms=["HS256"])
+    except:
+        json_response = JsonResponse({'status': 'success', 'message': 'Invalid refresh token. Returning guest token'}, status=200)
+        jwt_token = generate_guest_token()
+        json_response.set_cookie('jwt_token', jwt_token, httponly=True, secure=True, samesite='Lax')
+        return json_response
 
     json_response = JsonResponse({'status': 'success', 'message': 'Token refreshed successfully'})
     if len(jwt_token) > 10:
@@ -463,18 +474,34 @@ def refresh_token(request):
             jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             json_response = JsonResponse({'status': 'success', 'message': 'Expired Token refreshed'})
+            try:
+                # Now decode without checking expiry
+                decoded_data = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"], options={"verify_exp": False})
+                user_id = decoded_data.get('user_id')
+                if user_id == 0:
+                    jwt_token = generate_guest_token()
+                else:
+                        access_exp = datetime.now(timezone.utc) + timedelta(minutes=1)  # Short-lived
+                        access_payload = {
+                            'user_id': user_id,
+                            'exp': int(access_exp.timestamp()),
+                            'iat': int(datetime.now(timezone.utc).timestamp()),
+                        }
+                        jwt_token = jwt.encode(access_payload, settings.SECRET_KEY, algorithm="HS256")
+            except:
+                return json_response
 
-    # Filter and copy relevant cookies from the request to the response
-    # This example assumes you are only setting an 'auth_token' cookie.
-    cookie_name = 'jwt_token'
-    if cookie_name in request.COOKIES:
-        json_response.set_cookie(
-            key=cookie_name,
-            value=request.COOKIES[cookie_name],
-            httponly=True,  # Helps mitigate XSS
-            secure=True,    # Requires HTTPS
-            samesite='Lax', # Helps mitigate CSRF
-        )
+
+            # Filter and copy relevant cookies from the request to the response
+            cookie_name = 'jwt_token'
+            if cookie_name in request.COOKIES:
+                json_response.set_cookie(
+                    key="jwt_token",
+                    value=jwt_token,
+                    httponly=True,  # Helps mitigate XSS
+                    secure=True,    # Requires HTTPS
+                    samesite='Lax', # Helps mitigate CSRF
+                )
 
     return json_response
 
