@@ -214,7 +214,7 @@ CHANNEL_LAYERS = {
 
 # Defines a set of host/domain names that Django will accept requests from
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcgame', 'gateway', 'authentif', 'profileapi', 'play']
-ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', f'{os.getenv("ACTUALHOSTNAME")}' ]
+ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', f'{os.getenv("ACTUALHOSTNAME")}', 'gateway', 'authentif', 'profileapi', 'play', 'calcgame'] # Removing the containers names from host breaks communication between containers
 
 # Redirect all HTTP traffic to HTTPS
 SECURE_SSL_REDIRECT = True

@@ -141,9 +141,8 @@ async function handleOAuthCode(oauth_callback_url) {
 
       if (response.ok) {
         console.log("OAuth authentication successful");
-        await sleep(1000);
         refreshToken();
-        await sleep(1000);
+        await sleep(500);
         handleRefresh("oauth");
       } else {
         console.error("OAuth authentication failed");

@@ -389,6 +389,7 @@ def post_edit_profile_avatar(request):
   csrf_token = request.COOKIES.get('csrftoken')
   django_language = getDjangoLanguageCookie(request)
   jwt_token = request.COOKIES.get('jwt_token')
+  sudo_token = request.COOKIES.get('sudo')
   headers = {
         'X-CSRFToken': csrf_token,
         'X-Language': django_language,
@@ -396,6 +397,7 @@ def post_edit_profile_avatar(request):
         'Content-Type': 'application/json',
         'Referer': 'https://gateway:8443',
         'Authorization': f'Bearer {jwt_token}',
+        'sudo': f'{sudo_token}',
     }
 
   # Redirection usage

@@ -12,9 +12,12 @@ from datetime import datetime, timedelta, timezone
 from .forms import SignUpForm, LogInForm, EditProfileForm
 from .models import User
 from .authmiddleware import login_required, generate_guest_token, JWTAuthenticationMiddleware, generate_jwt_token, get_user_id
-
+import pyotp
+import qrcode
+from io import BytesIO
+import base64
+from django.core.cache import cache
 import prettyprinter
-from prettyprinter import pformat
 prettyprinter.set_default_config(depth=None, width=80, ribbon_width=80)
 
 logger = logging.getLogger(__name__)
@@ -323,8 +326,6 @@ def api_edit_profile(request):
       logger.debug(f'data: {data}')
 
       # Check the user id changed is the same as the user id in the token
-      if request.user.id_42:
-        return JsonResponse({'status': 'error', 'message': _('Unauthorized')}, status=401)
 
       user_id = data.get('user_id')
       user_obj = User.objects.get(id=user_id)
@@ -335,6 +336,9 @@ def api_edit_profile(request):
       new_password = data.get('new_password')
       # validate_password(new_password)
       
+      if request.user.id_42 and request.headers.get('sudo') != "add" :
+        return JsonResponse({'status': 'error', 'message': _('Unauthorized')}, status=401)
+    
       form = EditProfileForm(data, instance=user_obj)
       # logger.debug(f'form: {form}')
       
@@ -572,11 +576,16 @@ def oauth(request):
             'Authorization': f'Bearer {jwt_token}',
             'Referer': 'https://authentif:9001',
         }
+        cookies = {
+        'csrftoken': f'{csrf_token}',
+        'jwt_token': f'{jwt_token}',
+        'sudo': 'add',
+        }
 
         # Send the image to edit_profile_avatar
         edit_response = requests.post(
             "https://gateway:8443/edit_profile_avatar/",
-            cookies=request.COOKIES,
+            cookies=cookies,
             files=files,  # Sending the files parameter for multipart
             headers=headers,
             verify=os.getenv("CERTFILE")
@@ -613,8 +622,13 @@ def oauth(request):
         "preferred_language": f"{language}"
     })
 
-    response = requests.post("https://gateway:8443/edit_profile_general/",data=payload,headers=headers,verify=os.getenv("CERTFILE"))
+    cookies = {
+        'csrftoken': f'{csrf_token}',
+        'jwt_token': f'{jwt_token}',
+        'sudo': 'add',
+    }
 
+    response = requests.post("https://gateway:8443/edit_profile_general/",cookies=cookies,data=payload,headers=headers,verify=os.getenv("CERTFILE"))
     # Create response object
     response = JsonResponse({
         'status': 'success',
@@ -648,11 +662,6 @@ def oauth(request):
     
     return response
 
-
-import pyotp
-import qrcode
-from io import BytesIO
-import base64
 
 @login_required
 def enable2FA(request):
@@ -700,8 +709,6 @@ def enable2FA(request):
         'qr_code': qr_code_url,
         'two_fa_enabled': False
     }, status=200)
-
-from django.core.cache import cache
 
 @login_required
 def confirmEnable2FA(request):
