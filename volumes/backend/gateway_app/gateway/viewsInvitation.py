@@ -147,7 +147,15 @@ def invite_to_play(request, receiver_id):
   
   else:    
     logger.debug(f"invite_to_play > receiver_id: {receiver_id}, sender_id: {sender_id}")
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        status = 'error'
+        message = _('Invalid JSON data')
+        form = InviteFriendFormFrontend()
+        html = render_to_string('fragments/profile_fragment.html', {'form': form, 'message': message}, request=request)
+        user_response = JsonResponse({'html': html, 'status': status, 'message': message})
+        return user_response
     
     user_response = JsonResponse({
         'status': 'success',
