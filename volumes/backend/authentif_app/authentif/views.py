@@ -616,6 +616,7 @@ def oauth(request):
 
     payload = json.dumps({
         "csrfmiddlewaretoken": f"{csrf_token}",
+        "username": f"{user_data['login']}",
         "display_name": f"{user_data['login']}",
         "country": f"{user_data['campus'][0]['country']}",
         "city": f"{user_data['campus'][0]['city']}",

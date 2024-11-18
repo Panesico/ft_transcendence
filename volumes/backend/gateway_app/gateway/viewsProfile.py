@@ -70,8 +70,10 @@ def get_edit_profile(request):
 
     # GET profile user's variables
     profile_data = get_profileapi_variables(request=request)
+    logger.debug(f"get_edit_profile > username: {request.user.username}")
     if profile_data.get('status') == 'error':
         return redirect(profile_data.get('status_code'))
+    profile_data['username'] = request.user.username
     logger.debug(f"get_edit_profile > profile_data: {profile_data}")
 
     form = EditProfileFormFrontend()
@@ -429,6 +431,7 @@ def post_edit_profile_avatar(request):
 
     # Construct the data to send to the profileapi service
     data['user_id'] = request.user.id
+    data['username'] = request.user.username
     data['avatar'] = '/avatars/' + filename
     authentif_url = 'https://authentif:9001/api/editprofile/' 
     response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
