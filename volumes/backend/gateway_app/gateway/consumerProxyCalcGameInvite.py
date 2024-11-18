@@ -61,6 +61,11 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
             'cookies': self.scope['cookies'],
         }
 
+        # if user is already in waiting room, close connection
+        if user_id != 0 and await self.userIsAlreadyInGame(user_id, user, context, game_type): 
+            logger.error(f"Player {user_id} already in a game, connection closed")
+            return
+
         if game_type not in self.waiting:
             self.waiting[game_type] = {}
         
@@ -498,3 +503,37 @@ class ProxyCalcGameInvite(AsyncWebsocketConsumer):
 
             return True
         return False
+
+    async def userIsAlreadyInGame(self, user_id, user, context, game_type):
+        is_in_game = False
+        if game_type not in self.waiting:
+            return False
+        
+        # check if user_id is in waiting room
+        for player_id, player_info in self.waiting[game_type].items():
+            if player_info['player_id'] == user_id:
+                is_in_game = True
+                break
+                    
+        if not is_in_game:
+            return False
+        
+        info = {
+            'p1_label': user['username'],
+            'p1_value': user['profile']['display_name'],
+        }
+
+        player_language = get_player_language(context)
+        activate(player_language)
+        html = render_to_string('fragments/play_fragment.html', {'info': info, 'context': context})
+        
+        await self.send(json.dumps({
+            'type': 'already_in_game',
+            'html': html,
+            'title': _('Cancelled'),
+            'message': _('You are already waiting for a game'),
+        }))
+
+        await self.close()
+
+        return True
