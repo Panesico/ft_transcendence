@@ -94,5 +94,7 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     elif typeMessage == 'unblock':
       logger.debug(f'mainRoom > unblock')
       await block_user_responses(self, content, users_connected)
+    elif typeMessage == 'load_notifications':
+      await checkForNotifications(self)
     # elif typeMessage == 'get_connected_friends':
     #   await getConnectedFriends(self, content, users_connected)

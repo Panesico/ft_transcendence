@@ -21,26 +21,20 @@ logger = logging.getLogger(__name__)
 def get_profileapi_variables(request=None, response=None):
   if response is not None:
     user_id = int(response.json().get('user_id'))
-    logger.debug(f"get_profileapi_variables > user_id: {user_id}")
   else:
     user_id = request.user.id
   profile_api_url = 'https://profileapi:9002/api/profile/' + str(user_id) + '/'
-  logger.debug(f"get_profileapi_variables > profile_api_url: {profile_api_url}")
   response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
   if response.status_code == 200:
-    logger.debug(f"-------> get_edit_profile > Response: {response.json()}")
     return response.json()
   else:
     status = response.status_code
     message = response.json().get('message')
-    logger.debug(f"-------> get_edit_profile > error Response: {response.status_code}")
     return {'status': 'error', 'message': message, 'status_code': status
             }
 
 @login_required
 def get_profile(request):
-    logger.debug("")
-    logger.debug("get_profile")
     if request.method != 'GET':
       return redirect('405')
     form = InviteFriendFormFrontend()
@@ -54,7 +48,6 @@ def get_profile(request):
     if profile_data.get('status') == 'error':
         return redirect('404')
 
-    logger.debug(f"get_profile > profile_data: {profile_data}")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         logger.debug("get_profile XMLHttpRequest")
         html = render_to_string('fragments/profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
@@ -63,37 +56,29 @@ def get_profile(request):
 
 @login_required
 def get_edit_profile(request):
-    logger.debug("")
-    logger.debug("get_edit_profile called")
     if request.method != 'GET':
         return redirect('405')
 
     # GET profile user's variables
     profile_data = get_profileapi_variables(request=request)
-    logger.debug(f"get_edit_profile > username: {request.user.username}")
     if profile_data.get('status') == 'error':
         return redirect(profile_data.get('status_code'))
     profile_data['username'] = request.user.username
-    logger.debug(f"get_edit_profile > profile_data: {profile_data}")
 
     form = EditProfileFormFrontend()
-    # logger.debug(f"get_edit_profile > form: {form}")
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_edit_profile > XMLHttpRequest")
         html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
         return JsonResponse({'html': html})
     return render(request, 'partials/edit_profile.html', {'form': form, 'profile_data': profile_data, 'user': request.user})
 
 @login_required
 def get_friend_profile(request, friend_id):
-    logger.debug("")
-    logger.debug("get_friend_profile")
     if request.method != 'GET':
         return redirect('405')
     
     form = InviteFriendFormFrontend()
     
-    # Obtener el perfil del amigo
+    # Get friend's profile
     profile_api_url = f'https://profileapi:9002/api/getFullProfile/{friend_id}/'
     response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
     if response.status_code != 200:
@@ -101,13 +86,11 @@ def get_friend_profile(request, friend_id):
         return JsonResponse({'status': 'error', 'message': 'Error retrieving friend profile'})
     
     profile_data = response.json()
-    logger.debug(f"get_friend_profile > profile_data: {profile_data}")
     
-    # Obtener el perfil del usuario actual
+    # Get user's profile
     user_profile_api_url = f'https://profileapi:9002/api/getFullProfile/{request.user.id}/'
     user_response = requests.get(user_profile_api_url, verify=os.getenv("CERTFILE"))
     if user_response.status_code != 200:
-        logger.debug(f"-------> get_friend_profile > User Response: {user_response.status_code}")
         return JsonResponse({'status': 'error', 'message': 'Error retrieving user profile'})
     
     user_profile_data = user_response.json()

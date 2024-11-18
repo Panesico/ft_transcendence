@@ -43,7 +43,6 @@ async function loadContent(path) {
       document.querySelector('main').innerHTML = data.html;
     }
     console.log('loadContent > main updated');
-
     displayMessageInModal(data.message);
     handleFormSubmission();
   } catch (error) {
@@ -52,7 +51,20 @@ async function loadContent(path) {
   }
 }
 
-
+async function reloadNotificaationsIfNeeded() {
+  const emptyMessage = document.getElementById('notificationContent');
+  if (emptyMessage) {
+    if (emptyMessage.innerHTML && (emptyMessage.innerHTML.trim() === 'You have no notifications' || 
+                                   emptyMessage.innerHTML.trim() === 'No tienes notificaciones' || 
+                                   emptyMessage.innerHTML.trim() === 'Vous n\'avez pas de notifications')) {
+      const message = { type: 'load_notifications' };
+      sendMessagesBySocket(message, mainRoomSocket);
+    }
+  } else {
+    console.log('emptyMessage not found');
+    console.log('emptyMessage: ', emptyMessage);
+  }
+}
 // Handle navigation
 function navigate(e, path) {
   e.preventDefault();
@@ -95,6 +107,8 @@ async function changeLanguage(lang) {
       // console.log('changeLanguage > new django_language:', getCookie('django_language'));
       loadContent(path);
       handleRefresh('language');
+      await sleep(350);
+      reloadNotificaationsIfNeeded();
     } else {
       console.error('Error changing language:', response.statusText);
     }
