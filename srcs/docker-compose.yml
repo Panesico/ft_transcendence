@@ -221,10 +221,6 @@ services:
       - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
       - LOGSTASH_PASSWORD=${LOGSTASH_PASSWORD}
       - KIBANA_PASSWORD=${KIBANA_PASSWORD}
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
     volumes:
       - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - certs:/usr/share/elasticsearch/config/certs

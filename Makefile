@@ -12,7 +12,7 @@ check_certs: # creates certificates if needed
 	fi
 
 create_volumes_dirs: # creates volumes directories if needed
-	mkdir -p ./volumes/frontend ./volumes/backend ./volumes/certs
+	mkdir -p ./volumes/frontend ./volumes/backend ./volumes/certs ./volumes/logs
 
 # init:
 # 	bash -c "mkdir -p ./volumes/{postgres_db,frontend}"
