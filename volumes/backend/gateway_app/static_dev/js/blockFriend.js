@@ -95,6 +95,9 @@ async function blockFriend(friendId) {
         // displayMessageInModal(afterBlockMsg);
         document.getElementById('contactGameInviteContainer').style.display = 'none';
         document.getElementById('chat-modal-footer').style.display = 'none';
+
+        const notificationDropdownClass = document.getElementById('notificationClassContent');
+        deleteResponsesButtonsId(notificationDropdownClass, friendId)
       }
       else {
         // displayMessageInModal(afterUnblockMsg);
@@ -128,8 +131,8 @@ function sendBlockInfoToSocket(sender_id, receiver_id, is_blocked) {
 
 function handleBlockedNotif(data) {
   receiver_username = data.receiver_username;
-  sender_username = data.sender_username;
+  sender_id = data.sender_id;
   const notificationDropdownClass = document.getElementById('notificationClassContent');
 
-  deleteResponsesButtons(notificationDropdownClass, sender_username);
+  deleteResponsesButtonsId(notificationDropdownClass, sender_id);
 }

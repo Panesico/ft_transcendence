@@ -114,6 +114,7 @@ function appendElements(avatar, message, acceptButton, declineButton, newNotific
   // Set data attribute to identify the notification
   newNotification.setAttribute('data-type', 'friend-invite');
   newNotification.setAttribute('data-userid', sender_id);
+  newNotification.setAttribute('data-targetid', receiver_id);
 
 }
 
@@ -315,7 +316,7 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
       acceptButton.remove();
       declineButton.remove();
     }
-    //    mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'decline', 'sender_id': sender_id, 'receiver_id': receiver_id}));
+
   });
 
   // document.addEventListener('DOMContentLoaded', function () {
@@ -332,15 +333,19 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
   // });
 }
 
-function deleteResponsesButtons(notificationDropdownClass, username) {
+
+function deleteResponsesButtonsId(notificationDropdownClass, userid) {
   const notifications = notificationDropdownClass.children;
 
   for (let i = 0; i < notifications.length; i++) {
     const notification = notifications[i];
     const buttons = notification.querySelectorAll('img');
-    console.log('deleteResponsesButtons > notification.id:', notification.id);
+    // console.log('deleteResponsesButtonsId > notification:', notification);
+    // console.log('deleteResponsesButtonsId > buttons:', buttons);
 
-    if (notification.id == username && buttons.length > 0) {
+    const targetId = notification.getAttribute('data-targetid');
+
+    if (targetId == userid && buttons.length > 0) {
       // If the image is not the avatar, remove it
       buttons.forEach(button => {
         if (button.id !== 'avatar') {
@@ -350,6 +355,7 @@ function deleteResponsesButtons(notificationDropdownClass, username) {
     }
   }
 }
+
 
 function addRequestNotification(data) {
   const notificationDropdown = document.getElementById('navbarDropdownNotifications');
@@ -380,7 +386,7 @@ function addRequestNotification(data) {
 
   // Create a new notification element
   const newNotification = document.createElement('li');
-  newNotification.id = sender_username;
+  // newNotification.id = sender_username;
   newNotification.classList.add('dropdown-item');
   // style the notification --bs-dropdown-link-active-bg: var(--bs-danger-rgb);
   newNotification.style.setProperty('--bs-dropdown-link-active-bg', 'transparent');
@@ -416,7 +422,7 @@ function addRequestNotification(data) {
 
   // If data type is game, delete the accept and decline buttons from other previous games notifications
   if (data.type === 'game_request')
-    deleteResponsesButtons(notificationDropdownClass, sender_username);
+    deleteResponsesButtonsId(notificationDropdownClass, sender_id);
 
   // Append the avatar and message to the newNotification element
   appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status, type);
@@ -516,7 +522,7 @@ function addResponseNotification(data) {
 
     // If data type is game, delete the accept and decline buttons from other previous games notifications
     if (data.type === 'game_request_response' && data.response === 'accept')
-      deleteResponsesButtons(notificationDropdownClass, receiver_username);
+      deleteResponsesButtonsId(notificationDropdownClass, receiver_id);
 
     appendElements(avatar, message, acceptButton, declineButton, newNotification, data.status, data.type);
 
