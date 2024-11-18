@@ -313,100 +313,94 @@ function setupChatNavigateEventListeners(socket) {
   addChatNavigateListeners();
 }
 
+
 function displayKeyUsageInstructions(gameMode, gameType, player_role) {
   const keysPlayer1 = document.querySelector('#keysPlayer1');
   const keysPlayer2 = document.querySelector('#keysPlayer2');
 
   if (gameType === 'pong') {
 
-    if (gameMode === 'local') {
-      // keysPlayer1.querySelector('span').innerHTML = 'W, S';
+    if (gameMode === 'local') { // local = 2 players on same screen
       keysPlayer1.querySelector('span').innerHTML = `
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">W</span>
-        <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px;">S</span>
-      </div>
-    `;
-
-      // keysPlayer2.querySelector('span').innerHTML = '8, 5';
-      keysPlayer2.querySelector('span').innerHTML = `
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">8</span>
-        <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px;">5</span>
-      </div>
-    `;
-
-    } else {
-      if (player_role === '1') {
-        keysPlayer1.querySelector('span').innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center;">
-          <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">W</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px;">S</span>
+        <div class="d-flex flex-column align-items-center">
+          <p class="d-block bg-secondary text-white fw-bold border border-dark rounded mb-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px;">W</p>
+          <p class="bg-secondary text-white fw-bold border border-dark rounded" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">S</p>
         </div>
       `;
+      keysPlayer2.querySelector('span').innerHTML = `
+        <div class="d-flex flex-column align-items-center">
+          <p class="d-block bg-secondary text-white fw-bold border border-dark rounded mb-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">8</p>
+          <p class="bg-secondary text-white fw-bold border border-dark rounded" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">5</p>
+        </div>
+      `;
+    } else { // 1 player per screen, same commands
+      if (player_role === '1') {
+        keysPlayer1.querySelector('span').innerHTML = `
+          <div class="d-flex flex-column align-items-center">
+            <p class="d-block bg-secondary text-white fw-bold border border-dark rounded mb-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px;">W</p>
+            <p class="bg-secondary text-white fw-bold border border-dark rounded" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">S</p>
+          </div>
+        `;
         keysPlayer2.innerHTML = ' ';
       } else if (player_role === '2') {
         keysPlayer1.innerHTML = ' ';
         keysPlayer2.querySelector('span').innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center;">
-          <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">8</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px;">5</span>
-        </div>
-      `;
+          <div class="d-flex flex-column align-items-center">
+            <p class="d-block bg-secondary text-white fw-bold border border-dark rounded mb-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px;">W</p>
+            <p class="bg-secondary text-white fw-bold border border-dark rounded" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">S</p>
+          </div>
+        `;
       }
     }
 
   } else if (gameType === 'cows') {
 
-    if (gameMode === 'local') {
-      // keysPlayer1.querySelector('span').innerHTML = 'W, S, A, D';
+    if (gameMode === 'local') { // local = 2 players on same screen
       keysPlayer1.querySelector('span').innerHTML = `
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">W</span>
-        <div style="display: flex; justify-content: center; margin-top: 5px;">
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">A</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-left: 5px;">S</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 8px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-left: 5px;">D</span>
+        <div class="d-flex flex-column align-items-center">
+          <p class="d-block bg-secondary text-white fw-bold border border-dark rounded mb-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px;">W</p>
+          <div class="d-flex justify-content-center">
+            <p class="bg-secondary text-white fw-bold border border-dark rounded me-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">A</p>
+            <p class="bg-secondary text-white fw-bold border border-dark rounded me-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">S</p>
+            <p class="bg-secondary text-white fw-bold border border-dark rounded" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 8px;">D</p>
+          </div>
         </div>
-      </div>
-    `;
-      // keysPlayer2.querySelector('span').innerHTML = '8, 5, 4, 6';
+      `;
       keysPlayer2.querySelector('span').innerHTML = `
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">8</span>
-        <div style="display: flex; justify-content: center; margin-top: 5px;">
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">4</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-left: 5px;">5</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-left: 5px;">6</span>
+        <div class="d-flex flex-column align-items-center">
+          <p class="d-block bg-secondary text-white fw-bold border border-dark rounded mb-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">8</p>
+          <div class="d-flex justify-content-center">
+            <p class="bg-secondary text-white fw-bold border border-dark rounded me-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">4</p>
+            <p class="bg-secondary text-white fw-bold border border-dark rounded me-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">5</p>
+            <p class="bg-secondary text-white fw-bold border border-dark rounded" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">6</p>
+          </div>
         </div>
-      </div>
-    `;
-    } else {
+      `;
+    } else { // 1 player per screen, same commands
       if (player_role === '1') {
         keysPlayer1.querySelector('span').innerHTML = `
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">W</span>
-        <div style="display: flex; justify-content: center; margin-top: 5px;">
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">A</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-left: 5px;">S</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 8px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-left: 5px;">D</span>
-        </div>
-      </div>
-    `;
+          <div class="d-flex flex-column align-items-center">
+            <p class="d-block bg-secondary text-white fw-bold border border-dark rounded mb-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px;">W</p>
+            <div class="d-flex justify-content-center">
+              <p class="bg-secondary text-white fw-bold border border-dark rounded me-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">A</p>
+              <p class="bg-secondary text-white fw-bold border border-dark rounded me-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">S</p>
+              <p class="bg-secondary text-white fw-bold border border-dark rounded" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 8px;">D</p>
+            </div>
+          </div>
+        `;
         keysPlayer2.innerHTML = ' ';
       } else if (player_role === '2') {
         keysPlayer1.innerHTML = ' ';
-        // keysPlayer2.querySelector('span').innerHTML = '8, 5, 4, 6';
         keysPlayer2.querySelector('span').innerHTML = `
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <span style="display: block; width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">8</span>
-        <div style="display: flex; justify-content: center; margin-top: 5px;">
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold;">4</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-left: 5px;">5</span>
-          <span style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px; background-color: grey; border: 1px solid black; border-radius: 3px; color: white; font-weight: bold; margin-left: 5px;">6</span>
-        </div>
-      </div>
-    `;
+          <div class="d-flex flex-column align-items-center">
+            <p class="d-block bg-secondary text-white fw-bold border border-dark rounded mb-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 5px;">W</p>
+            <div class="d-flex justify-content-center">
+              <p class="bg-secondary text-white fw-bold border border-dark rounded me-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">A</p>
+              <p class="bg-secondary text-white fw-bold border border-dark rounded me-1" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 7px;">S</p>
+              <p class="bg-secondary text-white fw-bold border border-dark rounded" style="width: 30px; height: 30px; line-height: 30px; padding: 0 4px 0 8px;">D</p>
+            </div>
+          </div>
+        `;
       }
     }
 
