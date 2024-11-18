@@ -201,11 +201,13 @@ function createDeclineButton(sender_id, receiver_id, newNotification) {
 }
 
 function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, type, data) {
-  response_type = type + '_response';
-  console.log('listenUserResponse > response_type:', response_type);
+  // response_type = type + '_response';
+  // console.log('listenUserResponse > response_type:', response_type);
 
-  acceptButton.addEventListener('click', async function () {
+  acceptButton.addEventListener('click', async function (event) {
     console.log('Accept button clicked');
+
+    response_type = type + '_response';
 
     // Check if a user is blocked
     let blocked, imBlocked;
@@ -279,6 +281,9 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
   });
 
   declineButton.addEventListener('click', function () {
+
+    response_type = type + '_response';
+
     if (sendMessagesBySocket({
       'type': response_type,
       'response': 'decline',
