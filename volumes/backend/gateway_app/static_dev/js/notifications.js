@@ -271,8 +271,11 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
       playGameInvite(data.game_mode, data.game_type, sender_username, { sender_username, sender_id, receiver_username, receiver_id });
 
     }
+    else if (type === 'friend_request') {
+      // Sender accepts the friend request response
+      updateFriendsState();
+    }
 
-    //    mainRoomSocket.send(JSON.stringify({'type': 'friend_request_response', 'response': 'accept', 'sender_id': sender_id, 'receiver_id': receiver_id}));
   });
 
   declineButton.addEventListener('click', function () {

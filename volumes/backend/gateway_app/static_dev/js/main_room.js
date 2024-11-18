@@ -56,7 +56,7 @@ function listenUserReadNotification() {
       sendMessagesBySocket({ 'type': 'mark_notification_as_read', 'receiver_id': receiver_id }, mainRoomSocket);
     }
   }
-);
+  );
 }
 
 // Connect to the main room socket
@@ -124,9 +124,11 @@ function parseSocketMessage(data) {
 
   if (data.type === 'friend_request') {
     addRequestNotification(data);
+    updateFriendsState();
   }
   else if (data.type === 'friend_request_response') {
     addResponseNotification(data);
+    updateFriendsState();
   }
   else if (data.type === 'chat') {
     handleChatMessages(data);
