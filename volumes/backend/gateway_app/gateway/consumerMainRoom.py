@@ -28,15 +28,18 @@ class mainRoom(AsyncJsonWebsocketConsumer):
   async def disconnect(self, close_code):
     # Remove user from users_connected
     if self.user_id in users_connected:
-      del users_connected[self.user_id]
+      users_connected[self.user_id].remove(self)
+      if not self.user_id in users_connected or len(users_connected[self.user_id]) == 0:
+        del users_connected[self.user_id]
       # Broadcast message to room group
-      for user, connection in users_connected.items():
-        await connection.send_json({
-          'message': f'{self.user_id} has left the main room.',
-          'type': 'user_left',
-          'user_id': self.user_id,
-        })
-    
+      for user, connections in users_connected.items():
+        for connection in connections:
+          await connection.send_json({
+            'message': f'{self.user_id} has left the main room.',
+            'type': 'user_left',
+            'user_id': self.user_id,
+          })
+      
     # Leave room group on disconnect
     await self.channel_layer.group_discard(
       self.room_group_name,

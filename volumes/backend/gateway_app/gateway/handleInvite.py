@@ -56,19 +56,20 @@ async def invite_to_game(self, content, users_connected):
   logger.debug(f'invite_to_game > message: {message}, {date}')
   logger.debug(f'game_type: {game_type}')
   if receiver_id in users_connected:
-    await users_connected[receiver_id].send_json({
-      'type': 'game_request',
-      'sender_id': sender_id,
-      'sender_username': sender_username,
-      'receiver_username': receiver_username,
-      'receiver_id': receiver_id,
-      'sender_avatar_url': sender_avatar_url,
-      'receiver_avatar_url': self.avatar_url,
-      'message': message,
-      'date': date,
-      'game_type': game_type,
-      'game_mode': content.get('game_mode'),
-    })
+    for connection in users_connected[receiver_id]:
+      await connection.send_json({
+        'type': 'game_request',
+        'sender_id': sender_id,
+        'sender_username': sender_username,
+        'receiver_username': receiver_username,
+        'receiver_id': receiver_id,
+        'sender_avatar_url': sender_avatar_url,
+        'receiver_avatar_url': self.avatar_url,
+        'message': message,
+        'date': date,
+        'game_type': game_type,
+        'game_mode': content.get('game_mode'),
+      })
 
   # Save notification in database
   profileapi_url = 'https://profileapi:9002/api/createnotif/'

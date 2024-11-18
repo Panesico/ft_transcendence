@@ -13,15 +13,15 @@ async def sendChatMessage(content, users_connected, self):
   # Check if user_id is in users_connected
   if receiver_id in users_connected:
     logger.debug(f'senChatMessage > receiver_id: {receiver_id} is in users_connected')
-    # Get current date and time
-    await users_connected[receiver_id].send_json({
-      'type': 'chat',
-      'subtype' : 'chat_message',
-      'message': message,
-      'sender_id': sender_id,
-      'receiver_id': receiver_id,
-      'date': date
-    })
+    for connection in users_connected[receiver_id]:
+      await connection.send_json({
+          'type': 'chat',
+          'subtype': 'chat_message',
+          'message': message,
+          'sender_id': sender_id,
+          'receiver_id': receiver_id,
+          'date': date
+      })
 
   # Save chat message request in database
   logger.debug(f'senChatMessage > Save chat message in database')

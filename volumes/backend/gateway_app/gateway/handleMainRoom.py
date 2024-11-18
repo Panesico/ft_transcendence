@@ -57,21 +57,22 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
   logger.debug(f'requestResponse > sender_id: {sender_id}, users_connected: {users_connected}, type: {type}')
   if sender_id in users_connected:
     logger.debug(f'requestResponse > sender_id: {sender_id} is in users_connected {response}')
-    await users_connected[sender_id].send_json({
-      'type': type,
-      'response': response,
-      'message': message,
-      'sender_username': sender_username,
-      'sender_id': sender_id,
-      'sender_avatar_url': sender_avatar_url,
-      'receiver_username': receiver_username,
-      'receiver_avatar_url': receiver_avatar_url,
-      'receiver_id': receiver_id,
-      'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-      'game_mode': game_mode,
-      'game_type': game_type,
-      'html': html,
-    })
+    for connection in users_connected[sender_id]:
+      await connection.send_json({
+        'type': type,
+        'response': response,
+        'message': message,
+        'sender_username': sender_username,
+        'sender_id': sender_id,
+        'sender_avatar_url': sender_avatar_url,
+        'receiver_username': receiver_username,
+        'receiver_avatar_url': receiver_avatar_url,
+        'receiver_id': receiver_id,
+        'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'game_mode': game_mode,
+        'game_type': game_type,
+        'html': html,
+      })
   else:
     logger.debug(f'requestResponse > sender_id: {sender_id} is not in users_connected')
   
@@ -199,18 +200,19 @@ async def friendRequest(content, users_connected, self):
         logger.debug(f'friendRequest > receiver_id: {receiver_id} is in users_connected')
         # Get current date and time
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        await users_connected[receiver_id].send_json({
-          'type': 'friend_request',
-          'message': message,
-          'sender_username': sender_username,
-          'sender_id': sender_id,
-          'sender_avatar_url': sender_avatar_url,
-          'receiver_avatar_url': self.avatar_url,
-          'receiver_username': receiver_username,
-          'receiver_id': receiver_id,
-          'date': date,
-          'receiver_avatar_url': receiver_avatar_url
-        })
+        for connection in users_connected[receiver_id]:
+          await connection.send_json({
+            'type': 'friend_request',
+            'message': message,
+            'sender_username': sender_username,
+            'sender_id': sender_id,
+            'sender_avatar_url': sender_avatar_url,
+            'receiver_avatar_url': self.avatar_url,
+            'receiver_username': receiver_username,
+            'receiver_id': receiver_id,
+            'date': date,
+            'receiver_avatar_url': receiver_avatar_url
+          })
     else:
       logger.debug(f'friendRequest > Error saving friend request in database')
   except Exception as e:
@@ -226,11 +228,13 @@ async def handleNewConnection(self, users_connected):
   if (self.user_id == 'None' or self.user_id == 0):
     logger.debug(f'mainRoom > self.user_id: {self.user_id} closed connection')
     await self.close()
+    return
   logger.debug(f'mainRoom > self.user_id: {self.user_id}')
 
 # Check if user is already connected
-# if self.user_id not in users_connected and self.user_id is not None:
-  users_connected[self.user_id] = self
+  if self.user_id not in users_connected:
+    users_connected[self.user_id] = []
+  users_connected[self.user_id].append(self)
   await self.send_json({
       'message': 'You are connected to the main room!'
   })
@@ -242,21 +246,19 @@ async def handleNewConnection(self, users_connected):
     logger.debug(f'mainRoom > self.username: {self.username}')
     self.avatar_url = '/media/' + user_data.get('avatar_url', '')
     logger.debug(f'mainRoom > self.avatar_url: {self.avatar_url}')
-    #await self.send_json({
-    #  'message': f'Welcome {self.room_user_name}!',
-    #  'type': 'user_info',
-    #})
   else:
     logger.debug(f'mainRoom > Error getting user info')
     await self.close()
+    return
 
   # Broadcast message to room group
-  for user, connection in users_connected.items():
-    await connection.send_json({
-      'message': f'{self.user_id} has joined the main room.',
-      'type': 'user_connected',
-      'user_id': self.user_id,
-    })
+  for user, connections in users_connected.items():
+    for connection in connections:
+        await connection.send_json({
+          'message': f'{self.user_id} has joined the main room.',
+          'type': 'user_connected',
+          'user_id': self.user_id,
+        })
   # else:
   #   logger.debug(f'mainRoom > self.user_id: {self.user_id} closed connection')
   #   await self.close()
@@ -416,17 +418,18 @@ async def block_user_responses(self, content, users_connected):
     message = _(' has blocked you.')
   if receiver_id in users_connected:
     logger.debug(f'block_user_responses > receiver_id: {receiver_username} is in users_connected')
-    await users_connected[receiver_id].send_json({
-      'type': type,
-      'message': message,
-      'sender_username': sender_username,
-      'sender_id': sender_id,
-      'block_sender': False,
-      'receiver_username': receiver_username,
-      'receiver_avatar_url': receiver_avatar_url,
-      'sender_avatar_url': sender_avatar_url,
-      'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-    })
+    for connection in users_connected[receiver_id]:
+      await connection.send_json({
+        'type': type,
+        'message': message,
+        'sender_username': sender_username,
+        'sender_id': sender_id,
+        'block_sender': False,
+        'receiver_username': receiver_username,
+        'receiver_avatar_url': receiver_avatar_url,
+        'sender_avatar_url': sender_avatar_url,
+        'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+      })
   else:
     logger.debug(f'block_user_responses > receiver: {receiver_username} is not in users_connected')
   
