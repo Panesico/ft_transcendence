@@ -26,7 +26,7 @@ def get_logout(request):
     
     # Only allow GET requests
     if request.method != 'GET':
-        return redirect('405')  # Redirect to a 405 page for incorrect methods
+        return redirect('405')
     
     # TODO => Temporary fix
     if request.headers.get('x-requested-with') != 'XMLHttpRequest':
@@ -54,10 +54,10 @@ def get_logout(request):
         
         # Return the response
         return json_response
-        
+    
     except requests.exceptions.RequestException as e:
-        # If the external request fails, handle the error gracefully
-        return JsonResponse({'status': 'error', 'message': _('Method not allowed')}, status=405)
+      logger.error(f"get_logout > Error calling auth service: {str(e)}")
+      return JsonResponse({'status': 'error', 'message': _('Failed to log out')}, status=503)
 
 # Login
 def view_login(request):
