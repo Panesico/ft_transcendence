@@ -320,7 +320,7 @@ msgstr "Seguridad"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:104
 msgid "Change Password"
-msgstr "Cambiar contraseña"
+msgstr "Envíar"
 
 #: gateway/templates/fragments/edit_profile_fragment.html:108
 msgid "Disable"

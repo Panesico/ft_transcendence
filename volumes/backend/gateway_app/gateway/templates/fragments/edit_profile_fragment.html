@@ -106,7 +106,7 @@
 
             <!-- Enable 2FA Button -->
                 <button id="2fa-button-disable" class="btn btn-danger mt-3" onclick="disable2FA()" style="display: {% if user.two_factor_token %}block{% else %}none{% endif %};">{% trans "Disable" %} 2FA</button>
-                <button id="2fa-button-enable" class="btn btn-primary mt-3" onclick="enable2FA()" style="display: {% if not user.two_factor_token %}block{% else %}none{% endif %};">{% trans "Enable" %} 2FA</button>
+                <button id="2fa-button-enable" class="btn btn-warning mt-3" onclick="enable2FA()" style="display: {% if not user.two_factor_token %}block{% else %}none{% endif %};">{% trans "Enable" %} 2FA</button>
                 <div id="2fa-qr-code" class="mt-3 card p-2" style="display: none;"></div>
 
         </div>

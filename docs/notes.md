@@ -62,3 +62,25 @@ openssl req -x509 -nodes -newkey rsa:4096 -days 365 \
 ## Remove current project
 cd /usr/src/app/blockchain_app
 rm -fr contracts ignition test artifacts cache package.json hardhat.config.js node_modules package-lock.json
+
+## Docker runtimes files are located in goinfre rep
+11:29:01 /etc/docker $ cat ~/.config/docker/daemon.json
+
+{"data-root": "/goinfre/blarger/docker/"}
+
+## Check if it is bind mount volumes 
+$ docker inspect <container_id> | grep -A 5 '"Mounts"'
+
+            "Mounts": [
+                {
+                    "Type": "volume",
+                    "Source": "certs",
+                    "Target": "/certs",
+                    "VolumeOptions": {}
+--
+        "Mounts": [
+            {
+                "Type": "volume",
+                "Name": "backend",
+                "Source": "/goinfre/blarger/docker/volumes/backend/_data",
+                "Destination": "/usr/src/app",

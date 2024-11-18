@@ -27,6 +27,10 @@ def get_logout(request):
     # Only allow GET requests
     if request.method != 'GET':
         return redirect('405')  # Redirect to a 405 page for incorrect methods
+    
+    # TODO => Temporary fix
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        return redirect('home')
 
     try:
         # Make the external request to the authentif service
@@ -272,6 +276,7 @@ def oauth(request):
         }
         # Make the POST request to the external authentif service
         response = requests.post(authentif_url, cookies=request.COOKIES,data=payload, headers=headers, verify=os.getenv("CERTFILE"))
+        logger.debug(f"oauth > response: {response}")
         
         response_data = response.json() if response.status_code == 200 else {}
         

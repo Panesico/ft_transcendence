@@ -6,13 +6,13 @@ contract TournamentManager {
     // Structure to store tournament information
     struct Tournament {
         uint256 id;
-        // uint256[] users_id; // List of user id participating in the tournament
         // users id disaplayed names
         bytes32[] users_name;
 
-        // Add a minimum length to create a tournament (4)?
-        mapping(bytes32 => uint256) scores; // Mapping of user name to their score
-        bool exists; // Flag to check if tournament exists
+        // Mapping of user name to their score
+        mapping(bytes32 => uint256) scores;
+        // Flag to check if tournament exists
+        bool exists; 
     }
 
 
@@ -32,6 +32,7 @@ contract TournamentManager {
         newTournament.users_name = users_name;
         newTournament.exists = true;
 
+        // emit event is used to notify the frontend
         emit TournamentCreated(_tournamentId, users_name);
     }
 

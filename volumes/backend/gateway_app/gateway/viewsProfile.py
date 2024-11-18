@@ -280,7 +280,7 @@ def general_data_is_valid(data):
   if (city is None or city == "" or city.isspace()):
     data['message'] = _("City cannot be empty")
     return False
-  if (country is None or country == "" or city.isspace()):
+  if (country is None or country == "" or country.isspace()):
     data['message'] = _("Country cannot be empty")
     return False
   # Check if display_name has spaces
@@ -323,7 +323,6 @@ def post_edit_profile_general(request):
     # Recover data from the form
     data = json.loads(request.body)
     data['user_id'] = request.user.id
-    logger.debug(f"post_edit_profile_general > data['user_id'] : {data['user_id']}")
     logger.debug(f"post_edit_profile_general > data: {data}")
 
     profile_data = get_profileapi_variables(request=request)
@@ -356,7 +355,6 @@ def post_edit_profile_general(request):
         return redirect(profile_data.get('status_code'))
 
     if response.ok:
-        logger.debug('post_edit_profile_general > Response OK')      
         preferred_language = data.get('preferred_language')
         logger.debug(f"post_edit_profile > preferred_language: {preferred_language}")
         user_response =  JsonResponse({'status': status, 'type': type, 'message': message, 'preferred_language': preferred_language})

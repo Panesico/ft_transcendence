@@ -27,7 +27,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(blank=True, default='', unique=True, max_length=16)
+    username = models.CharField(blank=False, unique=True, max_length=16)
     password = models.CharField(max_length=128, blank=True, null=True)  # Password can be null if id_42 is provided
     id_42 = models.CharField(max_length=128, blank=True, null=True)  # Field for id_42
     two_factor_token = models.CharField(max_length=128, blank=True, null=True)  # Field for two-factor authentication token

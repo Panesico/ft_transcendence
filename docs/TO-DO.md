@@ -28,3 +28,10 @@ user_id = await getUserId(jwt_token)
 - Languages cookies not set properly when changing from edit profile
 
 - user profile pictures don't show with nginx
+
+# TO-CHECK
+- Regardless of whether you choose to implement the JWT Security module with
+  2FA, it’s crucial to prioritize the security of your website. For instance, if you opt
+  to create an API, ensure your routes are protected. Remember, even if you decide
+  not to use JWT tokens, securing the site remains essential.
+
