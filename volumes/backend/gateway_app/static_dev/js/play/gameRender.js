@@ -274,6 +274,13 @@ function setupNavbarNavigateEventListeners(socket) {
   }
 
   addNavbarNavigateListeners();
+
+  window.onbeforeunload = function (event) {
+    if (socket) {
+      socket.close();
+      socket = null;
+    }
+  };
 }
 
 // Attach and remove event listeners to navbar items on socket open/close

@@ -66,6 +66,10 @@ function navigate(e, path) {
 
 // Listen for popstate events (Back/Forward buttons)
 window.onpopstate = () => {
+  if (calcGameSocket) {
+    calcGameSocket.close();
+    calcGameSocket = null;
+  }
   loadContent(window.location.pathname);
 };
 
