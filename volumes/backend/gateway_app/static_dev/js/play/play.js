@@ -14,7 +14,7 @@ function checkValidInputGame(gameMode, gameType, p1_name, p2_name) {
     (gameMode !== 'local' && gameMode !== 'remote') ||
     (gameType !== 'pong' && gameType !== 'cows')) {
     let error = 'Invalid selection';
-    console.log('gameMode: ', gameMode, ', gameType: ', gameType);
+    // console.log('gameMode: ', gameMode, ', gameType: ', gameType);
     if (lang === 'fr')
       error = 'Sélection invalide';
     else if (lang === 'es')
@@ -204,8 +204,7 @@ async function playGameInvite(gameMode, gameType, p1_name, invite_data) {
   // gameRound: 'single'
   const gameRound = 'single';
 
-  console.log('playGameInvite > invite_data: ', invite_data, '. This user is p1_name: ', p1_name, ', gameMode: ', gameMode, ', gameType: ', gameType);
+  // console.log('playGameInvite > invite_data: ', invite_data, '. This user is p1_name: ', p1_name, ', gameMode: ', gameMode, ', gameType: ', gameType);
 
-  // return;
   startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, invite_data);
 }
