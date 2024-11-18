@@ -55,8 +55,10 @@ class mainRoom(AsyncJsonWebsocketConsumer):
 
     # Check if users have a blocked relationship
     if typeMessage == 'invite_game' or typeMessage == 'game_response' or typeMessage == 'friend_request' or typeMessage == 'friend_request_response':
-      if checkIfUsersAreBlocked(self, content) == True:
+      areBlocked = await checkIfUsersAreBlocked(self, content)
+      if areBlocked == True:
         return
+      
     # Message / Logs
     if typeMessage == 'message':
       readMessage(content.get('message', ''))
