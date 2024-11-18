@@ -163,14 +163,14 @@ async function startNewGame(gameMode, gameType, gameRound, p1_name, p2_name, inv
 
   // Event listeners for controls
   function handleKeyDown(e) {
-    if (e.key in cfg.keys) {
+    if (cfg.keys && e.key in cfg.keys) {
       cfg.keys[e.key] = true;
       notifyKeyPressed();
     }
   }
 
   function handleKeyUp(e) {
-    if (e.key in cfg.keys) {
+    if (cfg.keys && e.key in cfg.keys) {
       cfg.keys[e.key] = false;
       notifyKeyPressed();
     }

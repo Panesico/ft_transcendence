@@ -1,6 +1,9 @@
 function displayError(errorMessage) {
-  document.getElementById('error-div').style.display = 'block';
-  document.querySelector('.errorlist').textContent = errorMessage;
+  const errorDiv = document.getElementById('error-div');
+  if (errorDiv) {
+    errorDiv.style.display = 'block';
+    document.querySelector('.errorlist').textContent = errorMessage;
+  }
 }
 
 function checkValidInputGame(gameMode, gameType, p1_name, p2_name) {
