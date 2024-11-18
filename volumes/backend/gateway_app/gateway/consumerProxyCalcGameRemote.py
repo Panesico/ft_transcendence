@@ -337,7 +337,7 @@ class ProxyCalcGameRemote(AsyncWebsocketConsumer):
             
         else:
             # Forward client message to calcgame websocket
-            if data['game_id'] and data['game_id'] in self.active_games and 'calcgame_ws' in self.active_games[data['game_id']]:
+            if 'game_id' in data and data['game_id'] in self.active_games and 'calcgame_ws' in self.active_games[data['game_id']]:
                 calcgame_ws = self.active_games[data['game_id']]['calcgame_ws']
                 await send_data_via_websocket(calcgame_ws, text_data)
 
