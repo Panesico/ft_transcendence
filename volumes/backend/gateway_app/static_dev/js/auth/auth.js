@@ -56,21 +56,23 @@ function handleRefresh(type) {
       console.error('Error:', error);
     });
 
-
+  let chatPresent = false;
   // Remove chat on logout and language change
   if (type == 'logout' || type == 'language' || type == 'profile_update') {
     console.log('handleRefresh > remove chat');
     // remove chat element
     const chatSection = document.getElementById('chatSection');
-    if (chatSection)
+    if (chatSection) {
       chatSection.remove();
+      chatPresent = true;
+    }
     const chatButton = document.getElementById('chatButton');
     if (chatButton)
       chatButton.remove();
   }
 
   // Add chat
-  if (type == 'login' || type == 'refresh' || type == 'oauth' || type == 'signup' || type == 'language' || type == 'profile_update') {
+  if (type == 'login' || type == 'refresh' || type == 'oauth' || type == 'signup' || chatPresent) {
     console.log('handleRefresh > add chat');
     // GET request for chat section
     fetch(`/home/?status=success&message=Logged%20in%20successfully&type=chat`, {
