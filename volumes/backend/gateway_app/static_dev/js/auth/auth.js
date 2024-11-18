@@ -64,11 +64,14 @@ function handleRefresh(type) {
     const chatSection = document.getElementById('chatSection');
     if (chatSection) {
       chatSection.remove();
-      chatPresent = true;
+      if (type != 'logout') {
+        chatPresent = true;
+      }
     }
     const chatButton = document.getElementById('chatButton');
-    if (chatButton)
+    if (chatButton) {
       chatButton.remove();
+    }
   }
 
   // Add chat
