@@ -86,9 +86,11 @@ async function blockFriend(friendId) {
     console.log('blockFriend > data:', data);
 
     if (data.status === 'success') {
-      if (window.location.pathname.includes('my_friends')) {
+      // Reload my_friends page if on it
+      if (document.getElementById('myfriends-page') && window.location.pathname.includes('my_friends')) {
         document.querySelector('main').innerHTML = data.html;
       }
+
       if (checked) {
         // displayMessageInModal(afterBlockMsg);
         document.getElementById('contactGameInviteContainer').style.display = 'none';
@@ -106,8 +108,7 @@ async function blockFriend(friendId) {
   }
 }
 
-function sendBlockInfoToSocket(sender_id, receiver_id, is_blocked)
-{
+function sendBlockInfoToSocket(sender_id, receiver_id, is_blocked) {
   console.log('is_blocked:', is_blocked);
   type = "";
   if (is_blocked) {
