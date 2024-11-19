@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-19 09:56+0000\n"
+"POT-Creation-Date: 2024-11-19 10:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -145,7 +145,7 @@ msgstr "2FA ya está habilitado"
 
 #: authentif/views.py:709
 msgid "Scan the QR code, then enter the OTP below to confirm"
-msgstr ""
+msgstr "Escanee el código QR, luego ingrese la OTP a continuación para confirmar"
 "Escanee el código QR, luego ingrese el OTP a continuación para confirmar"
 
 #: authentif/views.py:734 authentif/views.py:805

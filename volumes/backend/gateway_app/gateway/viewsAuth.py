@@ -56,12 +56,10 @@ def get_logout(request):
         return json_response
     
     except requests.exceptions.RequestException as e:
-      logger.error(f"get_logout > Error calling auth service: {str(e)}")
       return JsonResponse({'status': 'error', 'message': _('Failed to log out')}, status=503)
 
 # Login
 def view_login(request):
-    logger.debug('view_login')
     if request.user.is_authenticated:
       return redirect('home')
     if request.method == 'GET': 
@@ -72,7 +70,6 @@ def view_login(request):
       return redirect('405')
 
 def get_login(request):
-    logger.debug('get_login')
     form = LogInFormFrontend()
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string('fragments/login_fragment.html', {'form': form, 'CLIENT_ID': settings.CLIENT_ID, 'REDIRECT_URI': settings.REDIRECT_URI}, request=request)
@@ -82,7 +79,6 @@ def get_login(request):
 User = get_user_model()
 
 def post_login(request):
-    logger.debug('post_login')
     authentif_url = 'https://authentif:9001/api/login/'
     
     if request.method != 'POST':
@@ -114,14 +110,11 @@ def post_login(request):
     try:
         response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
     except requests.exceptions.RequestException as e:
-        logger.error(f"post_login > Error calling auth service: {str(e)}")
         return JsonResponse({'status': 'error', 'message': 'Authentication service unavailable'}, status=503)
 
     response_data = response.json()
-    logger.debug(f"post_login > authentif response: {response_data}")
     # Handle the response from the auth service
     if response.ok:
-        # logger.debug("post_login > Response OK")
         # Extract token and message from the auth service
         jwt_token = response_data.get("token")
         user_id = response_data.get("user_id")
@@ -135,9 +128,7 @@ def post_login(request):
         if jwt_token:
             user_response = JsonResponse({'status': 'success', 'type': type, 'message': message, 'user_id': user_id})
             profile_data = get_profileapi_variables(response=response)
-            logger.debug(f"post_login > profile_data: {profile_data}")
             preferred_language = profile_data.get('preferred_language')
-            logger.debug(f"post_login > preferred_language: {preferred_language}")
             # Set the preferred language of the user, HTTP-only cookie
             user_response.set_cookie('django_language', preferred_language, httponly=False, secure=True, samesite='Lax')
             # Set the JWT token in a secure, HTTP-only cookie
@@ -145,11 +136,9 @@ def post_login(request):
             user_response.set_cookie('refresh_jwt_token', refresh_jwt_token, httponly=True, secure=True, samesite='Lax')            
             return user_response
         else:
-            logger.error("post_login > No JWT token returned from auth service")
             return JsonResponse({'status': 'error', 'message': 'Failed to retrieve token'}, status=500)
     
     else:
-        # logger.debug("post_login > Response NOT OK")
         message = response_data.get("message", "Login failed")
         status = response_data.get("status", "error")
 
@@ -162,9 +151,7 @@ def post_login(request):
 
 
 # Signup
-
 def view_signup(request):
-    logger.debug('view_signup')
     if request.user.is_authenticated:
       return redirect('home')
     if request.method == 'GET': 
@@ -175,7 +162,6 @@ def view_signup(request):
       return redirect('405')
 
 def get_signup(request):
-    logger.debug('get_signup')
     if request.method != 'GET':
       return redirect('405')
     
@@ -186,11 +172,10 @@ def get_signup(request):
     return render(request, 'partials/signup.html', {'form': form})
 
 def post_signup(request):
-    logger.debug('post_signup')
     authentif_url = 'https://authentif:9001/api/signup/' 
     if request.method != 'POST':
       return redirect('405')
-    
+
     try:
       data = json.loads(request.body)
     except json.JSONDecodeError:
@@ -221,8 +206,6 @@ def post_signup(request):
     response_data = response.json()
     status = response_data.get("status")
     message = response_data.get("message")
-    logger.debug(f"post_signup > status: {status}, message: {message}")
-    logger.debug(f"post_signup > response.json: {response_data}")
     jwt_token = response_data.get("token")
     user_id = response_data.get("user_id")
     type = response_data.get("type")
@@ -275,9 +258,7 @@ def oauth(request):
           'Authorization': f'Bearer {jwt_token}',
         }
         # Make the POST request to the external authentif service
-        response = requests.post(authentif_url, cookies=request.COOKIES,data=payload, headers=headers, verify=os.getenv("CERTFILE"))
-        logger.debug(f"oauth > response: {response}")
-        
+        response = requests.post(authentif_url, cookies=request.COOKIES,data=payload, headers=headers, verify=os.getenv("CERTFILE"))       
         response_data = response.json() if response.status_code == 200 else {}
         
         # Create a base JsonResponse with status and message
@@ -305,7 +286,6 @@ def oauth(request):
         
         if response.cookies.get('django_language') == None:
             profile_data = get_profileapi_variables(response=response)
-            logger.debug(f"post_login > profile_data: {profile_data}")
             preferred_language = profile_data.get('preferred_language')
             json_response.set_cookie('django_language', preferred_language, httponly=False, secure=True, samesite='Lax')
         return json_response
@@ -432,17 +412,13 @@ def verify2FA_redir(request, user_id):
         'Authorization': f'Bearer {jwt_token}',
     }
     
-    payload = json.loads(request.body)  # Decode the JSON request body
-    otp_code = payload.get('otp_code')  # Extract the otp_code
+    payload = json.loads(request.body)
+    otp_code = payload.get('otp_code')
 
 
     payload = {
-        'otp_code': otp_code,  # This should be coming from the form submission
+        'otp_code': otp_code,
     }
-
-    logger.debug(f"verify2FA_redir > payload: {payload}")
-    #body
-    logger.debug(f"verify2FA_redir > body: {request.body}")
 
     # Send the POST request with the same payload
     response = requests.post(authentif_url, headers=headers, json=payload, verify=os.getenv("CERTFILE"))

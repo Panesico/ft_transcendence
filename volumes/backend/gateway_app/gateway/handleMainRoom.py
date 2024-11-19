@@ -68,6 +68,7 @@ async def requestResponse(content, users_connected, receiver_avatar_url, self):
         'html': html,
       })
   
+  
   # Set the notification as read
   profileapi_url = 'https://profileapi:9002/api/setnotifasread/' + str(sender_id) + '/' + str(receiver_id) + '/' + str(type) + '/' + str(response) + '/'
   csrf_token = self.scope['cookies']['csrftoken']

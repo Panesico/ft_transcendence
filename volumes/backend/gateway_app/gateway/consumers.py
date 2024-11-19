@@ -11,7 +11,6 @@ class FormConsumer(AsyncWebsocketConsumer):
 
   async def connect(self):
     # Accept the WebSocket connection
-      logger.debug('FormConsumer > connect')
       await self.accept()
       # Send an initial message to confirm the connection
       await self.send(text_data=json.dumps({
@@ -21,34 +20,26 @@ class FormConsumer(AsyncWebsocketConsumer):
       self.user_input = ""
 
   async def disconnect(self, close_code):
-      logger.debug('FormConsumer > disconnect')
       pass
     
   async def receive(self, text_data):
       # Handle messages received from the client
-      logger.debug(f"FormConsumer > message received from client: {text_data}")
 
       # Parse the JSON message
       key_pressed = json.loads(text_data).get('key', '')
       user_id = json.loads(text_data).get('userID', '')
-      logger.debug(f'FormConsumer > user_id: {user_id}')
       if user_id:
         self.user_id = user_id
-        logger.debug(f'FormConsumer > self.user_id: {self.user_id}')
         profile_data = get_authentif_variables(self.user_id)
         self.usernames = sorted(profile_data.get('usernames', []))
-        logger.debug(f'FormConsumer > usernames: {self.usernames}')
-
-      logger.debug(f'FormConsumer > key_pressed: {key_pressed}')
 
       # update key pressed
       if key_pressed == 'Backspace':
           self.user_input = self.user_input[:-1]
       elif key_pressed.isascii() and is_valid_key(key_pressed):
           self.user_input += key_pressed
-          logger.debug(f'FormConsumer > self.user_input: {self.user_input}')
       
-      #If the user input is empty, send back an empty list
+      # If the user input is empty, send back an empty list
       if not self.user_input:
         await self.send(text_data=json.dumps({
           'type': 'suggestions',
@@ -56,11 +47,11 @@ class FormConsumer(AsyncWebsocketConsumer):
           'message': 'Suggestions sent!'
         }))
         return
+
       # Find matching usernames
       matching_usernames = find_matching_usernames(self.usernames, self.user_input)
-      logger.debug(f'FormConsumer > matching_usernames: {matching_usernames}')
 
-      # # Send back suggestions based on the constructed string
+      # Send back suggestions based on the constructed string
       await self.send(text_data=json.dumps({
         'type': 'suggestions',
         'suggestions': matching_usernames,

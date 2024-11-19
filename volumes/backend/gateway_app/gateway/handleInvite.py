@@ -32,8 +32,7 @@ async def invite_to_game(self, content, users_connected):
       'Content-Type': 'application/json',
       'Referer': 'https://gateway:8443',
   }
-  # language = self.scope['cookies']['django_language']
-  
+ 
 
   sender_id = content.get('sender_id', '')
   receiver_id = content.get('receiver_id', '')
@@ -63,6 +62,23 @@ async def invite_to_game(self, content, users_connected):
         'game_type': game_type,
         'game_mode': content.get('game_mode'),
       })
+  else:
+    # Inform the sender that the user is not connected, cancel the game invite
+    message = receiver_username + _(' is not connected. Game invite cancelled.')
+    await self.send_json({
+      'type': 'game_request_unconnected',
+      'sender_id': sender_id,
+      'sender_username': sender_username,
+      'receiver_username': receiver_username,
+      'receiver_id': receiver_id,
+      'sender_avatar_url': sender_avatar_url,
+      'receiver_avatar_url': self.avatar_url,
+      'message': message,
+      'date': date,
+      'game_type': game_type,
+    })
+    return
+    
 
   # Save notification in database
   profileapi_url = 'https://profileapi:9002/api/createnotif/'

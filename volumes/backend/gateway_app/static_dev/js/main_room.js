@@ -159,6 +159,9 @@ function parseSocketMessage(data) {
     addRequestNotification(data);
     updateFriendsState();
   }
+  else if (data.type === 'game_request_unconnected') {
+    addResponseNotification(data);
+  }
   else {
     console.error('unknown parseSocketMessage > data', data);
   }

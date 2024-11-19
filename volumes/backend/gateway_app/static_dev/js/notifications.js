@@ -506,6 +506,9 @@ function addResponseNotification(data) {
   else if (data.type === 'next_in_tournament') {
     inputMessage = gamePlayNextTournament;
   }
+  else if (data.type === 'game_request_unconnected') {
+    inputMessage = gameRequestUnconnected;
+  }
   else {
     console.warn('uncaught type > addResponseNotification > data:', data);
   }

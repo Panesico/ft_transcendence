@@ -152,6 +152,7 @@ async function fetchTranslations() {
     gameRequestCancelled = translations.gameRequestCancelled;
     gameWaitingToPlay = translations.gameWaitingToPlay;
     gamePlayNextTournament = translations.gamePlayNextTournament;
+    gameRequestUnconnected = translations.gameRequestUnconnected;
     userBlocked = translations.userBlocked;
     userUnblocked = translations.userUnblocked;
     afterBlockMsg = translations.afterBlockMsg;

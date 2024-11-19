@@ -5,21 +5,14 @@ from django.template.loader import render_to_string
 from django.utils.translation import activate, gettext as _
 from .consumerMainRoom import users_connected
 from .authmiddleware import login_required
-# from django.template.response import TemplateResponse
 logger = logging.getLogger(__name__)
 
 def get_home(request):
     if request.user.is_authenticated:
-        logger.debug(f"IN GET HOME > USERNAME: {request.user.username}")
-    logger.debug(f"get_home > request: {request}")
+        logger.info(f"IN GET HOME > USERNAME: {request.user.username}")
     status = request.GET.get('status', '')
     message = request.GET.get('message', '')
     type_msg = request.GET.get('type', '')
-    logger.debug(f"get_home > Request Cookies: {request.COOKIES}")
-
-    # django_language = request.COOKIES.get('django_language', 'en')
-    # activate(django_language)
-    # logger.debug(f"get_home > django_language cookie was: {request.COOKIES.get('django_language')}, activating: {django_language}, type: {type_msg}")
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         context = {'user': request.user}
@@ -47,8 +40,6 @@ def get_home(request):
 
 @login_required
 def get_friends(request):
-  logger.debug("")
-  logger.debug(f"get_friends > request: {request}")
   if request.method != 'GET':
     return redirect('405')
 
@@ -56,9 +47,7 @@ def get_friends(request):
   profile_api_url = 'https://profileapi:9002/api/getfriends/' + str(request.user.id) + '/'
   response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
   friends = response.json()
-  logger.debug(f"get_friends > friends: {friends}")
   if response.status_code == 200:
-    logger.debug(f"get_friends > users_connected: {users_connected}")
     # Add 'online': true to friends who are in users_connected
     for friend in friends:
       if friend['user_id'] in users_connected:
@@ -68,8 +57,6 @@ def get_friends(request):
 
 @login_required
 def list_friends(request):
-    logger.debug("")
-    logger.debug(f"list_friends > request: {request}")
     if request.method != 'GET':
       return redirect('405')
 
@@ -81,16 +68,14 @@ def list_friends(request):
     request_user_profile = requests.get('https://profileapi:9002/api/profile/' + str(request.user.id) + '/', verify=os.getenv("CERTFILE"))
     response_user_profile = request_user_profile.json()
 
-    logger.debug(f"list_friends > friends: {friends}")
     if response.status_code == 200 and request_user_profile.status_code == 200:
-      logger.debug(f"list_friends > users_connected: {users_connected}")
+
       # Add 'online': true to friends who are in users_connected
       for friend in friends:
         if not friend['im_blocked'] and friend['user_id'] in users_connected:
           friend['online'] = True
 
       blocked_users = response_user_profile['blocked_users']
-      logger.debug(f"list_friends > blocked_users: {blocked_users}")
       
       if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         # if friends is empty
@@ -108,7 +93,6 @@ def list_friends(request):
       return render(request, 'partials/myfriends.html', {'error': _('Error retrieving friends')})
 
 def set_language(request):
-    logger.debug("set_language")
     if request.method != 'POST':
         return redirect('405')
     
@@ -117,17 +101,14 @@ def set_language(request):
     except json.JSONDecodeError:
       return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
     
-    # logger.debug(f"set_language > data: {data}")
     language = data.get('language')
     activate(language)
-    logger.debug(f"set_language > new language: {language}")
     response = JsonResponse({'language': language}, status=200)
     response.set_cookie('django_language', language, httponly=False, secure=True, samesite='Lax')
     return response
 
 
 def get_translations(request):
-  logger.debug("get_translations")
   if request.method != 'GET':
     return redirect('405')
   
@@ -146,6 +127,7 @@ def get_translations(request):
     'gameRequestCancelled': _(" has cancelled the game request."),
     'gameWaitingToPlay': _(" is waiting to play."),
     'gamePlayNextTournament': _(" you play next in the tournament."),
+    'gameRequestUnconnected': _("  is not connected. Game invite cancelled."),
     'userBlocked': _(" has blocked you."),
     'userUnblocked': _(" has unblocked you."),
     'afterBlockMsg': _("Friend blocked successfully."),
