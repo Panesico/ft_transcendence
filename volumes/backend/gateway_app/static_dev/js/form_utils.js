@@ -20,7 +20,7 @@ function listenForm(form) {
         jsonObject['gameType'] = gameType;
       }
 
-      console.log('jsonObject: ', jsonObject);
+      // console.log('jsonObject: ', jsonObject);
 
       try {
         // console.log('url: ', url);
@@ -41,10 +41,10 @@ function listenForm(form) {
         if (!response.ok && (!data.html || !data.html.includes('class="errorlist nonfield'))) {
           throw new Error(`HTTP error - status: ${response.status}`);
         }
-        console.log('listenForm > data: ', data);
-        console.log(
-          'listenForm > data.preferred_language ', data.preferred_language);
-        console.log('listenForm > data.message: ', data.message);
+        // console.log('listenForm > data: ', data);
+        // console.log(
+        //   'listenForm > data.preferred_language ', data.preferred_language);
+        // console.log('listenForm > data.message: ', data.message);
         // console.log('listenForm > data.html: ', data.html);
 
         if (g_user_id === null || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
@@ -53,16 +53,16 @@ function listenForm(form) {
 
 
         if (data.type === 'invite_sent') {
-          console.log('Invitation to play sent, data: ', data);
+          // console.log('Invitation to play sent, data: ', data);
           inviteFriendToPlay(data.sender_username, data.sender_id, data.sender_avatar_url, data.receiver_id, data.game_type, data.game_mode);
           displayMessageInModal(data.message);
           return;
         }
         else if (data.status != 'error' && data.type && data.message && !data.html) {
-          console.log('data.type: ', data.type, 'data.message: ', data.message);
+          // console.log('data.type: ', data.type, 'data.message: ', data.message);
           // If login successful, connect to the main room socket
           if (data.type === 'login_successful') {
-            console.log('displayMessageInModal login_successful');
+            // console.log('displayMessageInModal login_successful');
             // Update user id global variable
             g_user_id = await getUserID();
             if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
@@ -144,7 +144,7 @@ function listenForm(form) {
 }
 
 function listenFormUpload(form) {
-  console.log('form: ', form);
+  // console.log('form: ', form);
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     // console.log('Form submitted', e);
@@ -168,7 +168,7 @@ function listenFormUpload(form) {
       const response = await fetch(request);
       const data = await response.json();
 
-      console.log('handleFormSubmission > data: ', data);
+      // console.log('handleFormSubmission > data: ', data);
 
       if (!response.ok && response.status == 400) {
         // window.location.replace('/edit_profile');
@@ -182,7 +182,7 @@ function listenFormUpload(form) {
 
       // Handle the response data
       if (data.status != 'error' && data.type && data.message && !data.html) {
-        console.log('data.type: ', data.type, 'data.message: ', data.message);
+        // console.log('data.type: ', data.type, 'data.message: ', data.message);
 
         if (data.type === 'profile_updated') {
           handleRefresh("profile_update");
@@ -218,31 +218,31 @@ async function handleFormSubmission() {
 
 
   if (formsInvitePlay.length > 0) {
-    console.log('formsInvitePlay');
+    // console.log('formsInvitePlay');
     formsInvitePlay.forEach(function (form) {
       listenForm(form)
     });
   }
   else if (modalInviteFriend && formFriendInvite) {
-    console.log('modalInviteFriend && formFriendInvite');
+    // console.log('modalInviteFriend && formFriendInvite');
     listenFriendInvitation(modalInviteFriend, formFriendInvite);
   }
   else if (formUpload) {
-    console.log('formUpload');
+    // console.log('formUpload');
     listenFormUpload(formUpload);
   }
   else if (form) {
-    console.log('form');
+    // console.log('form');
     listenForm(form);
   }
 
   if (formGeneral) {
-    console.log('formGeneral');
+    // console.log('formGeneral');
     listenForm(formGeneral);
   }
 
   if (formSecurity) {
-    console.log('formSecurity');
+    // console.log('formSecurity');
     listenForm(formSecurity);
   }
 }

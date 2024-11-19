@@ -15,7 +15,7 @@ function displayMessageInModal(message) {
   if (message) {
     // Displayed who called this function
     const stackTrace = new Error().stack;
-    console.log('displayMessageInModal > message: ', message, ', call stack:', stackTrace);
+    // console.log('displayMessageInModal > message: ', message, ', call stack:', stackTrace);
 
     let messageModal =
       new bootstrap.Modal(document.getElementById('messageModal'));
@@ -64,13 +64,13 @@ async function reconnectSocket(socket) {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const hostname = window.location.hostname;
   const port = window.location.port ? `:${window.location.port}` : '';
-  console.log('sendMessagesBySocket > reconnecting to the socket..')
+  // console.log('sendMessagesBySocket > reconnecting to the socket..')
 
   // Reconnect to the corresponding socket
   if (socket === mainRoomSocket) {
-    console.log('sendMessagesBySocket > reconnecting to the mainRoomSocket');
+    // console.log('sendMessagesBySocket > reconnecting to the mainRoomSocket');
     const userID = await getUserID();
-    console.log('userID:', userID);
+    // console.log('userID:', userID);
     if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null || userID === 'None' || userID === '[object HTMLInputElement]') {
       console.warn('Client is not logged in');
       return false;
@@ -78,25 +78,25 @@ async function reconnectSocket(socket) {
     socket = new WebSocket(`${protocol}//${hostname}${port}/wss/mainroom/${userID}/`);
   }
   else if (socket === inviteFriendSocket) {
-    console.log('sendMessagesBySocket > reconnecting to the inviteFriendSocket');
+    // console.log('sendMessagesBySocket > reconnecting to the inviteFriendSocket');
     socket = new WebSocket(`${protocol}//${hostname}${port}/wss/invite_friend/`);
   }
 
   // Check the socket state
   if (socket.readyState === WebSocket.OPEN) {
-    console.log('sendMessagesBySocket > socket reconnected successfully');
+    // console.log('sendMessagesBySocket > socket reconnected successfully');
     return true;
   }
   else {
     askUserToReload();
-    console.log('sendMessagesBySocket > socket failed to reconnect');
+    // console.log('sendMessagesBySocket > socket failed to reconnect');
     return false;
   }
 }
 
 // It gets the user ID from the server using the JWT token
 async function getUserID() {
-  console.log('getUserID > fetching userID..');
+  // console.log('getUserID > fetching userID..');
   const request = new Request('/api/getUserID/', {
     method: 'GET',
     headers: {
@@ -109,9 +109,9 @@ async function getUserID() {
   try {
     const response = await fetch(request);
     const data = await response.json();
-    console.log('getUserID > data:', data);
+    // console.log('getUserID > data:', data);
     const userID = parseInt(data.user_id, 10);
-    console.log('get UserID > userID:', userID);
+    // console.log('get UserID > userID:', userID);
     return userID;
   } catch (error) {
     console.error('Error fetching UserID:', error);

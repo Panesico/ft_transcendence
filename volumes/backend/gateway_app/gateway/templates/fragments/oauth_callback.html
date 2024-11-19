@@ -33,7 +33,7 @@
 
         if (code) {
             // Log to the console for debugging
-            console.log('Extracted from popup URL - Code:', code);
+            {% comment %} console.log('Extracted from popup URL - Code:', code); {% endcomment %}
 
             // Set the OAuth code in a cookie
             setCookie('oauth_code', code, 1); // Store it for 1 day, you can reduce the time if needed

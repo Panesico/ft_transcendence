@@ -27,7 +27,7 @@ function sendMessagesBySocket(message, socket) {
     return;
   }
 
-  console.log('sendMessagesBySocket > message:', message);
+  // console.log('sendMessagesBySocket > message:', message);
   if (socket && socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(message));
     return true;
@@ -46,7 +46,7 @@ function listenUserReadNotification() {
   }
 
   notificationDropdown.addEventListener('click', function () {
-    console.log('Notification dropdown clicked');
+    // console.log('Notification dropdown clicked');
     unreadNotifications = false;
     const bellIcon = notificationDropdown.querySelector('img');
     if (bellIcon.src.includes('bell_up')) {
@@ -61,7 +61,7 @@ function listenUserReadNotification() {
 
 // Connect to the main room socket
 async function connectMainRoomSocket() {
-  console.log('connectMainRoomSocket');
+  // console.log('connectMainRoomSocket');
 
   // Establish connection to the main room
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -71,7 +71,7 @@ async function connectMainRoomSocket() {
 
   // On websocket open
   mainRoomSocket.onopen = function (e) {
-    console.log('mainRoomSocket opened');
+    // console.log('mainRoomSocket opened');
     sendMessagesBySocket({ 'type': 'message', 'message': 'main socket opened', }, mainRoomSocket);
     //    mainRoomSocket.send(JSON.stringify({'type': 'message', 'message': 'main socket opened',}));
   };
@@ -108,7 +108,7 @@ window.onload = async () => {
   // Update user id global variable
   g_user_id = await getUserID();
 
-  console.log('g_user_id:', g_user_id);
+  // console.log('g_user_id:', g_user_id);
   if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
     console.warn('Client is not logged in');
     return;
@@ -160,6 +160,6 @@ function parseSocketMessage(data) {
     updateFriendsState();
   }
   else {
-    console.log('unknown parseSocketMessage > data.type:', data.type);
+    console.error('unknown parseSocketMessage > data.type:', data.type);
   }
 }

@@ -7,10 +7,10 @@ function deleteCookie(name) {
 async function handleRefresh(type) {
   console.warn('handleRefresh called by:\n', new Error().stack.split('\n')[2].trim());
   // First GET request for the main content
-  console.log('handleRefresh > type:', type);
+  // console.log('handleRefresh > type:', type);
 
   if (type != 'language') {
-    console.log('handleRefresh > main content');
+    // console.log('handleRefresh > main content');
     fetch(`/home/?status=success&message=Logged%20in%20successfully&type=main`, {
       headers: {
         'X-CSRFToken': getCookie('csrftoken'),
@@ -31,7 +31,7 @@ async function handleRefresh(type) {
 
 
   // Second GET request for the header content
-  console.log('handleRefresh > header');
+  // console.log('handleRefresh > header');
   fetch(`/home/?status=success&message=Logged%20in%20successfully&type=header`, {
     headers: {
       'X-CSRFToken': getCookie('csrftoken'),
@@ -59,7 +59,7 @@ async function handleRefresh(type) {
   let chatPresent = false;
   // Remove chat on logout and language change
   if (type == 'logout' || type == 'language' || type == 'profile_update') {
-    console.log('handleRefresh > remove chat');
+    // console.log('handleRefresh > remove chat');
     // remove chat element
     const chatSection = document.getElementById('chatSection');
     if (chatSection) {
@@ -76,7 +76,7 @@ async function handleRefresh(type) {
 
   // Add chat
   if (type == 'login' || type == 'refresh' || type == 'oauth' || type == 'signup' || chatPresent) {
-    console.log('handleRefresh > add chat');
+    // console.log('handleRefresh > add chat');
     // GET request for chat section
     fetch(`/home/?status=success&message=Logged%20in%20successfully&type=chat`, {
       headers: {
@@ -99,7 +99,7 @@ async function handleRefresh(type) {
 
           if (type == 'profile_update') {
             let lang = getCookie('django_language');
-            console.log('handleRefresh > lang:', lang);
+            // console.log('handleRefresh > lang:', lang);
             let message = 'Profile updated';
             if (lang === 'fr')
               message = 'Profil mis à jour';
@@ -137,7 +137,7 @@ function sleep(ms) {
 async function handleOAuthCode(oauth_callback_url) {
   const oauthCode = getCookie('oauth_code');
   if (oauthCode) {
-    console.log("OAuth code found in cookie:", oauthCode);
+    // console.log("OAuth code found in cookie:", oauthCode);
     // Delete the OAuth code cookie after retrieving it
     deleteCookie('oauth_code');
 
@@ -153,7 +153,7 @@ async function handleOAuthCode(oauth_callback_url) {
       });
 
       if (response.ok) {
-        console.log("OAuth authentication successful");
+        // console.log("OAuth authentication successful");
         refreshToken();
         await sleep(500);
         handleRefresh("oauth");
@@ -328,7 +328,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setInterval(async () => {
     try {
       const newToken = await refreshToken();
-      console.log("Token refreshed");
+      // console.log("Token refreshed");
     } catch (error) {
       console.error("Failed to refresh token:", error);
       // Handle token refresh failure (e.g., redirect to login)
@@ -356,7 +356,7 @@ async function refreshToken() {
 
     // check for the message variable in the response body if its == 'Expired Token refreshed'
     if (data.message === 'Expired Token refreshed') {
-      console.log("Expired Token refreshed");
+      // console.log("Expired Token refreshed");
       await sleep(300);
       handleRefresh("refresh");
     }

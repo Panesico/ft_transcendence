@@ -4,15 +4,15 @@ function removeEmptyMessage() {
   const emptyMessage = document.getElementById('notificationContent');
   if (emptyMessage) {
     if (emptyMessage.innerHTML.trim() === 'You have no notifications' || emptyMessage.innerHTML.trim() === 'No tienes notificaciones' || emptyMessage.innerHTML.trim() === 'Vous n\'avez pas de notifications') {
-      console.log('addRequestNotification > Removing empty message');
+      // console.log('addRequestNotification > Removing empty message');
       emptyMessage.remove();
       unreadNotifications = false;
 
     }
-    else {
-      console.log('addRequestNotification > No empty message to remove');
-      console.log('addRequestNotification > emptyMessage.innerHTML:', emptyMessage.innerHTML);
-    }
+    // else {
+    //   console.log('addRequestNotification > No empty message to remove');
+    //   console.log('addRequestNotification > emptyMessage.innerHTML:', emptyMessage.innerHTML);
+    // }
 
   }
 }
@@ -168,15 +168,15 @@ function changeNotificationIconToUp(notificationDropdownClass, newNotification, 
 
   if (notificationDropdownClass) {
     //notificationDropdown.insertBefore(newNotification, notificationDropdown.firstChild);
-    console.log('addRequestNotification > notificationDropdown:', notificationDropdown);
+    // console.log('addRequestNotification > notificationDropdown:', notificationDropdown);
     const bellIcon = notificationDropdown.querySelector('img');
     if (bellIcon && status !== 'accepted' && status !== 'declined') {
-      console.log('addRequestNotification > status:', status);
+      // console.log('addRequestNotification > status:', status);
       bellIcon.src = '/media/utils_icons/bell_up.png';
     }
   }
   else {
-    console.log('addRequestNotification > notificationDropdown is null');
+    console.error('addRequestNotification > notificationDropdown is null');
   }
 }
 
@@ -206,7 +206,7 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
   // console.log('listenUserResponse > response_type:', response_type);
 
   acceptButton.addEventListener('click', async function (event) {
-    console.log('Accept button clicked');
+    // console.log('Accept button clicked');
 
     response_type = type + '_response';
 
@@ -412,7 +412,7 @@ function addRequestNotification(data) {
   }
   else if (data.type === 'unblock') {
     message.textContent = sender_username + ' ' + userUnblocked;
-    console.log('addRequestNotification > message:', message);
+    // console.log('addRequestNotification > message:', message);
   }
 
   // Add button to accept the friend request represented by accept png

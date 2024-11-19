@@ -4,15 +4,15 @@ async function loadContent(path) {
   let url = (path === '/') ? path : `${path}/`;
 
   //if url ends by //, remove the last /
-  console.log('url: ', url);
+  // console.log('url: ', url);
   if (url.endsWith('//')) {
     url = url.slice(0, -1);
   }
 
   // Check go back arrow has been clicked
-  if (url === '/back') {
-    console.log('Go back arrow clicked');
-  }
+  // if (url === '/back') {
+  //   console.log('Go back arrow clicked');
+  // }
 
   // console.log('url: ', url);
   // Fetch content from Django and inject into main
@@ -31,18 +31,18 @@ async function loadContent(path) {
     }
     const data = await response.json();
 
-    console.log('loadContent > data: ', data);
+    // console.log('loadContent > data: ', data);
 
     if (data.type && data.message && (data.type === 'logout_successful')) {
       // disconnect main room socket
       handleRefresh("logout");
       closeMainRoomSocket();
-      console.log('loadContent > logout_successful');
+      // console.log('loadContent > logout_successful');
     }
     else {
       document.querySelector('main').innerHTML = data.html;
     }
-    console.log('loadContent > main updated');
+    // console.log('loadContent > main updated');
     displayMessageInModal(data.message);
     handleFormSubmission();
   } catch (error) {
@@ -84,8 +84,8 @@ async function reloadNotificationsIfNeeded() {
       sendMessagesBySocket(message, mainRoomSocket);
     }
   } else {
-    console.log('emptyMessage not found');
-    console.log('emptyMessage: ', emptyMessage);
+    // console.log('emptyMessage not found');
+    // console.log('emptyMessage: ', emptyMessage);
   }
 }
 
