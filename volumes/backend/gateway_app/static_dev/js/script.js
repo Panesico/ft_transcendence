@@ -51,20 +51,7 @@ async function loadContent(path) {
   }
 }
 
-async function reloadNotificaationsIfNeeded() {
-  const emptyMessage = document.getElementById('notificationContent');
-  if (emptyMessage) {
-    if (emptyMessage.innerHTML && (emptyMessage.innerHTML.trim() === 'You have no notifications' || 
-                                   emptyMessage.innerHTML.trim() === 'No tienes notificaciones' || 
-                                   emptyMessage.innerHTML.trim() === 'Vous n\'avez pas de notifications')) {
-      const message = { type: 'load_notifications' };
-      sendMessagesBySocket(message, mainRoomSocket);
-    }
-  } else {
-    console.log('emptyMessage not found');
-    console.log('emptyMessage: ', emptyMessage);
-  }
-}
+
 // Handle navigation
 function navigate(e, path) {
   e.preventDefault();
@@ -82,8 +69,25 @@ window.onpopstate = () => {
     calcGameSocket.close();
     calcGameSocket = null;
   }
+
   loadContent(window.location.pathname);
 };
+
+
+async function reloadNotificationsIfNeeded() {
+  const emptyMessage = document.getElementById('notificationContent');
+  if (emptyMessage) {
+    if (emptyMessage.innerHTML && (emptyMessage.innerHTML.trim() === 'You have no notifications' ||
+      emptyMessage.innerHTML.trim() === 'No tienes notificaciones' ||
+      emptyMessage.innerHTML.trim() === 'Vous n\'avez pas de notifications')) {
+      const message = { type: 'load_notifications' };
+      sendMessagesBySocket(message, mainRoomSocket);
+    }
+  } else {
+    console.log('emptyMessage not found');
+    console.log('emptyMessage: ', emptyMessage);
+  }
+}
 
 
 async function changeLanguage(lang) {
@@ -105,14 +109,59 @@ async function changeLanguage(lang) {
     if (response.ok) {
       data = await response.json();
       // console.log('changeLanguage > new django_language:', getCookie('django_language'));
+      await fetchTranslations();
       loadContent(path);
       handleRefresh('language');
       await sleep(350);
-      reloadNotificaationsIfNeeded();
+      reloadNotificationsIfNeeded();
     } else {
       console.error('Error changing language:', response.statusText);
     }
   } catch (error) {
     console.error('Fetch error:', error);
+  }
+}
+
+
+// Update variables for translations
+async function fetchTranslations() {
+  // console.log('fetchTranslations');
+  try {
+    // console.log('fetchTranslations > /getTranslations/');
+    const response = await fetch('/getTranslations/', {
+      headers: {
+        'X-Custom-Token': 'mega-super-duper-secret-token'
+      }
+    });
+
+    // console.log('fetchTranslations > response: ', response);
+    if (!response.ok) {
+      throw new Error(`HTTP error - status: ${response.status}`);
+    }
+
+    const translations = await response.json();
+
+    // console.log('fetchTranslations > translations: ', translations);
+    notificationMsg = translations.notificationMsg;
+    friendRequestReceived = translations.friendRequestReceived;
+    friendRequestAccepted = translations.friendRequestAccepted;
+    friendRequestDeclined = translations.friendRequestDeclined;
+    gameRequestReceived = translations.gameRequestReceived;
+    gameRequestAccepted = translations.gameRequestAccepted;
+    gameRequestDeclined = translations.gameRequestDeclined;
+    gameRequestCancelled = translations.gameRequestCancelled;
+    gameWaitingToPlay = translations.gameWaitingToPlay;
+    gamePlayNextTournament = translations.gamePlayNextTournament;
+    userBlocked = translations.userBlocked;
+    userUnblocked = translations.userUnblocked;
+    afterBlockMsg = translations.afterBlockMsg;
+    afterUnblockMsg = translations.afterUnblockMsg;
+    formSubmissionError = translations.formSubmissionError;
+    noFriendsmsg = translations.noFriendsmsg;
+    selectFriendmsg = translations.selectFriendmsg;
+    profileUpdatedmsg = translations.profileUpdatedmsg;
+
+  } catch (error) {
+    console.error('Error fetching translations:', error);
   }
 }

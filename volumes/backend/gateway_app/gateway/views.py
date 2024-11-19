@@ -124,3 +124,36 @@ def set_language(request):
     response = JsonResponse({'language': language}, status=200)
     response.set_cookie('django_language', language, httponly=False, secure=True, samesite='Lax')
     return response
+
+
+def get_translations(request):
+  logger.debug("get_translations")
+  if request.method != 'GET':
+    return redirect('405')
+  
+  token = request.headers.get('X-Custom-Token')
+  if token != 'mega-super-duper-secret-token':
+    return redirect('home')
+
+  translations = {
+    'notificationMsg': _("Notification"),
+    'friendRequestReceived': _(" sent you a friend request."),
+    'friendRequestAccepted': _(" accepted your friend request."),
+    'friendRequestDeclined': _(" declined your friend request."),
+    'gameRequestReceived': _(" has invited you to play: "),
+    'gameRequestAccepted': _(" has accepted your game request."),
+    'gameRequestDeclined': _(" has declined your game request."),
+    'gameRequestCancelled': _(" has cancelled the game request."),
+    'gameWaitingToPlay': _(" is waiting to play."),
+    'gamePlayNextTournament': _(" you play next in the tournament."),
+    'userBlocked': _(" has blocked you."),
+    'userUnblocked': _(" has unblocked you."),
+    'afterBlockMsg': _("Friend blocked successfully."),
+    'afterUnblockMsg': _("Friend unblocked successfully."),
+    'formSubmissionError': _("Form submission error. Please reload and retry."),
+    'noFriendsmsg': _("No friends yet"),
+    'selectFriendmsg': _("Select a contact"),
+    'profileUpdatedmsg': _("Profile updated"),
+  }
+
+  return JsonResponse(translations, status=200)

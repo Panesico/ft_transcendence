@@ -4,7 +4,7 @@ function deleteCookie(name) {
 }
 
 
-function handleRefresh(type) {
+async function handleRefresh(type) {
   console.warn('handleRefresh called by:\n', new Error().stack.split('\n')[2].trim());
   // First GET request for the main content
   console.log('handleRefresh > type:', type);
@@ -118,6 +118,13 @@ function handleRefresh(type) {
 
   if (type != 'language') {
     window.history.pushState({}, '', '/');
+  }
+
+  if (type == 'profile_update') {
+    console.warn('Profile updated');
+    await fetchTranslations();
+    await sleep(350);
+    reloadNotificationsIfNeeded();
   }
 }
 
