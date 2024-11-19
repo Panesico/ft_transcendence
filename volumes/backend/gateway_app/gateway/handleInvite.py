@@ -6,19 +6,15 @@ logger = logging.getLogger(__name__)
 
 def get_authentif_variables(user_id):
   authentif_api_url = 'https://authentif:9001/api/getUserInfo/' + str(user_id) + '/'
-  logger.debug(f"get_authentif_variables > authentif_api_url: {authentif_api_url}")
   response = requests.get(authentif_api_url, verify=os.getenv("CERTFILE"))
-  logger.debug(f"get_authentif_variables > Response: {response}")
   if response.status_code == 200:
     return response.json()
   else:
-    logger.debug(f"-------> get_authentif_variables > Response: {response}")
     return None
 
 def find_matching_usernames(usernames, user_input):
   # Perform a case-insensitive search for usernames containing the user input
   matching_usernames = [username for username in usernames if user_input in username]
-  logger.debug(f'FormConsumer > matching_usernames: {matching_usernames}')
 
   # Convert the QuerySet to a list and return it
   return matching_usernames
@@ -39,22 +35,19 @@ async def invite_to_game(self, content, users_connected):
   # language = self.scope['cookies']['django_language']
   
 
-  logger.debug(f'invite_to_game > content: {content}')
   sender_id = content.get('sender_id', '')
   receiver_id = content.get('receiver_id', '')
   game_type = content.get('game_type')
 
   sender_avatar_url = content.get('sender_avatar_url', '')
   sender_username = content.get('sender_username', '')
-  logger.debug(f'invite_to_game > sender_username: {sender_username}')
   
   receiver_data = await getUserData(receiver_id)
   receiver_username = receiver_data['username']
-  logger.debug(f'invite_to_game > receiver_username: {receiver_username}')
+
   message = sender_username + _(' has invited you to play: ') + game_type.capitalize()
   date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-  logger.debug(f'invite_to_game > message: {message}, {date}')
-  logger.debug(f'game_type: {game_type}')
+
   if receiver_id in users_connected:
     for connection in users_connected[receiver_id]:
       await connection.send_json({
@@ -76,16 +69,13 @@ async def invite_to_game(self, content, users_connected):
   notification_data = { 'sender_id': sender_id, 'receiver_id': receiver_id, 'type': 'game_request', 'message': message, 'game_type': game_type, 'date': date }
   try:
     response = requests.post(profileapi_url, json=notification_data, headers=headers, verify=os.getenv("CERTFILE"))
-    logger.debug(f'invite_to_game > response: {response}')
-    logger.debug(f'invite_to_game > response.json(): {response.json()}')
 
     response.raise_for_status()
     if response.status_code == 201:
       logger.debug(f'invite_to_game > Notification saved')
     else:
-      logger.debug(f'invite_to_game > Error saving notification')
+      logger.error(f'invite_to_game > Error saving notification')
       return
   except Exception as e:
-    logger.debug(f'invite_to_game > Error saving notification: {e}')
     return
 

@@ -51,7 +51,6 @@ class mainRoom(AsyncJsonWebsocketConsumer):
     # Receive message from room group
     typeMessage = content.get('type', '')
     subTypeMessage = content.get('subtype', '')
-    logger.debug(f'mainRoom > typeMessage: {typeMessage}')
 
     # Check if users have a blocked relationship
     if typeMessage == 'invite_game' or typeMessage == 'game_response' or typeMessage == 'friend_request' or typeMessage == 'friend_request_response':
@@ -73,29 +72,20 @@ class mainRoom(AsyncJsonWebsocketConsumer):
       elif subTypeMessage == 'get_conversation':
         await getConversation(content, self)
       elif subTypeMessage == 'check_unread_messages':
-        logger.debug(f'mainRoom > check_unread_messages')
         await checkForChatMessages(self)
       elif subTypeMessage == 'mark_conversation_read':
-        logger.debug(f'mainRoom > mark_conversation_read')
         await markConversationAsRead(content, self)
     elif typeMessage == 'invite_game':
-      logger.debug(f'mainRoom > invite_game')
-      logger.debug(f'mainRoom > invite_game > content: {content}')
       await invite_to_game(self, content, users_connected)    
     elif typeMessage == 'game_request_response':
       await requestResponse(content, users_connected, self.avatar_url, self)
     elif typeMessage == 'cancel_waiting_room':
-      logger.debug(f'mainRoom > cancel_waiting_room, username: {self.username}')
       await requestResponse(content, users_connected, self.avatar_url, self)
     elif typeMessage == 'next_in_tournament':
-      logger.debug(f'mainRoom > next_in_tournament, username: {self.username}')
       await requestResponse(content, users_connected, self.avatar_url, self)
     elif typeMessage == 'block':
       await block_user_responses(self, content, users_connected)
     elif typeMessage == 'unblock':
-      logger.debug(f'mainRoom > unblock')
       await block_user_responses(self, content, users_connected)
     elif typeMessage == 'load_notifications':
       await checkForNotifications(self)
-    # elif typeMessage == 'get_connected_friends':
-    #   await getConnectedFriends(self, content, users_connected)

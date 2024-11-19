@@ -49,7 +49,6 @@ def get_profile(request):
         return redirect('404')
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("get_profile XMLHttpRequest")
         html = render_to_string('fragments/profile_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
         return JsonResponse({'html': html, 'status': 'success'})
     return render(request, 'partials/profile.html', {'form': form, 'profile_data': profile_data})
@@ -82,7 +81,6 @@ def get_friend_profile(request, friend_id):
     profile_api_url = f'https://profileapi:9002/api/getFullProfile/{friend_id}/'
     response = requests.get(profile_api_url, verify=os.getenv("CERTFILE"))
     if response.status_code != 200:
-        logger.debug(f"-------> get_friend_profile > Response: {response.status_code}")
         return JsonResponse({'status': 'error', 'message': 'Error retrieving friend profile'})
     
     profile_data = response.json()
@@ -94,13 +92,12 @@ def get_friend_profile(request, friend_id):
         return JsonResponse({'status': 'error', 'message': 'Error retrieving user profile'})
     
     user_profile_data = user_response.json()
-    logger.debug(f"get_friend_profile > user_profile_data: {user_profile_data}")
     
-    # Verificar si el amigo está en la lista de usuarios bloqueados
+    # Check if the user is blocked
     is_blocked = friend_id in user_profile_data.get('blocked_users', [])
     im_blocked = request.user.id in profile_data.get('blocked_users', [])
-    logger.debug(f"get_friend_profile > is_blocked: {is_blocked}")
-    # Pasar la información al contexto de la plantilla
+
+    # Pass the information to the template
     context = {
         'form': form,
         'profile_data': profile_data,
@@ -117,7 +114,6 @@ def get_friend_profile(request, friend_id):
 def get_match_history(request, username):
     if request.method != 'GET':
         return redirect('405')
-    logger.debug("get_match_history")
     try:
        user_id = User.objects.get(username=username).id
     except:
@@ -131,12 +127,10 @@ def get_match_history(request, username):
           return JsonResponse({'html': html, 'status': 'success'})
         return render(request, 'partials/match_history.html', {'games_data': games_data, 'user_id': user_id, 'username': username})
     else:
-        logger.debug(f"-------> get_match_history > Response: {response.status_code}")
         return JsonResponse({'status': 'error', 'message': 'Error retrieving match history'})
     
 @login_required
 def view_user_profile(request, user_id):
-    logger.debug("view_user_profile")
     if request.method != 'GET':
         return redirect('405')
     
@@ -144,8 +138,6 @@ def view_user_profile(request, user_id):
         user = User.objects.get(id=user_id)
         profile = getUserProfile(user_id)
         
-        # logger.debug(f"view_user_profile > user: {pformat(user.__dict__)}")
-        logger.debug(f"view_user_profile > profile: {pformat(profile)}")
     except:
         return redirect('404')
     
@@ -177,15 +169,12 @@ def view_user_profile(request, user_id):
                                         }
                                     })
     else:
-        logger.debug(f"view_user_profile > Response: {response.status_code}")
         return JsonResponse({'status': 'error', 'message': _('Error retrieving match history')})
 
 @login_required
 def post_edit_profile_security(request):
     if request.method != 'POST':
         return redirect('405')
-    logger.debug("")
-    logger.debug("post_edit_profile_security")
 
     # Cookies & headers
     csrf_token = request.COOKIES.get('csrftoken')
@@ -226,15 +215,12 @@ def post_edit_profile_security(request):
     status = response.json().get("status")
     message = response.json().get("message")
     type = response.json().get("type")
-    logger.debug(f"post_edit_profile > response.json from authentif editprofile: {response.json()}")
     
      # Redirection usage
     form = LogInFormFrontend()
     preferred_language = profile_data.get('preferred_language')
 
     if response.ok:
-      logger.debug('post_edit_profile > Response OK')
-#      html = render_to_string('fragments/login_fragment.html', {'form': form, 'profile_data': profile_data}, request=request)
       user_response =  JsonResponse({'type': type, 'status': status, 'message': message})
       user_response.set_cookie('django_language', preferred_language, httponly=False, secure=True, samesite='Lax')
       return user_response
@@ -246,11 +232,9 @@ def post_edit_profile_security(request):
       data = json.loads(request.body)
       form = EditProfileFormFrontend(data)
       form.add_error(None, message)
-      logger.debug('post_edit_profile_security > Response KO')
 
       html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
-      #return render(request, 'partials/edit_profile.html', {'status': status, 'message': message, 'form': form, 'profile_data': profile_data})#change this line to return only the fragment
 
 
 def general_data_is_valid(data):
@@ -287,8 +271,6 @@ def security_data_is_valid(data):
 
 @login_required
 def post_edit_profile_general(request):
-    logger.debug("")
-    logger.debug("post_edit_profile_general")
     if request.method != 'POST':
         return redirect('405')
 
@@ -308,7 +290,6 @@ def post_edit_profile_general(request):
     # Recover data from the form
     data = json.loads(request.body)
     data['user_id'] = request.user.id
-    logger.debug(f"post_edit_profile_general > data: {data}")
 
     profile_data = get_profileapi_variables(request=request)
     if profile_data.get('status') == 'error':
@@ -332,7 +313,6 @@ def post_edit_profile_general(request):
     status = response.json().get("status")
     message = response.json().get("message")
     type = response.json().get("type")
-    logger.debug(f"post_edit_profile_general > profileapi response: {response.json()}")
 
     # Redirection usage
     form = EditProfileFormFrontend()
@@ -341,7 +321,6 @@ def post_edit_profile_general(request):
 
     if response.ok:
         preferred_language = data.get('preferred_language')
-        logger.debug(f"post_edit_profile > preferred_language: {preferred_language}")
         user_response =  JsonResponse({'status': status, 'type': type, 'message': message, 'preferred_language': preferred_language})
         user_response.set_cookie('django_language', preferred_language, httponly=False, secure=True, samesite='Lax')
 
@@ -351,13 +330,9 @@ def post_edit_profile_general(request):
     else:
       if profile_data.get('status') == 'error':
         return redirect(profile_data.get('status_code'))
-      logger.debug('profile_data: %s', profile_data)
       data = json.loads(request.body)
       form = EditProfileFormFrontend(data)
       form.add_error(None, message)
-      logger.debug('post_edit_profile_general > Response KO')
-      logger.debug(f"post_edit_profile > data: {data}")
-      logger.debug(f"post_edit_profile > response: {response.json()}")
       html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
       return JsonResponse({'html': html, 'status': status, 'message': message}, status=response.status_code)
 
@@ -367,8 +342,6 @@ def post_edit_profile_avatar(request):
       return redirect('405')
 
   # Cookies & headers
-  logger.debug("")
-  logger.debug("post_edit_profile_avatar")
   csrf_token = request.COOKIES.get('csrftoken')
   django_language = getDjangoLanguageCookie(request)
   jwt_token = request.COOKIES.get('jwt_token')
@@ -403,7 +376,6 @@ def post_edit_profile_avatar(request):
     if not uploaded_file.content_type.startswith('image'):
         form = EditProfileFormFrontend(data)
         form.add_error(None, _('Please select an image file'))
-        logger.debug('post_edit_profile_avatar > Invalid file type')
         html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
         return JsonResponse({'html': html, 'status': 'error'}, status=400)
 
@@ -433,7 +405,6 @@ def post_edit_profile_avatar(request):
   
   # Handle the case where no file is uploaded
   else:
-    logger.debug('post_edit_profile_avatar > No file uploaded')
     form = EditProfileFormFrontend(data)
     form.add_error(None, _('Please select an image file'))
     html = render_to_string('fragments/edit_profile_fragment.html', {'form': form, 'profile_data': profile_data, 'user': request.user}, request=request)
@@ -443,10 +414,11 @@ def post_edit_profile_avatar(request):
 @login_required
 def download_42_avatar(request):
     if request.method == 'POST':
+      
         # Get the image URL from the POST data
-        body_unicode = request.body.decode('utf-8')  # Decode the raw request body
-        body_data = json.loads(body_unicode)         # Parse the JSON data
-            
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)            
+
         # Get the image URL from the parsed JSON
         image_url = body_data.get('image_url')
         
@@ -456,7 +428,7 @@ def download_42_avatar(request):
         try:
             # Download the image
             response = requests.get(image_url)
-            response.raise_for_status()  # Raise an error if the download fails
+            response.raise_for_status()
 
             # Get the image content
             image_content = response.content
@@ -479,8 +451,6 @@ def download_42_avatar(request):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 async def checkNameExists(request):
-    logger.debug("")
-    logger.debug("checkDisplaynameExists")
     if request.method != 'POST':
       return redirect('405')
     data = json.loads(request.body)
@@ -507,7 +477,6 @@ async def checkNameExists(request):
     # Check if the display name already exists
     profile_api_url = 'https://profileapi:9002/api/checkDisplaynameExists/'
     response = requests.post(profile_api_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
-    logger.debug(f"checkDisplaynameExists > profileapi response: {response.json()}")
 
     status = response.json().get("status")
     message = response.json().get("message")
@@ -518,7 +487,6 @@ async def checkNameExists(request):
           # Check if the username already exists
           authentif_url = 'https://authentif:9001/api/checkUsernameExists/'
           response = requests.post(authentif_url, json=data, headers=headers, verify=os.getenv("CERTFILE"))
-          logger.debug(f"checkDisplaynameExists > authentif response: {response.json()}")
 
           status = response.json().get("status")
           message = response.json().get("message")
