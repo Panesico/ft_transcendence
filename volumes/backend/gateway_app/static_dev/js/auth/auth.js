@@ -120,13 +120,14 @@ async function handleRefresh(type) {
     window.history.pushState({}, '', '/');
   }
 
-  if (type == 'profile_update') {
-    console.warn('Profile updated');
+  if (type == 'profile_update' || type == 'login' || type == 'refresh' || type == 'oauth' || type == 'signup' || chatPresent) {
+    console.warn('handleRefresh > updating notifications');
     await fetchTranslations();
     await sleep(350);
     reloadNotificationsIfNeeded();
   }
 }
+
 
 // Function to handle OAuth code once available
 function sleep(ms) {
