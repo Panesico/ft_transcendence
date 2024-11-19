@@ -149,17 +149,17 @@ function parseSocketMessage(data) {
     addResponseNotification(data);
   }
   else if (data.type === 'block') {
-    console.warn('parseSocketMessage > data:', data);
+    //console.warn('parseSocketMessage > data:', data);
     handleBlockedNotif(data);
     addRequestNotification(data);
     updateFriendsState();
   }
   else if (data.type === 'unblock') {
-    console.warn('parseSocketMessage > data:', data);
+    //console.warn('parseSocketMessage > data:', data);
     addRequestNotification(data);
     updateFriendsState();
   }
   else {
-    console.error('unknown parseSocketMessage > data.type:', data.type);
+    console.error('unknown parseSocketMessage > data', data);
   }
 }

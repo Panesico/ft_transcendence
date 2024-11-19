@@ -478,7 +478,7 @@ function addResponseNotification(data) {
   const avatar = createAvatarElement(receiver_avatar_url);
 
   // Create a span element for the message
-  console.warn('addResponseNotification > data:', data);
+  // console.warn('addResponseNotification > data:', data);
   inputMessage = gameRequestCancelled;
   if (data.type === 'friend_request_response') {
     // if data.message contrains 'accepted', then the message is 'accepted'

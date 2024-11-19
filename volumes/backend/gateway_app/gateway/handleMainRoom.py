@@ -170,7 +170,8 @@ async def handleNewConnection(self, users_connected):
     users_connected[self.user_id] = []
   users_connected[self.user_id].append(self)
   await self.send_json({
-      'message': 'You are connected to the main room!'
+      'message': 'You are connected to the main room!',
+      'type': 'user_connected',
   })
 
   # Get user info

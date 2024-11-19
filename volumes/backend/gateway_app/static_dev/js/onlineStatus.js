@@ -1,7 +1,7 @@
 
 // Add or remove badge for online friends on my_friends page and chat modal
 function updateOnlineFriends(data) {
-  console.log('updateOnlineFriends > data:', data);
+  //console.log('updateOnlineFriends > data:', data);
   const userIdToUpdate = data.user_id;
 
   // for my_friends page
