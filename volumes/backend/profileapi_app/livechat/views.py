@@ -74,19 +74,18 @@ def getReceivedChatMessages(request, user_id):
 		return JsonResponse({'message': 'Method not allowed'}, status=405)
 	
 def markConversationAsRead(request, user_1_id, user_2_id):
-	logger.debug('markConversationAsRead > user_1_id: ' + str(user_1_id) + ', user_2_id: ' + str(user_2_id))
 	user_1_id = int(user_1_id)
 	user_2_id = int(user_2_id)
 	if request.method == 'GET':
 		try:
 			user_1 = Profile.objects.get(user_id=user_1_id)
 			user_2 = Profile.objects.get(user_id=user_2_id)
-			messages = Message.objects.filter(send_user=user_1, dest_user=user_2)
+			messages = Message.objects.filter(send_user=user_1, dest_user=user_2, read=False)
 			for message in messages:
 				message.read = True
 				message.save()
 				
-			messages = Message.objects.filter(send_user=user_2, dest_user=user_1)
+			messages = Message.objects.filter(send_user=user_2, dest_user=user_1, read=False)
 			for message in messages:
 				message.read = True
 				message.save()

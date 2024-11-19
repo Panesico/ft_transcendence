@@ -12,7 +12,6 @@ async def sendChatMessage(content, users_connected, self):
 
   # Check if user_id is in users_connected
   if receiver_id in users_connected:
-    logger.debug(f'senChatMessage > receiver_id: {receiver_id} is in users_connected')
     for connection in users_connected[receiver_id]:
       await connection.send_json({
           'type': 'chat',
@@ -24,7 +23,6 @@ async def sendChatMessage(content, users_connected, self):
       })
 
   # Save chat message request in database
-  logger.debug(f'senChatMessage > Save chat message in database')
   profileapi_url = 'https://profileapi:9002/livechat/api/saveChatMessage/'
   message_data = { 'sender_id': sender_id, 'receiver_id': receiver_id, 'message': message, 'type': 'chat_message', 'date': date }
   csrf_token = self.scope['cookies']['csrftoken']
@@ -38,22 +36,13 @@ async def sendChatMessage(content, users_connected, self):
   try:
     response = requests.post(
           profileapi_url, json=message_data, headers=headers, verify=os.getenv("CERTFILE"))
-    logger.debug(f'senChatMessage > response: {response}')
-    logger.debug(f'senChatMessage > response.json(): {response.json()}')
 
     response.raise_for_status()
-    if response.status_code == 201:
-      # We can now mark the chat as read
-      logger.debug(f'senChatMessage > Chat message saved in database')
-    else:
-      logger.debug(f'senChatMessage > Error saving chat message in database')
   except Exception as e:
-    logger.debug(f'senChatMessage > Error saving chat message in database: {e}')
     return
 
 async def getConversation(content, self):
   # Get the database chat messages
-  logger.debug(f'getConversation > self.user_id: {self.user_id}')
   receiver_id = content.get('receiver_id', '')
   profileapi_url = 'https://profileapi:9002/livechat/api/getConversation/' + str(self.user_id) + '/' + str(receiver_id) + '/'
   csrf_token = self.scope['cookies']['csrftoken']
@@ -65,7 +54,6 @@ async def getConversation(content, self):
       'Referer': 'https://gateway:8443',
   }
   conversation = requests.get(profileapi_url, headers=headers, verify=os.getenv("CERTFILE"))
-  logger.debug(f'getConversation > conversation.json(): {conversation.json()}')
 
   conversation.raise_for_status()
   if conversation.status_code == 200:
@@ -77,12 +65,9 @@ async def getConversation(content, self):
       'sender_id': self.user_id,
       'receiver_id': receiver_id
     })
-  else:
-    logger.debug(f'getConversation > Error getting conversation')
 
 async def checkForChatMessages(self):
   # Get the database chat messages
-  logger.debug(f'checkForChatMessages > self.user_id: {self.user_id}')
   profileapi_url = 'https://profileapi:9002/livechat/api/getReceivedChatMessages/' + str(self.user_id) + '/'
   csrf_token = self.scope['cookies']['csrftoken']
   headers = {
@@ -121,13 +106,8 @@ async def setReadMessages(self):
       'Referer': 'https://gateway:8443',
   }
   response = requests.get(profileapi_url, headers=headers, verify=os.getenv("CERTFILE"))
-  logger.debug(f'setReadMessages > response.json(): {response.json()}')
 
   response.raise_for_status()
-  if response.status_code == 200:
-    logger.debug(f'setReadMessages > Chat messages marked as read')
-  else:
-    logger.debug(f'setReadMessages > Error marking chat messages as read')
 
 async def innitListening(self):
   await self.send_json({
@@ -139,7 +119,6 @@ async def markConversationAsRead(content, self):
   # Get the database chat messages
   receiver_id = content.get('receiver_id', '')
   sender_id = content.get('sender_id', '')
-  logger.debug(f'markConversationAsRead > sender_id: {sender_id}, receiver_id: {receiver_id}')
   profileapi_url = 'https://profileapi:9002/livechat/api/markConversationAsRead/' + str(sender_id) + '/' + str(receiver_id) + '/'
   csrf_token = self.scope['cookies']['csrftoken']
   headers = {
@@ -150,13 +129,9 @@ async def markConversationAsRead(content, self):
       'Referer': 'https://gateway:8443',
   }
   response = requests.get(profileapi_url, headers=headers, verify=os.getenv("CERTFILE"))
-  logger.debug(f'markConversationAsRead > response.json(): {response.json()}')
 
   response.raise_for_status()
-  if response.status_code == 200:
-    logger.debug(f'markConversationAsRead > Conversation marked as read')
-  else:
-    logger.debug(f'markConversationAsRead > Error marking conversation as read')
+
 
 async def innitChat(self):
   await innitListening(self)
