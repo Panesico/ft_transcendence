@@ -214,7 +214,7 @@ def get_blocked_users(request, sender_id, receiver_id):
     receiver_obj = Profile.objects.get(user_id=receiver_id)
     logger.debug('sender_obj and receiver_obj recovered')
 
-    sender_blocked_users = sender_obj.sender_blocked_users.all()
+    sender_blocked_users = sender_obj.blocked_users.all()
     receiver_blocked_users = receiver_obj.blocked_users.all()
     logger.debug(f'blocked_users recovered: {sender_blocked_users}')
     logger.debug(f'blocked_users recovered: {receiver_blocked_users}')
