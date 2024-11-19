@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSION DU PACKAGE\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-19 09:56+0000\n"
+"POT-Creation-Date: 2024-11-19 10:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: NOM COMPLET <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUE <LL@li.org>\n"
@@ -137,42 +137,46 @@ msgstr "Nouveau mot de passe"
 msgid "Confirm new password"
 msgstr "Confirmer le nouveau mot de passe"
 
-#: gateway/handleInvite.py:54 gateway/templates/base_index.html:92
-#: gateway/views.py:143
+#: gateway/handleInvite.py:47 gateway/templates/base_index.html:92
+#: gateway/views.py:124
 msgid " has invited you to play: "
 msgstr " vous a invité à jouer : "
 
-#: gateway/handleMainRoom.py:34
+#: gateway/handleInvite.py:67 gateway/templates/base_index.html:98
+msgid " is not connected. Game invite cancelled."
+msgstr " n'est pas connecté. Invitation de jeu annulée."
+
+#: gateway/handleMainRoom.py:31
 msgid "has accepted your friend request."
 msgstr "a accepté votre demande d'amis."
 
-#: gateway/handleMainRoom.py:36
+#: gateway/handleMainRoom.py:33
 msgid "has declined your friend request."
 msgstr "a refusé votre demande d'amis."
 
-#: gateway/handleMainRoom.py:38
+#: gateway/handleMainRoom.py:35
 msgid "is waiting to play "
 msgstr "attend pour jouer "
 
-#: gateway/handleMainRoom.py:40
+#: gateway/handleMainRoom.py:37
 msgid "has declined the game request."
 msgstr "a refusé votre demande de jeu."
 
-#: gateway/handleMainRoom.py:42
+#: gateway/handleMainRoom.py:39
 msgid "has canceled the game request."
 msgstr "a annulé la demande de jeu."
 
-#: gateway/handleMainRoom.py:158
+#: gateway/handleMainRoom.py:111
 msgid "sent you a friend request"
 msgstr "t'a envoyé une demande d'amis"
 
-#: gateway/handleMainRoom.py:416 gateway/templates/base_index.html:99
-#: gateway/views.py:150
+#: gateway/handleMainRoom.py:308 gateway/templates/base_index.html:100
+#: gateway/views.py:132
 msgid " has unblocked you."
 msgstr " vous a bloqué."
 
-#: gateway/handleMainRoom.py:418 gateway/templates/base_index.html:98
-#: gateway/views.py:149
+#: gateway/handleMainRoom.py:310 gateway/templates/base_index.html:99
+#: gateway/views.py:131
 msgid " has blocked you."
 msgstr " vous a bloqué."
 
@@ -181,64 +185,64 @@ msgid "Choose..."
 msgstr "Choisissez..."
 
 #: gateway/templates/base_index.html:88
-#: gateway/templates/includes/popupMessages.html:9 gateway/views.py:139
+#: gateway/templates/includes/popupMessages.html:9 gateway/views.py:120
 msgid "Notification"
 msgstr "Notification"
 
-#: gateway/templates/base_index.html:89 gateway/views.py:140
+#: gateway/templates/base_index.html:89 gateway/views.py:121
 msgid " sent you a friend request."
 msgstr "t'a envoyé une demande d'amis"
 
-#: gateway/templates/base_index.html:90 gateway/views.py:141
+#: gateway/templates/base_index.html:90 gateway/views.py:122
 msgid " accepted your friend request."
 msgstr " a accepté votre demande d'amis."
 
-#: gateway/templates/base_index.html:91 gateway/views.py:142
+#: gateway/templates/base_index.html:91 gateway/views.py:123
 msgid " declined your friend request."
 msgstr " a refusé votre demande d'amis."
 
-#: gateway/templates/base_index.html:93 gateway/views.py:144
+#: gateway/templates/base_index.html:93 gateway/views.py:125
 msgid " has accepted your game request."
 msgstr " a accepté votre demande de jeu."
 
-#: gateway/templates/base_index.html:94 gateway/views.py:145
+#: gateway/templates/base_index.html:94 gateway/views.py:126
 msgid " has declined your game request."
 msgstr " a refusé votre demande de jeu."
 
-#: gateway/templates/base_index.html:95 gateway/views.py:146
+#: gateway/templates/base_index.html:95 gateway/views.py:127
 msgid " has cancelled the game request."
 msgstr " a annulé la demande de jeu."
 
-#: gateway/templates/base_index.html:96 gateway/views.py:147
+#: gateway/templates/base_index.html:96 gateway/views.py:128
 msgid " is waiting to play."
 msgstr " attend pour jouer."
 
-#: gateway/templates/base_index.html:97 gateway/views.py:148
+#: gateway/templates/base_index.html:97 gateway/views.py:129
 msgid " you play next in the tournament."
 msgstr "vous êtes le prochain à jouer dans le tournoi."
 
-#: gateway/templates/base_index.html:100 gateway/views.py:151
+#: gateway/templates/base_index.html:101 gateway/views.py:133
 msgid "Friend blocked successfully."
 msgstr "Ami bloqué avec succès."
 
-#: gateway/templates/base_index.html:101 gateway/views.py:152
+#: gateway/templates/base_index.html:102 gateway/views.py:134
 msgid "Friend unblocked successfully."
 msgstr "Ami débloqué avec succès."
 
-#: gateway/templates/base_index.html:102 gateway/views.py:153
+#: gateway/templates/base_index.html:103 gateway/views.py:135
 msgid "Form submission error. Please reload and retry."
 msgstr "Erreur de soumission du formulaire. Veuillez recharger et réessayer."
 
-#: gateway/templates/base_index.html:104 gateway/views.py:154
+#: gateway/templates/base_index.html:105 gateway/views.py:136
 msgid "No friends yet"
 msgstr "Pas encore d'amis"
 
-#: gateway/templates/base_index.html:105
-#: gateway/templates/includes/chat_modal.html:44 gateway/views.py:155
+#: gateway/templates/base_index.html:106
+#: gateway/templates/includes/chat_modal.html:44 gateway/views.py:137
 msgid "Select a contact"
 msgstr "Sélectionnez un contact"
 
-#: gateway/templates/base_index.html:106 gateway/views.py:156
+#: gateway/templates/base_index.html:107 gateway/views.py:138
 msgid "Profile updated"
 msgstr "Profil mis à jour"
 
@@ -696,40 +700,44 @@ msgstr "Déconnexion"
 msgid "You have no notifications"
 msgstr "Vous n'avez pas de notifications"
 
-#: gateway/views.py:108
+#: gateway/views.py:93
 msgid "Error retrieving friends"
 msgstr "Erreur lors de la récupération des amis"
+
+#: gateway/views.py:130
+msgid "  is not connected. Game invite cancelled."
+msgstr " n'est pas connecté. Invitation de jeu annulée."
 
 #: gateway/viewsAuth.py:42
 msgid "Logged out successfully"
 msgstr "Déconnexion réussie"
 
-#: gateway/viewsAuth.py:60
+#: gateway/viewsAuth.py:59
 msgid "Failed to log out"
 msgstr "Échec de la déconnexion"
 
-#: gateway/viewsAuth.py:108 gateway/viewsAuth.py:202
-#: gateway/viewsProfile.py:214 gateway/viewsProfile.py:320
+#: gateway/viewsAuth.py:104 gateway/viewsAuth.py:187
+#: gateway/viewsProfile.py:203 gateway/viewsProfile.py:301
 msgid "Invalid form data"
 msgstr "Données de formulaire invalides"
 
-#: gateway/viewsAuth.py:286
+#: gateway/viewsAuth.py:267
 msgid "No message provided"
 msgstr "Aucun message fourni"
 
-#: gateway/viewsAuth.py:315
+#: gateway/viewsAuth.py:295
 msgid "Failed to login with 42"
 msgstr "Échec de la connexion avec 42"
 
-#: gateway/viewsAuth.py:350
+#: gateway/viewsAuth.py:330
 msgid "Invalid request method. Use POST."
 msgstr "Méthode de requête invalide. Utilisez POST."
 
-#: gateway/viewsAuth.py:357
+#: gateway/viewsAuth.py:337
 msgid "OTP code is required"
 msgstr "Le code OTP est requis"
 
-#: gateway/viewsAuth.py:359
+#: gateway/viewsAuth.py:339
 msgid "Invalid JSON format"
 msgstr "Format JSON invalide"
 
@@ -781,35 +789,35 @@ msgstr "Une erreur s'est produite"
 msgid "You cannot unblock yourself"
 msgstr "Vous ne pouvez pas vous débloquer vous-même"
 
-#: gateway/viewsProfile.py:181
+#: gateway/viewsProfile.py:172
 msgid "Error retrieving match history"
 msgstr "Erreur lors de la récupération de l'historique des matchs"
 
-#: gateway/viewsProfile.py:263
+#: gateway/viewsProfile.py:247
 msgid "Display name cannot be empty"
 msgstr "Le nom d'affichage ne peut pas être vide."
 
-#: gateway/viewsProfile.py:266
+#: gateway/viewsProfile.py:250
 msgid "City cannot be empty"
 msgstr "La ville ne peut pas être vide."
 
-#: gateway/viewsProfile.py:269
+#: gateway/viewsProfile.py:253
 msgid "Country cannot be empty"
 msgstr "Le pays ne peut pas être vide."
 
-#: gateway/viewsProfile.py:273
+#: gateway/viewsProfile.py:257
 msgid "Display name cannot contain spaces"
 msgstr "Le nom d'affichage ne peut pas contenir d'espaces."
 
-#: gateway/viewsProfile.py:280
+#: gateway/viewsProfile.py:264
 msgid "Username cannot be empty"
 msgstr "Nom d'utilisateur ne peut pas être vide."
 
-#: gateway/viewsProfile.py:283
+#: gateway/viewsProfile.py:267
 msgid "Username cannot contain spaces"
 msgstr "Le nom d'utilisateur ne peut pas contenir d'espaces."
 
-#: gateway/viewsProfile.py:405 gateway/viewsProfile.py:438
+#: gateway/viewsProfile.py:378 gateway/viewsProfile.py:409
 msgid "Please select an image file"
 msgstr "Veuillez sélectionner une image à télécharger"
 
