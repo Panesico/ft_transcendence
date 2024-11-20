@@ -9,7 +9,7 @@ async function main() {
 
   contractAddress = await Contract.getAddress();
 
-  // console.log(`Contract deployed to ${await Contract.getAddress()}`);
+  console.log(`Contract deployed to ${await Contract.getAddress()}`);
   fs.writeFileSync(path, JSON.stringify({ contractAddress: contractAddress }));
 }
 

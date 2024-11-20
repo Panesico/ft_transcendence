@@ -192,11 +192,6 @@ def createProfile(username, user_id, csrf_token, id_42, lang):
         logger.error(f'api_signup > createProfile > Failed to create profile: {e}')
         return False
 
-# def validate_password(password):
-#     # Ensure the password meets the minimum requirements
-#     if not validate_password(password):
-#         raise DjangoValidationError(['Not a valid password'])
-#     return None
 
 def api_signup(request):
     logger.debug("api_signup")
@@ -212,6 +207,12 @@ def api_signup(request):
 
                 # Password validation
                 password = data.get('password') # clear text password
+                
+                # Ensure the password meets the minimum requirements
+                try:
+                  validate_password(password)
+                except DjangoValidationError as e:
+                  return JsonResponse({'status': 'error', 'message': _('Not a valid password')}, status=400)
                 
                 user.password = make_password(data['password']) # hashed password
                 user = form.save()
@@ -237,10 +238,6 @@ def api_signup(request):
                             'status': 'error', 
                             'message': _('Failed to create profile')
                         }, status=500)
-
-                # Ensure the password meets the minimum requirements
-                # if validate_password(password) == None:
-                #   raise DjangoValidationError(['Not a valid password'])
 
                 jwt_token, refresh_jwt_token = generate_jwt_token(user)
         
@@ -333,8 +330,12 @@ def api_edit_profile(request):
       logger.debug(f'user_obj username: {user_obj.username}, user_obj id: {user_obj.id}')
 
       # Password validation
-      new_password = data.get('new_password')
-      # validate_password(new_password)
+      if not request.user.id_42 and data.get('avatar') is None:
+        new_password = data.get('new_password')
+        try:
+          validate_password(new_password)
+        except DjangoValidationError as e:
+          return JsonResponse({'status': 'error', 'message': _('Not a valid password')}, status=400)
       
       if request.user.id_42 and request.headers.get('sudo') != "add" :
         return JsonResponse({'status': 'error', 'message': _('Unauthorized')}, status=401)
