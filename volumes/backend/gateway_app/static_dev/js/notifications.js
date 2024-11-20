@@ -231,6 +231,8 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
         error = 'Vous ne pouvez pas jouer avec cet utilisateur';
       else if (lang === 'es')
         error = 'No puedes jugar con este usuario';
+      
+      // deletePreviousGameRequestFromUser(receiver_id);
       displayMessageInModal(error);
 
       return;
@@ -335,6 +337,7 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
 
 
 function deleteResponsesButtonsId(notificationDropdownClass, userid) {
+  console.log('deleteResponsesButtonsId > userid:', userid);
   const notifications = notificationDropdownClass.children;
 
   for (let i = 0; i < notifications.length; i++) {
@@ -344,8 +347,9 @@ function deleteResponsesButtonsId(notificationDropdownClass, userid) {
     // console.log('deleteResponsesButtonsId > buttons:', buttons);
 
     const targetId = notification.getAttribute('data-targetid');
+    const userId = notification.getAttribute('data-userid');
 
-    if (targetId == userid && buttons.length > 0) {
+    if (((targetId == userid && g_user_id == userId) || (targetId == g_user_id && userId == userid)) && buttons.length > 0) {
       // If the image is not the avatar, remove it
       buttons.forEach(button => {
         if (button.id !== 'avatar') {
