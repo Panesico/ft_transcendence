@@ -3,6 +3,22 @@ function deleteCookie(name) {
   document.cookie = name + '=; Max-Age=-99999999; path=/;';
 }
 
+async function updateUserID() {
+    try {
+      const response = await fetch('/api/getUserID/', { credentials: 'include' });
+      const data = await response.json();
+      if (data.user_id) {
+        g_user_id = data.user_id;
+        console.log('Updated global user ID:', g_user_id);
+      } else {
+        console.error('Failed to retrieve user ID');
+        g_user_id = null;
+      }
+    } catch (error) {
+      console.error('Error fetching user ID:', error);
+      g_user_id = null;
+    }
+  }
 
 async function handleRefresh(type) {
   console.warn('handleRefresh called by:\n', new Error().stack.split('\n')[2].trim());
@@ -11,7 +27,7 @@ async function handleRefresh(type) {
 
   if (type != 'language') {
     // console.log('handleRefresh > main content');
-    fetch(`/home/?status=success&message=Logged%20in%20successfully&type=main`, {
+    await fetch(`/home/?status=success&message=Logged%20in%20successfully&type=main`, {
       headers: {
         'X-CSRFToken': getCookie('csrftoken'),
         'x-requested-with': 'XMLHttpRequest',
@@ -32,7 +48,7 @@ async function handleRefresh(type) {
 
   // Second GET request for the header content
   // console.log('handleRefresh > header');
-  fetch(`/home/?status=success&message=Logged%20in%20successfully&type=header`, {
+  await fetch(`/home/?status=success&message=Logged%20in%20successfully&type=header`, {
     headers: {
       'X-CSRFToken': getCookie('csrftoken'),
       'x-requested-with': 'XMLHttpRequest',
@@ -48,7 +64,9 @@ async function handleRefresh(type) {
           g_user_id = 0;
         }
         else {
-          g_user_id = data.user_id;
+            console.log(data.user_id)
+            g_user_id = data.user_id;
+            console.log(g_user_id)
         }
       }
     })
@@ -116,6 +134,12 @@ async function handleRefresh(type) {
 
   }
 
+  if (type != 'logout') {
+    if (!mainRoomSocket || mainRoomSocket.readyState != WebSocket.OPEN) {
+      connectMainRoomSocket();
+    }
+  }
+
   if (type != 'language') {
     window.history.pushState({}, '', '/');
   }
@@ -123,8 +147,12 @@ async function handleRefresh(type) {
   if (type == 'profile_update' || type == 'login' || type == 'refresh' || type == 'oauth' || type == 'signup' || chatPresent) {
     console.warn('handleRefresh > updating notifications');
     await fetchTranslations();
-    await sleep(350);
-    reloadNotificationsIfNeeded();
+    if (mainRoomSocket && mainRoomSocket.readyState != WebSocket.OPEN) {
+        connectMainRoomSocket();
+    }
+    if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
+        reloadNotificationsIfNeeded();
+    }
   }
 }
 
@@ -156,7 +184,7 @@ async function handleOAuthCode(oauth_callback_url) {
         // console.log("OAuth authentication successful");
         refreshToken();
         await sleep(500);
-        handleRefresh("oauth");
+        await handleRefresh("oauth");
       } else {
         console.error("OAuth authentication failed");
       }
@@ -281,9 +309,8 @@ function verify2FA() {
         messageDiv.innerHTML = `<p class="text-success">${data.message}</p>`;
         refreshToken();
         await sleep(200);
-        g_user_id = await getUserID();
-        handleRefresh('login');
-        connectMainRoomSocket();
+        await handleRefresh('login');
+        await connectMainRoomSocket();
       } else {
         messageDiv.innerHTML = `<p class="text-danger">${data.message}</p>`;
       }
@@ -358,7 +385,7 @@ async function refreshToken() {
     if (data.message === 'Expired Token refreshed') {
       // console.log("Expired Token refreshed");
       await sleep(300);
-      handleRefresh("refresh");
+      await handleRefresh("refresh");
     }
 
     // Assuming the new token is in data.token

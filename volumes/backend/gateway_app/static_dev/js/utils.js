@@ -69,13 +69,13 @@ async function reconnectSocket(socket) {
   // Reconnect to the corresponding socket
   if (socket === mainRoomSocket) {
     // console.log('sendMessagesBySocket > reconnecting to the mainRoomSocket');
-    const userID = await getUserID();
+    await updateUserID();
     // console.log('userID:', userID);
-    if (userID === 0 || userID === '0' || userID === '' || userID === undefined || userID === null || userID === 'None' || userID === '[object HTMLInputElement]') {
+    if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
       console.warn('Client is not logged in');
       return false;
     }
-    socket = new WebSocket(`${protocol}//${hostname}${port}/wss/mainroom/${userID}/`);
+    socket = new WebSocket(`${protocol}//${hostname}${port}/wss/mainroom/${g_user_id}/`);
   }
   else if (socket === inviteFriendSocket) {
     // console.log('sendMessagesBySocket > reconnecting to the inviteFriendSocket');

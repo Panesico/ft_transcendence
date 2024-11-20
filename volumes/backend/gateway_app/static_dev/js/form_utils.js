@@ -64,30 +64,28 @@ function listenForm(form) {
           if (data.type === 'login_successful') {
             // console.log('displayMessageInModal login_successful');
             // Update user id global variable
-            g_user_id = await getUserID();
-            if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
-              console.error('Failed to get user ID');
-              // Handle the redirect, maybe to a login page or another appropriate action
-              return;
-            }
+
 
             console.warn('global variable g_user_id:', g_user_id);
-            handleRefresh("login");
-            connectMainRoomSocket();
+            await handleRefresh("login");
+            if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
+                console.error('Failed to get user ID');
+                // Handle the redirect, maybe to a login page or another appropriate action
+                return;
+              }
 
           } else if (data.type === 'signup_successful') {
             // Update user id global variable
-            g_user_id = await getUserID();
+
+            await handleRefresh("signup");
             if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
-              console.error('Failed to get user ID');
-              // Handle the redirect, maybe to a login page or another appropriate action
-              return;
-            }
-            handleRefresh("signup");
-            connectMainRoomSocket();
+                console.error('Failed to get user ID');
+                // Handle the redirect, maybe to a login page or another appropriate action
+                return;
+              }
 
           } else if (data.type === 'profile_updated') {
-            handleRefresh("profile_update");
+            await handleRefresh("profile_update");
 
           } else if (data.type === '2FA') {
             try {
@@ -185,7 +183,7 @@ function listenFormUpload(form) {
         // console.log('data.type: ', data.type, 'data.message: ', data.message);
 
         if (data.type === 'profile_updated') {
-          handleRefresh("profile_update");
+          await handleRefresh("profile_update");
         }
 
       } else

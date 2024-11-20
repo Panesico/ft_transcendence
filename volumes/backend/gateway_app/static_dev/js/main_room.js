@@ -61,52 +61,51 @@ function listenUserReadNotification() {
 
 // Connect to the main room socket
 async function connectMainRoomSocket() {
-  // console.log('connectMainRoomSocket');
-
-  // Establish connection to the main room
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const hostname = window.location.hostname;
-  const port = window.location.port ? `:${window.location.port}` : '';
-  mainRoomSocket = new WebSocket(`${protocol}//${hostname}${port}/wss/mainroom/${g_user_id}/`);
-
-  // On websocket open
-  mainRoomSocket.onopen = function (e) {
-    // console.log('mainRoomSocket opened');
-    sendMessagesBySocket({ 'type': 'message', 'message': 'main socket opened', }, mainRoomSocket);
-    //    mainRoomSocket.send(JSON.stringify({'type': 'message', 'message': 'main socket opened',}));
-  };
-
-  // On websocket message
-  mainRoomSocket.onmessage = function (e) {
-    const data = JSON.parse(e.data);
-    parseSocketMessage(data);
-  };
-
-  // On websocket close
-  mainRoomSocket.onclose = function (e) {
-    console.warn('mainRoomSocket onclose > mainRoomSocket socket closed');
-  };
-
-  // Close the main room socket when the window is closed
-  window.onbeforeunload = () => {
+    if (!g_user_id || g_user_id === '0' || g_user_id === 0) {
+      console.error('WebSocket connection aborted: Invalid user ID');
+      return;
+    }
+  
     if (mainRoomSocket && mainRoomSocket.readyState === WebSocket.OPEN) {
-
-      console.warn('mainRoomSocket socket closed');
+      console.warn('WebSocket is already connected.');
+      return;
+    }
+  
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const hostname = window.location.hostname;
+    const port = window.location.port ? `:${window.location.port}` : '';
+  
+    console.log('Connecting to WebSocket...');
+    mainRoomSocket = new WebSocket(`${protocol}//${hostname}${port}/wss/mainroom/${g_user_id}/`);
+  
+    mainRoomSocket.onopen = function (e) {
+      console.log('WebSocket connection established.');
+      sendMessagesBySocket({ type: 'message', message: 'main socket opened' }, mainRoomSocket);
+    };
+  
+    mainRoomSocket.onmessage = function (e) {
+      const data = JSON.parse(e.data);
+      parseSocketMessage(data);
+    };
+  
+    mainRoomSocket.onclose = function (e) {
+      console.warn('WebSocket closed:', e);
+      mainRoomSocket = null; // Reset socket reference
+    };
+  
+    mainRoomSocket.onerror = function (e) {
+      console.error('WebSocket encountered an error:', e);
       mainRoomSocket.close();
-    }
-    else {
-      console.warn('mainRoomSocket is not open');
-    }
+    };
   }
-}
-
+  
 // Routine when user reload the page
 window.onload = async () => {
   // Handle form submission
   handleFormSubmission();
 
   // Update user id global variable
-  g_user_id = await getUserID();
+  await updateUserID();
 
   // console.log('g_user_id:', g_user_id);
   if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
@@ -115,7 +114,7 @@ window.onload = async () => {
   }
 
   // Connect to the main room socket
-  connectMainRoomSocket();
+  await connectMainRoomSocket();
 }
 
 function parseSocketMessage(data) {

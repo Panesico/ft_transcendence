@@ -35,7 +35,7 @@ async function loadContent(path) {
 
     if (data.type && data.message && (data.type === 'logout_successful')) {
       // disconnect main room socket
-      handleRefresh("logout");
+      await handleRefresh("logout");
       closeMainRoomSocket();
       // console.log('loadContent > logout_successful');
     }
@@ -111,7 +111,7 @@ async function changeLanguage(lang) {
       // console.log('changeLanguage > new django_language:', getCookie('django_language'));
       await fetchTranslations();
       loadContent(path);
-      handleRefresh('language');
+      await handleRefresh('language');
       await sleep(350);
       reloadNotificationsIfNeeded();
     } else {

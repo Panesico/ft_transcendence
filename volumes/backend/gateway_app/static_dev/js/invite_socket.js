@@ -158,6 +158,10 @@ function onModalOpen(userID, modal) {
   const hostname = window.location.hostname;
   const port = window.location.port ? `:${window.location.port}` : '';
   /* WebSocket */
+  if (inviteFriendSocket && inviteFriendSocket.readyState === WebSocket.OPEN) {
+    console.warn('WebSocket connection already exists. Skipping connection.');
+    return;
+  }
   inviteFriendSocket = new WebSocket(`${protocol}//${hostname}${port}/wss/inviteafriend/`);
 
   inviteFriendSocket.onopen = function (e) {
@@ -229,10 +233,10 @@ function onModalClose(modal) {
 // Function to listen for the friend invitation
 async function listenFriendInvitation(modal, form) {
   let inputField = document.getElementById('usernameInput');
-  let userID = await getUserID();
+  
 
   // console.log('User ID:', userID);
-  if (userID === '' || userID === undefined) {
+  if (g_user_id === '' || g_user_id === undefined) {
     console.error('User ID is not defined');
     // exit ===> handle error
   }
@@ -240,7 +244,7 @@ async function listenFriendInvitation(modal, form) {
   // Listen for modal open
   if (!modal.hasOpeningListener) {
     modal.addEventListener('show.bs.modal', () => {
-      onModalOpen(userID, modal);
+      onModalOpen(g_user_id, modal);
     });
     modal.hasOpeningListener = true;
   }
