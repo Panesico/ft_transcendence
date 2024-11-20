@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-19 10:32+0000\n"
+"POT-Creation-Date: 2024-11-20 14:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,27 +22,43 @@ msgstr ""
 msgid "Password and confirmation are required"
 msgstr "Se requieren la contraseña y la confirmación"
 
-#: authentif/forms.py:28 authentif/forms.py:109
+#: authentif/forms.py:28 authentif/forms.py:102
 msgid "Passwords do not match"
 msgstr "Las contraseñas no coinciden"
 
-#: authentif/forms.py:32
+#: authentif/forms.py:31 authentif/forms.py:105
+msgid "Password must contain at least one uppercase letter"
+msgstr "La contraseña debe contener al menos una letra mayúscula"
+
+#: authentif/forms.py:33 authentif/forms.py:107
+msgid "Password must contain at least one lowercase letter"
+msgstr "La contraseña debe contener al menos una letra minúscula"
+
+#: authentif/forms.py:35 authentif/forms.py:109
+msgid "Password must contain at least one digit"
+msgstr "La contraseña debe contener al menos un dígito"
+
+#: authentif/forms.py:37 authentif/forms.py:111
+msgid "Password must be at least 8 characters long"
+msgstr "La contraseña debe tener al menos 8 caracteres"
+
+#: authentif/forms.py:41
 msgid "Cannot set both password and id_42"
 msgstr "No se puede establecer tanto la contraseña como el id_42"
 
-#: authentif/forms.py:58
+#: authentif/forms.py:64
 msgid "New Username"
 msgstr "Nuevo nombre de usuario"
 
-#: authentif/forms.py:62
+#: authentif/forms.py:68
 msgid "New Password"
 msgstr "Nueva contraseña"
 
-#: authentif/forms.py:66
+#: authentif/forms.py:72
 msgid "Confirm Password"
 msgstr "Confirmar contraseña"
 
-#: authentif/forms.py:70
+#: authentif/forms.py:76
 msgid "Avatar"
 msgstr "Avatar"
 
@@ -54,8 +70,8 @@ msgstr "Debe establecerse la contraseña o el id_42."
 msgid "You cannot set both password and id_42."
 msgstr "No puede establecer tanto la contraseña como el id_42."
 
-#: authentif/views.py:44 authentif/views.py:46 authentif/views.py:362
-#: authentif/views.py:795
+#: authentif/views.py:44 authentif/views.py:46 authentif/views.py:366
+#: authentif/views.py:798
 msgid "User not found"
 msgstr "Usuario no encontrado"
 
@@ -75,8 +91,8 @@ msgstr "Credenciales incorrectas"
 msgid "2FA required"
 msgstr "Se requiere 2FA"
 
-#: authentif/views.py:117 authentif/views.py:251 authentif/views.py:504
-#: authentif/views.py:637 authentif/views.py:813
+#: authentif/views.py:117 authentif/views.py:251 authentif/views.py:507
+#: authentif/views.py:640 authentif/views.py:816
 msgid "Login successful"
 msgstr "Inicio de sesión exitoso"
 
@@ -85,7 +101,7 @@ msgid "Invalid username or password"
 msgstr "Nombre de usuario o contraseña inválidos"
 
 #: authentif/views.py:151 authentif/views.py:288 authentif/views.py:314
-#: authentif/views.py:359
+#: authentif/views.py:363
 msgid "Invalid JSON"
 msgstr "JSON inválido"
 
@@ -94,7 +110,7 @@ msgid "Wrong or invalid password"
 msgstr "Contraseña no válida"
 
 #: authentif/views.py:156 authentif/views.py:296 authentif/views.py:316
-#: authentif/views.py:368
+#: authentif/views.py:371
 msgid "Method not allowed"
 msgstr "Método no permitido"
 
@@ -106,7 +122,7 @@ msgstr "El usuario está inactivo"
 msgid "Failed to create profile"
 msgstr "Error al crear el perfil"
 
-#: authentif/views.py:291 authentif/views.py:365
+#: authentif/views.py:291 authentif/views.py:368
 msgid "Not a valid password"
 msgstr "Contraseña no válida"
 
@@ -122,8 +138,8 @@ msgstr "El usuario ya existe"
 msgid "User does not exist"
 msgstr "El usuario no existe"
 
-#: authentif/views.py:340 authentif/views.py:678 authentif/views.py:681
-#: authentif/views.py:723 authentif/views.py:727 authentif/views.py:769
+#: authentif/views.py:340 authentif/views.py:681 authentif/views.py:684
+#: authentif/views.py:726 authentif/views.py:730 authentif/views.py:772
 msgid "Unauthorized"
 msgstr "No autorizado"
 
@@ -131,60 +147,61 @@ msgstr "No autorizado"
 msgid "Profile updated"
 msgstr "Perfil actualizado"
 
-#: authentif/views.py:356
+#: authentif/views.py:359
 msgid "Invalid profile update"
 msgstr "Actualización de perfil inválida"
 
-#: authentif/views.py:675 authentif/views.py:720 authentif/views.py:785
+#: authentif/views.py:678 authentif/views.py:723 authentif/views.py:788
 msgid "Invalid request method. Use POST."
 msgstr "Método de solicitud inválido. Use POST."
 
-#: authentif/views.py:687
+#: authentif/views.py:690
 msgid "2FA is already enabled"
 msgstr "2FA ya está habilitado"
 
-#: authentif/views.py:709
+#: authentif/views.py:712
 msgid "Scan the QR code, then enter the OTP below to confirm"
-msgstr "Escanee el código QR, luego ingrese la OTP a continuación para confirmar"
-"Escanee el código QR, luego ingrese el OTP a continuación para confirmar"
+msgstr ""
+"Escanee el código QR, luego ingrese la OTP a continuación para "
+"confirmar"
 
-#: authentif/views.py:734 authentif/views.py:805
+#: authentif/views.py:737 authentif/views.py:808
 msgid "OTP code is required"
 msgstr "Se requiere el código OTP"
 
-#: authentif/views.py:736
+#: authentif/views.py:739
 msgid "Invalid JSON format"
 msgstr "Formato de JSON inválido"
 
-#: authentif/views.py:742
+#: authentif/views.py:745
 msgid "No 2FA setup in progress or setup expired"
 msgstr "No hay configuración de 2FA en progreso o la configuración ha expirado"
 
-#: authentif/views.py:757
+#: authentif/views.py:760
 msgid "2FA is now enabled"
 msgstr "2FA ahora está habilitado"
 
-#: authentif/views.py:761 authentif/views.py:819
+#: authentif/views.py:764 authentif/views.py:822
 msgid "Invalid OTP code"
 msgstr "Código OTP inválido"
 
-#: authentif/views.py:775
+#: authentif/views.py:778
 msgid "2FA disabled successfully"
 msgstr "2FA deshabilitado con éxito"
 
-#: authentif/views.py:777
+#: authentif/views.py:780
 msgid "2FA is not enabled"
 msgstr "2FA no está habilitado"
 
-#: authentif/views.py:778
+#: authentif/views.py:781
 msgid "Invalid request"
 msgstr "Solicitud inválida"
 
-#: authentif/views.py:789
+#: authentif/views.py:792
 msgid "User ID is required"
 msgstr "Se requiere ID de usuario"
 
-#: authentif/views.py:798
+#: authentif/views.py:801
 msgid "2FA is not enabled for this user"
 msgstr "2FA no está habilitado para este usuario"
 
