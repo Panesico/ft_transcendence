@@ -2,7 +2,12 @@ SHELL	= /bin/sh
 
 NAME	= transcendence
 
-all: check_certs create_volumes_dirs
+ifeq ($(wildcard srcs/.env), srcs/.env)
+    include srcs/.env
+		export
+endif
+
+all: check_certs create_volumes_dirs generate_yml
 	cd srcs && docker compose up --build
 
 check_certs: # creates certificates if needed
@@ -28,9 +33,9 @@ logs:
 
 prune:
 	docker image prune
-routine:
+routine: remove_templates
 	docker system prune -a
-reset:
+reset: remove_templates
 	docker stop $$(docker ps -qa); \
 	docker rm $$(docker ps -qa); \
 	docker rmi -f $$(docker images -qa); \
@@ -40,10 +45,11 @@ reset:
 certs:
 	mkdir -p volumes/certs && cd volumes/certs && openssl req -x509 -nodes \
 		-newkey rsa:4096 -days 365 \
-		-keyout key.pem -out cert.pem \
+		-keyout temp_key.pem -out cert.pem \
 		-subj "/C=ES/L=Malaga/O=42 Malaga/CN=localhost" \
 		-addext "subjectAltName=DNS:localhost,DNS:gateway,DNS:authentif,\
-		DNS:profileapi,DNS:play,DNS:calcgame,DNS:blockchain,DNS:nginx,DNS:logstash,DNS:elasticsearch,DNS:kibana,DNS:filebeat"
+		DNS:profileapi,DNS:play,DNS:calcgame,DNS:blockchain,DNS:nginx,DNS:logstash,DNS:elasticsearch,DNS:kibana,DNS:filebeat" && \
+	install -m 644 temp_key.pem key.pem && rm temp_key.pem
 
 clean_database:
 	docker exec -it gateway sh \
@@ -102,7 +108,16 @@ compilemessages:
 	docker exec play sh -c $(COMPILEMESSAGES_CMD)
 	docker exec profileapi sh -c $(COMPILEMESSAGES_CMD)
 
+generate_yml:
+	envsubst < srcs/logstash/logstash_template.yml > srcs/logstash/logstash.yml
+	envsubst < srcs/logstash/logstash_template.conf > srcs/logstash/logstash.conf
+	envsubst < srcs/kibana/kibana_template.yml > srcs/kibana/kibana.yml
+
+remove_templates:
+	rm -f srcs/logstash/logstash.yml srcs/logstash/logstash.conf srcs/kibana/kibana.yml
+
 .phony: all down stop logs prune routine reset certs postgres \
 	gateway gateway_restart authentif authentif_restart \
 	profileapi profileapi_restart calcgame blockchain \
-	makemessages compilemessages
+	makemessages compilemessages generate_yml remove_templates
+
