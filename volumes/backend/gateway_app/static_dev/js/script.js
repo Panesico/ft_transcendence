@@ -113,7 +113,7 @@ async function changeLanguage(lang) {
       loadContent(path);
       handleRefresh('language');
       await sleep(350);
-      reloadNotificationsIfNeeded();
+      //await reloadNotificationsIfNeeded();
     } else {
       console.error('Error changing language:', response.statusText);
     }

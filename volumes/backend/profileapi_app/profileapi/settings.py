@@ -150,18 +150,18 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': '/usr/src/app/logs/django-profileapi.log',
             'formatter': 'standard',
         },
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'standard',
         },
         'uvicorn_file': {  # Separate file handler for Uvicorn logs
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': '/usr/src/app/logs/uvicorn-profileapi.log',
             'formatter': 'uvicorn',
@@ -170,22 +170,22 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['file', 'console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False,
         },
         'uvicorn': {  # Base logger for Uvicorn
             'handlers': ['uvicorn_file', 'console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False,
         },
         'uvicorn.access': {  # Uvicorn access logs (HTTP requests)
             'handlers': ['uvicorn_file', 'console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False,
         },
         'uvicorn.error': {  # Uvicorn error logs
             'handlers': ['uvicorn_file', 'console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False,
         },
     },
