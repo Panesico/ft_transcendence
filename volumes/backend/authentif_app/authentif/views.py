@@ -330,7 +330,7 @@ def api_edit_profile(request):
       logger.debug(f'user_obj username: {user_obj.username}, user_obj id: {user_obj.id}')
 
       # Password validation
-      if not request.user.id_42:
+      if not request.user.id_42 and data.get('avatar') is None:
         new_password = data.get('new_password')
         try:
           validate_password(new_password)

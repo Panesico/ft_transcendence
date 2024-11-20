@@ -27,7 +27,7 @@ function sendMessagesBySocket(message, socket) {
     return;
   }
 
-  // console.log('sendMessagesBySocket > message:', message);
+  console.log('sendMessagesBySocket > message:', message);
   if (socket && socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(message));
     return true;
@@ -46,7 +46,7 @@ function listenUserReadNotification() {
   }
 
   notificationDropdown.addEventListener('click', function () {
-    // console.log('Notification dropdown clicked');
+    console.log('Notification dropdown clicked');
     unreadNotifications = false;
     const bellIcon = notificationDropdown.querySelector('img');
     if (bellIcon.src.includes('bell_up')) {
@@ -107,7 +107,7 @@ window.onload = async () => {
   // Update user id global variable
   await updateUserID();
 
-  // console.log('g_user_id:', g_user_id);
+  console.log('g_user_id:', g_user_id);
   if (g_user_id === 0 || g_user_id === '0' || g_user_id === '' || g_user_id === undefined || g_user_id === null || g_user_id === 'None' || g_user_id === '[object HTMLInputElement]') {
     console.warn('Client is not logged in');
     return;

@@ -4,7 +4,7 @@ function removeEmptyMessage() {
   const emptyMessage = document.getElementById('notificationContent');
   if (emptyMessage) {
     if (emptyMessage.innerHTML.trim() === 'You have no notifications' || emptyMessage.innerHTML.trim() === 'No tienes notificaciones' || emptyMessage.innerHTML.trim() === 'Vous n\'avez pas de notifications') {
-      // console.log('addRequestNotification > Removing empty message');
+      console.log('addRequestNotification > Removing empty message');
       emptyMessage.remove();
       unreadNotifications = false;
 
@@ -168,10 +168,10 @@ function changeNotificationIconToUp(notificationDropdownClass, newNotification, 
 
   if (notificationDropdownClass) {
     //notificationDropdown.insertBefore(newNotification, notificationDropdown.firstChild);
-    // console.log('addRequestNotification > notificationDropdown:', notificationDropdown);
+    console.log('addRequestNotification > notificationDropdown:', notificationDropdown);
     const bellIcon = notificationDropdown.querySelector('img');
     if (bellIcon && status !== 'accepted' && status !== 'declined') {
-      // console.log('addRequestNotification > status:', status);
+      console.log('addRequestNotification > status:', status);
       bellIcon.src = '/media/utils_icons/bell_up.png';
     }
   }
@@ -203,10 +203,10 @@ function createDeclineButton(sender_id, receiver_id, newNotification) {
 
 function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id, sender_username, receiver_username, type, data) {
   // response_type = type + '_response';
-  // console.log('listenUserResponse > response_type:', response_type);
+  //console.log('listenUserResponse > response_type:', response_type);
 
   acceptButton.addEventListener('click', async function (event) {
-    // console.log('Accept button clicked');
+    console.log('Accept button clicked');
 
     response_type = type + '_response';
 
@@ -253,7 +253,7 @@ function listenUserResponse(acceptButton, declineButton, sender_id, receiver_id,
       declineButton.remove();
     }
 
-    // console.log('listenUserResponse > type:', type, ', data:', data);
+    console.log('listenUserResponse > type:', type, ', data:', data);
     if (type === 'game_request') {
       // Cancel current game if any
       if (calcGameSocket) {
@@ -340,8 +340,8 @@ function deleteResponsesButtonsId(notificationDropdownClass, userid) {
   for (let i = 0; i < notifications.length; i++) {
     const notification = notifications[i];
     const buttons = notification.querySelectorAll('img');
-    // console.log('deleteResponsesButtonsId > notification:', notification);
-    // console.log('deleteResponsesButtonsId > buttons:', buttons);
+    console.log('deleteResponsesButtonsId > notification:', notification);
+    console.log('deleteResponsesButtonsId > buttons:', buttons);
 
     const targetId = notification.getAttribute('data-targetid');
 
@@ -412,7 +412,7 @@ function addRequestNotification(data) {
   }
   else if (data.type === 'unblock') {
     message.textContent = sender_username + ' ' + userUnblocked;
-    // console.log('addRequestNotification > message:', message);
+    console.log('addRequestNotification > message:', message);
   }
 
   // Add button to accept the friend request represented by accept png
@@ -478,7 +478,7 @@ function addResponseNotification(data) {
   const avatar = createAvatarElement(receiver_avatar_url);
 
   // Create a span element for the message
-  // console.warn('addResponseNotification > data:', data);
+  console.warn('addResponseNotification > data:', data);
   inputMessage = gameRequestCancelled;
   if (data.type === 'friend_request_response') {
     // if data.message contrains 'accepted', then the message is 'accepted'
@@ -501,7 +501,7 @@ function addResponseNotification(data) {
     inputMessage = gameRequestCancelled;
     document.querySelector('main').innerHTML = data.html;
     displayMessageInModal(data.receiver_username + gameRequestCancelled);
-    // console.warn('redirect to home');
+    console.warn('redirect to home');
   }
   else if (data.type === 'next_in_tournament') {
     inputMessage = gamePlayNextTournament;
