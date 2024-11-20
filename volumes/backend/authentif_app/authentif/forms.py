@@ -26,6 +26,15 @@ class SignUpForm(forms.ModelForm):
                 raise forms.ValidationError(_("Password and confirmation are required"))
             if password != confirm_password:
                 raise forms.ValidationError(_("Passwords do not match"))
+            # Check if password has one uppercase, one lowercase, one digit
+            if not any(char.isupper() for char in password):
+                raise ValidationError(_("Password must contain at least one uppercase letter"))
+            if not any(char.islower() for char in password):
+                raise ValidationError(_("Password must contain at least one lowercase letter"))
+            if not any(char.isdigit() for char in password):
+                raise ValidationError(_("Password must contain at least one digit"))
+            if len(password) < 8:
+                raise ValidationError(_("Password must be at least 8 characters long"))
 
         # If id_42 is set, we don't need a password, vice versa
         if id_42 and password:
@@ -91,6 +100,15 @@ class EditProfileForm(UserChangeForm):
         if new_password or confirm_password:
             if new_password != confirm_password:
                 raise ValidationError(_("Passwords do not match"))
+            # Check if password has one uppercase, one lowercase, one digit
+            if not any(char.isupper() for char in new_password):
+                raise ValidationError(_("Password must contain at least one uppercase letter"))
+            if not any(char.islower() for char in new_password):
+                raise ValidationError(_("Password must contain at least one lowercase letter"))
+            if not any(char.isdigit() for char in new_password):
+                raise ValidationError(_("Password must contain at least one digit"))
+            if len(new_password) < 8:
+                raise ValidationError(_("Password must be at least 8 characters long"))
             else:
               self.instance.set_password(new_password)
               if new_username:
