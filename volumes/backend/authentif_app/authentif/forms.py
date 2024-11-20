@@ -26,6 +26,15 @@ class SignUpForm(forms.ModelForm):
                 raise forms.ValidationError(_("Password and confirmation are required"))
             if password != confirm_password:
                 raise forms.ValidationError(_("Passwords do not match"))
+            # Check if password has one uppercase, one lowercase, one digit
+            if not any(char.isupper() for char in password):
+                raise ValidationError(_("Password must contain at least one uppercase letter"))
+            if not any(char.islower() for char in password):
+                raise ValidationError(_("Password must contain at least one lowercase letter"))
+            if not any(char.isdigit() for char in password):
+                raise ValidationError(_("Password must contain at least one digit"))
+            if len(password) < 8:
+                raise ValidationError(_("Password must be at least 8 characters long"))
 
         # If id_42 is set, we don't need a password, vice versa
         if id_42 and password:
@@ -50,9 +59,6 @@ class LogInForm42(AuthenticationForm):
 
 class EditProfileForm(UserChangeForm):
 
-    # current_password = forms.CharField(widget=forms.PasswordInput(attrs={
-    #     'class': 'form-control', 'id': 'currentPassword'
-    # }), label='Current Password')
     new_username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 'id': 'newUsername'
     }), label=_('New Username'), required=False)
@@ -70,46 +76,41 @@ class EditProfileForm(UserChangeForm):
     }), label=_('Avatar'), required=False) 
 
     def __init__(self, *args, **kwargs):
-        logger.debug("EditProfileForm > __init__")
         super(EditProfileForm, self).__init__(*args, **kwargs)
-        logger.debug(f"self.fields: {self.fields}")
         del self.fields['password']
-        logger.debug("Password field deleted")
 
     class Meta:
-        logger.debug("EditProfileForm > Meta")
         model = User
-        logger.debug(f"model: {model}")
         fields = ('username', 'avatar')
-        logger.debug(f"fields: {fields}")
 
 
 
     def clean(self):
-        logger.debug("EditProfileForm > clean")
-        logger.debug(f"new_password: {self.cleaned_data.get('new_password')}")
-        logger.debug(f"confirm_password: {self.cleaned_data.get('confirm_password')}")
-        logger.debug(f"new_username: {self.cleaned_data.get('username')}")
         cleaned_data = super().clean()
         new_password = cleaned_data.get('new_password')
         confirm_password = cleaned_data.get('confirm_password')
         new_username = cleaned_data.get('username')
         avatar = cleaned_data.get('avatar')
-        logger.debug(f'avatar: {avatar}')
 
         # Change avatar
         if avatar:
             self.instance.avatar = avatar
 
         # Validate current password
-        if new_password and confirm_password:
-            logger.debug("EditProfileForm > clean > if password and confirm_password")
+        if new_password or confirm_password:
             if new_password != confirm_password:
-                logger.debug("EditProfileForm > clean > if password != confirm_password")
                 raise ValidationError(_("Passwords do not match"))
+            # Check if password has one uppercase, one lowercase, one digit
+            if not any(char.isupper() for char in new_password):
+                raise ValidationError(_("Password must contain at least one uppercase letter"))
+            if not any(char.islower() for char in new_password):
+                raise ValidationError(_("Password must contain at least one lowercase letter"))
+            if not any(char.isdigit() for char in new_password):
+                raise ValidationError(_("Password must contain at least one digit"))
+            if len(new_password) < 8:
+                raise ValidationError(_("Password must be at least 8 characters long"))
             else:
               self.instance.set_password(new_password)
               if new_username:
                 self.instance.username = new_username
-        logger.debug("EditProfileForm > clean > return cleaned_data")
         return cleaned_data

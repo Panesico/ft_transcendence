@@ -89,6 +89,7 @@ async function blockFriend(friendId) {
       // Reload my_friends page if on it
       if (document.getElementById('myfriends-page') && window.location.pathname.includes('my_friends')) {
         document.querySelector('main').innerHTML = data.html;
+        handleFormSubmission();
       }
 
       if (checked) {

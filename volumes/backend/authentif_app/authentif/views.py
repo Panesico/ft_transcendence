@@ -353,8 +353,12 @@ def api_edit_profile(request):
               'status': 200
             })
       else:
-        logger.debug('api_edit_profile > Form is invalid')
-        return JsonResponse({'status': 'error', 'message': _('Invalid profile update')}, status=400)
+        errors = json.loads(form.errors.as_json())
+        if errors:
+          message = next((error['message'] for field_errors in errors.values() for error in field_errors), None)
+        else:
+          message = _('Invalid profile update')
+        return JsonResponse({'status': 'error', 'message':message}, status=400)
     except json.JSONDecodeError:
       logger.debug('api_edit_profile > Invalid JSON')
       return JsonResponse({'status': 'error', 'message': _('Invalid JSON')}, status=400)    
@@ -362,7 +366,6 @@ def api_edit_profile(request):
       logger.debug('api_edit_profile > User not found')
       return JsonResponse({'status': 'error', 'message': _('User not found')}, status=404)
     except DjangoValidationError as e:
-          logger.debug(f'Password validation error: {e.messages}')
           return JsonResponse({'status': 'error', 'message': _('Not a valid password')}, status=400)
   else:
     logger.debug('api_edit_profile > Method not allowed')
