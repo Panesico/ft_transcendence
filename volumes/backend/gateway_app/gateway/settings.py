@@ -260,18 +260,18 @@ SESSION_COOKIE_SECURE = True
 # Mitigates the risk of cross-site scripting (XSS) - document.cookie not accessible in the browser.
 SESSION_COOKIE_HTTPONLY = True
 
-CORS_ALLOWED_ORIGINS = [ '"https://localhost:8443", "https://localhost:8000"',
-  f'https://{os.getenv("ACTUALHOSTNAME")}:8000' ]
+CORS_ALLOWED_ORIGINS = [ '"https://localhost:8443", "https://localhost:8888"',
+  f'https://{os.getenv("ACTUALHOSTNAME")}:8888' ]
 
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'Strict'
 CSRF_TRUSTED_ORIGINS = [
-  'https://localhost:8000',
-  'https://nginx:8000',
+  'https://localhost:8888',
+  'https://nginx:8888',
   'https://gateway:8443',
   'https://authentif:9001',
   'https://profileapi:9002',
   'https://play:9003',
   'https://calcgame:9004',
-  f'https://{os.getenv("ACTUALHOSTNAME")}:8000', 
+  f'https://{os.getenv("ACTUALHOSTNAME")}:8888', 
 ]
