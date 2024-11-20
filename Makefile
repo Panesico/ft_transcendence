@@ -7,7 +7,7 @@ ifeq ($(wildcard srcs/.env), srcs/.env)
 		export
 endif
 
-all: check_certs create_volumes_dirs generate_yml
+all: certs create_volumes_dirs generate_yml
 	cd srcs && docker compose up --build
 
 check_certs: # creates certificates if needed
