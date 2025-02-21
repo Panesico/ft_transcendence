@@ -7,8 +7,8 @@ ifeq ($(wildcard srcs/.env), srcs/.env)
 		export
 endif
 
-all: certs create_volumes_dirs generate_yml
-	cd srcs && docker compose up --build
+all: create_volumes_dirs generate_yml
+	cd srcs && docker-compose up --build
 
 check_certs: # creates certificates if needed
 	@if [ ! -d "volumes/certs" ] || [ ! -f "volumes/certs/cert.pem" ] || \
@@ -25,9 +25,9 @@ create_volumes_dirs: # creates volumes directories if needed
 # 	echo "Please, fill the .env file with the following variables: DJANGO_SECRET_KEY, DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL, DJANGO_SUPERUSER_PASSWORD, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, CERTFILE"
 
 down:
-	cd srcs && docker compose down -v
+	cd srcs && docker-compose down -v
 stop:
-	cd srcs && docker compose stop
+	cd srcs && docker-compose stop
 logs:
 	cd srcs && docker-compose logs -f
 
@@ -42,14 +42,14 @@ reset: remove_templates
 	docker volume rm $$(docker volume ls -q); \
 	docker network rm $$(docker network ls -q) 2>/dev/null
 
-certs:
-	mkdir -p volumes/certs && cd volumes/certs && openssl req -x509 -nodes \
-		-newkey rsa:4096 -days 365 \
-		-keyout temp_key.pem -out cert.pem \
-		-subj "/C=ES/L=Malaga/O=42 Malaga/CN=localhost" \
-		-addext "subjectAltName=DNS:localhost,DNS:gateway,DNS:authentif,\
-		DNS:profileapi,DNS:play,DNS:calcgame,DNS:blockchain,DNS:nginx,DNS:logstash,DNS:elasticsearch,DNS:kibana,DNS:filebeat" && \
-	install -m 644 temp_key.pem key.pem && rm temp_key.pem
+#certs:
+#	mkdir -p volumes/certs && cd volumes/certs && openssl req -x509 -nodes \
+#		-newkey rsa:4096 -days 365 \
+#		-keyout temp_key.pem -out cert.pem \
+#		-subj "/C=ES/L=Malaga/O=42 Malaga/CN=jorge-fernandez-moreno" \
+#		-addext "subjectAltName=DNS:localhost,DNS:gateway,DNS:authentif,\
+#		DNS:profileapi,DNS:play,DNS:calcgame,DNS:blockchain,DNS:nginx,DNS:logstash,DNS:elasticsearch,DNS:kibana,DNS:filebeat,DNS:www.jorge-fernandez-moreno.software,DNS:jorge-fernandez-moreno.software" && \
+#	install -m 644 temp_key.pem key.pem && rm temp_key.pem
 
 clean_database:
 	docker exec -it gateway sh \

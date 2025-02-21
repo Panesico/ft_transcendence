@@ -232,7 +232,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # SSL - HTTPS - Security
 
 # Defines a set of host/domain names that Django will accept requests from
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'authentif']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'authentif', 'jorge-fernandez-moreno', 'www.jorge-fernandez-moreno.software']
 
 
 # Redirect all HTTP traffic to HTTPS
@@ -258,6 +258,7 @@ CORS_ALLOWED_ORIGINS = [ "https://localhost:8443" ]
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'Strict'
 CSRF_TRUSTED_ORIGINS = [
+        "https://www.jorge-fernandez-moreno.software",
     'https://localhost:8888',
     'https://nginx:8888',
     'https://gateway:8443',

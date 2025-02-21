@@ -228,7 +228,7 @@ CHANNEL_LAYERS = {
 # SSL - HTTPS - Security
 
 # Defines a set of host/domain names that Django will accept requests from
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcgame', 'gateway', 'authentif', 'profileapi', 'play']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcgame', 'gateway', 'authentif', 'profileapi', 'play', 'jorge-fernandez-moreno', 'www.jorge-fernandez-moreno.software']
 
 
 # Redirect all HTTP traffic to HTTPS
@@ -260,6 +260,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://profileapi:9002',
     'https://play:9003',
     'https://calcgame:9004',
+    'jorge-fernandez-moreno',
     ]
 
 

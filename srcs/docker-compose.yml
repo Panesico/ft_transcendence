@@ -1,5 +1,3 @@
-name: transcendence
-
 services:
   nginx:
     build:
@@ -10,7 +8,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8888:8888"
+      - "443:443"
     volumes:
       - backend:/usr/src/app
       - frontend:/usr/src/frontend
@@ -187,7 +185,7 @@ services:
 
   postgres:
     image: postgres:16.4-alpine3.20
-    container_name: postgres
+    container_name: postgre
     env_file:
       - .env
     environment:
@@ -197,109 +195,11 @@ services:
       - 5432
     working_dir: /var/lib/postgresql/data
     volumes:
-      - postgres_database:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
       - certs:/certs
     networks:
       - transcendence
     restart: unless-stopped
-
-  elasticsearch:
-    stdin_open: true
-    tty: true
-    build:
-      context: ./elasticsearch
-      dockerfile: Dockerfile
-      args:
-        ELKF_VERSION: ${ELKF_VERSION:-7.17.0}
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - cluster.name=docker-cluster
-      - node.name=node-1
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
-      - LOGSTASH_PASSWORD=${LOGSTASH_PASSWORD}
-      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
-    volumes:
-      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - certs:/usr/share/elasticsearch/config/certs
-    ports:
-      - "9200:9200"
-    networks:
-      - transcendence
-    depends_on:
-      - gateway
-    env_file:
-      - .env
-
-  logstash:
-    build:
-      context: ./logstash
-      dockerfile: Dockerfile
-      args:
-        ELKF_VERSION: ${ELKF_VERSION:-7.17.0}
-    container_name: logstash
-    volumes:
-      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-      - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - certs:/usr/share/logstash/config/certs
-    ports:
-      - "5000:5000"
-      - "9600:9600"   #For Filebeat to send logs
-      - "5044:5044"   #For Logstash to receive logs
-    depends_on:
-      - elasticsearch
-    environment:
-      - LOGSTASH_PASSWORD=${LOGSTASH_PASSWORD}
-    networks:
-      - transcendence
-    env_file:
-      - .env
-    restart: unless-stopped
-
-  kibana:
-    build:
-      context: ./kibana
-      dockerfile: Dockerfile
-      args:
-        ELKF_VERSION: ${ELKF_VERSION:-7.17.0}
-    container_name: kibana
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-    environment:
-      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
-      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
-    networks:
-      - transcendence
-    volumes:
-      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
-      - certs:/certs
-    env_file:
-      - .env
-    restart: unless-stopped
-
-  filebeat:
-    build:
-      context: ./filebeat
-      dockerfile: Dockerfile
-      args:
-        ELKF_VERSION: ${ELKF_VERSION:-7.17.0}
-    container_name: filebeat
-    volumes:
-      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - logs:/usr/share/filebeat/logs
-      - certs:/certs
-    depends_on:
-      - logstash
-    networks:
-      - transcendence
-    env_file:
-      - .env
-    restart: unless-stopped
-
 
 volumes:
   frontend:
@@ -316,8 +216,8 @@ volumes:
       type: none
       o: bind
       device: ../volumes/backend/
-  postgres_database:
-    name: postgres_database
+  postgres_data:
+    name: postgres_data
     driver: local
   logs:
     name: logs

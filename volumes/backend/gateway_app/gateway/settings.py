@@ -241,7 +241,7 @@ CHANNEL_LAYERS = {
 
 # Defines a set of host/domain names that Django will accept requests from
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'calcgame', 'gateway', 'authentif', 'profileapi', 'play']
-ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', f'{os.getenv("ACTUALHOSTNAME")}', 'gateway', 'authentif', 'profileapi', 'play', 'calcgame'] # Removing the containers names from host breaks communication between containers
+ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', f'{os.getenv("ACTUALHOSTNAME")}', 'gateway', 'authentif', 'profileapi', 'play', 'calcgame', 'jorge-fernandez-moreno', 'www.jorge-fernandez-moreno.software'] # Removing the containers names from host breaks communication between containers
 
 # Redirect all HTTP traffic to HTTPS
 SECURE_SSL_REDIRECT = True
@@ -261,7 +261,7 @@ SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 
 CORS_ALLOWED_ORIGINS = [ '"https://localhost:8443", "https://localhost:8888"',
-  f'https://{os.getenv("ACTUALHOSTNAME")}:8888' ]
+                        f'https://{os.getenv("ACTUALHOSTNAME")}:8888', 'https://www.jorge-fernandez-moreno.software' ]
 
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'Strict'
